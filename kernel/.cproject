@@ -30,6 +30,9 @@
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.766983484" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1758233369" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">
+								<option id="gnu.c.link.option.libs.93195220" superClass="gnu.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="commons"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.265485821" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -109,4 +112,5 @@
 		</scannerConfigBuildInfo>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope"/>
 </cproject>
