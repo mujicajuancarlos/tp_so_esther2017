@@ -1,0 +1,26 @@
+15:41:55 **** Incremental Build of configuration Debug for project proyectoSO ****
+make all 
+Building file: ../src/Kernel.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/Kernel.d" -MT"src/Kernel.d" -o "src/Kernel.o" "../src/Kernel.c"
+../src/Kernel.c: In function ‘main’:
+../src/Kernel.c:51:45: warning: pointer targets in passing argument 3 of ‘accept’ differ in signedness [-Wpointer-sign]
+   if((newSocket2 = accept(newSocket,(struct sockaddr *)&cliente,&sin_size)) == -1){
+                                             ^
+In file included from ../src/Kernel.c:7:0:
+/usr/include/i386-linux-gnu/sys/socket.h:243:12: note: expected ‘socklen_t * __restrict__’ but argument is of type ‘int *’
+ extern int accept (int __fd, __SOCKADDR_ARG __addr,
+            ^
+Finished building: ../src/Kernel.c
+ 
+Building target: proyectoSO
+Invoking: GCC C Linker
+gcc  -o "proyectoSO"  ./src/Consola.o ./src/Cpu.o ./src/FIleSystem.o ./src/Kernel.o ./src/Memoria.o ./src/proyectoSO.o   
+./src/Kernel.o: En la función `main':
+/home/utnso/tp-2017-1c-Los-5-Fant-sticos/proyectoSO/Debug/../src/Kernel.c:20: definiciones múltiples de `main'
+./src/Consola.o:/home/utnso/tp-2017-1c-Los-5-Fant-sticos/proyectoSO/Debug/../src/Consola.c:20: primero se definió aquí
+collect2: error: ld returned 1 exit status
+make: *** [proyectoSO] Error 1
+
+15:41:55 Build Finished (took 400ms)
+

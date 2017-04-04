@@ -4,12 +4,27 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../src/Consola.c \
+../src/Cpu.c \
+../src/FIleSystem.c \
+../src/Kernel.c \
+../src/Memoria.c \
 ../src/proyectoSO.c 
 
 OBJS += \
+./src/Consola.o \
+./src/Cpu.o \
+./src/FIleSystem.o \
+./src/Kernel.o \
+./src/Memoria.o \
 ./src/proyectoSO.o 
 
 C_DEPS += \
+./src/Consola.d \
+./src/Cpu.d \
+./src/FIleSystem.d \
+./src/Kernel.d \
+./src/Memoria.d \
 ./src/proyectoSO.d 
 
 

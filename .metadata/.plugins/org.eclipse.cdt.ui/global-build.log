@@ -1,0 +1,153 @@
+15:18:51 **** Clean-only build of configuration Debug for project proyectoSO ****
+make clean 
+rm -rf  ./src/proyectoSO.o  ./src/proyectoSO.d  proyectoSO
+ 
+15:18:51 **** Build of configuration Debug for project proyectoSO ****
+make all 
+Building file: ../src/Consola.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/Consola.d" -MT"src/Consola.d" -o "src/Consola.o" "../src/Consola.c"
+Finished building: ../src/Consola.c
+ 
+Building file: ../src/Cpu.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/Cpu.d" -MT"src/Cpu.d" -o "src/Cpu.o" "../src/Cpu.c"
+Finished building: ../src/Cpu.c
+ 
+Building file: ../src/FIleSystem.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/FIleSystem.d" -MT"src/FIleSystem.d" -o "src/FIleSystem.o" "../src/FIleSystem.c"
+Finished building: ../src/FIleSystem.c
+ 
+Building file: ../src/Kernel.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/Kernel.d" -MT"src/Kernel.d" -o "src/Kernel.o" "../src/Kernel.c"
+Finished building: ../src/Kernel.c
+ 
+Building file: ../src/Memoria.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/Memoria.d" -MT"src/Memoria.d" -o "src/Memoria.o" "../src/Memoria.c"
+Finished building: ../src/Memoria.c
+ 
+Building file: ../src/proyectoSO.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/proyectoSO.d" -MT"src/proyectoSO.d" -o "src/proyectoSO.o" "../src/proyectoSO.c"
+Finished building: ../src/proyectoSO.c
+ 
+Building target: proyectoSO
+Invoking: GCC C Linker
+gcc  -o "proyectoSO"  ./src/Consola.o ./src/Cpu.o ./src/FIleSystem.o ./src/Kernel.o ./src/Memoria.o ./src/proyectoSO.o   
+Finished building target: proyectoSO
+ 
+15:20:55 **** Incremental Build of configuration Debug for project proyectoSO ****
+make all 
+Building file: ../src/Kernel.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/Kernel.d" -MT"src/Kernel.d" -o "src/Kernel.o" "../src/Kernel.c"
+../src/Kernel.c: In function ‘main’:
+../src/Kernel.c:67:1: warning: control reaches end of non-void function [-Wreturn-type]
+ }
+ ^
+Finished building: ../src/Kernel.c
+ 
+Building target: proyectoSO
+Invoking: GCC C Linker
+gcc  -o "proyectoSO"  ./src/Consola.o ./src/Cpu.o ./src/FIleSystem.o ./src/Kernel.o ./src/Memoria.o ./src/proyectoSO.o   
+./src/proyectoSO.o: En la función `main':
+/home/utnso/tp-2017-1c-Los-5-Fant-sticos/proyectoSO/Debug/../src/proyectoSO.c:14: definiciones múltiples de `main'
+./src/Kernel.o:/home/utnso/tp-2017-1c-Los-5-Fant-sticos/proyectoSO/Debug/../src/Kernel.c:20: primero se definió aquí
+collect2: error: ld returned 1 exit status
+make: *** [proyectoSO] Error 1
+15:27:35 **** Incremental Build of configuration Debug for project proyectoSO ****
+make all 
+Building file: ../src/Consola.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/Consola.d" -MT"src/Consola.d" -o "src/Consola.o" "../src/Consola.c"
+../src/Consola.c: In function ‘main’:
+../src/Consola.c:67:1: warning: control reaches end of non-void function [-Wreturn-type]
+ }
+ ^
+Finished building: ../src/Consola.c
+ 
+Building file: ../src/Kernel.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/Kernel.d" -MT"src/Kernel.d" -o "src/Kernel.o" "../src/Kernel.c"
+../src/Kernel.c: In function ‘main’:
+../src/Kernel.c:51:45: warning: pointer targets in passing argument 3 of ‘accept’ differ in signedness [-Wpointer-sign]
+   if((newSocket2 = accept(newSocket,(struct sockaddr *)&cliente,&sin_size)) == -1){
+                                             ^
+In file included from ../src/Kernel.c:7:0:
+/usr/include/i386-linux-gnu/sys/socket.h:243:12: note: expected ‘socklen_t * __restrict__’ but argument is of type ‘int *’
+ extern int accept (int __fd, __SOCKADDR_ARG __addr,
+            ^
+Finished building: ../src/Kernel.c
+ 
+Building file: ../src/proyectoSO.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/proyectoSO.d" -MT"src/proyectoSO.d" -o "src/proyectoSO.o" "../src/proyectoSO.c"
+../src/proyectoSO.c:15:29: warning: "/*" within comment [-Wcomment]
+  puts("!!!Hello World!!!"); /* prints !!!Hello World!!!
+ ^
+Finished building: ../src/proyectoSO.c
+ 
+Building target: proyectoSO
+Invoking: GCC C Linker
+gcc  -o "proyectoSO"  ./src/Consola.o ./src/Cpu.o ./src/FIleSystem.o ./src/Kernel.o ./src/Memoria.o ./src/proyectoSO.o   
+./src/Kernel.o: En la función `main':
+/home/utnso/tp-2017-1c-Los-5-Fant-sticos/proyectoSO/Debug/../src/Kernel.c:20: definiciones múltiples de `main'
+./src/Consola.o:/home/utnso/tp-2017-1c-Los-5-Fant-sticos/proyectoSO/Debug/../src/Consola.c:20: primero se definió aquí
+collect2: error: ld returned 1 exit status
+make: *** [proyectoSO] Error 1
+15:27:53 **** Incremental Build of configuration Debug for project proyectoSO ****
+make all 
+Building target: proyectoSO
+Invoking: GCC C Linker
+gcc  -o "proyectoSO"  ./src/Consola.o ./src/Cpu.o ./src/FIleSystem.o ./src/Kernel.o ./src/Memoria.o ./src/proyectoSO.o   
+./src/Kernel.o: En la función `main':
+/home/utnso/tp-2017-1c-Los-5-Fant-sticos/proyectoSO/Debug/../src/Kernel.c:20: definiciones múltiples de `main'
+./src/Consola.o:/home/utnso/tp-2017-1c-Los-5-Fant-sticos/proyectoSO/Debug/../src/Consola.c:20: primero se definió aquí
+collect2: error: ld returned 1 exit status
+make: *** [proyectoSO] Error 1
+15:28:54 **** Incremental Build of configuration Debug for project proyectoSO ****
+make all 
+Building target: proyectoSO
+Invoking: GCC C Linker
+gcc  -o "proyectoSO"  ./src/Consola.o ./src/Cpu.o ./src/FIleSystem.o ./src/Kernel.o ./src/Memoria.o ./src/proyectoSO.o   
+./src/Kernel.o: En la función `main':
+/home/utnso/tp-2017-1c-Los-5-Fant-sticos/proyectoSO/Debug/../src/Kernel.c:20: definiciones múltiples de `main'
+./src/Consola.o:/home/utnso/tp-2017-1c-Los-5-Fant-sticos/proyectoSO/Debug/../src/Consola.c:20: primero se definió aquí
+collect2: error: ld returned 1 exit status
+make: *** [proyectoSO] Error 1
+15:34:59 **** Build of configuration Debug for project proyectoSO ****
+make all 
+Building target: proyectoSO
+Invoking: GCC C Linker
+gcc  -o "proyectoSO"  ./src/Consola.o ./src/Cpu.o ./src/FIleSystem.o ./src/Kernel.o ./src/Memoria.o ./src/proyectoSO.o   
+./src/Kernel.o: En la función `main':
+/home/utnso/tp-2017-1c-Los-5-Fant-sticos/proyectoSO/Debug/../src/Kernel.c:20: definiciones múltiples de `main'
+./src/Consola.o:/home/utnso/tp-2017-1c-Los-5-Fant-sticos/proyectoSO/Debug/../src/Consola.c:20: primero se definió aquí
+collect2: error: ld returned 1 exit status
+make: *** [proyectoSO] Error 1
+15:41:55 **** Incremental Build of configuration Debug for project proyectoSO ****
+make all 
+Building file: ../src/Kernel.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/Kernel.d" -MT"src/Kernel.d" -o "src/Kernel.o" "../src/Kernel.c"
+../src/Kernel.c: In function ‘main’:
+../src/Kernel.c:51:45: warning: pointer targets in passing argument 3 of ‘accept’ differ in signedness [-Wpointer-sign]
+   if((newSocket2 = accept(newSocket,(struct sockaddr *)&cliente,&sin_size)) == -1){
+                                             ^
+In file included from ../src/Kernel.c:7:0:
+/usr/include/i386-linux-gnu/sys/socket.h:243:12: note: expected ‘socklen_t * __restrict__’ but argument is of type ‘int *’
+ extern int accept (int __fd, __SOCKADDR_ARG __addr,
+            ^
+Finished building: ../src/Kernel.c
+ 
+Building target: proyectoSO
+Invoking: GCC C Linker
+gcc  -o "proyectoSO"  ./src/Consola.o ./src/Cpu.o ./src/FIleSystem.o ./src/Kernel.o ./src/Memoria.o ./src/proyectoSO.o   
+./src/Kernel.o: En la función `main':
+/home/utnso/tp-2017-1c-Los-5-Fant-sticos/proyectoSO/Debug/../src/Kernel.c:20: definiciones múltiples de `main'
+./src/Consola.o:/home/utnso/tp-2017-1c-Los-5-Fant-sticos/proyectoSO/Debug/../src/Consola.c:20: primero se definió aquí
+collect2: error: ld returned 1 exit status
+make: *** [proyectoSO] Error 1

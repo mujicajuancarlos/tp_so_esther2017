@@ -1,5 +1,4 @@
-# include todas las q esten en el servidor ejemplo de beej
-#include <netdb.h>
+# include las mismas que en servidor
 
 #define PUERTO 3550
 #define MAXIMODATOS 30
@@ -16,14 +15,14 @@ struct sockaddr_in servidor;
 
 //ACA VA COMPROBAION DE ERRORES DE LINEA DE COMANDO. DESPUS LOS PASO
 
-if((newSocket=socket(AF_INET(),SOCK_STREAM(),0)) == -1){
+if((newSocket=socket(AF_INET,SOCK_STREAM,0)) == -1){
 
 printf("Error en socket");
 exit(-1);
 }
 
-servidor.sin_family = AF_INET();
-servidor.sin_port = htons (PUERTO);
+servidor.sin_family = AF_INET;
+servidor.sin_port = htons (PUERTO);//aca puse 0
 servidor.sin_addr = *((struct in_addr *)he->h_addr);
 bzero(&(servidor.sin_zero),8);
 
