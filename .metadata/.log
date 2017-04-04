@@ -1092,3 +1092,18 @@ Binding(CTRL+SHIFT+H,
 !MESSAGE Save operation warnings.
 !SUBENTRY 1 org.eclipse.core.resources 2 234 2017-04-04 19:07:25.422
 !MESSAGE The project description file (.project) for 'RemoteSystemsTempFiles' was missing.  This file contains important information about the project.  A new project description file has been created, but some information about the project may have been lost.
+
+!ENTRY org.eclipse.cdt.core 1 0 2017-04-04 19:14:49.100
+!MESSAGE Indexed 'CPU' (0 sources, 0 headers) in 0,002 sec: 0 declarations; 0 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2017-04-04 19:15:35.615
+!MESSAGE Indexed 'MEMO' (0 sources, 0 headers) in 0,001 sec: 0 declarations; 0 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2017-04-04 19:17:00.254
+!MESSAGE Indexed 'FileSystem' (0 sources, 0 headers) in 0,001 sec: 0 declarations; 0 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2017-04-04 19:18:25.836
+!MESSAGE Indexed 'CONSOLE' (1 sources, 1 headers) in 0,019 sec: 0 declarations; 2 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2017-04-04 19:18:55.256
+!MESSAGE Indexed 'KERNEL (Svr)' (0 sources, 1 headers) in 0,071 sec: 0 declarations; 1 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
