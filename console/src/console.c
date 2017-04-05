@@ -7,11 +7,15 @@
  Description : Hello World in C, Ansi-style
  ============================================================================
  */
+#include "console.h"
+#include "configuration.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+int main(int argc, char *argv[]) {
 
-int main(void) {
-	puts("!!!Hello World!!!"); /* prints !!!Hello World!!! */
+	puts("Accediendo al archivo de configuracion");
+	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
+
+	printf("IP_KERNEL= %d\nPUERTO_KERNEL = %d\n",config->ip_kernel,config->puerto_kernel);
+
 	return EXIT_SUCCESS;
 }
