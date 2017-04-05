@@ -65,8 +65,7 @@ typedef struct Configuration {
 } Configuration;
 
 Configuration* config;
-char* config_dir;
-char* config_file_name;
+char* config_file;
 
 /**
  * Crea la configuracion y la devuelve

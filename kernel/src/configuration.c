@@ -9,6 +9,8 @@
 
 Configuration* config_with(char *config_file) {
 
+	config_file = DEFAULT_CONFIG_PATH;
+
 	Configuration* config = malloc(sizeof(Configuration));
 
 	t_config* nConfig = config_create(
