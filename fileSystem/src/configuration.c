@@ -24,21 +24,13 @@ Configuration* config_with(char *config_file) {
 		}
 	}
 
-	config->puerto_program = config_get_int_value(nConfig, PUERTO_PROG);
-	config->puerto_cpu = config_get_int_value(nConfig, PUERTO_CPU);
-	config->ip_memoria = strdup(config_get_string_value(nConfig, IP_MEMORIA));
-	config->puerto_memoria = config_get_int_value(nConfig, PUERTO_MEMORIA);
-	config->ip_fs = strdup(config_get_string_value(nConfig, IP_FS));
-	config->puerto_fs = config_get_int_value(nConfig, PUERTO_FS);
-	config->quantum = config_get_int_value(nConfig, QUANTUM);
-	config->quantum_sleep = config_get_int_value(nConfig, QUANTUM_SLEEP);
-	config->algoritmo = strdup(config_get_string_value(nConfig, ALGORITMO));
-	config->grado_multiprog = config_get_int_value(nConfig, GRADO_MULTIPROG);
-//	config->sem_ids
-//	config->sem_init
-//	config->shared_vars
-	config->stack_size = config_get_int_value(nConfig, STACK_SIZE);
-
+	config->tamanio_bloques = config_get_int_value(nConfig, TAMANIO_BLOQUES);
+	config->cantidad_bloques = config_get_int_value(nConfig, CANTIDAD_BLOQUES);
+	config->magic_number = strdup(config_get_string_value(nConfig, MAGIC_NUMBER));
+	//	config->bloques
+	config->tamanio = config_get_int_value(nConfig, TAMANIO);
+	config->puerto = config_get_int_value(nConfig, PUERTO);
+	config->punto_montaje = strdup(config_get_string_value(nConfig, PUNTO_MONTAJE));
 	//configuracion de log
 	config->log_level = strdup(config_get_string_value(nConfig, LOG_LEVEL));
 	config->log_file = strdup(config_get_string_value(nConfig, LOG_FILE));

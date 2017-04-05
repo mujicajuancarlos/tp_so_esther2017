@@ -20,23 +20,16 @@
 #include <commons/log.h>
 
 //configuration file keys
-#define DEFAULT_CONFIG_PATH "../kernel.conf"
-#define ECLIPSE_CONFIG_PATH "kernel.conf"
+#define DEFAULT_CONFIG_PATH "../fileSystem.conf"
+#define ECLIPSE_CONFIG_PATH "fileSystem.conf"
 //process keys
-#define PUERTO_PROG "PUERTO_PROG"
-#define PUERTO_CPU "PUERTO_CPU"
-#define IP_MEMORIA "IP_MEMORIA"
-#define PUERTO_MEMORIA "PUERTO_MEMORIA"
-#define IP_FS "IP_FS"
-#define PUERTO_FS "PUERTO_FS"
-#define QUANTUM "QUANTUM"
-#define QUANTUM_SLEEP "QUANTUM_SLEEP"
-#define ALGORITMO "ALGORITMO"
-#define GRADO_MULTIPROG "GRADO_MULTIPROG"
-#define SEM_IDS "SEM_IDS"
-#define SEM_INIT "SEM_INIT"
-#define SHARED_VARS "SHARED_VARS"
-#define STACK_SIZE "STACK_SIZE"
+#define TAMANIO_BLOQUES "TAMANIO_BLOQUES"
+#define CANTIDAD_BLOQUES "CANTIDAD_BLOQUES"
+#define MAGIC_NUMBER "MAGIC_NUMBER"
+#define TAMANIO "TAMANIO"
+#define BLOQUES "BLOQUES"
+#define PUERTO "PUERTO"
+#define PUNTO_MONTAJE "PUNTO_MONTAJE"
 //log keys
 #define LOG_LEVEL "LOG_LEVEL"
 #define LOG_FILE "LOG_FILE"
@@ -44,20 +37,13 @@
 #define LOG_PRINT_CONSOLE "LOG_PRINT_CONSOLE"
 
 typedef struct Configuration {
-	int puerto_program;
-	int puerto_cpu;
-	char* ip_memoria;
-	int puerto_memoria;
-	char* ip_fs;
-	int puerto_fs;
-	int quantum;
-	int quantum_sleep;
-	char* algoritmo;
-	int grado_multiprog;
-	char** sem_ids;
-	int* sem_init;
-	char** shared_vars;
-	int stack_size;
+	int tamanio_bloques;
+	int cantidad_bloques;
+	char* magic_number;
+	int tamanio;
+	int* bloques;
+	int puerto;
+	char* punto_montaje;
 	char* log_level;
 	char* log_file;
 	char* log_program_name;
