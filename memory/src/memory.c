@@ -14,13 +14,14 @@
 
 int main(int argc, char *argv[]) {
 
-	puts("Accediendo al archivo de configuracion");
+	puts("Accediendo al archivo de configuración...");
 	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
 
-	printf("PUERTO= %d\nMARCOS = %d\nMARCO_SIZE= %d\nENTRADAS_CACHE= %d\nCACHE_X_PROCESO= %d\nREEMPLAZO_CACHE= %s\nRETARDO_MEMORIA= %d\n"
+	puts("Configuración del proceso:");
+	printf("\nPUERTO= %d\nMARCOS = %d\nMARCO_SIZE= %d\nENTRADAS_CACHE= %d\nCACHE_X_PROCESO= %d\nREEMPLAZO_CACHE= %s\nRETARDO_MEMORIA= %d\n\n"
 			,config->puerto,config->marcos,config->marco_size,config->entradas_cache,config->cache_x_proceso,config->reemplazo_cache,config->retardo_memoria);
 
-	puts("Creando el logger memory.log");
+	puts("Creando el logger memory.log ...");
 			t_log* logger = log_create(config->log_file, config->log_program_name, config->log_print_console, log_level_from_string(config->log_level));
 
 	log_info(logger, "Inició el proceso correctamente!");
