@@ -5,7 +5,7 @@
  *      Author: utnso
  */
 
-#include "Kernel-main.h"
+#include "conf.h"
 #include <commons/config.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,16 +13,19 @@
 #include <sys/stat.h>
 
 
-#define PATH_ARCHIVO_CONFIG "/home/utnso/tp-2017-1c-Los-5-Fant-sticos/Config"
+#define PATH_ARCHIVO_CONFIG "/home/utnso/tp-2017-1c-Los-5-Fant-sticos/archivoConfiguracion"
 #define BUFER_MAX_LEN 2048
 #define FILE_MAX 1024
+
 archivoConfiguracion *strConfig;
 
 int main(int argc, char **argv)
 {
 
-	printf ("Si retorna Cero es porque se ejecuto bien %d \n", obtenerArchivoConfiguracion());
-	return 0;
+
+
+printf ("Si retorna Cero es porque se ejecuto bien %d \n", obtenerArchivoConfiguracion());
+return 0;
 }
 
 
@@ -98,22 +101,10 @@ int main(int argc, char **argv)
 		entero = config_get_int_value(archivoConfiguracion,"GRADO_MULTIPROG");
 		strConfig->GRADO_MULTIPROG = entero;
 
-		if ( aux == NULL )
-			{
-				return -1;
-			}
 //declaracion de array
 
 
-		array = config_get_double_value(archivoConfiguracion, "SEM_IDS");
-		strConfig->SEM_IDS = array;
 
-
-		array = config_get_double_value(archivoConfiguracion, "SEM_INIT");
-		strConfig->SEM_INIT = array;
-
-		array = config_get_double_value(archivoConfiguracion, "SHARED_VARS");
-		strConfig->SHARED_VARS = array;
 
 		entero = config_get_int_value(archivoConfiguracion,"STACK_SIZE");
 		strConfig->STACK_SIZE = entero;
@@ -123,5 +114,7 @@ int main(int argc, char **argv)
 
 		return 0;
 	}
+
+
 
 
