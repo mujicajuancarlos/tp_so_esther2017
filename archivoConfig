@@ -1,0 +1,127 @@
+* Kernel-main.c
+
+ *
+ *  Created on: 4/4/2017
+ *      Author: utnso
+ */
+
+#include "Kernel-main.h"
+#include <commons/config.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+
+
+#define PATH_ARCHIVO_CONFIG "/home/utnso/tp-2017-1c-Los-5-Fant-sticos/Config"
+#define BUFER_MAX_LEN 2048
+#define FILE_MAX 1024
+archivoConfiguracion *strConfig;
+
+int main(int argc, char **argv)
+{
+
+	printf ("Si retorna Cero es porque se ejecuto bien %d \n", obtenerArchivoConfiguracion());
+	return 0;
+}
+
+
+	int obtenerArchivoConfiguracion(char* nombre, char* path)
+	{
+		t_config *archivoConfiguracion = malloc(sizeof(t_config));
+
+		//strConfig = malloc(sizeof(tConfig));
+
+		char path_file[FILE_MAX];
+		memset(path_file, '\0', FILE_MAX);
+		strcpy(path_file, PATH_ARCHIVO_CONFIG);//Copio el contenido de la ruta paara pasarle por parametro a config_create (commons)
+
+
+		char* aux;
+		int entero;
+		int array;
+
+		archivoConfiguracion = config_create(path_file);
+
+		aux=(char*)malloc (BUFER_MAX_LEN);//EN ESTA VAR VOY OBTENIENDO LOS VALORES DEL ARCHIVO
+		memset(aux,'\0', BUFER_MAX_LEN);
+
+		if ( archivoConfiguracion == NULL )
+		{
+			return -1;
+		}
+		entero = config_get_int_value(archivoConfiguracion,"PUERTO_PROG");
+		strConfig->PUERTO_PROG = entero;
+
+		entero = config_get_int_value(archivoConfiguracion,"PUERTO_CPU");
+		strConfig->PUERTO_CPU = entero;
+
+		if ( aux == NULL )
+				{
+					return -1;
+				}
+
+		aux = config_get_string_value(archivoConfiguracion, "IP_MEMORIA");
+		strcpy((strConfig->IP_MEMORIA), aux);
+
+
+		entero = config_get_int_value(archivoConfiguracion,"PUERTO_MEMORIA");
+		strConfig->PUERTO_MEMORIA = entero;
+
+
+		if ( aux == NULL )
+			{
+				return -1;
+			}
+
+		aux = config_get_string_value(archivoConfiguracion, "IP_FS");
+		strcpy((strConfig->IP_FS), aux);
+
+
+		entero = config_get_int_value(archivoConfiguracion,"PUERTO_FS");
+		strConfig->PUERTO_FS = entero;
+
+		entero = config_get_int_value(archivoConfiguracion,"QUANTUM");
+		strConfig->QUANTUM = entero;
+
+		entero = config_get_int_value(archivoConfiguracion,"QUANTUM_SLEEP");
+		strConfig->QUANTUM_SLEEP = entero;
+
+		if ( aux == NULL )
+			{
+				return -1;
+			}
+
+		aux = config_get_string_value(archivoConfiguracion, "ALGORITMO");
+		strcpy((strConfig->ALGORITMO), aux);
+
+		entero = config_get_int_value(archivoConfiguracion,"GRADO_MULTIPROG");
+		strConfig->GRADO_MULTIPROG = entero;
+
+		if ( aux == NULL )
+			{
+				return -1;
+			}
+//declaracion de array
+
+
+		array = config_get_double_value(archivoConfiguracion, "SEM_IDS");
+		strConfig->SEM_IDS = array;
+
+
+		array = config_get_double_value(archivoConfiguracion, "SEM_INIT");
+		strConfig->SEM_INIT = array;
+
+		array = config_get_double_value(archivoConfiguracion, "SHARED_VARS");
+		strConfig->SHARED_VARS = array;
+
+		entero = config_get_int_value(archivoConfiguracion,"STACK_SIZE");
+		strConfig->STACK_SIZE = entero;
+
+
+		config_destroy(archivoConfiguracion);
+
+		return 0;
+	}
+
+
