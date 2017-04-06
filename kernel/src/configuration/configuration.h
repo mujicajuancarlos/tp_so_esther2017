@@ -5,8 +5,8 @@
  *      Author: utnso
  */
 
-#ifndef CONFIGURATION_H_
-#define CONFIGURATION_H_
+#ifndef CONFIGURATION_CONFIGURATION_H_
+#define CONFIGURATION_CONFIGURATION_H_
 
 //import standart library
 #include <stdio.h>
@@ -77,4 +77,4 @@ Configuration* config_with(char *config_file);
  */
 Configuration* getConfiguration();
 
-#endif /* CONFIGURATION_H_ */
+#endif /* CONFIGURATION_CONFIGURATION_H_ */

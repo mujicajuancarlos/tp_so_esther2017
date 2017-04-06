@@ -10,7 +10,8 @@
 
 
 #include "kernel.h"
-#include "configuration.h"
+#include "configuration/configuration.h"
+#include "socket/socket.h"
 
 int main(int argc, char *argv[]) {
 
@@ -21,6 +22,10 @@ int main(int argc, char *argv[]) {
 	t_log* logger = log_create(config->log_file, config->log_program_name, config->log_print_console, log_level_from_string(config->log_level));
 
 	log_info(logger, "Inició el proceso correctamente!");
+
+	crearSockets(config);
+
+	for(;;);//loop infinito para que el socket quede escuchando
 
 	return EXIT_SUCCESS;
 }
