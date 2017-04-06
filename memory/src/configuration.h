@@ -5,8 +5,8 @@
  *      Author: utnso
  */
 
-#ifndef CONFIGURATION_MEMORY_H_
-#define CONFIGURATION_MEMORY_H_
+#ifndef CONFIGURATION_H_
+#define CONFIGURATION_H_
 
 //import standart library
 #include <stdio.h>
@@ -19,8 +19,8 @@
 #include <commons/log.h>
 
 //keys de configuracion
-#define DEFAULT_CONFIG_PATH "../config_memory.txt"
-#define ECLIPSE_CONFIG_PATH "config_memory.txt"
+#define DEFAULT_CONFIG_PATH "../memory.conf"
+#define ECLIPSE_CONFIG_PATH "memory.conf"
 #define PUERTO "PUERTO"
 #define MARCOS "MARCOS"
 #define MARCO_SIZE "MARCO_SIZE"
@@ -28,6 +28,11 @@
 #define CACHE_X_PROC "CACHE_X_PROC"
 #define REEMPLAZO_CACHE "REEMPLAZO_CACHE"
 #define RETARDO_MEMORIA "RETARDO_MEMORIA"
+//log keys
+#define LOG_LEVEL "LOG_LEVEL"
+#define LOG_FILE "LOG_FILE"
+#define LOG_PROGRAM_NAME "LOG_PROGRAM_NAME"
+#define LOG_PRINT_CONSOLE "LOG_PRINT_CONSOLE"
 
 typedef struct Configuration {
 	int puerto;
@@ -37,11 +42,24 @@ typedef struct Configuration {
 	int cache_x_proceso;
 	char* reemplazo_cache;
 	int retardo_memoria;
+	char* log_level;
+	char* log_file;
+	char* log_program_name;
+	int log_print_console;
 } Configuration;
 
 Configuration* config;
 char* config_dir;
 char* config_file_name;
 
+/**
+ * Crea la configuracion y la devuelve
+ */
+Configuration* config_with(char *config_file);
 
-#endif /* CONFIGURATION_MEMORY_H_ */
+/**
+ * devuelve la configuracion
+ */
+Configuration* getConfiguration();
+
+#endif /* CONFIGURATION_H_ */

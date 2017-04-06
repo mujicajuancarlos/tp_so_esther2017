@@ -17,5 +17,10 @@ int main(int argc, char *argv[]) {
 
 	printf("IP_KERNEL= %d\nPUERTO_KERNEL = %d\n",config->ip_kernel,config->puerto_kernel);
 
+	puts("Creando el logger console.log");
+		t_log* logger = log_create(config->log_file, config->log_program_name, config->log_print_console, log_level_from_string(config->log_level));
+
+	log_info(logger, "Inició el proceso correctamente!");
+
 	return EXIT_SUCCESS;
 }

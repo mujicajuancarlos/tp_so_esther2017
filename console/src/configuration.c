@@ -24,6 +24,14 @@ Configuration* config_with(char *config_file){
 	config->ip_kernel=config_get_int_value(nConfig,IP_KERNEL);
 	config->puerto_kernel=config_get_int_value(nConfig,PUERTO_KERNEL);
 
+	//configuracion de log
+		config->log_level = strdup(config_get_string_value(nConfig, LOG_LEVEL));
+		config->log_file = strdup(config_get_string_value(nConfig, LOG_FILE));
+		config->log_program_name = strdup(
+				config_get_string_value(nConfig, LOG_PROGRAM_NAME));
+		config->log_print_console = config_get_int_value(nConfig,
+		LOG_PRINT_CONSOLE);
+
 	config_destroy(nConfig);
 
 	return config;

@@ -5,7 +5,7 @@
  *      Author: utnso
  */
 
-#include "configuration_memory.h"
+#include "configuration.h"
 
 Configuration* config_with(char *config_file){
 
@@ -28,6 +28,14 @@ Configuration* config_with(char *config_file){
 	config->cache_x_proceso = config_get_int_value(nConfig,CACHE_X_PROC);
 	config->reemplazo_cache = strdup(config_get_string_value(nConfig,REEMPLAZO_CACHE));
 	config->retardo_memoria = config_get_int_value(nConfig,RETARDO_MEMORIA);
+
+	//configuracion de log
+		config->log_level = strdup(config_get_string_value(nConfig, LOG_LEVEL));
+		config->log_file = strdup(config_get_string_value(nConfig, LOG_FILE));
+		config->log_program_name = strdup(
+				config_get_string_value(nConfig, LOG_PROGRAM_NAME));
+		config->log_print_console = config_get_int_value(nConfig,
+		LOG_PRINT_CONSOLE);
 
 	config_destroy(nConfig);
 
