@@ -23,6 +23,10 @@ Configuration* config_with(char *config_file){
 		}
 	}
 
+	config->ip_memoria=config_get_int_value(nConfig,IP_MEMORIA);
+	config->puerto_memoria=config_get_int_value(nConfig,PUERTO_MEMORIA);
+
+	//Configuración del log
 	config->log_level = strdup(config_get_string_value(nConfig, LOG_LEVEL));
 	config->log_file = strdup(config_get_string_value(nConfig, LOG_FILE));
 	config->log_program_name = strdup(config_get_string_value(nConfig, LOG_PROGRAM_NAME));
