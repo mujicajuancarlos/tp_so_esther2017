@@ -8,7 +8,8 @@
  ============================================================================
  */
 #include "console.h"
-#include "configuration.h"
+#include "configuration/configuration.h"
+#include "socket.h"
 
 int main(int argc, char *argv[]) {
 
