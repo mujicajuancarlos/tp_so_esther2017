@@ -21,8 +21,8 @@
 //keys de configuracion
 #define DEFAULT_CONFIG_PATH "../cpu.conf"
 #define ECLIPSE_CONFIG_PATH "cpu.conf"
-#define ip_memoria "ip_memoria"
-#define puerto_memoria "puerto_memoria"
+#define IP_MEMORIA "IP_MEMORIA"
+#define PUERTO_MEMORIA "PUERTO_MEMORIA"
 
 //log keys
 #define LOG_LEVEL "LOG_LEVEL"
