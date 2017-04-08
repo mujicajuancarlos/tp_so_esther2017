@@ -5,23 +5,29 @@
  *      Author: utnso
  */
 #include "socket.h"
-void crearSocket(Configuration* config){
+int crearSocketCliente(char* ip,int puerto){
 
 
 	/*creo y completo estructura para el connect */
 	struct sockaddr_in direccionServidor;
 	direccionServidor.sin_family = AF_INET;
-	direccionServidor.sin_addr.s_addr = inet_addr(config->ip_kernel);
-	direccionServidor.sin_port = htons(config->puerto_kernel);
+	direccionServidor.sin_addr.s_addr = inet_addr(ip);
+	direccionServidor.sin_port = htons(puerto);
 	memset(&(direccionServidor.sin_zero), '\0', 8);
 
 	/* socket y connect */
 
 	int socketCreado = socket(AF_INET,SOCK_STREAM,0);
+	if(socketCreado == -1){
+		puts("error al crear socket");
+	}
 
-	connect(socketCreado, (struct sockaddr *)& direccionServidor,sizeof(struct sockaddr_in));
+	int conectando = connect(socketCreado, (struct sockaddr *)& direccionServidor,sizeof(struct sockaddr_in));
+	if(conectando == -1){
+		puts("error en el connect");
+	}
 
-	return;
+	return socketCreado;
 
 }
 

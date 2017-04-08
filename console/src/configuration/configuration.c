@@ -21,7 +21,7 @@ Configuration* config_with(char *config_file){
 		}
 	}
 
-	config->ip_kernel=config_get_int_value(nConfig,IP_KERNEL);
+	config->ip_kernel=strdup(config_get_string_value(nConfig,IP_KERNEL));
 	config->puerto_kernel=config_get_int_value(nConfig,PUERTO_KERNEL);
 
 	//configuracion de log

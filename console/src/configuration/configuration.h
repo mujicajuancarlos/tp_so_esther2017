@@ -30,7 +30,7 @@
 #define LOG_PRINT_CONSOLE "LOG_PRINT_CONSOLE"
 
 typedef struct Configuration {
-	int ip_kernel;
+	char* ip_kernel;
 	int puerto_kernel;
 	char* log_level;
 	char* log_file;

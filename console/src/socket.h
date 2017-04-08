@@ -17,6 +17,6 @@
 #include "configuration/configuration.h"
 
 
-void crearSocket(Configuration* config);
+int crearSocketCliente(char* ip,int puerto);
 
 #endif /* SOCKET_H_ */
