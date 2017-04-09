@@ -9,35 +9,64 @@
 
 void crearConexiones(Configuration *config){
 
-	int socketDesc, binder, listener, new_descriptor;
+	int listenerfd, binder, listener, new_descriptor;
 	struct sockaddr_in my_addr, remote_addr;
+	char *msg = "Hola conexión nueva";
 
-	socketDesc = socket(AF_INET, SOCK_STREAM, 0);
+	//creo el socket escucha
+	listenerfd = socket(AF_INET, SOCK_STREAM, 0);
+
+	if (listenerfd == -1){
+		puts("Error en la creación del socket");//
+	}
+
+	//Asocio el socket escucha a su puerto
+	bind_port(listenerfd,config->puerto);
+
+	//Escucho clientes
+	if(listen(listenerfd,100) == -1){
+		puts("No se puede escuchar en ese puerto (Intente en otro) \n");
+	}
+
+	puts("Se enlazó al puerto");
+
+	while(1){
+
+		struct sockaddr_in cliente;
+		int *addrlen = sizeof(cliente);
+
+		puts("Esperando al cliente...");
+		int accepted = accept(listenerfd, (struct sockaddr *)&cliente, &addrlen);
+		if(accepted == -1){
+			puts("No se puede conectar con el socket aceptado");
+		}
+		puts("Atendiendo al cliente...");
+		send(accepted,msg,sizeof(msg),0);
+		close(accepted);
+
+	}
+
+	return ;
+}
+
+void bind_port(int sockfd, int puerto){
+
+	struct sockaddr_in my_addr;
+
 	my_addr.sin_family = AF_INET;
-	my_addr.sin_port = 0;
-	my_addr.sin_addr.s_addr = INADDR_ANY;
+	my_addr.sin_port = htons(puerto);
+	my_addr.sin_addr.s_addr = INADDR_ANY; //INADDR_ANY usa mi dirección IP
 	memset(&(my_addr.sin_zero), '\0', 8);
 
-	if (socketDesc == -1){
-		puts("Error en la creación del socket");
+	int reuse = 1;
+	if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (char *)&reuse, sizeof(int)) == -1){
+		puts("No es posible reutilizar el socket \n");
 	}
 
-	binder = bind(socketDesc, (struct sockaddr *)&my_addr, sizeof(struct sockaddr));
+	int binder = bind(sockfd,(struct sockaddr *)&my_addr, sizeof(struct sockaddr));
 
 	if (binder == -1){
-		puts("Error al asociar el proceso a un puerto");
+		puts("Error al asociar el proceso a ese puerto"); //
 	}
 
-	listener = listen(socketDesc,10);
-
-	if (listener == -1){
-		puts("Error al esperar conexiones de entrada");
-	}
-
-	int sin_size = sizeof(struct sockaddr_in);
-	new_descriptor = accept(socketDesc, (struct sockaddr *)&remote_addr, &sin_size);
-
-	if (new_descriptor == -1){
-		puts("Error al crear receptor de llamadas");
-	}
 }
