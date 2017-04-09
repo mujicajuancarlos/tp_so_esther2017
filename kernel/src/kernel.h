@@ -18,11 +18,21 @@
 #include <commons/log.h>
 //sockets
 #include <sys/socket.h>
+//configuracion
+#include "configuration/configuration.h"
 
 /**
  * DEFINICION DE ESTRUCTURAS
  */
 
+//estructura princial del kernel
+typedef struct kernel_struct {
+    int socketServerCPU;
+    int socketServerConsola;
+    t_list* listaCPUs;
+    t_log* logger;
+    Configuration* config;
+} kernel_struct;
 
 /**
  * DEFINICION DE FUNCIONES
