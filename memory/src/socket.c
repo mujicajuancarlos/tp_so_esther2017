@@ -9,8 +9,8 @@
 
 void crearConexiones(Configuration *config){
 
-	int socketDesc, binder;
-	struct sockaddr_in my_addr;
+	int socketDesc, binder, listener, new_descriptor;
+	struct sockaddr_in my_addr, remote_addr;
 
 	socketDesc = socket(AF_INET, SOCK_STREAM, 0);
 	my_addr.sin_family = AF_INET;
@@ -25,8 +25,19 @@ void crearConexiones(Configuration *config){
 	binder = bind(socketDesc, (struct sockaddr *)my_addr, sizeof(struct sockaddr));
 
 	if (binder == -1){
-		puts("Error al asociar el proceso en un puerto");
+		puts("Error al asociar el proceso a un puerto");
 	}
 
+	listener = listen(socketDesc,10);
 
+	if (listener == -1){
+		puts("Error al esperar conexiones de entrada");
+	}
+
+	int sin_size = sizeof(struct sockaddr_in);
+	new_descriptor = accept(socketDesc, (struct sockaddr *)&remote_addr, &sin_size);
+
+	if (new_descriptor == -1){
+		puts("Error al crear receptor de llamadas");
+	}
 }
