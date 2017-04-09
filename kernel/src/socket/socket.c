@@ -16,18 +16,18 @@ void crearSockets(kernel_struct *args) {
 	//server socket para atender los pedidos de la consola
 	args->socketServerConsola = abrirSocketInetServer(server_ip, args->config->puerto_program);
 	if (args->socketServerConsola == -1){
-		log_error(args->logger,"No se pudo crear el server para las consolas");
+		logError("No se pudo crear el server para las consolas");
 		exit(-1);
 	}
-	log_info(args->logger, "Server Socket de consolas esta escuchando");
+	logInfo("Server Socket de consolas esta escuchando");
 
 	//server socket para atender los pedidos del cpu
 	args->socketServerCPU = abrirSocketInetServer(server_ip, args->config->puerto_cpu);
 	if (args->socketServerCPU == -1) {
-		log_error(args->logger,"No se pudo crear el server para cpu's");
+		logError("No se pudo crear el server para cpu's");
 		exit(-1);
 	}
-	log_info(args->logger,"Server Socket de cpu's esta escuchando");
+	logInfo("Server Socket de cpu's esta escuchando");
 }
 
 /**

@@ -20,6 +20,7 @@
 #include <sys/socket.h>
 //configuracion
 #include "configuration/configuration.h"
+#include "log/logger.h"
 
 /**
  * DEFINICION DE ESTRUCTURAS
@@ -30,7 +31,6 @@ typedef struct kernel_struct {
     int socketServerCPU;
     int socketServerConsola;
     t_list* listaCPUs;
-    t_log* logger;
     Configuration* config;
 } kernel_struct;
 
