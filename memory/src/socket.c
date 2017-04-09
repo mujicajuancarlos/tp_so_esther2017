@@ -22,7 +22,7 @@ void crearConexiones(Configuration *config){
 		puts("Error en la creación del socket");
 	}
 
-	binder = bind(socketDesc, (struct sockaddr *)my_addr, sizeof(struct sockaddr));
+	binder = bind(socketDesc, (struct sockaddr *)&my_addr, sizeof(struct sockaddr));
 
 	if (binder == -1){
 		puts("Error al asociar el proceso a un puerto");
