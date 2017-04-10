@@ -7,31 +7,23 @@
 
 #include "socket.h"
 
-void crearConexiones(Configuration *config){
+int conectarAMemory(ip, puerto){
 
-	char *msg = "Me estás escuchando?"
-	int socketDesc, conexion, leng, bytes_sent;
+	int socketClient, connector;
 	struct sockaddr_in direccionServerMemoria;
-	socketDesc = socket(AF_INET, SOCK_STREAM, 0);
+
+
 	direccionServerMemoria.sin_family = AF_INET;
-	direccionServerMemoria.sin_addr.s_addr = inet_addr(config->ip_memoria);
-	direccionServerMemoria.sin_port = htons(config->puerto_memoria);
+	direccionServerMemoria.sin_addr.s_addr = inet_addr(ip);
+	direccionServerMemoria.sin_port = htons(puerto);
 	memset(&(direccionServerMemoria.sin_zero), '\0',8);
 
-	if (socketDesc == -1){
-		puts("Error en la creación del socket");
+	socketClient = socket(AF_INET, SOCK_STREAM, 0);
+
+	connector = connect(socketClient, (void *)&direccionServerMemoria, sizeof(direccionServerMemoria));
+	if ( connector == -1){
+		puts("No se pudo conectar...");
 	}
 
-	conexion = connect(socketDesc, (struct sockaddr *)&direccionServerMemoria, sizeof(struct sockaddr_in));
-	if (conexion == -1){
-		puts("No se pudo conectar con la Memoria");
-	}
-
-	leng = strlen(msg);
-	bytes_sent = send(socketDesc, msg, leng, 0);
-
-	if(bytes_sent > 0){
-		puts("Enviando datos...");
-	}
-	return;
+	return connector;
 }

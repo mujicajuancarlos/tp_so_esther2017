@@ -8,6 +8,7 @@
 #ifndef SOCKET_H_
 #define SOCKET_H_
 
+#include <string.h>
 #include <stdio.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>

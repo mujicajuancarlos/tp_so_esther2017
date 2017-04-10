@@ -14,6 +14,9 @@
 
 int main(int argc, char *argv[]) {
 
+	int socketClient;
+	char *msg = "Hola, me escuchas?";
+
 	puts("Accediendo al archivo de configuración...");
 	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
 
@@ -25,7 +28,12 @@ int main(int argc, char *argv[]) {
 	log_info(logger, "Inició el proceso correctamente!");
 
 	puts("Creando conexiones...");
-	crearConexiones(config);
+	socketClient = conectarAMemory(config->ip_memoria,config->puerto_memoria);
+
+	int len = strlen(msg);
+	if(send(socketClient,msg,len,0) == -1){
+		puts("Error en el envio");
+	}
 
 	return EXIT_SUCCESS;
 }

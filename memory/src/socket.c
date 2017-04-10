@@ -33,6 +33,7 @@ void crearConexiones(Configuration *config){
 
 		struct sockaddr_in cliente;
 		int *addrlen = sizeof(cliente);
+		char *buffer = malloc(20);
 
 		puts("Esperando al cliente...");
 		int accepted = accept(listenerfd, (struct sockaddr *)&cliente, &addrlen);
@@ -40,8 +41,17 @@ void crearConexiones(Configuration *config){
 			puts("No se puede conectar con el socket aceptado");
 		}
 		puts("Atendiendo al cliente...");
-		send(accepted,msg,sizeof(msg),0);
+
+		int bytes_recv = recv(accepted, buffer, 20, 0);
+		if (bytes_recv < 0){
+			puts("Error al recibir ");
+		}
+		buffer[bytes_recv]='\0';
+		printf("Me llegaron %d bytes con %s", bytes_recv, buffer);
+
+		printf("%s\n",msg);
 		puts("Te escuché");
+		free(buffer);
 		close(accepted);
 
 	}
