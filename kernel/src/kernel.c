@@ -10,8 +10,8 @@
 
 #include "kernel.h"
 #include "configuration/configuration.h"
-#include "socket/socket.h"
 #include "cpu/cpu.h"
+#include "socket/server.h"
 
 
 

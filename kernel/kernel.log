@@ -187,3 +187,182 @@
 [INFO] 16:31:21:313 ESThER/(26352:26352): Server Socket de consolas esta escuchando
 [INFO] 16:31:21:313 ESThER/(26352:26352): Server Socket de cpu's esta escuchando
 [INFO] 16:31:21:313 ESThER/(26352:26352): Creando el hilo para mantener CPU's
+[INFO] 18:40:12:880 ESThER/(27385:27385): Inicializado proceso kernel
+[INFO] 18:40:12:880 ESThER/(27385:27385): Inicializando lista de cpu
+[INFO] 18:40:12:880 ESThER/(27385:27385): Inicializando sockets
+[INFO] 18:40:12:880 ESThER/(27385:27385): Server Socket de consolas esta escuchando
+[INFO] 18:43:16:44 ESThER/(27385:27385): Server Socket de cpu's esta escuchando
+[INFO] 22:09:42:85 ESThER/(29842:29842): Inicializado proceso kernel
+[INFO] 22:09:46:805 ESThER/(29842:29842): Inicializando lista de cpu
+[INFO] 22:09:54:726 ESThER/(29842:29842): Inicializando sockets
+[INFO] 22:09:58:415 ESThER/(29842:29842): Server Socket de consolas esta escuchando
+[INFO] 22:09:58:415 ESThER/(29842:29842): Server Socket de cpu's esta escuchando
+[INFO] 22:10:12:158 ESThER/(29842:29842): Creando el hilo para mantener CPU's
+[INFO] 22:14:10:382 ESThER/(29842:29862): Esperando nuevas conexiones y mensajes
+[INFO] 22:15:05:715 ESThER/(29842:29862): Llego un nuevo pedido
+[INFO] 22:25:52:839 ESThER/(30249:30249): Inicializado proceso kernel
+[INFO] 22:25:52:839 ESThER/(30249:30249): Inicializando lista de cpu
+[INFO] 22:25:52:839 ESThER/(30249:30249): Inicializando sockets
+[INFO] 22:25:52:839 ESThER/(30249:30249): Server Socket de consolas esta escuchando
+[INFO] 22:25:52:839 ESThER/(30249:30249): Server Socket de cpu's esta escuchando
+[INFO] 22:25:52:839 ESThER/(30249:30249): Creando el hilo para mantener CPU's
+[INFO] 22:25:52:854 ESThER/(30249:30254): Esperando nuevas conexiones y mensajes
+[INFO] 22:26:05:283 ESThER/(30249:30254): Llego un nuevo pedido
+[INFO] 22:31:53:486 ESThER/(30378:30378): Inicializado proceso kernel
+[INFO] 22:31:53:486 ESThER/(30378:30378): Inicializando lista de cpu
+[INFO] 22:31:53:486 ESThER/(30378:30378): Inicializando sockets
+[INFO] 22:31:53:486 ESThER/(30378:30378): Server Socket de consolas esta escuchando
+[INFO] 22:31:53:486 ESThER/(30378:30378): Server Socket de cpu's esta escuchando
+[INFO] 22:31:53:486 ESThER/(30378:30378): Creando el hilo para mantener CPU's
+[INFO] 22:31:53:511 ESThER/(30378:30383): Esperando nuevas conexiones y mensajes
+[INFO] 22:32:44:30 ESThER/(30419:30419): Inicializado proceso kernel
+[INFO] 22:32:44:30 ESThER/(30419:30419): Inicializando lista de cpu
+[INFO] 22:32:44:30 ESThER/(30419:30419): Inicializando sockets
+[INFO] 22:32:44:30 ESThER/(30419:30419): Server Socket de consolas esta escuchando
+[INFO] 22:32:44:30 ESThER/(30419:30419): Server Socket de cpu's esta escuchando
+[INFO] 22:32:44:30 ESThER/(30419:30419): Creando el hilo para mantener CPU's
+[INFO] 22:32:44:47 ESThER/(30419:30425): Esperando nuevas conexiones y mensajes
+[INFO] 22:33:22:594 ESThER/(30419:30425): Llego un nuevo pedido
+[INFO] 22:40:06:996 ESThER/(30582:30582): Inicializado proceso kernel
+[INFO] 22:40:06:996 ESThER/(30582:30582): Inicializando lista de cpu
+[INFO] 22:40:06:996 ESThER/(30582:30582): Inicializando sockets
+[INFO] 22:40:06:996 ESThER/(30582:30582): Server Socket de consolas esta escuchando
+[INFO] 22:40:06:996 ESThER/(30582:30582): Server Socket de cpu's esta escuchando
+[INFO] 22:40:06:996 ESThER/(30582:30582): Creando el hilo para mantener CPU's
+[INFO] 22:40:07:13 ESThER/(30582:30587): Esperando nuevas conexiones y mensajes
+[INFO] 22:40:11:267 ESThER/(30582:30587): Llego un nuevo pedido
+[INFO] 22:41:04:238 ESThER/(30582:30587): Se registro la nueva conexion del server socket 5 en la posicion 0
+[INFO] 22:45:32:124 ESThER/(30712:30712): Inicializado proceso kernel
+[INFO] 22:45:32:124 ESThER/(30712:30712): Inicializando lista de cpu
+[INFO] 22:45:32:124 ESThER/(30712:30712): Inicializando sockets
+[INFO] 22:45:32:124 ESThER/(30712:30712): Server Socket de consolas esta escuchando
+[INFO] 22:45:32:124 ESThER/(30712:30712): Server Socket de cpu's esta escuchando
+[INFO] 22:45:32:124 ESThER/(30712:30712): Creando el hilo para mantener CPU's
+[INFO] 22:45:32:142 ESThER/(30712:30717): Esperando nuevas conexiones y mensajes
+[INFO] 22:45:38:378 ESThER/(30712:30717): Llego un nuevo pedido
+[INFO] 22:45:53:325 ESThER/(30712:30717): Se registro la nueva conexion del server socket 5 en la posicion 0
+[INFO] 22:46:48:123 ESThER/(30712:30717): Se envio la respuesta de conexion para el cliente 6
+[INFO] 22:46:55:160 ESThER/(30712:30717): Esperando nuevas conexiones y mensajes
+[INFO] 22:48:16:440 ESThER/(30806:30806): Inicializado proceso kernel
+[INFO] 22:48:16:441 ESThER/(30806:30806): Inicializando lista de cpu
+[INFO] 22:48:16:441 ESThER/(30806:30806): Inicializando sockets
+[INFO] 22:48:16:441 ESThER/(30806:30806): Server Socket de consolas esta escuchando
+[INFO] 22:48:16:441 ESThER/(30806:30806): Server Socket de cpu's esta escuchando
+[INFO] 22:48:16:441 ESThER/(30806:30806): Creando el hilo para mantener CPU's
+[INFO] 22:48:16:448 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:48:23:453 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:48:23:454 ESThER/(30806:30809): Se registro la nueva conexion del server socket 5 en la posicion 0
+[INFO] 22:48:23:454 ESThER/(30806:30809): Se envio la respuesta de conexion para el cliente 6
+[INFO] 22:48:23:454 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:48:39:12 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:48:47:252 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:48:55:412 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:00:849 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:05:679 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:08:444 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:09:84 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:11:21 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:11:21 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:12:361 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:12:361 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:15:12 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:15:13 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:19:988 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:19:988 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:21:309 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:21:477 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:21:879 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:21:880 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:22:243 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:22:244 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:22:644 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:22:644 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:23:54 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:23:54 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:23:396 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:23:396 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:23:732 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:23:732 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:24:79 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:24:79 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:24:444 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:24:444 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:24:846 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:24:847 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:25:236 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:25:236 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:25:620 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:25:621 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:26:4 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:26:4 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:26:380 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:26:380 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:26:780 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:26:781 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:27:176 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:27:176 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:27:548 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:27:548 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:27:924 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:27:924 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:28:268 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:28:268 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:28:636 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:28:636 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:28:996 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:28:996 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:29:357 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:29:357 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:29:724 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:29:724 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:30:52 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:30:52 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:30:413 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:30:413 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:30:804 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:49:30:804 ESThER/(30806:30809): Llego un nuevo pedido
+[INFO] 22:49:35:863 ESThER/(30806:30809): CPU 1 ha cerrado la conexión
+[INFO] 22:49:35:864 ESThER/(30806:30809): Esperando nuevas conexiones y mensajes
+[INFO] 22:55:48:392 ESThER/(30980:30980): Inicializado proceso kernel
+[INFO] 22:55:48:392 ESThER/(30980:30980): Inicializando lista de cpu
+[INFO] 22:55:48:392 ESThER/(30980:30980): Inicializando sockets
+[INFO] 22:55:48:392 ESThER/(30980:30980): Server Socket de consolas esta escuchando
+[INFO] 22:55:48:392 ESThER/(30980:30980): Server Socket de cpu's esta escuchando
+[INFO] 22:55:48:392 ESThER/(30980:30980): Creando el hilo para mantener CPU's
+[INFO] 22:55:48:406 ESThER/(30980:30984): Esperando nuevas conexiones y mensajes
+[INFO] 22:55:54:486 ESThER/(30980:30984): Llego un nuevo pedido
+[INFO] 22:55:54:487 ESThER/(30980:30984): Se registro la nueva conexion del server socket 5 tu id es 0
+[INFO] 22:55:54:487 ESThER/(30980:30984): Se envio la respuesta de conexion para el cliente 6
+[INFO] 22:55:54:487 ESThER/(30980:30984): Esperando nuevas conexiones y mensajes
+[INFO] 22:56:03:780 ESThER/(30980:30984): Llego un nuevo pedido
+[INFO] 22:56:03:780 ESThER/(30980:30984): Se envio la respuesta al cliente 6
+[INFO] 22:56:03:780 ESThER/(30980:30984): Esperando nuevas conexiones y mensajes
+[INFO] 22:56:14:300 ESThER/(30980:30984): Llego un nuevo pedido
+[INFO] 22:56:21:460 ESThER/(30980:30984): Se envio la respuesta al cliente 6
+[INFO] 22:56:21:460 ESThER/(30980:30984): Esperando nuevas conexiones y mensajes
+[INFO] 22:56:23:806 ESThER/(30980:30984): Llego un nuevo pedido
+[INFO] 22:56:26:780 ESThER/(30980:30984): Se envio la respuesta al cliente 6
+[INFO] 22:56:26:780 ESThER/(30980:30984): Esperando nuevas conexiones y mensajes
+[INFO] 22:56:26:780 ESThER/(30980:30984): Llego un nuevo pedido
+[INFO] 22:56:33:612 ESThER/(30980:30984): Se envio la respuesta al cliente 6
+[INFO] 22:56:33:612 ESThER/(30980:30984): Esperando nuevas conexiones y mensajes
+[INFO] 22:56:38:81 ESThER/(30980:30984): Llego un nuevo pedido
+[INFO] 22:56:40:621 ESThER/(30980:30984): Se envio la respuesta al cliente 6
+[INFO] 22:56:40:621 ESThER/(30980:30984): Esperando nuevas conexiones y mensajes
+[INFO] 22:56:52:524 ESThER/(30980:30984): Llego un nuevo pedido
+[INFO] 22:56:52:524 ESThER/(30980:30984): CPU 0 ha cerrado la conexión
+[INFO] 22:56:52:524 ESThER/(30980:30984): Esperando nuevas conexiones y mensajes
+[INFO] 22:58:40:406 ESThER/(31069:31069): Inicializado proceso kernel
+[INFO] 22:58:40:406 ESThER/(31069:31069): Inicializando lista de cpu
+[INFO] 22:58:40:406 ESThER/(31069:31069): Inicializando sockets
+[INFO] 22:58:40:408 ESThER/(31069:31069): Server Socket de consolas esta escuchando
+[INFO] 22:58:40:408 ESThER/(31069:31069): Server Socket de cpu's esta escuchando
+[INFO] 22:58:40:408 ESThER/(31069:31069): Creando el hilo para mantener CPU's
+[INFO] 22:58:40:421 ESThER/(31069:31074): Esperando nuevas conexiones y mensajes
+[INFO] 22:58:58:203 ESThER/(31087:31087): Inicializado proceso kernel
+[INFO] 22:58:58:204 ESThER/(31087:31087): Inicializando lista de cpu
+[INFO] 22:58:58:204 ESThER/(31087:31087): Inicializando sockets
+[INFO] 22:58:58:204 ESThER/(31087:31087): Server Socket de consolas esta escuchando
+[INFO] 22:58:58:204 ESThER/(31087:31087): Server Socket de cpu's esta escuchando
+[INFO] 22:58:58:204 ESThER/(31087:31087): Creando el hilo para mantener CPU's
+[INFO] 22:58:58:207 ESThER/(31087:31090): Esperando nuevas conexiones y mensajes
