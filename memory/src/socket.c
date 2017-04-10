@@ -9,8 +9,7 @@
 
 void crearConexiones(Configuration *config){
 
-	int listenerfd, binder, listener, new_descriptor;
-	struct sockaddr_in my_addr, remote_addr;
+	int listenerfd;
 	char *msg = "Hola conexión nueva";
 
 	//creo el socket escucha
@@ -42,6 +41,7 @@ void crearConexiones(Configuration *config){
 		}
 		puts("Atendiendo al cliente...");
 		send(accepted,msg,sizeof(msg),0);
+		puts("Te escuché");
 		close(accepted);
 
 	}
