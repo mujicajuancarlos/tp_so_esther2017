@@ -36,6 +36,7 @@ typedef struct kernel_struct {
 	int cpuSockets[MAX_CPUS];
 	int consolaSockets[MAX_CONSOLAS];
 	t_list* listaCPUs;
+	t_list* listaConsolas;
 	Configuration* config;
 } kernel_struct;
 

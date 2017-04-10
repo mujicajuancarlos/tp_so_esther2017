@@ -11,6 +11,7 @@
 #include "kernel.h"
 #include "configuration/configuration.h"
 #include "cpu/cpu.h"
+#include "console/console.h"
 #include "socket/server.h"
 
 
@@ -36,6 +37,10 @@ int main(int argc, char *argv[]) {
 	logInfo("Creando el hilo para mantener CPU's");
 	pthread_t hiloCpu;
 	pthread_create(&hiloCpu, NULL, (void*) handleCPUs, &args);
+
+	logInfo("Creando el hilo para mantener Consolas's");
+	pthread_t hiloConsola;
+	pthread_create(&hiloConsola, NULL, (void*) handleConsolas, &args);
 
 	for (;;);
 	return EXIT_SUCCESS;
