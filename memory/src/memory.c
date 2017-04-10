@@ -26,5 +26,9 @@ int main(int argc, char *argv[]) {
 
 	log_info(logger, "Inició el proceso correctamente!");
 
+	puts("Esperando conexiones...");
+	crearConexiones(config);
+	for(;;);
+
 	return EXIT_SUCCESS;
 }

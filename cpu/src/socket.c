@@ -9,7 +9,8 @@
 
 void crearConexiones(Configuration *config){
 
-	int socketDesc, conexion;
+	char *msg = "Me estás escuchando?"
+	int socketDesc, conexion, leng, bytes_sent;
 	struct sockaddr_in direccionServerMemoria;
 	socketDesc = socket(AF_INET, SOCK_STREAM, 0);
 	direccionServerMemoria.sin_family = AF_INET;
@@ -26,6 +27,11 @@ void crearConexiones(Configuration *config){
 		puts("No se pudo conectar con la Memoria");
 	}
 
+	leng = strlen(msg);
+	bytes_sent = send(socketDesc, msg, leng, 0);
 
+	if(bytes_sent > 0){
+		puts("Enviando datos...");
+	}
 	return;
 }
