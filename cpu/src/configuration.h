@@ -11,6 +11,7 @@
 //import standart library
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 //import commoms library
 #include <commons/collections/list.h>
@@ -31,7 +32,7 @@
 #define LOG_PRINT_CONSOLE "LOG_PRINT_CONSOLE"
 
 typedef struct Configuration {
-	int ip_memoria;
+	char* ip_memoria;
 	int puerto_memoria;
 	char* log_level;
 	char* log_file;

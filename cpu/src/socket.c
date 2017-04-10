@@ -7,7 +7,7 @@
 
 #include "socket.h"
 
-int conectarAMemory(ip, puerto){
+int conectarAMemory(char* ip,int puerto){
 
 	int socketClient, connector;
 	struct sockaddr_in direccionServerMemoria;
@@ -25,5 +25,5 @@ int conectarAMemory(ip, puerto){
 		puts("No se pudo conectar...");
 	}
 
-	return connector;
+	return socketClient;
 }
