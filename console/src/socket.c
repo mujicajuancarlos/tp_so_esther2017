@@ -19,12 +19,12 @@ int crearSocketCliente(char* ip,int puerto){
 
 	int socketCreado = socket(AF_INET,SOCK_STREAM,0);
 	if(socketCreado == -1){
-		puts("error al crear socket");
+		puts("Error al crear socket");
 	}
 
 	int conectando = connect(socketCreado, (struct sockaddr *)& direccionServidor,sizeof(struct sockaddr_in));
 	if(conectando == -1){
-		puts("error en el connect");
+		puts("Error en el connect");
 	}
 
 	return socketCreado;
