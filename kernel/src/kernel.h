@@ -16,11 +16,13 @@
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/log.h>
+//commons death coders
+#include <dc-commons/logger.h>
 //sockets
 #include <sys/socket.h>
 //configuracion
 #include "configuration/configuration.h"
-#include "log/logger.h"
+
 
 #define MAX_CPUS 20	//cantidad de CPUs que se pueden conectar
 #define MAX_CONSOLAS 20	//cantidad de Consolas que se pueden conectar

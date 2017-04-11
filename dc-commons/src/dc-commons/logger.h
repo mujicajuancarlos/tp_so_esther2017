@@ -1,8 +1,8 @@
 /*
- * log.h
+ * logger.c
  *
- *  Created on: 30/04/2016
- *      Author: hernan
+ *  Created on: 10/04/2017
+ *      Author: JuanCarlosMujica
  */
 
 
