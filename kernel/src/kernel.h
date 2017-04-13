@@ -18,7 +18,7 @@
 #include <commons/log.h>
 //commons death coders
 #include <dc-commons/logger.h>
-
+#include <dc-commons/socket-client.h>
 //sockets
 #include <sys/socket.h>
 //configuracion
