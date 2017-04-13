@@ -22,7 +22,7 @@ int crearSocketServer(int port) {
 
 	if (socketFileDescriptor == -1) {
 		error_show(
-				"Create socket file descriptor failed FD: %d address: %c port: %d",
+				"Create socket file descriptor failed FD: %d address: %s port: %d\n",
 				socketFileDescriptor, INADDR_LOOPBACK, port);
 		return SOCKET_FAILURE;
 	}
@@ -30,20 +30,20 @@ int crearSocketServer(int port) {
 	int activado = 1;
 	if (setsockopt(socketFileDescriptor, SOL_SOCKET, SO_REUSEADDR, &activado,
 			sizeof(activado)) != 0) {
-		error_show("Set socket option failed FD: %d address: %c port: %d",
+		error_show("Set socket option failed FD: %d address: %s port: %d\n",
 				socketFileDescriptor, INADDR_LOOPBACK, port);
 		return SOCKET_FAILURE;
 	}
 
 	if (bind(socketFileDescriptor, (void*) &direccionServidor,
 			sizeof(direccionServidor)) != 0) {
-		error_show("Socket bind failed FD: %d address: %c port: %d",
+		error_show("Socket bind failed FD: %d address: %s port: %d\n",
 				socketFileDescriptor, INADDR_LOOPBACK, port);
 		return SOCKET_FAILURE;
 	}
 
 	if (listen(socketFileDescriptor, 100) == -1) {
-		error_show("Socket listen failed FD: %d address: %c port: %d",
+		error_show("Socket listen failed FD: %d address: %s port: %d\n",
 				socketFileDescriptor, INADDR_LOOPBACK, port);
 		close(socketFileDescriptor);
 		return SOCKET_FAILURE;
@@ -62,7 +62,7 @@ int aceptarConexionCliente(int socketServerFileDescriptor) {
 			&longitudCliente);
 
 	if (newSocketFileDescriptor == -1) {
-		error_show("Socket accept failed FD: %d", socketServerFileDescriptor);
+		error_show("Socket accept failed FD: %d\n", socketServerFileDescriptor);
 		return SOCKET_FAILURE;
 	}
 
