@@ -9,7 +9,7 @@
  */
 #include "console.h"
 #include "configuration/configuration.h"
-#include "socket.h"
+#include <dc-commons/socket-client.h>
 #define MAXDATASIZE 100
 
 int main(int argc, char *argv[]) {
