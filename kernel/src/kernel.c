@@ -57,10 +57,5 @@ int main(int argc, char *argv[]) {
 
 	for (;;);
 
-
-
-
-
-
 	return EXIT_SUCCESS;
 }
