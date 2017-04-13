@@ -27,7 +27,7 @@
  * definitions
  */
 #define	SOCKET_FAILURE	-1	/* Failing exit status.  */
-
+#define	LOCAL_HOST	"127.0.0.1"
 /**
  * Funciones
  */
