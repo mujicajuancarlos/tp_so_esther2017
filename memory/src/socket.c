@@ -47,7 +47,7 @@ void crearConexiones(Configuration *config){
 			puts("Error al recibir ");
 		}
 		buffer[bytes_recv]='\0';
-		printf("Me llegaron %d bytes con %s", bytes_recv, buffer);
+		printf("Me llegaron %d bytes con %s\n", bytes_recv, buffer);
 
 		printf("%s\n",msg);
 		puts("Te escuché");

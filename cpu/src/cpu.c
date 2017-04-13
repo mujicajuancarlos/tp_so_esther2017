@@ -11,11 +11,12 @@
 #include "cpu.h"
 #include "configuration.h"
 #include "socket.h"
+#include <dc-commons/socket-client.h>
 
 int main(int argc, char *argv[]) {
 
 	int socketClient;
-	char *msg = "Hola, me escuchas?";
+	char *msg = "Hola, soy cpu!";
 
 	puts("Accediendo al archivo de configuración...");
 	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
