@@ -12,8 +12,9 @@ int crearSocketServer(int port) {
 	struct sockaddr_in direccionServidor;
 	direccionServidor.sin_family = AF_INET;
 	//direccionServidor.sin_addr.s_addr = htonl(ip);
-	//direccionServidor.sin_addr.s_addr = inet_addr("0.0.0.0");
-	direccionServidor.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	direccionServidor.sin_addr.s_addr = inet_addr("127.0.0.1");
+//	direccionServidor.sin_addr.s_addr = htonl(INADDR_ANY);
+	//direccionServidor.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 	direccionServidor.sin_port = htons(port);
 
 	//creo el file descriptor
