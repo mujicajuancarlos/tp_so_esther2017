@@ -14,7 +14,8 @@
 #include <stdlib.h>
 
 #include <commons/error.h>
-#include <dc-commons/package.h>
+
+#include "package.h"
 
 #define SEND_OR_RECEIVE_FAILURE -1
 #define SEND_OR_RECEIVE_SUCCESS 0
