@@ -27,3 +27,24 @@ void destroyPackage(Package* package) {
 	}
 	free(package);
 }
+
+char* serializePackage(Package *package){
+
+	char *serializedPackage = calloc(1,sizePackage(package));
+
+	int offset = 0;
+	int size_to_send;
+
+	size_to_send =  sizeof(package->msgCode);
+	memcpy(serializedPackage + offset, &(package->msgCode), size_to_send);
+	offset += size_to_send;
+
+	size_to_send =  sizeof(package->message_long);
+	memcpy(serializedPackage + offset, &(package->message_long), size_to_send);
+	offset += size_to_send;
+
+	size_to_send =  package->message_long;
+	memcpy(serializedPackage + offset, package->message, size_to_send);
+
+	return serializedPackage;
+}

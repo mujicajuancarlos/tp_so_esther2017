@@ -7,6 +7,43 @@
 
 #include "socket-message.h"
 
+int sendPackage(int fileDescriptor, Package *package) {
+	int result;
+	char* serializedPkg = serializePackage(package);
+	result = sendMessage(fileDescriptor, (char *) serializedPkg,
+			sizePackage(package));
+	free(serializedPkg);
+	if (result == SEND_OR_RECEIVE_FAILURE)
+		return result;
+
+	return SEND_OR_RECEIVE_SUCCESS;
+}
+
+int receivePackage(int fileDescriptor, Package *package) {
+
+	int status = 0;
+	int buffer_size = sizeof(uint32_t);
+	char *buffer = malloc(buffer_size );
+
+	status = receiveMessage(fileDescriptor, buffer, sizeof(package->msgCode));
+	memcpy(&(package->msgCode), buffer, buffer_size);
+	if (status == SEND_OR_RECEIVE_FAILURE)
+		return status;
+
+	status = receiveMessage(fileDescriptor, buffer, sizeof(package->message_long));
+	memcpy(&(package->message_long), buffer, buffer_size);
+	if (status == SEND_OR_RECEIVE_FAILURE)
+			return status;
+
+	package->message = malloc(sizeof(char) * package->message_long);
+	status = receiveMessage(fileDescriptor, package->message, package->message_long);
+	if (status == SEND_OR_RECEIVE_FAILURE)
+			return status;
+
+	free(buffer);
+	return SEND_OR_RECEIVE_SUCCESS;
+}
+
 int sendMessage(int fileDescriptor, char *message, int sizeOfMessage) {
 
 	int total_bytes_written = 0;

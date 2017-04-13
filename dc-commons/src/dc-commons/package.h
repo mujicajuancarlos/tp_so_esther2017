@@ -28,6 +28,16 @@ typedef struct Package {
  */
 
 /**
+ * @NAME: serializePackage
+ * @DESC: recibe un puntero a package y retorna un puntero a char con el contenido serializado de package
+ * @PARAMS:
+ * 		puntero a package
+ * @RETURN:
+ * 		puntero a char
+ */
+char* serializePackage(Package *package);
+
+/**
  * @NAME: createPackage
  * @DESC: Crea un package con los datos recibidos por parametro, usa malloc para generar la estructura y el mensaje
  * @PARAMS:
