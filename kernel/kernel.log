@@ -384,3 +384,12 @@
 [INFO] 00:30:27:681 ESThER/(1942:1942): Creando el hilo para mantener Consolas's
 [INFO] 00:30:27:685 ESThER/(1942:1945): Esperando nuevas conexiones y mensajes
 [INFO] 00:30:27:686 ESThER/(1942:1944): Esperando nuevas conexiones y mensajes
+[INFO] 02:20:17:969 ESThER/(6151:6151): Inicializado proceso kernel
+[INFO] 02:20:17:998 ESThER/(6151:6151): Inicializando lista de cpu
+[INFO] 02:20:17:998 ESThER/(6151:6151): Inicializando sockets
+[INFO] 02:21:29:890 ESThER/(6151:6151): Server Socket de consolas esta escuchando
+[INFO] 02:21:47:311 ESThER/(6151:6151): Server Socket de cpu's esta escuchando
+[INFO] 02:21:47:311 ESThER/(6151:6151): Creando el hilo para mantener CPU's
+[INFO] 02:21:47:321 ESThER/(6151:6151): Creando el hilo para mantener Consolas's
+[INFO] 02:21:47:321 ESThER/(6151:6172): Esperando nuevas conexiones y mensajes
+[INFO] 02:21:47:327 ESThER/(6151:6173): Esperando nuevas conexiones y mensajes

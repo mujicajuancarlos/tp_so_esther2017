@@ -9,58 +9,16 @@
 
 void crearSockets(kernel_struct *args) {
 
-	//INADDR_ANY no funciono, por eso uso 0.0.0.0 que tiene el mismo efecto
-	char* server_ip = "0.0.0.0"; //INADDR_ANY;
-
 	//server socket para atender los pedidos de la consola
-	crearServerSocketParaConsola(args, server_ip);
+	crearServerSocketParaConsola(args);
 
 	//server socket para atender los pedidos del cpu
-	crearServerSocketParaCpus(args, server_ip);
+	crearServerSocketParaCpus(args);
 }
 
-/**
- * Genera un socket Inet, recibe una ip y un puerto
- */
-int abrirSocketInetServer(const char* ip, int port) {
-	/*CPUs
-	 * Se rellenan los campos de la estructura Direccion, necesaria
-	 * para la llamada a la funcion bind()
-	 */
-	struct sockaddr_in direccionServidor;
-	direccionServidor.sin_family = AF_INET;
-	direccionServidor.sin_addr.s_addr = inet_addr(ip);
-	direccionServidor.sin_port = htons(port);
-
-	//se abre el socket
-	int servidorFD = socket(AF_INET, SOCK_STREAM, 0);
-
-	int activado = 1;
-	setsockopt(servidorFD, SOL_SOCKET, SO_REUSEADDR, &activado,
-			sizeof(activado));
-
-	if (bind(servidorFD, (void*) &direccionServidor, sizeof(direccionServidor))
-			!= 0) {
-		perror("Fallo al hacer el bind (Server)\n");
-		return 1;
-	}
-	/*
-	 * Se avisa al sistema que comience a atender llamadas de clientes
-	 */
-	if (listen(servidorFD, 100) == -1) {
-		close(servidorFD);
-		return -1;
-	}
-	/*
-	 * Se devuelve el descriptor del socket servidor
-	 */
-	return servidorFD;
-}
-
-void crearServerSocketParaConsola(kernel_struct* args, char* server_ip) {
+void crearServerSocketParaConsola(kernel_struct* args) {
 	//server socket para atender los pedidos de la consola
-	args->socketServerConsola = abrirSocketInetServer(server_ip,
-			args->config->puerto_program);
+	args->socketServerConsola = crearSocketServer(args->config->puerto_program);
 	if (args->socketServerConsola == -1) {
 		logError("No se pudo crear el server para las consolas");
 		exit(-1);
@@ -69,10 +27,9 @@ void crearServerSocketParaConsola(kernel_struct* args, char* server_ip) {
 	inicializarSockets(MAX_CONSOLAS, args->consolaSockets);
 }
 
-void crearServerSocketParaCpus(kernel_struct* args, char* server_ip) {
+void crearServerSocketParaCpus(kernel_struct* args) {
 	//server socket para atender los pedidos del cpu
-	args->socketServerCPU = abrirSocketInetServer(server_ip,
-			args->config->puerto_cpu);
+	args->socketServerCPU = crearSocketServer(args->config->puerto_cpu);
 	if (args->socketServerCPU == -1) {
 		logError("No se pudo crear el server para cpu's");
 		exit(-1);
@@ -122,19 +79,10 @@ int recieve_and_deserialize(Package *package, int socketCliente) {
 // registra el socket_fd y lo devuelve, si devuelve -1 es porque no lo pudo registrar
 int registrarNuevoCliente(int fd_socketServer, int* arraySockets, int max_clientes) {
 
-	socklen_t longitudCliente;
-	struct sockaddr clienteAddr;
-	int new_socket_fd;
+	int new_socket_fd = aceptarConexionCliente(fd_socketServer);
 	int estadoRegistrado = -1;
 	int i;
 
-	//como es el primer pedido el tamaño es fijo, osea el tamaño de la estructura socket address
-	longitudCliente = sizeof(clienteAddr);
-	if ((new_socket_fd = accept(fd_socketServer, &clienteAddr, &longitudCliente))
-			< 0) {
-		logError("Error al aceptar una nueva conexion");
-		exit(EXIT_FAILURE);
-	};
 	//Se acepto la conexion por lo tanto se tiene que guardar en el array de conexiones
 	for (i = 0; i < max_clientes; i++) {
 		//si la posicion no esta ocupada entonces registo el socket del cliente

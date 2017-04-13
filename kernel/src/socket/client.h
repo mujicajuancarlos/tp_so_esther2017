@@ -9,7 +9,7 @@
 #ifndef CLIENT_CLIENT_H_
 #define CLIENT_CLIENT_H_
 
-#include "package.h"
+#include <dc-commons/package.h>
 
 Package* createPackage();
 void destroyPackage(Package* package);

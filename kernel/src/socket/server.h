@@ -22,8 +22,9 @@
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/log.h>
+#include <dc-commons/socket-server.h>
+#include <dc-commons/package.h>
 
-#include "package.h"
 #include "../configuration/configuration.h"
 #include "../kernel.h"
 /**
@@ -31,11 +32,9 @@
  */
 
 void crearSockets(kernel_struct* args);
-int abrirSocketInetServer(const char* ip, int port);
-void crearServerSocketParaConsola(kernel_struct* args, char* server_ip);
-void crearServerSocketParaCpus(kernel_struct* args, char* server_ip);
+void crearServerSocketParaConsola(kernel_struct* args);
+void crearServerSocketParaCpus(kernel_struct* args);
 void inicializarSockets(int tamanio_maximo, int* arraySockets);
 int recieve_and_deserialize(Package *package, int socketCliente);
-int registrarNuevoCliente (int fd_socketServer, int* arraySockets, int max_clientes);
 
 #endif /* SOCKET_SERVER_H_ */
