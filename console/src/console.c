@@ -9,7 +9,8 @@
  */
 #include "console.h"
 #include "configuration/configuration.h"
-#include <dc-commons/socket-client.h>
+#include "socket.h"
+
 #define MAXDATASIZE 100
 
 int main(int argc, char *argv[]) {
@@ -26,7 +27,7 @@ int main(int argc, char *argv[]) {
 	logInfo("Inició el proceso correctamente!");
 
 	puts("Creando Conexiones");
-	int sckCliente = crearSocketCliente(config->ip_kernel,config->puerto_kernel);
+	int sckCliente = crearSocketConectarAKernel(config->ip_kernel,config->puerto_kernel);
 
 
 	logInfo("Socket cliente consola creado");

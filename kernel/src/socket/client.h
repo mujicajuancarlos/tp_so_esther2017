@@ -13,5 +13,6 @@
 
 Package* createPackage();
 void destroyPackage(Package* package);
+int crearSocketCliente(char* ip,int puerto);
 
 #endif /* CLIENT_CLIENT_H_ */
