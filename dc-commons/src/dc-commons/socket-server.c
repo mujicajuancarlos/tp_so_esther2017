@@ -7,40 +7,43 @@
 
 #include "socket-server.h"
 
-int crearSocketServer(const char* ip, int port) {
+int crearSocketServer(int port) {
 
 	struct sockaddr_in direccionServidor;
 	direccionServidor.sin_family = AF_INET;
-	direccionServidor.sin_addr.s_addr = inet_addr(ip);
+	//direccionServidor.sin_addr.s_addr = htonl(ip);
+	//direccionServidor.sin_addr.s_addr = inet_addr("0.0.0.0");
+	direccionServidor.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 	direccionServidor.sin_port = htons(port);
 
 	//creo el file descriptor
 	int socketFileDescriptor = socket(AF_INET, SOCK_STREAM, 0);
 
-	if(socketFileDescriptor == -1){
-		error_show("Create socket file descriptor failed FD: %d address: %c port: %d",
-								socketFileDescriptor, ip, port);
+	if (socketFileDescriptor == -1) {
+		error_show(
+				"Create socket file descriptor failed FD: %d address: %c port: %d",
+				socketFileDescriptor, INADDR_LOOPBACK, port);
 		return SOCKET_FAILURE;
 	}
 
 	int activado = 1;
-	if(setsockopt(socketFileDescriptor, SOL_SOCKET, SO_REUSEADDR, &activado,
-			sizeof(activado)) != 0){
+	if (setsockopt(socketFileDescriptor, SOL_SOCKET, SO_REUSEADDR, &activado,
+			sizeof(activado)) != 0) {
 		error_show("Set socket option failed FD: %d address: %c port: %d",
-						socketFileDescriptor, ip, port);
+				socketFileDescriptor, INADDR_LOOPBACK, port);
 		return SOCKET_FAILURE;
 	}
 
 	if (bind(socketFileDescriptor, (void*) &direccionServidor,
 			sizeof(direccionServidor)) != 0) {
 		error_show("Socket bind failed FD: %d address: %c port: %d",
-								socketFileDescriptor, ip, port);
+				socketFileDescriptor, INADDR_LOOPBACK, port);
 		return SOCKET_FAILURE;
 	}
 
 	if (listen(socketFileDescriptor, 100) == -1) {
 		error_show("Socket listen failed FD: %d address: %c port: %d",
-										socketFileDescriptor, ip, port);
+				socketFileDescriptor, INADDR_LOOPBACK, port);
 		close(socketFileDescriptor);
 		return SOCKET_FAILURE;
 	}
@@ -48,15 +51,16 @@ int crearSocketServer(const char* ip, int port) {
 	return socketFileDescriptor;
 }
 
-int aceptarConexionCliente (int socketServerFileDescriptor){
+int aceptarConexionCliente(int socketServerFileDescriptor) {
 
 	struct sockaddr cliente;
-	socklen_t longitudCliente = sizeof (cliente);
+	socklen_t longitudCliente = sizeof(cliente);
 	int newSocketFileDescriptor;
 
-	newSocketFileDescriptor = accept (socketServerFileDescriptor, &cliente, &longitudCliente);
+	newSocketFileDescriptor = accept(socketServerFileDescriptor, &cliente,
+			&longitudCliente);
 
-	if (newSocketFileDescriptor == -1){
+	if (newSocketFileDescriptor == -1) {
 		error_show("Socket accept failed FD: %d", socketServerFileDescriptor);
 		return SOCKET_FAILURE;
 	}

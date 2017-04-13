@@ -34,19 +34,21 @@
 
 /**
  * @NAME: crearSocketServer
- * @DESC: Crea un socket y devuelve el file descriptor
+ * @DESC: Crea un socket para localhost y devuelve el file descriptor
  * @PARAMS:
- * 		ip
  *		puerto
+ * @RETURN: FD del socket creado o -1 si hubo un error en la creacion
  */
-int crearSocketServer(const char* ip, int port);
+int crearSocketServer(int port);
 
 /**
  * @NAME: aceptarConexionCliente
  * @DESC: Crea un socket para atender la nueva conexion que llego al socket server
+ * 			Esta funcion sirve para sockets AF_INET o AF_UNIX.
  * @PARAMS:
  * 		socketServerFileDescriptor
+ * @RETURN: FD del nuevo socket o -1 si hubo un error
  */
-int aceptarConexionCliente (int socketServerFileDescriptor);
+int aceptarConexionCliente(int socketServerFileDescriptor);
 
 #endif /* SRC_DC_COMMONS_SOCKET_SERVER_H_ */
