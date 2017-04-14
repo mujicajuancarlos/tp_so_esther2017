@@ -39,8 +39,7 @@ Configuration* config_with(char *config_file) {
 	config->log_print_console = config_get_int_value(nConfig,
 	LOG_PRINT_CONSOLE);
 
-	config_destroy(nConfig);
-
+config_destroy(nConfig);
 	return config;
 }
 
