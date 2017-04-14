@@ -26,8 +26,28 @@ int main(int argc, char *argv[]) {
 
 	log_info(logger, "Inició el proceso correctamente!");
 
+	/*Creo Server con las funciones de dc-commons*/
+
 	puts("Esperando conexiones...");
-	crearConexiones(config);
+
+	int accepted,bytes_recv;
+	accepted = aceptarConexionCliente(crearSocketServer(config->puerto));
+
+	/*Atendiendo a clientes*/
+
+	puts("Atendiendo al cliente...");
+	char *buffer = malloc(20);
+	bytes_recv = recv(accepted, buffer, 20, 0);
+	if (bytes_recv < 0){
+		puts("Error al recibir ");
+	}
+	buffer[bytes_recv]='\0';
+	printf("Me llegaron %d bytes con %s\n", bytes_recv, buffer);
+	puts("Hola conexion nueva, Te escuche");
+	free(buffer);
+	close(accepted);
+
+
 	for(;;);
 
 	return EXIT_SUCCESS;
