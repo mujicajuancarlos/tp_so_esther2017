@@ -1,82 +1,246 @@
+// includes libreria + i/o estandar
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
+
+// includes sockets
+#include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/ip.h>
 #include <arpa/inet.h>
-#include <sys/wait.h>
-#include <signal.h>
 #include <unistd.h>
-#include <netdb.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
-#define PORT 38432
-#define BACKLOG 5 //Numero maximo de conexiones
+//includes archivoConfiguracion
+#include "Kernel.h"
+#include <commons/config.h>
 
 
-int main(void){
-	int newSocket;
-	int newSocket2;
-	struct sockaddr_in cliente;
-	struct sockaddr_in servidor;
-	int sin_size;
-	char buffer[30];
-	int reutilizar;
-	int yes=1;
+#define PATH_ARCHIVO_CONFIG "/home/utnso/tp-2017-1c-Los-5-Fant-sticos/Kernel/archivoConfiguracion"
+#define BUFER_MAX_LEN 2048
+#define FILE_MAX 1024
+#define PUERTO 1299 // puerto de conexion
+#define PUERTO_SALIDA 1300
+#define MAXCONEXIONES 10 // maximas conexiones posibles en cola (en este caso no hace diferencia)
+#define MAXCONEXIONES_SALIDA 10
+#define MAXBUFFER 1024 // tamaño maximo en caracteres que le daremos al buffer
 
-	if((newSocket = socket(AF_INET,SOCK_STREAM,0)) == -1){
-			printf("Error en Socket()");
-			exit(-1);
+archivoConfiguracion *strConfig;//puntero de mi struct
+
+int obtenerArchivoConfiguracion();
+
+int main(void) {
+	int hembra; // socket de entrada
+	int macho; // socket de salida
+	int maxDescriptors = 4;
+	int addrlen = sizeof (struct sockaddr_in);
+	struct sockaddr_in datosEntrada, datosSalida, datosCliente; // datos de entrada, salida y cliente
+	char buffer[MAXBUFFER]; // el buffer utilizado para recibir mensajes será un array del tamaño maximo definido
+	int on=1; // necesario para setsockop
+	fd_set readDescriptors; // set de fd que me interesa leer
+	fd_set writeDescriptors; // set de fd a los que me interesa escribir
+	fd_set readDescriptorsOriginales;
+
+	obtenerArchivoConfiguracion();
+		puts("\n");
+
+		printf("Configuracion desde %s\n",PATH_ARCHIVO_CONFIG);
+
+		puts("\n");
+
+		printf ("PUERTO_PROG:  %d \n", strConfig->PUERTO_PROG );
+	    printf ("PUERTO_CPU:  %d \n", strConfig->PUERTO_CPU );
+	    printf("IP_MEMORIA:  %s \n",strConfig->IP_MEMORIA);
+	    printf ("PUERTO_MEMORIA: %d \n", strConfig->PUERTO_MEMORIA);
+	    printf("IP_FS:  %s \n",strConfig->IP_FS);
+	    printf ("PUERTO_FS:  %d \n", strConfig->PUERTO_FS );
+	    printf ("QUANTUM:  %d \n", strConfig->QUANTUM );
+	    printf ("QUANTUM_SLEEP: %d \n", strConfig->QUANTUM_SLEEP );
+	    printf("ALGORITMO: %s \n",strConfig->ALGORITMO);
+	    printf ("GRADO_MULTIPROG: %d \n", strConfig->GRADO_MULTIPROG);
+	    printf ("STACK_SIZE: %d \n", strConfig->STACK_SIZE);
+
+
+
+	// creamos los socket de entrada y salida
+	hembra = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	macho = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	checkError(hembra,"Error en socket(hembra)\n");
+
+	checkError(macho,"Error en socket(macho)\n");
+
+	// asignamos los datos de entrada
+	datosEntrada.sin_family = AF_INET; // tipo de direccion, en este caso Internet Protocol v4
+	datosEntrada.sin_addr.s_addr = INADDR_ANY; // LocalHost
+	datosEntrada.sin_port = htons (strConfig->PUERTO_PROG); // puerto a conectarse
+	memset (datosEntrada.sin_zero, 0, 8); // campo raro ?
+
+	// asignamos los datos de salida
+	datosSalida.sin_family = AF_INET; // tipo de direccion, en este caso Internet Protocol v4
+	datosSalida.sin_addr.s_addr = INADDR_ANY; // LocalHost
+	datosSalida.sin_port = htons (strConfig->PUERTO_CPU); // puerto a conectarse
+	memset (datosSalida.sin_zero, 0, 8); // campo raro ?
+
+	/* si el server se cierra bruscamente, el puerto por el que conectaba queda ocupado, lo cual es molesto.
+	 esto se puede solucionar con la siguiente linea */
+	setsockopt (hembra, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+	setsockopt (macho, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+
+	// enlazo sockets a las estructuras de entrada y salida respectivamente
+	bind (hembra, (struct sockaddr*) &datosEntrada, sizeof (datosEntrada));
+	bind (macho, (struct sockaddr*) &datosSalida, sizeof (datosSalida));
+
+	// finalmente los ponemos a escuchar
+	listen (hembra, MAXCONEXIONES);
+	listen (macho, MAXCONEXIONES_SALIDA);
+
+	printf ("Nuestro kernel esta conectado con IP %s\n", inet_ntoa((struct in_addr)datosEntrada.sin_addr));
+
+	// inicializo los fd de lectura y agrego los propios del kernel
+	FD_ZERO (&readDescriptorsOriginales);
+	FD_SET (hembra, &readDescriptorsOriginales);
+	FD_SET (macho, &readDescriptorsOriginales);
+
+	FD_ZERO (&writeDescriptors);
+
+	printf ("Esperando conexiones \n\n");
+
+	while (1) { // bucle infinito
+
+		readDescriptors = readDescriptorsOriginales;
+
+		if (select (maxDescriptors + 1, &readDescriptors, NULL, NULL, NULL) == -1)
+			printf ("Error en select");
+
+		int i;
+
+		for (i = 0; i <= maxDescriptors; i++) {
+			if (FD_ISSET (i, &readDescriptors)) {
+				// si la actividad es del macho me conecto a una salida
+				if (i == macho) {
+					int saliente;
+					saliente = accept (macho, &datosCliente, &addrlen);
+					send (saliente, "Te conectaste", 13, 0);
+					FD_SET (saliente, &writeDescriptors);
+					FD_SET (saliente, &readDescriptorsOriginales); // lo agregamos tambien a lectura para darnos cuenta si se cerro el proceso
+					printf ("Se me conecto un nuevo proceso de salida\nSe le asigna numero de proceso = %i\n\n", (saliente - 4));
+					if (saliente > maxDescriptors)
+						maxDescriptors = saliente;
+				}
+				else if (i == hembra) {
+					// si la actividad es de hembra recibi conexion nueva
+					int entrante; // socket que se conecta
+					entrante = accept (hembra, &datosCliente, &addrlen);
+					printf ("Se conecto una nueva consola. \nSe le asigna numero de proceso = %i \nIP de consola: %s\n\n", (entrante - 4), inet_ntoa((struct in_addr)datosCliente.sin_addr));
+					FD_SET (entrante, &readDescriptorsOriginales);
+					if (entrante > maxDescriptors)
+						maxDescriptors = entrante;
+				}
+				else if (FD_ISSET (i, &writeDescriptors)) { // si tambien pertenece a los writeDescriptors se cerro un proceso de salida
+					close (i);
+					FD_CLR (i, &readDescriptorsOriginales);
+					FD_CLR (i, &writeDescriptors);
+					printf ("Proceso de salida con numero de proceso %i desconectado\n\n", (i - 4));
+				}
+				else {
+					// sino la actividad es de algun cliente
+					int sizeMensaje = recv (i, buffer, MAXBUFFER, 0);
+					if (sizeMensaje > 0) {
+						// si recibi mensaje lo imprimo
+						buffer[sizeMensaje] = '\0'; // agrego caracter de terminacion de string
+						printf ("Consola numero de proceso %i dice: \"%s\"\n\n", (i - 4), buffer);
+						int j = 0;
+						for (j = 0; j <= maxDescriptors; j++) {
+							if (FD_ISSET (j,&writeDescriptors))
+								send (j, buffer, strlen(buffer), 0); // se envia el mensaje
+						}
+					}
+					else {
+						close (i);
+						FD_CLR (i, &readDescriptorsOriginales);
+						printf ("Consola numero de proceso %i desconectada \n\n", (i - 4));
+					}
+				}
+			}
 		}
-
-	if((reutilizar=setsockopt(newSocket,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)))==-1){
-		printf("Error reutilizar");
-		exit(-1);
 	}
 
-	servidor.sin_family = AF_INET;
-	servidor.sin_port = htons(PORT);
-	servidor.sin_addr.s_addr = htonl(INADDR_ANY);
-	bzero(&(cliente.sin_zero),8);
-//CREACION DE SOCKET CON COMPROBACION DE ERROR---------------------------------------------------------------------------------
+	close (macho);
+	close (hembra);
+	return 0;
+}
 
 
+int obtenerArchivoConfiguracion()
+{
+    t_config *archivoConfiguracion = malloc(sizeof(t_config));
 
-	//ASOCIACION DE PUERTO CON COMPROBACION DE ERROR---------------------------------------------------------------------------------
-	if(bind(newSocket,(struct sockaddr *)&servidor,sizeof(servidor)) == -1) {
-		printf("Error en bind()");
-		exit(-1);
-	}
-	//LLAMADA A LISTEN CON COMPROBACION DE ERROR---------------------------------------------------------------------------------
-	if(listen(newSocket,BACKLOG) == -1){
-		printf("Error de listen()");
-		exit(-1);
-	}
 
-//ACEPTA Y DA UN NUEVO SOCKET PARA CONECTAR CON CLIENTE----------------------------------------------------
-	while(1) {
-		sin_size = sizeof(cliente);
-		if((newSocket2 = accept(newSocket,(struct sockaddr *)&cliente,&sin_size)) == -1){
-			printf("Error en accept()");
-			exit(-1);
-	}
+    strConfig = malloc(sizeof(archivoConfiguracion));
+    char path_file[FILE_MAX];
+    memset(path_file, '\0', FILE_MAX);
+    strcpy(path_file, PATH_ARCHIVO_CONFIG);//Copio el contenido de la ruta paara pasarle por parametro a config_create (commons)
 
-	printf("Se obtuvo una conexion desde %s\n",inet_ntoa(cliente.sin_addr));
+    char* aux;
+    int entero;
 
-int recibe;
-if((recibe= recv(newSocket2,buffer,sizeof(buffer),0))==-1){
-	printf("error al recibir");
-	exit(-1);
+    archivoConfiguracion = config_create(path_file);
+
+    aux=(char*)malloc (BUFER_MAX_LEN);//EN ESTA VAR VOY OBTENIENDO LOS VALORES DEL ARCHIVO
+    memset(aux,'\0', BUFER_MAX_LEN);
+
+    if ( archivoConfiguracion == NULL )
+    {
+        return -1;
+    }
+
+    entero = config_get_int_value(archivoConfiguracion,"PUERTO_PROG");//guarda el dato en la var entero
+    strConfig->PUERTO_PROG= entero;//asigna el numero guardado en entero, en la estructura
+
+    entero = config_get_int_value(archivoConfiguracion,"PUERTO_CPU");//guarda el dato en la var entero
+    strConfig->PUERTO_CPU= entero;//asigna el numero guardado en entero, en la estructura
+
+    aux = config_get_string_value(archivoConfiguracion, "IP_MEMORIA");
+    strcpy(strConfig->IP_MEMORIA, aux);
+
+    entero = config_get_int_value(archivoConfiguracion,"PUERTO_MEMORIA");//guarda el dato en la var entero
+    strConfig->PUERTO_MEMORIA= entero;//asigna el numero guardado en entero, en la estructura
+
+    aux = config_get_string_value(archivoConfiguracion, "IP_FS");
+    strcpy(strConfig->IP_FS, aux);
+
+    entero = config_get_int_value(archivoConfiguracion,"PUERTO_FS");//guarda el dato en la var entero
+    strConfig->PUERTO_FS= entero;//asigna el numero guardado en entero, en la estructura
+
+    entero = config_get_int_value(archivoConfiguracion,"QUANTUM");//guarda el dato en la var entero
+    strConfig->QUANTUM= entero;//asigna el numero guardado en entero, en la estructura
+
+    entero = config_get_int_value(archivoConfiguracion,"QUANTUM_SLEEP");//guarda el dato en la var entero
+    strConfig->QUANTUM_SLEEP= entero;//asigna el numero guardado en entero, en la estructura
+
+    aux = config_get_string_value(archivoConfiguracion, "ALGORITMO");
+    strcpy(strConfig->ALGORITMO, aux);
+
+    entero = config_get_int_value(archivoConfiguracion,"GRADO_MULTIPROG");//guarda el dato en la var entero
+    strConfig->GRADO_MULTIPROG= entero;//asigna el numero guardado en entero, en la estructura
+
+    entero = config_get_int_value(archivoConfiguracion,"STACK_SIZE");//guarda el dato en la var entero
+    strConfig->STACK_SIZE= entero;//asigna el numero guardado en entero, en la estructura
+
+
+    config_destroy(archivoConfiguracion);
+
+        return 0 ;
 
 }
-printf("cliente: %s",buffer);
 
-send(newSocket2,"Bienvenido al servidor.",22,0);//Jugar con variables para el mensaje y la longitud de no ser msj fijo
+void checkError(int valor, char* mensaje){
+	if(valor<0){
+		printf("%s \n",mensaje);
+		exit(-1);
+	}
+}
 
-close(newSocket2);
-	return EXIT_SUCCESS;
-}
-}

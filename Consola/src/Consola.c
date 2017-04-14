@@ -1,86 +1,132 @@
+// includes libreria + i/o estandar
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
+
+// includes sockets
+#include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/ip.h>
 #include <arpa/inet.h>
-#include <sys/wait.h>
-#include <signal.h>
 #include <unistd.h>
-#include <netdb.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
-#define PORT 38432
-#define MAXIMODATOS 30
+//include archivoConfiguracion
+#include "Consola.h"
+#include <commons/config.h>
+
+#define PATH_ARCHIVO_CONFIG "/home/utnso/tp-2017-1c-Los-5-Fant-sticos/Consola/archivoConfiguracion"
+#define PUERTO 1299 // puerto de conexion
+#define MAXBUFFER 1024 // tamaño maximo en caracteres que le daremos al buffer
+#define BUFER_MAX_LEN 2048
+#define FILE_MAX 1024
+
+archivoConfiguracion *strConfig;//puntero de mi struct
+
+void checkError(int , char*);
+int obtenerArchivoConfiguracion();
+
+int main(void) {
+	char buffer[MAXBUFFER];
+	int macho; // el socket que se va a conectar, desde el cliente al servidor
+	struct sockaddr_in datosServer; // datos del servidor representados en una estructura sockaddr_in
+	int enviados; // > 0 si se envio algo
+	int conecta;
+	obtenerArchivoConfiguracion();
+		puts("\n");
+
+		printf("Configuracion desde %s\n",PATH_ARCHIVO_CONFIG);
+
+  		puts("\n");
+
+		printf ("PUERTO_KERNEL: %d \n", strConfig->PUERTO_KERNEL );
+	    printf("IP_KERNEL %s \n",strConfig->IP_KERNEL);
 
 
-int main(void){
+	// se crea el socket
+	macho = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
+	checkError(macho,"Error en socket()\n");
 
-int newSocket, bytesRecibidos;//ficheros
-char buffer[MAXIMODATOS]; //ACA SE GUARDA LO Q  SE RECIBE
-char hostname[40];
-struct hostent *he;
-struct sockaddr_in servidor;
-char mensaje[30];
+	// cargamos la estructura con la info del server
 
+	datosServer.sin_family = AF_INET; // tipo de direccion, en este caso Internet Protocol v4
+	datosServer.sin_addr.s_addr = INADDR_ANY; // localHost
+	datosServer.sin_port = htons (strConfig->PUERTO_KERNEL); // puerto a conectarse
+	memset(datosServer.sin_zero, 0, 8); // campo raro ?
 
+	// me conecto al servidor
+	conecta= connect (macho, (struct sockaddr *) &datosServer, sizeof (struct sockaddr));
 
-gethostname(hostname,sizeof hostname);
+	checkError(conecta,"Error en connect()\n");
 
-if((newSocket=socket(AF_INET,SOCK_STREAM,0)) == -1){
-	printf("Error en socket");
-exit(-1);
+	printf ("Conectado al servidor \nPara desconectarse escriba \"salir\"\n");
+
+	while (1) {
+		printf ("Escriba el mensaje a enviar> ");
+
+		fgets (buffer, MAXBUFFER, stdin); // tomamos el input del usuario en pantalla
+
+		buffer [strlen(buffer)-1] = '\0'; // strlen devuelve el tamaño del string sin contar el caracter nulo
+
+		if (strcmp (buffer,"salir")==0) break; // si el string que tipeo el usuario fue "salir" entonces se sale
+
+		enviados = send (macho, buffer, strlen(buffer), 0); // se envia el mensaje
+
+		checkError(enviados,"Error en send()\n");
+
+		printf ("Enviado\n");
+
+	}
+
+	close (macho);
+	printf("Desconectado\n");
+
+	return 0;
 }
 
-he= gethostbyname(hostname);
 
-if(he == NULL){
-	printf("error host");
-	exit(-1);
+int obtenerArchivoConfiguracion()
+{
+    t_config *archivoConfiguracion = malloc(sizeof(t_config));
+
+
+    strConfig = malloc(sizeof(archivoConfiguracion));
+    char path_file[FILE_MAX];
+    memset(path_file, '\0', FILE_MAX);
+    strcpy(path_file, PATH_ARCHIVO_CONFIG);//Copio el contenido de la ruta paara pasarle por parametro a config_create (commons)
+
+    char* aux;
+    int entero;
+
+    archivoConfiguracion = config_create(path_file);
+
+    aux =(char*)malloc (BUFER_MAX_LEN);//EN ESTA VAR VOY OBTENIENDO LOS VALORES DEL ARCHIVO
+    memset(aux,'\0', BUFER_MAX_LEN);
+
+    if ( archivoConfiguracion == NULL )
+    {
+        return -1;
+    }
+
+    entero = config_get_int_value(archivoConfiguracion,"PUERTO_KERNEL");//guarda el dato en la var entero
+    strConfig->PUERTO_KERNEL = entero;//asigna el numero guardado en entero, en la estructura
+
+    aux = config_get_string_value(archivoConfiguracion, "IP_KERNEL");
+    strcpy(strConfig->IP_KERNEL, aux);
+
+
+
+    config_destroy(archivoConfiguracion);
+
+        return 0 ;
+
 }
 
-
-servidor.sin_family = AF_INET;
-servidor.sin_port = htons(PORT);
-
-bcopy((char *)he->h_addr,(char *)&servidor.sin_addr.s_addr, he->h_length);
-bzero(&(servidor.sin_zero),8);
-
-
-
-if(connect(newSocket,(struct sockaddr *)&servidor, sizeof(servidor)) == -1){
-	printf("Error en connect");
-	exit(-1);
-
+void checkError(int valor, char* mensaje){
+	if(valor<0){
+		printf("%s \n",mensaje);
+		exit(-1);
+	}
 }
-
-char *a="Hola servidor";
-int s;
-
-if((s= send(newSocket,a, strlen(s)+1,0))==-1){
-	printf("Error en envio");
-	exit(-1);
-}
-
-
-
-if((bytesRecibidos=recv(newSocket,buffer,MAXIMODATOS,0)) == -1){
-	printf("Error en recv");
-	exit(-1);
-
-}
-
-buffer[bytesRecibidos] = '\0' ;
-		//PONER BARRA CERO Y TERMINAR CADENA
-
-printf("Mensaje recibido desde el servidor: %s", buffer);
-
-close(newSocket);
-return EXIT_SUCCESS;
-}
-
-
