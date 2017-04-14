@@ -10,12 +10,10 @@
 
 #include "cpu.h"
 #include "configuration.h"
-#include "socket.h"
 #include <dc-commons/socket-client.h>
 
 int main(int argc, char *argv[]) {
 
-	int socketClient;
 	char *msg = "Hola, soy cpu!";
 
 	puts("Accediendo al archivo de configuración...");
@@ -29,7 +27,7 @@ int main(int argc, char *argv[]) {
 	log_info(logger, "Inició el proceso correctamente!");
 
 	puts("Creando conexiones...");
-	socketClient = conectarAMemory(config->ip_memoria,config->puerto_memoria);
+	int socketClient = crearSocketCliente(config->ip_memoria,config->puerto_memoria);
 
 	int len = strlen(msg);
 	if(send(socketClient,msg,len,0) == -1){

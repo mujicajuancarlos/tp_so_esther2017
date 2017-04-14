@@ -14,6 +14,10 @@
 #include <commons/config.h>
 #include <commons/log.h>
 
+//commons death coders
+#include <dc-commons/logger.h>
+#include <dc-commons/socket-client.h>
+
 //standar
 #include <stdio.h>
 #include <stdlib.h>
