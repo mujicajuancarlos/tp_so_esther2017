@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 
+#include <dc-commons/socket-clien.h>
 #include "configuration.h"
 
 void crearConexiones(Configuration* config);

@@ -15,6 +15,9 @@
 #include <unistd.h>
 #include <sys/types.h>
 
+#include <dc-commons/socket-server.h>
+#include <dc-commons/package.h>
+
 #include "configuration.h"
 
 
