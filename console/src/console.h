@@ -16,6 +16,7 @@
 
 //commons death coders
 #include <dc-commons/logger.h>
+#include <dc-commons/socket-client.h>
 
 //standart
 #include <stdio.h>

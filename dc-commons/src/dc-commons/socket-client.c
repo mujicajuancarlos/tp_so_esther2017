@@ -16,14 +16,15 @@ int crearSocketCliente(const char* ip, int port) {
 	serv_addr.sin_port = htons(port);
 
 	socketClientFileDescription = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (socketClientFileDescription == -1)
-		error_show("Create file descriptor failed FD: %d address: %c port: %d",
+	if (socketClientFileDescription == -1) {
+		error_show("Create file descriptor failed FD: %d address: %s port: %d\n",
 				socketClientFileDescription, ip, port);
-	return SOCKET_FAILURE;
+		return SOCKET_FAILURE;
+	}
 
 	if (connect(socketClientFileDescription, (void*) &serv_addr,
 			sizeof(serv_addr)) == -1) {
-		error_show("Connect failed FD: %d address: %c port: %d",
+		error_show("Connect failed FD: %d address: %s port: %d\n",
 				socketClientFileDescription, ip, port);
 		return SOCKET_FAILURE;
 	}

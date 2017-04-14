@@ -11,10 +11,7 @@ int crearSocketServer(int port) {
 
 	struct sockaddr_in direccionServidor;
 	direccionServidor.sin_family = AF_INET;
-	//direccionServidor.sin_addr.s_addr = htonl(ip);
-	direccionServidor.sin_addr.s_addr = inet_addr("127.0.0.1");
-//	direccionServidor.sin_addr.s_addr = htonl(INADDR_ANY);
-	//direccionServidor.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	direccionServidor.sin_addr.s_addr = inet_addr(LOCAL_HOST);
 	direccionServidor.sin_port = htons(port);
 
 	//creo el file descriptor
@@ -22,29 +19,29 @@ int crearSocketServer(int port) {
 
 	if (socketFileDescriptor == -1) {
 		error_show(
-				"Create socket file descriptor failed FD: %d address: %c port: %d",
-				socketFileDescriptor, INADDR_LOOPBACK, port);
+				"Create socket file descriptor failed FD: %d address: %s port: %d\n",
+				socketFileDescriptor, LOCAL_HOST, port);
 		return SOCKET_FAILURE;
 	}
 
 	int activado = 1;
 	if (setsockopt(socketFileDescriptor, SOL_SOCKET, SO_REUSEADDR, &activado,
 			sizeof(activado)) != 0) {
-		error_show("Set socket option failed FD: %d address: %c port: %d",
-				socketFileDescriptor, INADDR_LOOPBACK, port);
+		error_show("Set socket option failed FD: %d address: %s port: %d\n",
+				socketFileDescriptor, LOCAL_HOST, port);
 		return SOCKET_FAILURE;
 	}
 
 	if (bind(socketFileDescriptor, (void*) &direccionServidor,
 			sizeof(direccionServidor)) != 0) {
-		error_show("Socket bind failed FD: %d address: %c port: %d",
-				socketFileDescriptor, INADDR_LOOPBACK, port);
+		error_show("Socket bind failed FD: %d address: %s port: %d\n",
+				socketFileDescriptor, LOCAL_HOST, port);
 		return SOCKET_FAILURE;
 	}
 
 	if (listen(socketFileDescriptor, 100) == -1) {
-		error_show("Socket listen failed FD: %d address: %c port: %d",
-				socketFileDescriptor, INADDR_LOOPBACK, port);
+		error_show("Socket listen failed FD: %d address: %s port: %d\n",
+				socketFileDescriptor, LOCAL_HOST, port);
 		close(socketFileDescriptor);
 		return SOCKET_FAILURE;
 	}
@@ -62,7 +59,7 @@ int aceptarConexionCliente(int socketServerFileDescriptor) {
 			&longitudCliente);
 
 	if (newSocketFileDescriptor == -1) {
-		error_show("Socket accept failed FD: %d", socketServerFileDescriptor);
+		error_show("Socket accept failed FD: %d\n", socketServerFileDescriptor);
 		return SOCKET_FAILURE;
 	}
 
