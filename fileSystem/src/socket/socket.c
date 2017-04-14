@@ -48,7 +48,7 @@ int crearSocketServer(int puerto) {
 
 		error_show("Socket listen failed FD: %d address: %c port: %d",
 				socketFileDescriptor, INADDR_LOOPBACK, puerto);
-		perror("Listen other connection");
+		
 		close(socketFileDescriptor);
 		return SOCKET_FAILURE;
 	}
