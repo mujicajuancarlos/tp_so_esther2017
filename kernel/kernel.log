@@ -414,3 +414,23 @@
 [INFO] 22:30:18:842 ESThER/(24191:24197): La consola 7 me envio el siguiente saludo: hola como estas
 
 [INFO] 22:30:25:269 ESThER/(24191:24197): Esperando nuevas conexiones y mensajes
+[INFO] 02:21:12:430 ESThER/(28135:28135): Inicializado proceso kernel
+[INFO] 02:21:12:431 ESThER/(28135:28135): Creando socket para conectarse a la memoria
+[ERROR] 02:21:12:431 ESThER/(28135:28135): No se pudo establecer la conexion con la memoria
+[INFO] 02:21:12:431 ESThER/(28135:28135): Inicializando lista de cpu
+[INFO] 02:21:12:431 ESThER/(28135:28135): Inicializando sockets servidor
+[INFO] 02:21:12:431 ESThER/(28135:28135): Server Socket de consolas esta escuchando
+[INFO] 02:21:12:431 ESThER/(28135:28135): Server Socket de cpu's esta escuchando
+[INFO] 02:21:12:431 ESThER/(28135:28135): Creando el hilo para mantener CPU's
+[INFO] 02:21:12:454 ESThER/(28135:28135): Creando el hilo para mantener Consolas's
+[INFO] 02:21:12:454 ESThER/(28135:28143): Esperando nuevas conexiones y mensajes
+[INFO] 02:21:12:458 ESThER/(28135:28144): Esperando nuevas conexiones y mensajes
+[INFO] 02:21:48:80 ESThER/(28135:28144): Se registro la nueva conexion del server socket 5 tu id es 0
+[INFO] 02:21:48:80 ESThER/(28135:28144): Se envio la respuesta de conexion para el cliente 7
+[INFO] 02:21:48:80 ESThER/(28135:28144): Esperando nuevas conexiones y mensajes
+[INFO] 02:23:01:551 ESThER/(28135:28143): Se registro la nueva conexion del server socket 6 tu id es 0
+[INFO] 02:23:01:551 ESThER/(28135:28143): Se envio la respuesta de conexion para el cliente 8
+[INFO] 02:23:01:551 ESThER/(28135:28143): Esperando nuevas conexiones y mensajes
+[INFO] 02:23:20:301 ESThER/(28135:28144): La consola 7 me envio el siguiente saludo: hola este es el mensaje
+
+[INFO] 02:24:29:25 ESThER/(28135:28144): Replicando mensaje en cpus

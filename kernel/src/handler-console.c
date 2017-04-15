@@ -135,7 +135,6 @@ void crearServerSocketParaConsola(kernel_struct* args) {
 		exit(-1);
 	}
 	logInfo("Server Socket de consolas esta escuchando");
-	inicializarArray(MAX_CONSOLAS, args->consolaSockets);
 }
 
 void nuevaConsola(t_list* listaConsolas, int socketConsola_fd) {

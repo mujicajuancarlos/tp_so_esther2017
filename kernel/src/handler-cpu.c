@@ -109,7 +109,6 @@ void crearServerSocketParaCpus(kernel_struct* args) {
 		exit(-1);
 	}
 	logInfo("Server Socket de cpu's esta escuchando");
-	inicializarArray(MAX_CPUS, args->cpuSockets);
 }
 
 void nuevoCPU(t_list* listaCPUs, int socketCPU_fd) {
