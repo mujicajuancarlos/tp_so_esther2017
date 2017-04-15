@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 	puts("Configuración del proceso:");
 
 	//cómo mostrar bloques y punto_montaje
-	printf("\nTAMANIO_BLOQUES= %d\nCANTIDAD_BLOQUES = %d\nMAGIC_NUMBER= %s\nTAMANIO= %d\nBLOQUES= %d\nPUERTO= %d\nPUNTO_MONTAJE= %d\n\n",
+	printf("\nTAMANIO_BLOQUES= %d\nCANTIDAD_BLOQUES = %d\nMAGIC_NUMBER= %s\nTAMANIO= %d\nBLOQUES= %d\nPUERTO= %d\nPUNTO_MONTAJE= %s\n\n",
 				config->tamanio_bloques,config->cantidad_bloques,config->magic_number,config->tamanio,config->puerto,config->punto_montaje);
 
 	puts("Creando el logger fileSystem.log ...");

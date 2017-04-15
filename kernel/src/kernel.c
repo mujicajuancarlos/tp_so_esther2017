@@ -12,6 +12,7 @@
 #include "handler-console.h"
 #include "handler-cpu.h"
 #include "handler-memory.h"
+#include "handler-fileSystem.h"
 
 int main(int argc, char *argv[]) {
 
@@ -28,6 +29,7 @@ int main(int argc, char *argv[]) {
 	initializeStruct(&args, config);
 
 	handleMemoria(&args);
+	handleFileSystem(&args);
 
 	logInfo("Inicializando lista de cpu");
 
