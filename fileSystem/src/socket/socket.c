@@ -25,15 +25,15 @@ int crearSocketServer(int puerto) {
 
 	int activado = 1;
 
-	if (setsockopt(socketFileDescriptor, SOL_SOCKET, SO_REUSEADDR, &activado,
-			sizeof(activado)) != 0) {
-		error_show("Set socket option failed FD: %d address: %c port: %d",
-				socketFileDescriptor, INADDR_LOOPBACK, puerto);
-		return SOCKET_FAILURE;
-	}
+	setsockopt(socketFileDescriptor, SOL_SOCKET, SO_REUSEADDR, &activado,
+			sizeof(activado));
 
 	if (bind(socketFileDescriptor, (void*) &direccionServidor,sizeof(direccionServidor)) != 0) {
-
+		if (bind(socketFileDescriptor, (void*) &direccionServidor,
+			sizeof(direccionServidor)) == -1) {
+			perror("Socket bind failed");
+			exit(1);
+		}
 		error_show("Socket bind failed FD: %d address: %c port: %d",
 				socketFileDescriptor, INADDR_LOOPBACK, puerto);
 		return SOCKET_FAILURE;
