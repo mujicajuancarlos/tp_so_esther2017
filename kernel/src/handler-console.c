@@ -62,7 +62,7 @@ void handleConsolas(kernel_struct *args) {
 				//creo un packete para almacenar la informacion recibida
 				Package* package = createEmptyPackage();
 				if (receivePackage(socketClientDescriptor, package) == 0)
-					handleConsoleRequest(socketClientDescriptor, package);
+					handleConsoleRequest(socketClientDescriptor, package, args);
 				else
 					logError("Error al intentar recibir los datos del FD: %D",
 							socketClientDescriptor);
@@ -83,7 +83,8 @@ void handleConsolas(kernel_struct *args) {
 
 }
 
-void handleConsoleRequest(int fileDescriptor, Package *package) {
+void handleConsoleRequest(int fileDescriptor, Package *package,
+		kernel_struct *args) {
 	switch (package->msgCode) {
 	case COD_INICIAR_PROGRAMA:
 		logInfo("Ejecutando inicio de programa");
@@ -94,11 +95,36 @@ void handleConsoleRequest(int fileDescriptor, Package *package) {
 	case COD_SALUDO:
 		logInfo("La consola %d me envio el siguiente saludo: %s",
 				fileDescriptor, package->message);
+		logInfo("Replicando mensaje en cpus");
+		void _send_message(void* element) {
+			if (sendPackage(element, package) == -1)
+				logError("No se pudo enviar el mensaje al cpu fd: %d", element);
+			else
+				logInfo("Se envió el mensaje a la cpu fd: %d", element);
+		}
+		list_iterate(args->listaCPUs, _send_message);
+		if (args->socketClientFileSystem != 0) {
+			if (sendPackage(args->socketClientFileSystem, package) == -1)
+				logError("No se pudo enviar el mensaje al file system fd: %d",
+						args->socketClientFileSystem);
+			else
+				logInfo("Se envió el mensaje a la file system fd: %d",
+						args->socketClientFileSystem);
+		}
+		if (args->socketClientMemoria != 0) {
+			if (sendPackage(args->socketClientMemoria, package) == -1)
+				logError("No se pudo enviar el mensaje a la memoria fd: %d",
+						args->socketClientMemoria);
+			else
+				logInfo("Se envió el mensaje a la memoria fd: %d",
+						args->socketClientMemoria);
+		}
 		break;
 	default:
 		logError("La consola solicito una accion no permitida");
 		break;
 	}
+
 }
 
 void crearServerSocketParaConsola(kernel_struct* args) {
