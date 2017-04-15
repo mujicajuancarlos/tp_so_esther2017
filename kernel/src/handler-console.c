@@ -5,14 +5,7 @@
  *      Author: utnso
  */
 
-#include "console.h"
-#include <errno.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-
-#define SALUDO_1 1
-#define SALUDO_2 2
-#define SALUDO_3 3
+#include "handler-console.h"
 
 void handleConsolas(kernel_struct *args) {
 
@@ -62,34 +55,25 @@ void handleConsolas(kernel_struct *args) {
 		if ((activity < 0) && (errno != EINTR))
 			logError("Error al hacer el select del socket server de consola");
 
-		logInfo("Llego un nuevo pedido");
-
 		// Verifico si algún cliente que ya estaba conectado ha enviado un mensaje
 		for (i = 0; i < MAX_CONSOLAS; i++) {
 			socketClientDescriptor = (args->consolaSockets)[i];
 			if (FD_ISSET(socketClientDescriptor, &descriptoresLectura)) {
 				//creo un packete para almacenar la informacion recibida
-				Package* package = createPackage();
-				//identifico el mensaje enviado por el cliente
-				if (recieve_and_deserialize(package, socketClientDescriptor)
-						> 0) {
-					//logDebug("CPU %d envía [message code]: %d, [Mensaje]: %s", i+1, package->msgCode, package->message);
-					analizarMensajeConsola(socketClientDescriptor, package, args);
-				} else {
-					//si llego aca es porque debe cerrarse la conexion
-					logInfo("Consola %d ha cerrado la conexión", i);
-					//TODO descomentar y agregar la funcion para crear la estructura cpu y agregarla a listaCPUs
-					//eliminarCPU(listaCPUs, socketClientDescriptor);
-					(args->consolaSockets)[i] = 0;
-				}
+				Package* package = createEmptyPackage();
+				if (receivePackage(socketClientDescriptor, package) == 0)
+					handleConsoleRequest(socketClientDescriptor, package);
+				else
+					logError("Error al intentar recibir los datos del FD: %D",
+							socketClientDescriptor);
 				destroyPackage(package);
 			}
 		}
 
 		// Verifico si hay un nuevo cliente tratado de conectarse
 		if (FD_ISSET(socketServidor, &descriptoresLectura)) {
-			socketClientDescriptor = registrarNuevoCliente(socketServidor,
-					args->consolaSockets, MAX_CONSOLAS);
+			socketClientDescriptor = registrarFileDescriptorInArray(
+					socketServidor, args->consolaSockets, MAX_CONSOLAS);
 			if (socketClientDescriptor != -1) {
 				nuevaConsola(listaConsolas, socketClientDescriptor);
 			}
@@ -99,30 +83,44 @@ void handleConsolas(kernel_struct *args) {
 
 }
 
+void handleConsoleRequest(int fileDescriptor, Package *package) {
+	switch (package->msgCode) {
+	case COD_INICIAR_PROGRAMA:
+		logInfo("Ejecutando inicio de programa");
+		break;
+	case COD_FINALIZAR_PROGRAMA:
+		logInfo("Ejecutando finalizacion de programa");
+		break;
+	case COD_SALUDO:
+		logInfo("La consola %d me envio el siguiente saludo: %s",
+				fileDescriptor, package->message);
+		break;
+	default:
+		logError("La consola solicito una accion no permitida");
+		break;
+	}
+}
+
+void crearServerSocketParaConsola(kernel_struct* args) {
+	//server socket para atender los pedidos de la consola
+	args->socketServerConsola = crearSocketServer(args->config->puerto_program);
+	if (args->socketServerConsola == -1) {
+		logError("No se pudo crear el server para las consolas");
+		exit(-1);
+	}
+	logInfo("Server Socket de consolas esta escuchando");
+	inicializarArray(MAX_CONSOLAS, args->consolaSockets);
+}
+
 void nuevaConsola(t_list* listaConsolas, int socketConsola_fd) {
 	//este es el momento que deberia crearse una nueva cpu
 	//TODO a completar
 	//crear una nueva cpu, responder adecuadamente al cliente para comenzar el proceso
 	char* message = "Hola, te acabas de conectar al servidor kernel";
-	if (send(socketConsola_fd, message, strlen(message), 0) != strlen(message)) {
+	if (send(socketConsola_fd, message, strlen(message), 0)
+			!= strlen(message)) {
 		logError("No se pudo enviar el mensaje al nuevo cliente conectado");
 	}
 	logInfo("Se envio la respuesta de conexion para el cliente %d",
 			socketConsola_fd);
 }
-
-
-void analizarMensajeConsola(int socketDescriptor, Package* package,
-		kernel_struct *args) {
-	if (package->msgCode == SALUDO_1) {
-		logTrace("Consola %d me informa que debo ejecutar el saludo 1",
-				socketDescriptor);
-		printf("Saludo numero 1");
-	}
-	char* message = "Este es mensaje por defecto, para avisarte que me llego tu solicitud";
-	if (send(socketDescriptor, message, strlen(message), 0) != strlen(message)) {
-			logError("No se pudo enviar el mensaje al nuevo cliente conectado");
-		}
-		logInfo("Se envio la respuesta al cliente %d", socketDescriptor);
-}
-

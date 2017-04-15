@@ -5,19 +5,19 @@
  *      Author: utnso
  */
 
-#ifndef CONSOLE_CONSOLE_H_
-#define CONSOLE_CONSOLE_H_
+#ifndef HANDLER_CONSOLE_H_
+#define HANDLER_CONSOLE_H_
 
-#include <pthread.h>
+#include <dc-commons/package.h>
+#include <dc-commons/socket-message.h>
+#include <dc-commons/protocol-kernel-console.h>
 
-#include "../kernel.h"
-#include "../socket/client.h"
-#include "../socket/server.h"
+#include "kernel.h"
+#include "commonFunctions.h"
 
 void handleConsolas(kernel_struct *args);
-void analizarMensajeConsola(int socketDescriptor , Package* package, kernel_struct *args);
+void handleConsoleRequest(int fileDescriptor, Package *package);
+void crearServerSocketParaConsola(kernel_struct* args);
 void nuevaConsola(t_list* listaCPUs, int socketCPU_fd);
 
-
-
-#endif /* CONSOLE_CONSOLE_H_ */
+#endif /* HANDLER_CONSOLE_H_ */

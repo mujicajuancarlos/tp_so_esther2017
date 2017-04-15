@@ -5,17 +5,19 @@
  *      Author: utnso
  */
 
-#ifndef CPU_CPU_H_
-#define CPU_CPU_H_
+#ifndef HANDLER_CPU_H_
+#define HANDLER_CPU_H_
 
-#include <pthread.h>
+#include <dc-commons/package.h>
+#include <dc-commons/socket-message.h>
+#include <dc-commons/protocol-kernel-cpu.h>
 
-#include "../kernel.h"
-#include "../socket/client.h"
-#include "../socket/server.h"
+#include "kernel.h"
+#include "commonFunctions.h"
 
 void handleCPUs(kernel_struct *args);
-void analizarMensajeCPU(int socketDescriptor , Package* package, kernel_struct *args);
+void handleCpuRequest(int fileDescriptor, Package *package);
+void crearServerSocketParaCpus(kernel_struct* args);
 void nuevoCPU(t_list* listaCPUs, int socketCPU_fd);
 
-#endif /* CPU_CPU_H_ */
+#endif /* HANDLER_CPU_H_ */

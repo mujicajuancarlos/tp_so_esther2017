@@ -13,7 +13,6 @@ EXECUTABLES :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
-src/socket \
 src \
 src/configuration \
 

@@ -393,3 +393,24 @@
 [INFO] 02:21:47:321 ESThER/(6151:6151): Creando el hilo para mantener Consolas's
 [INFO] 02:21:47:321 ESThER/(6151:6172): Esperando nuevas conexiones y mensajes
 [INFO] 02:21:47:327 ESThER/(6151:6173): Esperando nuevas conexiones y mensajes
+[INFO] 22:22:52:133 ESThER/(24025:24025): Inicializado proceso kernel
+[INFO] 22:22:52:133 ESThER/(24025:24025): Creando socket para conectarse a la memoria
+[INFO] 22:24:36:389 ESThER/(24078:24078): Inicializado proceso kernel
+[INFO] 22:24:36:389 ESThER/(24078:24078): Creando socket para conectarse a la memoria
+[INFO] 22:27:30:996 ESThER/(24191:24191): Inicializado proceso kernel
+[INFO] 22:27:30:996 ESThER/(24191:24191): Creando socket para conectarse a la memoria
+[ERROR] 22:27:30:996 ESThER/(24191:24191): No se pudo establecer la conexion con la memoria
+[INFO] 22:27:30:996 ESThER/(24191:24191): Inicializando lista de cpu
+[INFO] 22:27:30:996 ESThER/(24191:24191): Inicializando sockets servidor
+[INFO] 22:27:30:996 ESThER/(24191:24191): Server Socket de consolas esta escuchando
+[INFO] 22:27:30:996 ESThER/(24191:24191): Server Socket de cpu's esta escuchando
+[INFO] 22:27:30:996 ESThER/(24191:24191): Creando el hilo para mantener CPU's
+[INFO] 22:27:31:12 ESThER/(24191:24191): Creando el hilo para mantener Consolas's
+[INFO] 22:27:31:13 ESThER/(24191:24196): Esperando nuevas conexiones y mensajes
+[INFO] 22:27:31:15 ESThER/(24191:24197): Esperando nuevas conexiones y mensajes
+[INFO] 22:28:09:572 ESThER/(24191:24197): Se registro la nueva conexion del server socket 5 tu id es 0
+[INFO] 22:28:09:572 ESThER/(24191:24197): Se envio la respuesta de conexion para el cliente 7
+[INFO] 22:28:09:572 ESThER/(24191:24197): Esperando nuevas conexiones y mensajes
+[INFO] 22:30:18:842 ESThER/(24191:24197): La consola 7 me envio el siguiente saludo: hola como estas
+
+[INFO] 22:30:25:269 ESThER/(24191:24197): Esperando nuevas conexiones y mensajes

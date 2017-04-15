@@ -8,7 +8,6 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include src/socket/subdir.mk
 -include src/configuration/subdir.mk
 -include src/subdir.mk
 -include subdir.mk

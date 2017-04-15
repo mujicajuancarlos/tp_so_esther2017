@@ -8,22 +8,10 @@
 #ifndef KERNEL_H_
 #define KERNEL_H_
 
-//standart
-#include <stdio.h>
-#include <stdlib.h>
-//commoms
-#include <commons/collections/list.h>
-#include <commons/string.h>
-#include <commons/config.h>
-#include <commons/log.h>
-//commons death coders
-#include <dc-commons/logger.h>
-#include <dc-commons/socket-client.h>
-//sockets
-#include <sys/socket.h>
-//configuracion
-#include "configuration/configuration.h"
 
+#include <commons/config.h>
+#include <dc-commons/logger.h>
+#include "configuration/configuration.h"
 
 #define MAX_CPUS 20	//cantidad de CPUs que se pueden conectar
 #define MAX_CONSOLAS 20	//cantidad de Consolas que se pueden conectar
@@ -36,6 +24,8 @@
 typedef struct kernel_struct {
 	int socketServerCPU;
 	int socketServerConsola;
+	int socketClientMemoria;
+	int socketClientFileSystem;
 	int cpuSockets[MAX_CPUS];
 	int consolaSockets[MAX_CONSOLAS];
 	t_list* listaCPUs;
@@ -50,8 +40,5 @@ typedef struct CPU {
     int libre;	// 0:ocupado / 1:libre
 } CPU;
 
-/**
- * DEFINICION DE FUNCIONES
- */
 
 #endif /* KERNEL_H_ */

@@ -5,36 +5,32 @@
  *      Author: utnso
  */
 
-#ifndef SOCKET_SERVER_H_
-#define SOCKET_SERVER_H_
+#ifndef COMMONFUNCTIONS_H_
+#define COMMONFUNCTIONS_H_
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <arpa/inet.h>
-#include <bits/socket.h>
-#include <asm-generic/socket.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#include <netinet/in.h>
-
-//commoms
-#include <commons/collections/list.h>
-#include <commons/string.h>
-#include <commons/config.h>
-#include <commons/log.h>
 #include <dc-commons/socket-server.h>
-#include <dc-commons/package.h>
 
-#include "../configuration/configuration.h"
-#include "../kernel.h"
+#include "kernel.h"
+#include "handler-console.h"
+#include "handler-cpu.h"
+#include "handler-memory.h"
 /**
  * DEFINICION DE FUNCIONES
  */
 
+/**
+ * funcion que genera los sockets cliente y servidor para el proceso kernel
+ */
 void crearSockets(kernel_struct* args);
-void crearServerSocketParaConsola(kernel_struct* args);
-void crearServerSocketParaCpus(kernel_struct* args);
-void inicializarSockets(int tamanio_maximo, int* arraySockets);
-int recieve_and_deserialize(Package *package, int socketCliente);
 
-#endif /* SOCKET_SERVER_H_ */
+/**
+ * funcion que recibe un array y su tamaño para inicializar con -1
+ */
+void inicializarArray(int tamanio_maximo, int* arraySockets);
+
+/**
+ * funcion que setea el file descriptor en la primer posicion disponible que encuentre
+ */
+int registrarFileDescriptorInArray(int fd_socketServer, int* arraySockets, int max_clientes);
+
+#endif /* COMMONFUNCTIONS_H_ */
