@@ -18,6 +18,6 @@
 void handleCPUs(kernel_struct *args);
 void handleCpuRequest(int fileDescriptor, Package *package);
 void crearServerSocketParaCpus(kernel_struct* args);
-void nuevoCPU(t_list* listaCPUs, int socketCPU_fd);
+void crear_registrar_CPU(t_list* listaCPUs, int socketCPU_fd);
 
 #endif /* HANDLER_CPU_H_ */

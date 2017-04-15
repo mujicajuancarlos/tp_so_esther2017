@@ -75,7 +75,7 @@ void handleCPUs(kernel_struct *args) {
 			socketClientDescriptor = registrarFileDescriptorInArray(
 					socketServidor, args->cpuSockets, MAX_CPUS);
 			if (socketClientDescriptor != -1) {
-				nuevoCPU(listaCPUs, socketClientDescriptor);
+				crear_registrar_CPU(listaCPUs, socketClientDescriptor);
 			}
 		}
 
@@ -111,14 +111,13 @@ void crearServerSocketParaCpus(kernel_struct* args) {
 	logInfo("Server Socket de cpu's esta escuchando");
 }
 
-void nuevoCPU(t_list* listaCPUs, int socketCPU_fd) {
-	//este es el momento que deberia crearse una nueva cpu
-	//TODO a completar
-	//crear una nueva cpu, responder adecuadamente al cliente para comenzar el proceso
-	char* message = "Hola, te acabas de conectar al servidor kernel";
-	if (send(socketCPU_fd, message, strlen(message), 0) != strlen(message)) {
-		logError("No se pudo enviar el mensaje al nuevo cliente conectado");
-	}
-	logInfo("Se envio la respuesta de conexion para el cliente %d",
-			socketCPU_fd);
+void crear_registrar_CPU(t_list* listaCPUs, int socketCPU_fd) {
+	char* message = "Conexion con kernel establecida con kernel";
+	Package* package = createPackage(COD_SALUDO,message, strlen(message));
+	sendPackage(socketCPU_fd,package);
+	CPU* cpu = malloc(sizeof(CPU));
+	cpu->cpuFD = socketCPU_fd;
+	cpu->libre = 1;
+	cpu->pid = socketCPU_fd;
+	list_add(listaCPUs, cpu);
 }

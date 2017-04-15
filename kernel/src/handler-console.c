@@ -96,14 +96,14 @@ void handleConsoleRequest(int fileDescriptor, Package *package,
 		logInfo("La consola %d me envio el siguiente saludo: %s",
 				fileDescriptor, package->message);
 		logInfo("Replicando mensaje en cpus");
-		void _send_message(void* element) {
-			if (sendPackage(element, package) == -1)
-				logError("No se pudo enviar el mensaje al cpu fd: %d", element);
+		void _send_message(CPU* cpu) {
+			if (sendPackage(cpu->cpuFD, package) == -1)
+				logError("No se pudo enviar el mensaje al cpu fd: %d", cpu->cpuFD);
 			else
-				logInfo("Se envió el mensaje a la cpu fd: %d", element);
+				logInfo("Se envió el mensaje a la cpu fd: %d", cpu->cpuFD);
 		}
-		list_iterate(args->listaCPUs, _send_message);
-		if (args->socketClientFileSystem != 0) {
+		list_iterate(args->listaCPUs, (void*) _send_message);
+		if (args->socketClientFileSystem != -1) {
 			if (sendPackage(args->socketClientFileSystem, package) == -1)
 				logError("No se pudo enviar el mensaje al file system fd: %d",
 						args->socketClientFileSystem);
@@ -111,7 +111,7 @@ void handleConsoleRequest(int fileDescriptor, Package *package,
 				logInfo("Se envió el mensaje a la file system fd: %d",
 						args->socketClientFileSystem);
 		}
-		if (args->socketClientMemoria != 0) {
+		if (args->socketClientMemoria != -1) {
 			if (sendPackage(args->socketClientMemoria, package) == -1)
 				logError("No se pudo enviar el mensaje a la memoria fd: %d",
 						args->socketClientMemoria);

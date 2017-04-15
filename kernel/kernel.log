@@ -434,3 +434,57 @@
 [INFO] 02:23:20:301 ESThER/(28135:28144): La consola 7 me envio el siguiente saludo: hola este es el mensaje
 
 [INFO] 02:24:29:25 ESThER/(28135:28144): Replicando mensaje en cpus
+[INFO] 03:11:50:4 ESThER/(29244:29244): Inicializado proceso kernel
+[INFO] 03:11:50:4 ESThER/(29244:29244): Creando socket para conectarse a la memoria
+[INFO] 03:11:51:4 ESThER/(29244:29244): Inicializando lista de cpu
+[INFO] 03:11:51:4 ESThER/(29244:29244): Inicializando sockets servidor
+[INFO] 03:11:51:4 ESThER/(29244:29244): Server Socket de consolas esta escuchando
+[INFO] 03:11:51:4 ESThER/(29244:29244): Server Socket de cpu's esta escuchando
+[INFO] 03:11:51:4 ESThER/(29244:29244): Creando el hilo para mantener CPU's
+[INFO] 03:11:51:13 ESThER/(29244:29244): Creando el hilo para mantener Consolas's
+[INFO] 03:11:51:13 ESThER/(29244:29251): Esperando nuevas conexiones y mensajes
+[INFO] 03:11:51:15 ESThER/(29244:29252): Esperando nuevas conexiones y mensajes
+[INFO] 03:11:58:746 ESThER/(29244:29251): Se registro la nueva conexion del server socket 6 tu id es 0
+[INFO] 03:15:07:486 ESThER/(29385:29385): Inicializado proceso kernel
+[INFO] 03:15:07:486 ESThER/(29385:29385): Creando socket para conectarse a la memoria
+[INFO] 03:15:07:486 ESThER/(29385:29385): Inicializando lista de cpu
+[INFO] 03:15:07:486 ESThER/(29385:29385): Inicializando sockets servidor
+[INFO] 03:15:07:486 ESThER/(29385:29385): Server Socket de consolas esta escuchando
+[INFO] 03:15:07:486 ESThER/(29385:29385): Server Socket de cpu's esta escuchando
+[INFO] 03:15:07:486 ESThER/(29385:29385): Creando el hilo para mantener CPU's
+[INFO] 03:15:07:508 ESThER/(29385:29385): Creando el hilo para mantener Consolas's
+[INFO] 03:15:07:508 ESThER/(29385:29393): Esperando nuevas conexiones y mensajes
+[INFO] 03:15:07:510 ESThER/(29385:29394): Esperando nuevas conexiones y mensajes
+[INFO] 03:15:58:337 ESThER/(29385:29393): Se registro la nueva conexion del server socket 6 tu id es 0
+[INFO] 03:19:52:442 ESThER/(29542:29542): Inicializado proceso kernel
+[INFO] 03:19:52:442 ESThER/(29542:29542): Creando socket para conectarse a la memoria
+[INFO] 03:19:52:442 ESThER/(29542:29542): Inicializando lista de cpu
+[INFO] 03:19:52:442 ESThER/(29542:29542): Inicializando sockets servidor
+[INFO] 03:19:52:442 ESThER/(29542:29542): Server Socket de consolas esta escuchando
+[INFO] 03:19:52:442 ESThER/(29542:29542): Server Socket de cpu's esta escuchando
+[INFO] 03:19:52:442 ESThER/(29542:29542): Creando el hilo para mantener CPU's
+[INFO] 03:19:52:465 ESThER/(29542:29542): Creando el hilo para mantener Consolas's
+[INFO] 03:19:52:465 ESThER/(29542:29548): Esperando nuevas conexiones y mensajes
+[INFO] 03:19:52:473 ESThER/(29542:29549): Esperando nuevas conexiones y mensajes
+[INFO] 03:20:05:95 ESThER/(29542:29548): Se registro la nueva conexion del server socket 6 tu id es 0
+[INFO] 03:23:41:736 ESThER/(29644:29644): Inicializado proceso kernel
+[INFO] 03:23:41:736 ESThER/(29644:29644): Creando socket para conectarse a la memoria
+[INFO] 03:23:41:736 ESThER/(29644:29644): Inicializando lista de cpu
+[INFO] 03:23:41:737 ESThER/(29644:29644): Inicializando sockets servidor
+[INFO] 03:23:41:737 ESThER/(29644:29644): Server Socket de consolas esta escuchando
+[INFO] 03:23:41:737 ESThER/(29644:29644): Server Socket de cpu's esta escuchando
+[INFO] 03:23:41:737 ESThER/(29644:29644): Creando el hilo para mantener CPU's
+[INFO] 03:23:41:748 ESThER/(29644:29644): Creando el hilo para mantener Consolas's
+[INFO] 03:23:41:748 ESThER/(29644:29653): Esperando nuevas conexiones y mensajes
+[INFO] 03:23:41:751 ESThER/(29644:29654): Esperando nuevas conexiones y mensajes
+[INFO] 03:23:50:258 ESThER/(29644:29653): Se registro la nueva conexion del server socket 6 tu id es 0
+[INFO] 03:24:25:16 ESThER/(29644:29653): Esperando nuevas conexiones y mensajes
+[INFO] 03:25:56:936 ESThER/(29644:29654): Se registro la nueva conexion del server socket 5 tu id es 0
+[INFO] 03:25:56:936 ESThER/(29644:29654): Se envio la respuesta de conexion para el cliente 8
+[INFO] 03:25:56:936 ESThER/(29644:29654): Esperando nuevas conexiones y mensajes
+[INFO] 03:26:01:128 ESThER/(29644:29654): La consola 8 me envio el siguiente saludo: hola como estas
+
+[INFO] 03:26:16:60 ESThER/(29644:29654): Replicando mensaje en cpus
+[INFO] 03:26:47:757 ESThER/(29644:29654): Se envió el mensaje a la cpu fd: 7
+[ERROR] 03:28:04:751 ESThER/(29644:29654): No se pudo enviar el mensaje al file system fd: -1
+[ERROR] 03:28:10:91 ESThER/(29644:29654): No se pudo enviar el mensaje a la memoria fd: -1
