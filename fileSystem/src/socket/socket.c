@@ -32,13 +32,8 @@ int crearSocketServer(int puerto) {
 		return SOCKET_FAILURE;
 	}
 
-	if (bind(socketFileDescriptor, (void*) &direccionServidor,
-			sizeof(direccionServidor)) != 0) {
-		if (bind(socketFileDescriptor, (void*) &direccionServidor,
-			sizeof(direccionServidor)) == -1) {
-			perror("Socket bind failed");
-			exit(1);
-		}
+	if (bind(socketFileDescriptor, (void*) &direccionServidor,sizeof(direccionServidor)) != 0) {
+
 		error_show("Socket bind failed FD: %d address: %c port: %d",
 				socketFileDescriptor, INADDR_LOOPBACK, puerto);
 		return SOCKET_FAILURE;
