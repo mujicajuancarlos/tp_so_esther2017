@@ -64,7 +64,7 @@ void handleCPUs(kernel_struct *args) {
 				if (receivePackage(socketClientDescriptor, package) == 0)
 					handleCpuRequest(socketClientDescriptor, package);
 				else
-					logError("Error al intentar recibir los datos del FD: %D",
+					logError("Error al intentar recibir los datos del FD: %d",
 							socketClientDescriptor);
 				destroyPackage(package);
 			}

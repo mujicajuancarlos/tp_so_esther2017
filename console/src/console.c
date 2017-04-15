@@ -26,11 +26,16 @@ int main(int argc, char *argv[]) {
 			config->log_print_console,
 			log_level_from_string(config->log_level));
 
-	logInfo("Inició el proceso correctamente!");
+	logInfo("Iniciando el proceso consola");
 
 	logInfo("Creando Conexiones");
 	kernelClientFileDescriptor = crearSocketCliente(config->ip_kernel,
 			config->puerto_kernel);
+
+	if (kernelClientFileDescriptor == -1) {
+		logError("No se pudo establecer conexion con el kernel");
+		return EXIT_FAILURE;
+	}
 
 	//forma de implementar el envio de informacion entre procesos
 	int status;
