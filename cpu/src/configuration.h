@@ -22,6 +22,8 @@
 //keys de configuracion
 #define DEFAULT_CONFIG_PATH "../cpu.conf"
 #define ECLIPSE_CONFIG_PATH "cpu.conf"
+#define IP_KERNEL "IP_KERNEL"
+#define PUERTO_KERNEL "PUERTO_KERNEL"
 #define IP_MEMORIA "IP_MEMORIA"
 #define PUERTO_MEMORIA "PUERTO_MEMORIA"
 
@@ -31,9 +33,13 @@
 #define LOG_PROGRAM_NAME "LOG_PROGRAM_NAME"
 #define LOG_PRINT_CONSOLE "LOG_PRINT_CONSOLE"
 
+
+
 typedef struct Configuration {
 	char* ip_memoria;
 	int puerto_memoria;
+	char* ip_kernel;
+	int puerto_kernel;
 	char* log_level;
 	char* log_file;
 	char* log_program_name;

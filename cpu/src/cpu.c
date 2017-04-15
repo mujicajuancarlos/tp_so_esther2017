@@ -8,31 +8,42 @@
  ============================================================================
  */
 
-#include "cpu.h"
-#include "configuration.h"
+
 #include <dc-commons/socket-client.h>
+
+#include "cpu.h"
+#include "handler-kernel.h"
 
 int main(int argc, char *argv[]) {
 
-	char *msg = "Hola, soy cpu!";
+	cpu_struct args;
 
-	puts("Accediendo al archivo de configuración...");
+	puts("Cargando archivo externo de configuration");
 	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
+	args.config = config;
+	initLogMutex(config->log_file, config->log_program_name,
+			config->log_print_console,
+			log_level_from_string(config->log_level));
 
-	printf("...\n"); //por ahora no tiene info que mostrar
+	logInfo("Iniciando el proceso CPU");
 
-	puts("Creando el logger cpu.log ...");
-		t_log* logger = log_create(config->log_file, config->log_program_name, config->log_print_console, log_level_from_string(config->log_level));
+	logInfo("Creando socket cliente para memoria");
+	int fd_memoria = crearSocketCliente(config->ip_memoria,
+			config->puerto_memoria);
+	if(fd_memoria == -1){
+		logError("No se pudo establecer conexion con la memoria");
+		return EXIT_FAILURE;
+	}else args.socketClientMemoria = fd_memoria;
 
-	log_info(logger, "Inició el proceso correctamente!");
+	logInfo("Creando socket cliente para kernel");
+	int fd_kernel = crearSocketCliente(config->ip_kernel,
+			config->puerto_kernel);
+	if(fd_kernel == -1) {
+		logError("No se pudo establecer conexion con el kernel");
+		return EXIT_FAILURE;
+	}else args.socketClientKernel = fd_kernel;
 
-	puts("Creando conexiones...");
-	int socketClient = crearSocketCliente(config->ip_memoria,config->puerto_memoria);
-
-	int len = strlen(msg);
-	if(send(socketClient,msg,len,0) == -1){
-		puts("Error en el envio");
-	}
+	handleKernel(&args);
 
 	return EXIT_SUCCESS;
 }

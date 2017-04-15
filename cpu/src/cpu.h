@@ -8,18 +8,19 @@
 #ifndef CPU_H_
 #define CPU_H_
 
-//commoms
-#include <commons/collections/list.h>
-#include <commons/string.h>
-#include <commons/config.h>
-#include <commons/log.h>
-
-//commons death coders
-#include <dc-commons/logger.h>
-#include <dc-commons/socket-client.h>
-
 //standar
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <commons/config.h>
+#include <dc-commons/logger.h>
+#include "configuration.h"
+
+//estructura princial del cpu
+typedef struct cpu_struct {
+	int socketClientKernel;
+	int socketClientMemoria;
+	Configuration* config;
+} cpu_struct;
 
 #endif /* CPU_H_ */
