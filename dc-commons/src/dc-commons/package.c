@@ -16,6 +16,14 @@ Package* createPackage(uint32_t msgCode, char* message, uint32_t message_long) {
 	return package;
 }
 
+Package* createEmptyPackage() {
+	Package *package = malloc(sizeof(Package));
+	package->message = NULL;
+	package->message_long = 0;
+	package->msgCode = -1;
+	return package;
+}
+
 int sizePackage(Package *package) {
 	return sizeof(package->msgCode) + sizeof(package->message_long)
 			+ (sizeof(char) * package->message_long);

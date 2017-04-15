@@ -49,6 +49,13 @@ char* serializePackage(Package *package);
 Package* createPackage(uint32_t msgCode, char* message, uint32_t message_long);
 
 /**
+ * @NAME: createEmptyPackage
+ * @DESC: Crea un package con los datos en NULL
+ * @RETURN: un punteto a package
+ */
+Package* createEmptyPackage();
+
+/**
  * @NAME: sizePackage
  * @DESC: calcula el tamaño completo de la estructura
  * @PARAMS:
