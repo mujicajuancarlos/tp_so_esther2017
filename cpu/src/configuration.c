@@ -9,35 +9,41 @@
 
 Configuration* config_with(char *config_file) {
 
-	config_file = DEFAULT_CONFIG_PATH;
-
 	Configuration* config = malloc(sizeof(Configuration));
-
-	t_config* nConfig = config_create(
-			config_file ? config_file : DEFAULT_CONFIG_PATH);
-	if (nConfig == NULL) {
-		//para debuggear desde eclipse
-		nConfig = config_create(ECLIPSE_CONFIG_PATH);
-		if (nConfig == NULL) {
-			printf("No se encontro el archivo de configuracion.\n");
+	t_config* temporalConfig;
+	if (config_file != NULL) {
+		//si es distinto a null quiere decir que recibimos el archivo de configuracion por parametro
+		temporalConfig = config_create(config_file);
+		if (temporalConfig == NULL) {
+			error_show("No se pudo leer el archivo de configuracion %s",
+					config_file);
 			exit(1);
+		}
+	} else {
+		temporalConfig = config_create(DEFAULT_CONFIG_PATH);
+		if (temporalConfig == NULL) {
+			//para debuggear desde eclipse
+			temporalConfig = config_create(ECLIPSE_CONFIG_PATH);
+			if (temporalConfig == NULL) {
+				error_show("No se encontró el archivo de configuracion %s",
+				ECLIPSE_CONFIG_PATH);
+				exit(1);
+			}
 		}
 	}
 
-	config->ip_memoria = strdup(config_get_string_value(nConfig, IP_MEMORIA));
-	config->puerto_memoria = config_get_int_value(nConfig, PUERTO_MEMORIA);
-	config->ip_kernel = strdup(config_get_string_value(nConfig, IP_KERNEL));
-	config->puerto_kernel = config_get_int_value(nConfig, PUERTO_KERNEL);
+	config_set_string_valid_value(&config->ip_memoria, temporalConfig, IP_MEMORIA);
+	config_set_int_valid_value(&config->puerto_memoria, temporalConfig, PUERTO_MEMORIA);
+	config_set_string_valid_value(&config->ip_kernel, temporalConfig, IP_KERNEL);
+	config_set_int_valid_value(&config->puerto_kernel, temporalConfig, PUERTO_KERNEL);
 
-	//Configuración del log
-	config->log_level = strdup(config_get_string_value(nConfig, LOG_LEVEL));
-	config->log_file = strdup(config_get_string_value(nConfig, LOG_FILE));
-	config->log_program_name = strdup(
-			config_get_string_value(nConfig, LOG_PROGRAM_NAME));
-	config->log_print_console = config_get_int_value(nConfig,
-			LOG_PRINT_CONSOLE);
+	//configuracion de log
+	config_set_string_valid_value(&config->log_level, temporalConfig, LOG_LEVEL);
+	config_set_string_valid_value(&config->log_file, temporalConfig, LOG_FILE);
+	config_set_string_valid_value(&config->log_program_name, temporalConfig, LOG_PROGRAM_NAME);
+	config_set_int_valid_value(&config->log_print_console, temporalConfig, LOG_PRINT_CONSOLE);
 
-	config_destroy(nConfig);
+	config_destroy(temporalConfig);
 
 	return config;
 }
