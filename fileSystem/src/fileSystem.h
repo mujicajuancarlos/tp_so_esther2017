@@ -8,16 +8,18 @@
 #ifndef FILESYSTEM_H_
 #define FILESYSTEM_H_
 
-//commoms
-#include <commons/collections/list.h>
-#include <commons/string.h>
-#include <commons/config.h>
-#include <commons/log.h>
-
-//standart
+//standar
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <sys/socket.h>
+#include <commons/config.h>
+#include <dc-commons/logger.h>
+#include "configuration.h"
+
+typedef struct fileSystem_struct{
+	int socketServer;
+	int fd_kernel;
+	Configuration* config;
+} fileSystem_struct;
 
 #endif /* FILESYSTEM_H_ */
