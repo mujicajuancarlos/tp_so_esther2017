@@ -9,37 +9,44 @@
 
 Configuration* config_with(char *config_file) {
 
-	config_file = DEFAULT_CONFIG_PATH;
-
 	Configuration* config = malloc(sizeof(Configuration));
-
-	t_config* nConfig = config_create(
-			config_file ? config_file : DEFAULT_CONFIG_PATH);
-	if (nConfig == NULL) {
-		//para debuggear desde eclipse
-		nConfig = config_create(ECLIPSE_CONFIG_PATH);
-		if (nConfig == NULL) {
-			printf("No se encontro el archivo de configuracion.\n");
+	t_config* temporalConfig;
+	if (config_file != NULL) {
+		//si es distinto a null quiere decir que recibimos el archivo de configuracion por parametro
+		temporalConfig = config_create(config_file);
+		if (temporalConfig == NULL) {
+			error_show("No se pudo leer el archivo de configuracion %s",
+					config_file);
 			exit(1);
+		}
+	} else {
+		temporalConfig = config_create(DEFAULT_CONFIG_PATH);
+		if (temporalConfig == NULL) {
+			//para debuggear desde eclipse
+			temporalConfig = config_create(ECLIPSE_CONFIG_PATH);
+			if (temporalConfig == NULL) {
+				error_show("No se encontró el archivo de configuracion %s",
+				ECLIPSE_CONFIG_PATH);
+				exit(1);
+			}
 		}
 	}
 
-	config->tamanio_bloques = config_get_int_value(nConfig, TAMANIO_BLOQUES);
-	config->cantidad_bloques = config_get_int_value(nConfig, CANTIDAD_BLOQUES);
-	config->magic_number = strdup(config_get_string_value(nConfig, MAGIC_NUMBER));
-	//	config->bloques
-	config->tamanio = config_get_int_value(nConfig, TAMANIO);
-	config->puerto = config_get_int_value(nConfig, PUERTO);
-	config->punto_montaje = strdup(config_get_string_value(nConfig, PUNTO_MONTAJE));
-	//configuracion de log
-	config->log_level = strdup(config_get_string_value(nConfig, LOG_LEVEL));
-	config->log_file = strdup(config_get_string_value(nConfig, LOG_FILE));
-	config->log_program_name = strdup(
-			config_get_string_value(nConfig, LOG_PROGRAM_NAME));
-	config->log_print_console = config_get_int_value(nConfig,
-	LOG_PRINT_CONSOLE);
+	config_set_int_valid_value(&config->tamanio_bloques, temporalConfig, TAMANIO_BLOQUES);
+	config_set_int_valid_value(&config->cantidad_bloques, temporalConfig, CANTIDAD_BLOQUES);
+	config_set_string_valid_value(&config->magic_number, temporalConfig, MAGIC_NUMBER);
+	config_set_int_valid_value(&config->tamanio, temporalConfig, TAMANIO);
+	config_set_int_valid_value(&config->puerto, temporalConfig, PUERTO);
+	config_set_string_valid_value(&config->punto_montaje, temporalConfig, PUNTO_MONTAJE);
 
-config_destroy(nConfig);
+	//configuracion de log
+	config_set_string_valid_value(&config->log_level, temporalConfig, LOG_LEVEL);
+	config_set_string_valid_value(&config->log_file, temporalConfig, LOG_FILE);
+	config_set_string_valid_value(&config->log_program_name, temporalConfig, LOG_PROGRAM_NAME);
+	config_set_int_valid_value(&config->log_print_console, temporalConfig, LOG_PRINT_CONSOLE);
+
+	config_destroy(temporalConfig);
+
 	return config;
 }
 
