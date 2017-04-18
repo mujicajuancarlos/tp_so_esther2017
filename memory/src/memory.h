@@ -13,8 +13,14 @@
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/log.h>
+
+//commons DeathCoders
 #include <dc-commons/socket-server.h>
 #include <dc-commons/logger.h>
+#include <dc-commons/package.h>
+#include <dc-commons/protocol-memory-cpu.h>
+#include <dc-commons/protocol-memory-kernel.h>
+
 //standart
 #include <stdio.h>
 #include <stdlib.h>
