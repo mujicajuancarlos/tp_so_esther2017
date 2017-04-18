@@ -3,6 +3,7 @@
 *.ko
 *.obj
 *.elf
+*.d
 
 # Precompiled Headers
 *.gch
@@ -34,7 +35,7 @@
 */Debug/
 
 # LOG files
-*/*.log
+*.log
 
 .metadata
 RemoteSystemsTempFiles/
