@@ -8,16 +8,11 @@
 #ifndef CONFIGURATION_CONFIGURATION_H_
 #define CONFIGURATION_CONFIGURATION_H_
 
-//import standart library
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 //commoms
-#include <commons/collections/list.h>
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/log.h>
+#include <dc-commons/config.h>
 
 //configuration file keys
 #define DEFAULT_CONFIG_PATH "../kernel.conf"

@@ -52,12 +52,7 @@ int main(int argc, char *argv[]) {
 	return EXIT_SUCCESS;
 }
 
-/**
- * inicializo la estructura
- */
-void initializeStruct(kernel_struct *args, Configuration* config);
-
-void initializeStruct(kernel_struct *args, Configuration* config){
+void initializeStruct(kernel_struct* args, Configuration* config){
 	args->config = config;
 	inicializarArray(MAX_CPUS, args->cpuSockets);
 	inicializarArray(MAX_CONSOLAS, args->consolaSockets);
