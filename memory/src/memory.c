@@ -9,8 +9,11 @@
  */
 
 #include "memory.h"
+#include <pthread.h>
 
 #include "configuration.h"
+
+void atiendoCliente(int numero_sck);
 
 int main(int argc, char *argv[]) {
 
@@ -22,22 +25,35 @@ int main(int argc, char *argv[]) {
 			,config->puerto,config->marcos,config->marco_size,config->entradas_cache,config->cache_x_proceso,config->reemplazo_cache,config->retardo_memoria);
 
 	puts("Creando el logger memory.log ...");
-			t_log* logger = log_create(config->log_file, config->log_program_name, config->log_print_console, log_level_from_string(config->log_level));
+	 initLogMutex(config->log_file, config->log_program_name, config->log_print_console, log_level_from_string(config->log_level));
 
-	log_info(logger, "Inició el proceso correctamente!");
+	logInfo("Inició el proceso correctamente!");
 
 	/*Creo Server con las funciones de dc-commons*/
-
 	puts("Esperando conexiones...");
 
-	int accepted,bytes_recv;
-	accepted = aceptarConexionCliente(crearSocketServer(config->puerto));
+	int sck = crearSocketServer(config->puerto);
 
-	/*Atendiendo a clientes*/
+	while(sck != -1){
+
+	int accepted = aceptarConexionCliente(sck);
+
+	pthread_t hiloCliente;
+	pthread_create(&hiloCliente, NULL, (void*) atiendoCliente, &accepted);
+
+	}
+
+	for(;;);
+
+	return EXIT_SUCCESS;
+}
+
+void atiendoCliente(int aceptado){
+
 
 	puts("Atendiendo al cliente...");
 	char *buffer = malloc(20);
-	bytes_recv = recv(accepted, buffer, 20, 0);
+	int bytes_recv = recv(aceptado, buffer, 20, 0);
 	if (bytes_recv < 0){
 		puts("Error al recibir ");
 	}
@@ -45,10 +61,5 @@ int main(int argc, char *argv[]) {
 	printf("Me llegaron %d bytes con %s\n", bytes_recv, buffer);
 	puts("Hola conexion nueva, Te escuche");
 	free(buffer);
-	close(accepted);
-
-
-	for(;;);
-
-	return EXIT_SUCCESS;
+	close(aceptado);
 }

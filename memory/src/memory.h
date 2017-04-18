@@ -13,7 +13,8 @@
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/log.h>
-
+#include <dc-commons/socket-server.h>
+#include <dc-commons/logger.h>
 //standart
 #include <stdio.h>
 #include <stdlib.h>
