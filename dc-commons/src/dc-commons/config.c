@@ -25,7 +25,7 @@ void config_set_int_valid_value(int *value, t_config* temporalConfig,
 }
 
 void printError(char* key) {
-	error_show("Archivo de configuracion incompleto, no se encontro -> %s",
+	error_show("Archivo de configuracion incompleto, no se encontro -> %s \n",
 			key);
 	exit(1);
 }
