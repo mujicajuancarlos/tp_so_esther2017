@@ -44,12 +44,14 @@ int main(int argc, char *argv[]) {
 		if (recibido == 3)
 		{
 			puts("Se conecto una CPU");
+
 			pthread_t hiloCPU;
 			pthread_create(&hiloCPU,NULL,/* Agus aca pone la funcion que tiene que hacer CPU*/,/*Y aca las variables de la funcion*/);
 		}
 		else
 		{
 			puts("Se conecto un Kernell");
+			args.socketClientKernel = recibido;
 			/* aca va lo que hace memoria con kernel */
 
 		}
