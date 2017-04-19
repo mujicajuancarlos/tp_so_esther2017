@@ -10,7 +10,7 @@
 
 #include "memory.h"
 
-void atiendoCliente(int numero_sck);
+int atiendoCliente(int numero_sck);
 
 int main(int argc, char *argv[]) {
 
@@ -36,64 +36,26 @@ int main(int argc, char *argv[]) {
 	}
 	logInfo("Server Socket de memoria esta escuchando");
 
-	while (args.socketServer != -1) {
+	while(args.socketServer !=- 1){
 
 		int accepted = aceptarConexionCliente(args.socketServer);
+		int recibido = atiendoCliente(accepted);
 
-		pthread_t hiloCliente;
-		pthread_create(&hiloCliente, NULL, (void*) atiendoCliente, &accepted);
-
-	} //SOCKETKERNEL... VER MÁS ABAJO
-
-	for (;;)
-		;
-
-	//forma de implementar el envio de informacion entre procesos
-	int status;
-	uint32_t size_message = 200;
-	uint32_t code = COD_SALUDO;
-	int exit = 0;
-	while (exit == 0) {
-		printf("\nIngrese un mensaje:\n");
-		char* message = malloc(sizeof(char) * size_message);
-		fgets(message, size_message, stdin);
-		if (strcmp(message, "") == 0 || strcmp(message, "exit") == 0)
-			exit = 1;
-		else {
-			Package *package = createPackage(code, message, size_message);
-			status = sendPackage(args.socketServer, package);
-			if (status != -1)
-				printf("\nEnvio OK\n");
-			destroyPackage(package);
-		}
-		free(message);
-	}
-//Comunicación con Núcleo INICIO (RECEIVE)
-	int continuar = 1;
-	while(continuar){
-
-	Package *packageRecv;
-	if(receivePackage(socketKernel, packageRecv) != 0){ // SOCKETKERNEL O COMO LO HAGA CHRIS
-		switch(packageRecv->msgCode)
+		if (recibido == 3)
 		{
-		case COD_ESCRITURA_PAGE:
-			//Hace lo que tiene que hacer
-			break;
-		case COD_ASIGN_PAGE_PROCESS:
-			//Hace lo que tiene que hacer
-			break;
-		case COD_FINALIZAR_PROGRAMA:
-			continuar = 0;
-			logDebug("El Kernel informa que finalizó el programa");
-			break;
-		case COD_SALUDO:
-			//Hace lo que tenga que hacer
-			break;
+			puts("Se conecto una CPU");
+			pthread_t hiloCPU;
+			pthread_create(&hiloCPU,NULL,/* Agus aca pone la funcion que tiene que hacer CPU*/,/*Y aca las variables de la funcion*/);
 		}
-		destroyPackage(packageRecv);
+		else
+		{
+			puts("Se conecto un Kernell");
+			/* aca va lo que hace memoria con kernel */
+
+		}
 	}
-	}
-//Comunicación con Nucleo FIN
+
+	for (;;);
 
 	return EXIT_SUCCESS;
 }
@@ -105,9 +67,7 @@ void initializeStruct(memory_struct* args, Configuration* config) {
 	args->listaCPUs = list_create();
 }
 
-void atiendoCliente(int aceptado) {
-
-	puts("Atendiendo al cliente...");
+int atiendoCliente(int aceptado) {
 	char *buffer = malloc(20);
 	int bytes_recv = recv(aceptado, buffer, 20, 0);
 	if (bytes_recv < 0) {
@@ -115,7 +75,56 @@ void atiendoCliente(int aceptado) {
 	}
 	buffer[bytes_recv] = '\0';
 	printf("Me llegaron %d bytes con %s\n", bytes_recv, buffer);
-	puts("Hola conexion nueva, Te escuche");
+	puts("Te escuche");
 	free(buffer);
-	close(aceptado);
+	return bytes_recv;
 }
+
+/*
+//forma de implementar el envio de informacion entre procesos
+int status;
+uint32_t size_message = 200;
+uint32_t code = COD_SALUDO;
+int exit = 0;
+while (exit == 0) {
+	printf("\nIngrese un mensaje:\n");
+	char* message = malloc(sizeof(char) * size_message);
+	fgets(message, size_message, stdin);
+	if (strcmp(message, "") == 0 || strcmp(message, "exit") == 0)
+		exit = 1;
+	else {
+		Package *package = createPackage(code, message, size_message);
+		status = sendPackage(args.socketServer, package);
+		if (status != -1)
+			printf("\nEnvio OK\n");
+		destroyPackage(package);
+	}
+	free(message);
+}
+//Comunicación con Núcleo INICIO (RECEIVE)
+int continuar = 1;
+while(continuar){
+
+Package *packageRecv;
+if(receivePackage(socketKernel, packageRecv) != 0){ // SOCKETKERNEL O COMO LO HAGA CHRIS
+	switch(packageRecv->msgCode)
+	{
+	case COD_ESCRITURA_PAGE:
+		//Hace lo que tiene que hacer
+		break;
+	case COD_ASIGN_PAGE_PROCESS:
+		//Hace lo que tiene que hacer
+		break;
+	case COD_FINALIZAR_PROGRAMA:
+		continuar = 0;
+		logDebug("El Kernel informa que finalizó el programa");
+		break;
+	case COD_SALUDO:
+		//Hace lo que tenga que hacer
+		break;
+	}
+	destroyPackage(packageRecv);
+}
+}
+//Comunicación con Nucleo FIN
+*/

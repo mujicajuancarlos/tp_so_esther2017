@@ -12,6 +12,7 @@
 #include <pthread.h>
 //commoms
 #include <commons/collections/list.h>
+#include <commons/string.h>
 
 //commons DeathCoders
 #include <dc-commons/config.h>

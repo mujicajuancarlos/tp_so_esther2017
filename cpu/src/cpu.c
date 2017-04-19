@@ -14,6 +14,7 @@
 #include "cpu.h"
 #include "handler-kernel.h"
 
+void mensajeParaConectarseAMemory(int memory);
 int main(int argc, char *argv[]) {
 
 	cpu_struct args;
@@ -33,7 +34,11 @@ int main(int argc, char *argv[]) {
 	if(fd_memoria == -1){
 		logError("No se pudo establecer conexion con la memoria");
 		return EXIT_FAILURE;
-	}else args.socketClientMemoria = fd_memoria;
+	}
+	else {
+		args.socketClientMemoria = fd_memoria;
+		mensajeParaConectarseAMemory(fd_memoria);
+	}
 
 	logInfo("Creando socket cliente para kernel");
 	int fd_kernel = crearSocketCliente(config->ip_kernel,
@@ -46,4 +51,12 @@ int main(int argc, char *argv[]) {
 	handleKernel(&args);
 
 	return EXIT_SUCCESS;
+}
+
+void mensajeParaConectarseAMemory(int sck_memory){
+			char* message = "CPU";
+			int len = strlen(message);
+			if (send(sck_memory, message, len, 0) != -1) {
+				puts("Se mando mensaje a memoria corectamente");
+			};
 }

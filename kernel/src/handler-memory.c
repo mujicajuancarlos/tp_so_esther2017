@@ -17,7 +17,7 @@ void handleMemoria(kernel_struct *args) {
 	if (fileDescripor == -1)
 		logError("No se pudo establecer la conexion con la memoria");
 	else {
-		char* message = "hola soy el kernel";
+		char* message = "kernel";
 		int len = strlen(message);
 		if (send(fileDescripor, message, len, 0) != -1) {
 			puts("Se mando mensaje a memoria corectamente");
