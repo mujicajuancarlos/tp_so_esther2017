@@ -9,41 +9,44 @@
  */
 
 #include "memory.h"
-#include "pthread.h"
-
-#include "configuration.h"
 
 void atiendoCliente(int numero_sck);
 
 int main(int argc, char *argv[]) {
 
-	puts("Accediendo al archivo de configuración...");
+	memory_struct args;
+
+	puts("Cargando archivo externo de configuration");
 	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
+	initLogMutex(config->log_file, config->log_program_name,
+			config->log_print_console,
+			log_level_from_string(config->log_level));
 
-	puts("Configuración del proceso:");
-	printf("\nPUERTO= %d\nMARCOS = %d\nMARCO_SIZE= %d\nENTRADAS_CACHE= %d\nCACHE_X_PROCESO= %d\nREEMPLAZO_CACHE= %s\nRETARDO_MEMORIA= %d\n\n"
-			,config->puerto,config->marcos,config->marco_size,config->entradas_cache,config->cache_x_proceso,config->reemplazo_cache,config->retardo_memoria);
+	logInfo("Iniciando el proceso Memoria");
 
-	puts("Creando el logger memory.log ...");
-	 initLogMutex(config->log_file, config->log_program_name, config->log_print_console, log_level_from_string(config->log_level));
-
-	logInfo("Inició el proceso correctamente!");
+	initializeStruct(&args, config);
 
 	/*Creo Server con las funciones de dc-commons*/
-	puts("Esperando conexiones...");
+	logInfo("Esperando conexiones...");
 
-	int socket = crearSocketServer(config->puerto); // Si unificamos conexiones de los dos clientes
+	args.socketServer = crearSocketServer(args.config->puerto);
+	if (args.socketServer == -1) {
+		logError("No se pudo crear el server de memoria");
+		exit(-1);
+	}
+	logInfo("Server Socket de memoria esta escuchando");
 
-	while(socket != -1){
+	while (args.socketServer != -1) {
 
-	int accepted = aceptarConexionCliente(socket);
+		int accepted = aceptarConexionCliente(args.socketServer);
 
-	pthread_t hiloCliente;
-	pthread_create(&hiloCliente, NULL, (void*) atiendoCliente, &accepted);
+		pthread_t hiloCliente;
+		pthread_create(&hiloCliente, NULL, (void*) atiendoCliente, &accepted);
 
 	}
 
-	for(;;);
+	for (;;)
+		;
 
 	//forma de implementar el envio de informacion entre procesos
 	int status;
@@ -58,7 +61,7 @@ int main(int argc, char *argv[]) {
 			exit = 1;
 		else {
 			Package *package = createPackage(code, message, size_message);
-			status = sendPackage(socket, package);
+			status = sendPackage(args.socketServer, package);
 			if (status != -1)
 				printf("\nEnvio OK\n");
 			destroyPackage(package);
@@ -66,20 +69,25 @@ int main(int argc, char *argv[]) {
 		free(message);
 	}
 
-
 	return EXIT_SUCCESS;
 }
 
-void atiendoCliente(int aceptado){
+void initializeStruct(memory_struct* args, Configuration* config) {
+	args->config = config;
+	args->socketServer = -1;
+	args->socketClientKernel = -1;
+	args->listaCPUs = list_create();
+}
 
+void atiendoCliente(int aceptado) {
 
 	puts("Atendiendo al cliente...");
 	char *buffer = malloc(20);
 	int bytes_recv = recv(aceptado, buffer, 20, 0);
-	if (bytes_recv < 0){
+	if (bytes_recv < 0) {
 		puts("Error al recibir ");
 	}
-	buffer[bytes_recv]='\0';
+	buffer[bytes_recv] = '\0';
 	printf("Me llegaron %d bytes con %s\n", bytes_recv, buffer);
 	puts("Hola conexion nueva, Te escuche");
 	free(buffer);

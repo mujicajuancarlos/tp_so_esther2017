@@ -9,7 +9,7 @@
  */
 
 
-#include <dc-commons/socket-client.h>
+
 
 #include "cpu.h"
 #include "handler-kernel.h"

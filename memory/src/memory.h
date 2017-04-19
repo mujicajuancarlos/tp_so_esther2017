@@ -8,22 +8,34 @@
 #ifndef MEMORY_H_
 #define MEMORY_H_
 
+
+#include <pthread.h>
 //commoms
 #include <commons/collections/list.h>
-#include <commons/string.h>
-#include <commons/config.h>
-#include <commons/log.h>
 
 //commons DeathCoders
+#include <dc-commons/config.h>
 #include <dc-commons/socket-server.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/package.h>
+#include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-memory-cpu.h>
 #include <dc-commons/protocol-memory-kernel.h>
 
-//standart
-#include <stdio.h>
-#include <stdlib.h>
+#include "configuration.h"
 
+
+//estructura princial del cpu
+typedef struct memory_struct {
+	int socketServer;
+	int socketClientKernel;
+	t_list* listaCPUs;
+	Configuration* config;
+} memory_struct;
+
+/**
+ * Inicializacion de la estructura global
+ */
+void initializeStruct(memory_struct* args, Configuration* config);
 
 #endif /* MEMORY_H_ */

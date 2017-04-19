@@ -13,6 +13,7 @@
 #include <stdlib.h>
 
 #include <commons/config.h>
+#include <dc-commons/socket-client.h>
 #include <dc-commons/logger.h>
 #include "configuration.h"
 
