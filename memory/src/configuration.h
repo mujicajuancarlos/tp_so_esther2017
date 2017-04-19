@@ -11,6 +11,7 @@
 //import standart library
 #include <stdio.h>
 #include <stdlib.h>
+#include <error.h>
 
 //import commoms library
 #include <commons/collections/list.h>
@@ -45,7 +46,7 @@ typedef struct Configuration {
 	char* log_level;
 	char* log_file;
 	char* log_program_name;
-	int log_print_console;
+	bool log_print_console;
 } Configuration;
 
 Configuration* config;

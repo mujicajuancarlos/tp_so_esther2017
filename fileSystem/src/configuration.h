@@ -42,7 +42,7 @@ typedef struct Configuration {
 	char* log_level;
 	char* log_file;
 	char* log_program_name;
-	int log_print_console;
+	bool log_print_console;
 } Configuration;
 
 Configuration* config;

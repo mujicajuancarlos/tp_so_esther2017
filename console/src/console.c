@@ -13,15 +13,8 @@
 int kernelClientFileDescriptor;
 
 int main(int argc, char *argv[]) {
-
 	puts("Accediendo al archivo de configuración...");
 	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
-
-	puts("Configuración del proceso:");
-	printf("IP_KERNEL= %s\nPUERTO_KERNEL = %d\n\n", config->ip_kernel,
-			config->puerto_kernel);
-
-	puts("Creando el logger console.log ...");
 	initLogMutex(config->log_file, config->log_program_name,
 			config->log_print_console,
 			log_level_from_string(config->log_level));

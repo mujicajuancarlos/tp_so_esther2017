@@ -27,6 +27,6 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-kernel-console.h>
 
-#include "configuration/configuration.h"
+#include "configuration.h"
 
 #endif /* CONSOLE_H_ */
