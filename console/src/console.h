@@ -8,11 +8,7 @@
 #ifndef CONSOLE_H_
 #define CONSOLE_H_
 
-
-
-//standart
-#include <stdio.h>
-#include <stdlib.h>
+#include <time.h>
 
 //commoms
 #include <commons/collections/list.h>
@@ -28,5 +24,21 @@
 #include <dc-commons/protocol-kernel-console.h>
 
 #include "configuration.h"
+
+typedef struct console_struct{
+	t_list* listaProgramas;
+	Configuration* config;
+} console_struct;
+
+typedef struct Program{
+	int pid;
+	struct timeval startDate;
+	struct timeval endDate;
+	int fd_client;
+	pthread_t hilo;
+	char* sourceCodePath;
+} Program;
+
+void initializeStruct(console_struct* args, Configuration* config);
 
 #endif /* CONSOLE_H_ */
