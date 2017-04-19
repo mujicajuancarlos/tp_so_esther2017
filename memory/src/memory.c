@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
 		pthread_t hiloCliente;
 		pthread_create(&hiloCliente, NULL, (void*) atiendoCliente, &accepted);
 
-	}
+	} //SOCKETKERNEL... VER MÁS ABAJO
 
 	for (;;)
 		;
@@ -68,6 +68,32 @@ int main(int argc, char *argv[]) {
 		}
 		free(message);
 	}
+//Comunicación con Núcleo INICIO (RECEIVE)
+	int continuar = 1;
+	while(continuar){
+
+	Package *packageRecv;
+	if(receivePackage(socketKernel, packageRecv) != 0){ // SOCKETKERNEL O COMO LO HAGA CHRIS
+		switch(packageRecv->msgCode)
+		{
+		case COD_ESCRITURA_PAGE:
+			//Hace lo que tiene que hacer
+			break;
+		case COD_ASIGN_PAGE_PROCESS:
+			//Hace lo que tiene que hacer
+			break;
+		case COD_FINALIZAR_PROGRAMA:
+			continuar = 0;
+			logDebug("El Kernel informa que finalizó el programa");
+			break;
+		case COD_SALUDO:
+			//Hace lo que tenga que hacer
+			break;
+		}
+		destroyPackage(packageRecv);
+	}
+	}
+//Comunicación con Nucleo FIN
 
 	return EXIT_SUCCESS;
 }
