@@ -46,13 +46,13 @@ int main(int argc, char *argv[]) {
 			puts("Se conecto una CPU");
 
 			pthread_t hiloCPU;
-			pthread_create(&hiloCPU,NULL,/* Agus aca pone la funcion que tiene que hacer CPU*/,/*Y aca las variables de la funcion*/);
+			pthread_create(&hiloCPU,NULL,comunicacionConCPU(),hiloCPU);
 		}
 		else
 		{
 			puts("Se conecto un Kernell");
 			args.socketClientKernel = recibido;
-			/* aca va lo que hace memoria con kernel */
+			comunicacionConKernel(args.socketClientKernel);
 
 		}
 	}
@@ -82,6 +82,10 @@ int atiendoCliente(int aceptado) {
 	return bytes_recv;
 }
 
+
+
+
+
 /*
 //forma de implementar el envio de informacion entre procesos
 int status;
@@ -103,30 +107,4 @@ while (exit == 0) {
 	}
 	free(message);
 }
-//Comunicación con Núcleo INICIO (RECEIVE)
-int continuar = 1;
-while(continuar){
 
-Package *packageRecv;
-if(receivePackage(socketKernel, packageRecv) != 0){ // SOCKETKERNEL O COMO LO HAGA CHRIS
-	switch(packageRecv->msgCode)
-	{
-	case COD_ESCRITURA_PAGE:
-		//Hace lo que tiene que hacer
-		break;
-	case COD_ASIGN_PAGE_PROCESS:
-		//Hace lo que tiene que hacer
-		break;
-	case COD_FINALIZAR_PROGRAMA:
-		continuar = 0;
-		logDebug("El Kernel informa que finalizó el programa");
-		break;
-	case COD_SALUDO:
-		//Hace lo que tenga que hacer
-		break;
-	}
-	destroyPackage(packageRecv);
-}
-}
-//Comunicación con Nucleo FIN
-*/
