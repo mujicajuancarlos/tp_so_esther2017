@@ -15,9 +15,7 @@
 #define COD_START_PROGRAM "run"
 #define COD_INFO_PROGRAM "info"
 #define COD_STOP_PROGRAM "stop"
-#define OPT_STOP_ALL "-all"
-#define OPT_STOP_PID "-p"
-#define OPT_INFO_ALL "-all"
-#define OPT_INFO_PID "-p"
+#define OPT_ALL "-all"
+#define OPT_PID "-p"
 
 #endif /* PROTOCOL_CONSOLE_USER_H_ */

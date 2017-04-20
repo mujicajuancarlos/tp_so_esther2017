@@ -8,14 +8,17 @@
 #ifndef HANDLER_USER_H_
 #define HANDLER_USER_H_
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdbool.h>
+#include <commons/string.h>
+#include <dc-commons/utils.h>
 #include "handler-program.h"
 #include "protocol-console-user.h"
 
 void handleUserRequest(console_struct* args);
 
 void clearConsoleScreen();
+
+void printCommandsHelp();
 
 void printWelcome();
 
