@@ -24,7 +24,8 @@
 #include <dc-commons/protocol-memory-kernel.h>
 
 #include "configuration.h"
-
+#include "Packages/packagesKernel"
+#include "Packages/packagesCPU.h"
 
 //estructura princial del cpu
 typedef struct memory_struct {
