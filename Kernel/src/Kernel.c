@@ -20,8 +20,10 @@
 #define PATH_ARCHIVO_CONFIG "/home/utnso/tp-2017-1c-Los-5-Fant-sticos/Kernel/archivoConfiguracion"
 #define BUFER_MAX_LEN 2048
 #define FILE_MAX 1024
-#define PUERTO 1299 // puerto de conexion
-#define PUERTO_SALIDA 1300
+#define PUERTOCONSOLA 1299 // puerto de conexion
+#define PUERTOMEMORIA 1302
+#define PUERTOFS 5000
+#define PUERTOCPU 1300
 #define MAXCONEXIONES 10 // maximas conexiones posibles en cola (en este caso no hace diferencia)
 #define MAXCONEXIONES_SALIDA 10
 #define MAXBUFFER 1024 // tamaño maximo en caracteres que le daremos al buffer
@@ -32,12 +34,15 @@ int obtenerArchivoConfiguracion();
 
 int main(void) {
 	int hembra; // socket de entrada
-	int macho; // socket de salida
+	int macho;
+	int fd_FS;// socket de salida
+	int fd_Memoria;
 	int maxDescriptors = 4;
 	int addrlen = sizeof (struct sockaddr_in);
-	struct sockaddr_in datosEntrada, datosSalida, datosCliente; // datos de entrada, salida y cliente
+	struct sockaddr_in datosEntrada, datosFS, datosCliente, datosMemoria, datosSalida; // datos de entrada, salida y cliente
 	char buffer[MAXBUFFER]; // el buffer utilizado para recibir mensajes será un array del tamaño maximo definido
 	int on=1; // necesario para setsockop
+	int conecta;
 	fd_set readDescriptors; // set de fd que me interesa leer
 	fd_set writeDescriptors; // set de fd a los que me interesa escribir
 	fd_set readDescriptorsOriginales;
@@ -64,30 +69,62 @@ int main(void) {
 
 
 	// creamos los socket de entrada y salida
-	hembra = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	hembra = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP); //Escucha CPUs
 
-	macho = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	fd_FS = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP); //Para conectar con FS
+
+	fd_Memoria = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP); //Para conectar Memoria
+
+	macho = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP); //Escucha Consolas
 
 	checkError(hembra,"Error en socket(hembra)\n");
 
+	checkError(fd_FS,"Error en socket(macho)\n");
+
+	checkError(fd_Memoria,"Error en socket(macho)\n");
+
 	checkError(macho,"Error en socket(macho)\n");
 
-	// asignamos los datos de entrada
+	// asignamos los datos de entrada (CPU y Consola)
 	datosEntrada.sin_family = AF_INET; // tipo de direccion, en este caso Internet Protocol v4
 	datosEntrada.sin_addr.s_addr = INADDR_ANY; // LocalHost
 	datosEntrada.sin_port = htons (strConfig->PUERTO_PROG); // puerto a conectarse
 	memset (datosEntrada.sin_zero, 0, 8); // campo raro ?
 
-	// asignamos los datos de salida
 	datosSalida.sin_family = AF_INET; // tipo de direccion, en este caso Internet Protocol v4
 	datosSalida.sin_addr.s_addr = INADDR_ANY; // LocalHost
 	datosSalida.sin_port = htons (strConfig->PUERTO_CPU); // puerto a conectarse
 	memset (datosSalida.sin_zero, 0, 8); // campo raro ?
 
+	// asignamos los datos de salida
+	datosFS.sin_family = AF_INET; // tipo de direccion, en este caso Internet Protocol v4
+	datosFS.sin_addr.s_addr = inet_addr(strConfig->IP_FS); // LocalHost
+	datosFS.sin_port = htons (strConfig->PUERTO_FS); // puerto a conectarse
+	memset (datosFS.sin_zero, 0, 8); // campo raro ?
+
+	datosMemoria.sin_family = AF_INET; // tipo de direccion, en este caso Internet Protocol v4
+	datosMemoria.sin_addr.s_addr = inet_addr(strConfig->IP_MEMORIA); // LocalHost
+	datosMemoria.sin_port = htons (strConfig->PUERTO_MEMORIA); // puerto a conectarse
+	memset (datosMemoria.sin_zero, 0, 8); // campo raro ?
+
 	/* si el server se cierra bruscamente, el puerto por el que conectaba queda ocupado, lo cual es molesto.
 	 esto se puede solucionar con la siguiente linea */
 	setsockopt (hembra, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 	setsockopt (macho, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+
+	conecta= connect (fd_Memoria, (struct sockaddr *) &datosMemoria, sizeof (struct sockaddr));
+
+	checkError(conecta,"Error al conectar con Memoria\n");
+
+	printf("Conectado con memoria\n");
+
+	conecta = connect(fd_FS, (struct sockaddr *) &datosFS, sizeof(struct sockaddr));
+
+	checkError(conecta,"Error al conectar con File System\n");
+
+	printf("Conectado con File System\n");
+
+
 
 	// enlazo sockets a las estructuras de entrada y salida respectivamente
 	bind (hembra, (struct sockaddr*) &datosEntrada, sizeof (datosEntrada));
@@ -95,20 +132,25 @@ int main(void) {
 
 	// finalmente los ponemos a escuchar
 	listen (hembra, MAXCONEXIONES);
-	listen (macho, MAXCONEXIONES_SALIDA);
+	listen (macho, MAXCONEXIONES);
 
-	printf ("Nuestro kernel esta conectado con IP %s\n", inet_ntoa((struct in_addr)datosEntrada.sin_addr));
+
+	printf ("Nuestro kernel esta conectado con IP %s\n\n", inet_ntoa((struct in_addr)datosEntrada.sin_addr));
 
 	// inicializo los fd de lectura y agrego los propios del kernel
+
 	FD_ZERO (&readDescriptorsOriginales);
 	FD_SET (hembra, &readDescriptorsOriginales);
-	FD_SET (macho, &readDescriptorsOriginales);
-
+	FD_SET(macho, &readDescriptorsOriginales);
 	FD_ZERO (&writeDescriptors);
+	FD_SET(fd_FS, &writeDescriptors);
+	FD_SET(fd_Memoria, &writeDescriptors);
 
-	printf ("Esperando conexiones \n\n");
+	printf ("Esperando conexiones de consolas y CPUs \n\n");
 
-	while (1) { // bucle infinito
+	int sizeMensaje;
+
+	while(1){
 
 		readDescriptors = readDescriptorsOriginales;
 
@@ -147,7 +189,7 @@ int main(void) {
 				}
 				else {
 					// sino la actividad es de algun cliente
-					int sizeMensaje = recv (i, buffer, MAXBUFFER, 0);
+					 sizeMensaje = recv (i, buffer, MAXBUFFER, 0);
 					if (sizeMensaje > 0) {
 						// si recibi mensaje lo imprimo
 						buffer[sizeMensaje] = '\0'; // agrego caracter de terminacion de string
@@ -157,6 +199,7 @@ int main(void) {
 							if (FD_ISSET (j,&writeDescriptors))
 								send (j, buffer, strlen(buffer), 0); // se envia el mensaje
 						}
+
 					}
 					else {
 						close (i);
@@ -167,6 +210,7 @@ int main(void) {
 			}
 		}
 	}
+
 
 	close (macho);
 	close (hembra);
