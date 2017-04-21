@@ -6,6 +6,9 @@
  */
 
 #include "packagesKernel.h"
+#include <dc-commons/protocol-memory-kernel.h>
+
+void exceptionTo(int destinationfd, char *exception);
 
 void comunicacionConKernel(int socketKernelfd){
 
@@ -15,9 +18,9 @@ void comunicacionConKernel(int socketKernelfd){
 	while (init){
 		packagesReceptionKernel(socketKernelfd, init);
 	}
-	while (exit){
+	/*while (exit){
 		packagesSenderKernel(socketKernelfd, exit);
-	}
+	}*/
 }
 
 void packagesReceptionKernel(int kernelfd, int continuador){
@@ -39,7 +42,7 @@ void packagesReceptionKernel(int kernelfd, int continuador){
 		break;
 	case COD_SALUDO:
 		//Hace lo que tenga que hacer
-
+		break;
 	}
 	destroyPackage(packageRecv);
 }
@@ -70,7 +73,8 @@ void packagesSenderKernel(int kernelfd, int exit, int code){ //Cuando se le pide
 				exceptionTo(kernelfd,"No es posible asignar paginas por falta de espacio");
 				break;
 			case COD_SALUDO: //Cuando se conectan, no hacen un handshake ya?
-				doHandshake(kernelfd, code);
+				/*doHandshake(kernelfd, code);*/
+				break;
 
 		}
 	}
@@ -78,7 +82,7 @@ void packagesSenderKernel(int kernelfd, int exit, int code){ //Cuando se le pide
 
 }
 
-
+/*
 void doHandshake(int destinationfd, int code){ //puede estar en las dc-commons para no repetir lógica luego
 
 	int status;
@@ -99,12 +103,22 @@ void doHandshake(int destinationfd, int code){ //puede estar en las dc-commons p
 		}
 		free(message);
 }
-
+*/
 void exceptionTo(int destinationfd, char *exception){
 
 	int len, bytes_sent;
 	len = strlen(exception);
 
-	bytes_sent = send(destinationfd, exception, len, 0); //Verificar
+	bytes_sent = sendmsg(destinationfd,exception,len);
+
+	if (bytes_sent != -1){
+
+		puts("Eror en mandar exception");
+
+	}
+	else
+	{
+		puts("Se mando corectamente mensaje de exception");
+	}
 
 }

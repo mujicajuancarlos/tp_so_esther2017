@@ -9,6 +9,8 @@
 #define PACKAGES_PACKAGESKERNEL_H_
 
 #include "memory.h"
+#include <dc-commons/package.h>
+#include <dc-commons/socket-message.h>
 
 // Memory se pone a recibir y enviar packages con el Kernel
 void comunicacionConKernel(int socketKernelfd);
@@ -18,7 +20,7 @@ void comunicacionConKernel(int socketKernelfd);
 void packagesReceptionKernel(int kernelfd, int continuador);
 
 //Empaqueta y envia packages al Kernel
-void packagesSenderKernel(int kernelfd, int exit);
+void packagesSenderKernel(int kernelfd, int exit,int code);
 
 
 #endif /* PACKAGES_PACKAGESKERNEL_H_ */
