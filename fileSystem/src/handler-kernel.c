@@ -16,7 +16,7 @@ void handleKernel(fileSystem_struct *args) {
 
 	while (1) {
 
-		//borra el set de descriptiores
+		//borra el set de descriptores
 		FD_ZERO(&descriptoresLectura);
 		//agrega el socket cliente del kernel para recibir instrucciones
 		FD_SET(fd_fileSystem, &descriptoresLectura);
@@ -53,11 +53,27 @@ void handleKernel(fileSystem_struct *args) {
 	}
 }
 
+
 void handleKernelRequest(fileSystem_struct *args, Package *package) {
 
 	switch (package->msgCode) {
-	case COD_SALUDO:
-		logInfo("El kernel %d me envio el siguiente saludo: %s", args->fd_kernel,
+		case COD_VALIDAR_ARCHIVO:
+			//	Verifica que el archivo del path exista
+			break;
+		case COD_CREAR_ARCHIVO:
+			//	En caso de que no exista (y en el path se pueda escribir) se va a crear el archivo dentro de ese path
+			break;
+		case COD_BORRAR_ARCHIVO:
+			//	En caso de que exista, borrará el archivo metadata y liberará bloques del bitmap
+			break;
+		case COD_OBTENER_DATOS:
+			//	Si pide datos el Kernel, y el path está en modo lectura, se devolverá la cant de bytes definidos por el size en base al offset
+			break;
+		case COD_GUARDAR_DATOS:
+			//	Si se encuentra en modo escritura, se almacenará en el path los bytes del buffer definidos por el size
+			break;
+		case COD_SALUDO:
+			logInfo("El kernel %d me envio el siguiente saludo: %s", args->fd_kernel,
 				package->message);
 		break;
 	default:

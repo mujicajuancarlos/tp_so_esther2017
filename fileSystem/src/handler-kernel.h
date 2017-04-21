@@ -12,6 +12,7 @@
 #include <errno.h>
 
 #include <dc-commons/package.h>
+#include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-fileSystem-kernel.h>
 #include "fileSystem.h"
 
