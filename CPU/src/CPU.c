@@ -80,7 +80,7 @@ int main(void) {
 	printf("Desconectado\n");
 
 	return 0;
-}
+}//Cierra
 
 int obtenerArchivoConfiguracion()
 {
