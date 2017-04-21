@@ -16,7 +16,13 @@
 
 void handleUserRequest(console_struct* args);
 
-void clearConsoleScreen();
+void handleCommand_start_program(console_struct* console, char** commands, bool *shouldCompareCommand);
+
+void printFileNotFound(char* filePath);
+
+void printInvalidArguments(char* command);
+
+void printInvalidOptions(char* command);
 
 void printCommandsHelp();
 

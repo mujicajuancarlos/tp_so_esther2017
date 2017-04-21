@@ -12,6 +12,26 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <commons/string.h>
+#include "logger.h"
+
+/**
+ * @NAME: readFile
+ * @DESC: devuelve el contenido del archivo pathFile
+ * @PARAMS:
+ *		char* path del archivo
+ * @RETURN: char* contenido del archivo
+ */
+char* readFile(char* pathFile);
+
+/**
+ * @NAME: file_exists
+ * @DESC: indica si un archivo existe y puede ser accedido
+ * @PARAMS:
+ *		char* path del archivo
+ *		char* modo de apertura
+ * @RETURN: true si existe y puede ser manipulado en el modo indicado
+ */
+bool file_exists(char* filePath, char* mode);
 
 /**
  * @NAME: get_user_commands

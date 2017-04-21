@@ -18,10 +18,6 @@
 
 //commons death coders
 #include <dc-commons/logger.h>
-#include <dc-commons/package.h>
-#include <dc-commons/socket-client.h>
-#include <dc-commons/socket-message.h>
-#include <dc-commons/protocol-kernel-console.h>
 
 #include "configuration.h"
 
@@ -32,11 +28,12 @@ typedef struct console_struct{
 
 typedef struct Program{
 	int pid;
-	struct timeval startDate;
-	struct timeval endDate;
+	time_t startDate;
+	time_t endDate;
 	int fd_client;
 	pthread_t hilo;
 	char* sourceCodePath;
+	console_struct* console;
 } Program;
 
 void initializeStruct(console_struct* args, Configuration* config);
