@@ -14,6 +14,10 @@
 
 #include <commons/config.h>
 #include <dc-commons/logger.h>
+#include <dc-commons/socket-server.h>
+#include <dc-commons/logger.h>
+#include <dc-commons/package.h>
+#include <dc-commons/socket-message.h>
 #include "configuration.h"
 
 typedef struct fileSystem_struct{
