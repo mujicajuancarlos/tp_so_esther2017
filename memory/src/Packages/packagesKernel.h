@@ -17,10 +17,12 @@ void comunicacionConKernel(int socketKernelfd);
 
 
 //Recibe y desempaqueta los packages provenientes del Kernel
-void packagesReceptionKernel(int kernelfd, int continuador);
+void packagesReceptionKernel(int kernelfd);
 
 //Empaqueta y envia packages al Kernel
-void packagesSenderKernel(int kernelfd, int exit,int code);
+void packagesSenderKernel(int kernelfd,int code);
+
+void saludoAKernel(int sck);
 
 
 #endif /* PACKAGES_PACKAGESKERNEL_H_ */

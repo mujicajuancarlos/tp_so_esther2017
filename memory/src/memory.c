@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 		else
 		{
 			puts("Se conecto un Kernell");
-			args.socketClientKernel = recibido;
+			args.socketClientKernel = accepted;
 			comunicacionConKernel(args.socketClientKernel);
 
 		}

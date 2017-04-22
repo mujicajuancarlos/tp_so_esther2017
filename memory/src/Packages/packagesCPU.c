@@ -6,6 +6,7 @@
  */
 #include <dc-commons/protocol-memory-cpu.h>
 #include <dc-commons/package.h>
+#include "packagesCPU.h"
 
 
 void comunicacionConCPU(unsigned long int hiloCPU){
