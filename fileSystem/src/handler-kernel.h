@@ -21,8 +21,12 @@ void handleKernel(fileSystem_struct *args);
 
 void handleKernelRequest(fileSystem_struct *args, Package *package);
 
-void exceptionTo(int fileDescriptor, char *exception);
+void comunicacionConKernel(fileSystem_struct *args);
 
+void packagesSenderKernel(fileSystem_struct *args, int code);
 
+void saludoAKernel(int sck);
+
+void exceptionTo(int destinationfd, char *message);
 
 #endif /* HANDLER_KERNEL_H_ */

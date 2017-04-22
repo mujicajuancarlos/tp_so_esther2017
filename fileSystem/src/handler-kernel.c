@@ -88,10 +88,10 @@ void handleKernelRequest(fileSystem_struct *args, Package *package) {
 void comunicacionConKernel(fileSystem_struct *args){
 
 	Package *package;
-	//int init = 1;
+	int init = 1;
 	//int exit = 1;
 
-	while (1){
+	while (init){
 		handleKernelRequest(args, package);
 	}
 	/*while (exit){
@@ -99,15 +99,13 @@ void comunicacionConKernel(fileSystem_struct *args){
 	}*/
 }
 
-void packagesSenderKernel(fileSystem_struct *fileDesc, int exit, int code){
+void packagesSenderKernel(fileSystem_struct *args, int code) {
 	/*Cuando se le pide al proceso que haga alguna de las operaciones,
 	se le puede mandar esta función con el código setteado (Se le podría cambiar
 	el nombre a esta función)*/
-	exit = 1;
 	if(code < 0){
 		puts("La especificada, no es una operacion valida");
 	} else {
-	while (exit){
 	 switch(code)	{
 		case COD_CREAR_ARCHIVO:
 			//	Enviar un mensaje de que fue satisfactorio
@@ -120,24 +118,34 @@ void packagesSenderKernel(fileSystem_struct *fileDesc, int exit, int code){
 			break;
 		case COD_GUARDAR_DATOS:
 			//	En caso de guardar y que no haya espacio
-			exceptionTo(fileDesc,"No es guardar datos, no hay espacio disponible");
+			exceptionTo(args->fd_kernel,"No es guardar datos, no hay espacio disponible");
 			break;
 		case COD_SALUDO: //Cuando se conectan, no hacen un handshake ya?
-			/*doHandshake(fd_kernel, code);*/
+			saludoAKernel(args->fd_kernel);
 			break;
 		}
 	}
-
-}
-	void exceptionTo(int destinationfd, char *exception){
-		int len, bytes_sent;
-		len = strlen(exception);
-		bytes_sent = sendmsg(destinationfd,exception,len);
-		if (bytes_sent != -1){
-			puts("Eror en mandar exception");
+  }
+void saludoAKernel(int sck){
+	char *mensaje = "Te conectaste kernel";
+	int longMensaje = sizeof(mensaje);
+	Package *paqueteParaEnviar = createPackage(COD_SALUDO,mensaje,longMensaje);
+	int consultaEnvio = sendPackage(sck,paqueteParaEnviar);
+	if(consultaEnvio != -1){
+		puts("Se envio paquete corectamente");
 		}
-		else
-		{
+	else {
+		puts("Error en el envio");
+	}
+}
+
+void exceptionTo(int destinationfd, char *message){
+	int len, bytes_sent;
+	len = strlen(message);
+	bytes_sent = sendmsg(destinationfd,message,len);
+	if (bytes_sent != -1){
+		puts("Error en mandar exception");
+		}	else	{
 			puts("Se mando corectamente mensaje de exception");
 		}
-	}
+}
