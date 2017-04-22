@@ -86,13 +86,11 @@ void handleKernelRequest(fileSystem_struct *args, Package *package) {
 // COMUNICACIÓN C/KERNEL
 
 void comunicacionConKernel(fileSystem_struct *args){
-
-	Package *package;
 	int init = 1;
 	//int exit = 1;
 
 	while (init){
-		handleKernelRequest(args, package);
+		handleKernelRequest(args, COD_SALUDO);
 	}
 	/*while (exit){
 		packagesSenderKernel(fileSystem_struct *args, exit);
