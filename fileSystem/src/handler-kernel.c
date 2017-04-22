@@ -56,8 +56,7 @@ void handleKernel(fileSystem_struct *args) {
 }
 
 void handleKernelRequest(fileSystem_struct *args, Package *package) {
-
-		switch (package->msgCode) {
+	switch (package->msgCode) {
 			case COD_VALIDAR_ARCHIVO:
 				//	Verifica que el archivo del path exista
 				break;
@@ -88,51 +87,19 @@ void handleKernelRequest(fileSystem_struct *args, Package *package) {
 
 void comunicacionConKernel(fileSystem_struct *args){
 
-	int init = 1;
-	int exit = 1;
+	Package *package;
+	//int init = 1;
+	//int exit = 1;
 
-	while (init){
-		packagesReceptionKernel(args, init);
+	while (1){
+		handleKernelRequest(args, package);
 	}
 	/*while (exit){
 		packagesSenderKernel(fileSystem_struct *args, exit);
 	}*/
 }
 
-void packagesReceptionKernel(fileSystem_struct *fd_kernel, int continuador){
-
-	Package *package;
-
-	if(receivePackage(fd_kernel, package) != 0){
-		switch (package->msgCode) {
-			case COD_VALIDAR_ARCHIVO:
-				//	Verifica que el archivo del path exista
-				break;
-			case COD_CREAR_ARCHIVO:
-				//	En caso de que no exista (y en el path se pueda escribir) se va a crear el archivo dentro de ese path
-				break;
-			case COD_BORRAR_ARCHIVO:
-				//	En caso de que exista, borrará el archivo metadata y liberará bloques del bitmap
-				break;
-			case COD_OBTENER_DATOS:
-				//	Si pide datos el Kernel, y el path está en modo lectura, se devolverá la cant de bytes definidos por el size en base al offset
-				break;
-			case COD_GUARDAR_DATOS:
-				//	Si se encuentra en modo escritura, se almacenará en el path los bytes del buffer definidos por el size
-				break;
-			case COD_SALUDO:
-				logInfo("El kernel %d me envio el siguiente saludo: %s", fd_kernel,
-					package->message);
-			break;
-		default:
-			logError("El kernel solicito una accion no permitida");
-			break;
-		}
-
-	destroyPackage(package);
-}}
-
-void packagesSenderKernel(fileSystem_struct *fd_kernel, int exit, int code){
+void packagesSenderKernel(fileSystem_struct *fileDesc, int exit, int code){
 	/*Cuando se le pide al proceso que haga alguna de las operaciones,
 	se le puede mandar esta función con el código setteado (Se le podría cambiar
 	el nombre a esta función)*/
@@ -153,7 +120,7 @@ void packagesSenderKernel(fileSystem_struct *fd_kernel, int exit, int code){
 			break;
 		case COD_GUARDAR_DATOS:
 			//	En caso de guardar y que no haya espacio
-			exceptionTo(fd_kernel,"No es guardar datos, no hay espacio disponible");
+			exceptionTo(fileDesc,"No es guardar datos, no hay espacio disponible");
 			break;
 		case COD_SALUDO: //Cuando se conectan, no hacen un handshake ya?
 			/*doHandshake(fd_kernel, code);*/
@@ -162,14 +129,15 @@ void packagesSenderKernel(fileSystem_struct *fd_kernel, int exit, int code){
 	}
 
 }
-	void exceptionTo(int fileDescriptor, char *exception){
+	void exceptionTo(int destinationfd, char *exception){
 		int len, bytes_sent;
 		len = strlen(exception);
-		bytes_sent = sendmsg(fileDescriptor, exception, len);
+		bytes_sent = sendmsg(destinationfd,exception,len);
 		if (bytes_sent != -1){
-			puts("Error en mandar exception");
-		}	else	{
-			puts("Se mandó corectamente mensaje de exception");
+			puts("Eror en mandar exception");
 		}
-
+		else
+		{
+			puts("Se mando corectamente mensaje de exception");
+		}
 	}
