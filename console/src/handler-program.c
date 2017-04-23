@@ -7,7 +7,7 @@
 
 #include "handler-program.h"
 
-int handleNewProgram(Program *program) {
+int handleNewProgram(Program* program) {
 
 	Package* package;
 
@@ -52,14 +52,13 @@ void handleKernelRequest(Program *program, Package* package) {
 	}
 }
 
-Program* createNewProgram(console_struct* console, pthread_t *thread,
-		char* sourceCodePath) {
+Program* createNewProgram(console_struct* console, char* sourceCodePath) {
 	Program *program = malloc(sizeof(Program));
 	program->startDate = time(NULL);
+	program->endDate = NULL;
 	program->fd_client = -1;
-	program->hilo = *thread;
 	program->pid = -1;
-	program->sourceCodePath = sourceCodePath;
+	program->sourceCodePath = string_duplicate(sourceCodePath);
 	program->console = console;
 	return program;
 }

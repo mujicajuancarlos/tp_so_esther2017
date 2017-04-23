@@ -7,13 +7,13 @@
 
 #include "handler-user.h"
 
-void handleUserRequest(console_struct* args) {
+void handleUserRequest(console_struct* consoleStruct) {
 
 	int exit = 0;
 	bool shouldCompareCommand;
 	while (exit == 0) {
 		printf(" > ");
-		char** commands = get_user_commands(200);
+		char** commands = get_user_commands();
 		shouldCompareCommand = true;
 
 		if (equal_user_command(commands[0], COD_CONSOLE_HELP, &shouldCompareCommand)) {
@@ -34,7 +34,7 @@ void handleUserRequest(console_struct* args) {
 		}
 
 		if (equal_user_command(commands[0], COD_CONSOLE_START_PROGRAM, &shouldCompareCommand)) {
-			handleCommand_start_program(args, commands, &shouldCompareCommand);
+			handleCommand_start_program(consoleStruct, commands, &shouldCompareCommand);
 		}
 
 		if (equal_user_command(commands[0], COD_CONSOLE_INFO_PROGRAM,
@@ -50,17 +50,18 @@ void handleUserRequest(console_struct* args) {
 			printf("«%s» no es un comando válido. Si necesita ayuda use: «%s»\n",commands[0],COD_CONSOLE_HELP);
 		}
 
+		free_user_commands(commands);
 	}
 }
 
-void handleCommand_start_program(console_struct* console, char** commands, bool *shouldCompareCommand){
+void handleCommand_start_program(console_struct* consoleStruct, char** commands, bool *shouldCompareCommand){
 	if(commands[1]!=NULL && commands[2]==NULL){
 		if(file_exists(commands[1],"r")){
 			logInfo("Creando el hilo para ejecutar un programa");
 			pthread_t hiloPrograma;
 			logInfo("Creando el nuevo programa");
-			Program* program = createNewProgram(console, &hiloPrograma, commands[1]);
-			pthread_create(&hiloPrograma, NULL, (void*)handleNewProgram, &program);
+			Program* program = createNewProgram(consoleStruct, commands[1]);
+			pthread_create(&hiloPrograma, NULL, (void*)handleNewProgram, program);
 		} else
 			printFileNotFound(commands[1]);
 	}else

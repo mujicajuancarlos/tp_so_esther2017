@@ -22,7 +22,7 @@ int handleNewProgram(Program *program);
 
 void handleKernelRequest(Program *program, Package* package);
 
-Program* createNewProgram(console_struct* console, pthread_t *thread, char* sourceCodePath);
+Program* createNewProgram(console_struct* console, char* sourceCodePath);
 
 void destroyProgram(Program* program);
 

@@ -11,27 +11,29 @@
 #include "console.h"
 #include "handler-user.h"
 
+console_struct consoleStruct;
+
 int main(int argc, char *argv[]) {
 
-	console_struct args;
-	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
+
+	Configuration *config = config_with(argc > 1 ? argv[1] : NULL);
 	initLogMutex(config->log_file, config->log_program_name,
 			config->log_print_console,
 			log_level_from_string(config->log_level));
 
 	logInfo("Iniciando el proceso consola");
-	initializeStruct(&args, config);
+	initializeStruct(&consoleStruct, config);
 
 	logInfo("Imprimo bienvenida al programa");
 	printWelcome();
 
 	logInfo("Inicia el lector de comandos para el usuario");
-	handleUserRequest(&args);
+	handleUserRequest(&consoleStruct);
 
 	return EXIT_SUCCESS;
 }
 
-void initializeStruct(console_struct* args, Configuration* config){
+void initializeStruct(console_struct *args, Configuration *config){
 	args->listaProgramas = list_create();
 	args->config = config;
 }

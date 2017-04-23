@@ -21,17 +21,16 @@
 
 #include "configuration.h"
 
-typedef struct console_struct{
+typedef struct {
 	t_list* listaProgramas;
 	Configuration* config;
 } console_struct;
 
-typedef struct Program{
+typedef struct {
 	int pid;
 	time_t startDate;
 	time_t endDate;
 	int fd_client;
-	pthread_t hilo;
 	char* sourceCodePath;
 	console_struct* console;
 } Program;
