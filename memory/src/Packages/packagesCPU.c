@@ -4,6 +4,10 @@
  *  Created on: 20/4/2017
  *      Author: utnso
  */
+#include <dc-commons/protocol-memory-cpu.h>
+#include <dc-commons/package.h>
+#include "packagesCPU.h"
+
 
 void comunicacionConCPU(unsigned long int hiloCPU){
 
@@ -40,7 +44,7 @@ void packagesReceptionCPU(unsigned long int hiloCPU, int continuador){
 			break;
 		case COD_SALUDO:
 			//Hace lo que tiene que hacer
-
+			break;
 		}
 		}
 }

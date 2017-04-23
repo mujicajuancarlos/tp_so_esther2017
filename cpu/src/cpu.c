@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
 void mensajeParaConectarseAMemory(int sck_memory){
 			char* message = "CPU";
 			int len = strlen(message);
-			if (send(sck_memory, message, len, 0) != -1) {
+			if(send(sck_memory, message, len, 0) != -1){
 				puts("Se mando mensaje a memoria corectamente");
 			};
 }

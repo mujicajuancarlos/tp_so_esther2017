@@ -25,7 +25,9 @@ void handleKernel(fileSystem_struct *args) {
 		/* Espera indefinida hasta que alguno de los descriptores tenga algo
 		 * que decir -> puede ser producido por:
 		 * 1. Nuevo cliente solicitando conectarse
-		 * 2. Un cliente ya conectado que envía un mensaje*/
+		 * 2. Un cliente ya conectado que envía un mensaje
+		 * Erratas: el select para que sea más amigable el código, podría romper
+		 * tranquilamente en caso de que quiera mandar otro proceso*/
 		activity = select(fd_fileSystem + 1, &descriptoresLectura, NULL,
 		NULL, NULL);
 		if ((activity < 0) && (errno != EINTR))
@@ -53,32 +55,95 @@ void handleKernel(fileSystem_struct *args) {
 	}
 }
 
-
 void handleKernelRequest(fileSystem_struct *args, Package *package) {
-
 	switch (package->msgCode) {
-		case COD_VALIDAR_ARCHIVO:
-			//	Verifica que el archivo del path exista
+			case COD_VALIDAR_ARCHIVO:
+				//	Verifica que el archivo del path exista
+				break;
+			case COD_CREAR_ARCHIVO:
+				//	En caso de que no exista (y en el path se pueda escribir) se va a crear el archivo dentro de ese path
+				break;
+			case COD_BORRAR_ARCHIVO:
+				//	En caso de que exista, borrará el archivo metadata y liberará bloques del bitmap
+				break;
+			case COD_OBTENER_DATOS:
+				//	Si pide datos el Kernel, y el path está en modo lectura, se devolverá la cant de bytes definidos por el size en base al offset
+				break;
+			case COD_GUARDAR_DATOS:
+				//	Si se encuentra en modo escritura, se almacenará en el path los bytes del buffer definidos por el size
+				break;
+			case COD_SALUDO:
+				logInfo("El kernel %d me envio el siguiente saludo: %s", args->fd_kernel,
+					package->message);
 			break;
+		default:
+			logError("El kernel solicito una accion no permitida");
+			break;
+		}
+	destroyPackage(package);
+}
+
+// COMUNICACIÓN C/KERNEL
+
+void comunicacionConKernel(fileSystem_struct *args){
+	int init = 1;
+	//int exit = 1;
+
+	while (init){
+		handleKernelRequest(args, COD_SALUDO);
+	}
+	/*while (exit){
+		packagesSenderKernel(fileSystem_struct *args, exit);
+	}*/
+}
+
+void packagesSenderKernel(fileSystem_struct *args, int code) {
+	/*Cuando se le pide al proceso que haga alguna de las operaciones,
+	se le puede mandar esta función con el código setteado (Se le podría cambiar
+	el nombre a esta función)*/
+	if(code < 0){
+		puts("La especificada, no es una operacion valida");
+	} else {
+	 switch(code)	{
 		case COD_CREAR_ARCHIVO:
-			//	En caso de que no exista (y en el path se pueda escribir) se va a crear el archivo dentro de ese path
+			//	Enviar un mensaje de que fue satisfactorio
 			break;
 		case COD_BORRAR_ARCHIVO:
-			//	En caso de que exista, borrará el archivo metadata y liberará bloques del bitmap
+			//	Verificar que existe ese archivo del path, borrarlo y mencionar el éxito del proceso
 			break;
 		case COD_OBTENER_DATOS:
 			//	Si pide datos el Kernel, y el path está en modo lectura, se devolverá la cant de bytes definidos por el size en base al offset
 			break;
 		case COD_GUARDAR_DATOS:
-			//	Si se encuentra en modo escritura, se almacenará en el path los bytes del buffer definidos por el size
+			//	En caso de guardar y que no haya espacio
+			exceptionTo(args->fd_kernel,"No es guardar datos, no hay espacio disponible");
 			break;
-		case COD_SALUDO:
-			logInfo("El kernel %d me envio el siguiente saludo: %s", args->fd_kernel,
-				package->message);
-		break;
-	default:
-		logError("El kernel solicito una accion no permitida");
-		break;
+		case COD_SALUDO: //Cuando se conectan, no hacen un handshake ya?
+			saludoAKernel(args->fd_kernel);
+			break;
+		}
+	}
+  }
+void saludoAKernel(int sck){
+	char *mensaje = "Te conectaste kernel";
+	int longMensaje = sizeof(mensaje);
+	Package *paqueteParaEnviar = createPackage(COD_SALUDO,mensaje,longMensaje);
+	int consultaEnvio = sendPackage(sck,paqueteParaEnviar);
+	if(consultaEnvio != -1){
+		puts("Se envio paquete corectamente");
+		}
+	else {
+		puts("Error en el envio");
 	}
 }
 
+void exceptionTo(int destinationfd, char *message){
+	int len, bytes_sent;
+	len = strlen(message);
+	bytes_sent = sendmsg(destinationfd,message,len);
+	if (bytes_sent != -1){
+		puts("Error en mandar exception");
+		}	else	{
+			puts("Se mando corectamente mensaje de exception");
+		}
+}

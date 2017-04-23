@@ -24,7 +24,7 @@
 #include <dc-commons/protocol-memory-kernel.h>
 
 #include "configuration.h"
-#include "Packages/packagesKernel"
+#include "Packages/packagesKernel.h"
 #include "Packages/packagesCPU.h"
 
 //estructura princial del cpu
