@@ -9,29 +9,27 @@
 #include "packagesCPU.h"
 
 
-void comunicacionConCPU(unsigned long int hiloCPU){
+void comunicacionConCPU(pthread_t *hiloCPU){
 
-	int init = 1;
-	int exit = 1;
+	int conexionInterrumpida = 1;
 
-	while (init){
-		packagesReceptionCPU(hiloCPU, init);
-	}
-	while (exit){
-		packagesSenderCPU(hiloCPU, exit);
+	while(conexionInterrumpida){
+
+		conexionInterrumpida = packagesReceptionCPU(hiloCPU); //Si retorna 0, sale del while
+
 	}
 
 }
 
-void packagesReceptionCPU(unsigned long int hiloCPU, int continuador){
+int packagesReceptionCPU(pthread_t *hiloCPU){
 
 	Package *packageRecv;
 
-		if(receivePackage(hiloCPU, packageRecv) != 0){
+		if(receivePackage(&hiloCPU, packageRecv) != 0){ //Los sends packages van dentro de cada caso, armandose como se debe en cada uno
 		switch(packageRecv->msgCode)
 		{
 		case COD_SOLICITAR_BYTES_PAGE:
-			//Solicitar bytes de una página
+			//Solicitar bytes de una página... solicitarBytes(&hiloCPU) (dentro de esta funcion se hace lo que tiene resolver y arma un paquete con la respuesta
 			break;
 		case COD_ESCRITURA_PAGE:
 			//Almacenar bytes en una página
@@ -46,6 +44,13 @@ void packagesReceptionCPU(unsigned long int hiloCPU, int continuador){
 			//Hace lo que tiene que hacer
 			break;
 		}
+		return 1;
+
+		}else {
+			puts("Conexion interrumpida ... ");
+
+			return 0;
+
 		}
 }
 

@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
 	else {
 		args.socketClientMemoria = fd_memoria;
 		mensajeParaConectarseAMemory(fd_memoria);
+
 	}
 
 	logInfo("Creando socket cliente para kernel");
