@@ -7,17 +7,17 @@
 
 #include "utils.h"
 
-char* readFile(char* pathFile){
+char* readFile(char* pathFile) {
 	FILE *file;
 	char* buffer;
 	long fsize;
 
-	if((file=fopen(pathFile,"r"))==NULL){
-		logError("Error al abrir el archivo %s",pathFile);
-		exit (EXIT_FAILURE);
+	if ((file = fopen(pathFile, "r")) == NULL) {
+		logError("Error al abrir el archivo %s", pathFile);
+		exit(EXIT_FAILURE);
 	}
 
-	logDebug("Leyendo el archivo %s",pathFile);
+	logDebug("Leyendo el archivo %s", pathFile);
 
 	//Obtengo el tamanio del archivo
 	fseek(file, 0, SEEK_END);
@@ -40,27 +40,54 @@ char* readFile(char* pathFile){
 bool file_exists(char* filePath, char* mode) {
 	FILE *file;
 	file = fopen(filePath, mode);
-	if (file!=NULL) {
+	if (file != NULL) {
 		fclose(file);
 		return true;
 	}
 	return false;
 }
 
-char** get_user_commands(int max_buffer){
-	char* buffer = malloc(sizeof(char) * max_buffer);
-	fgets(buffer,max_buffer,stdin);
-	int length = string_length(buffer);
-	if(length > 0 && buffer[--length] == '\n')
-		buffer[length] = '\0';
-	char** commands = string_split(buffer," ");
+char* getStdinString() {
+
+	unsigned int maxlen = 16, size = 16;
+	char* buffer = (char*) malloc(maxlen);
+
+	int ch = EOF;
+	int pos = 0;
+
+	/* Read input one character at a time, resizing the buffer as necessary */
+	while ((ch = getchar()) != '\n' && ch != EOF) {
+		buffer[pos++] = ch;
+		/* Next character to be inserted needs more memory */
+		if (pos == size) {
+			size = pos + maxlen;
+			buffer = (char*) realloc(buffer, size);
+		}
+	}
+	buffer[pos] = '\0'; /* Null-terminate the completed string */
+
+	return buffer;
+}
+
+char** get_user_commands() {
+	char* buffer = getStdinString();
+	char** commands = string_split(buffer, " ");
 	free(buffer);
 	return commands;
 }
 
-bool equal_user_command(char* userCommand, char* expectedCommand, bool *shouldCompareCommand){
-	if(*shouldCompareCommand){
-		if(string_equals_ignore_case(userCommand, expectedCommand)){
+void free_user_commands(char** array) {
+	int i = 0;
+	while (array[i] != NULL) {
+		free(array[i++]);
+	}
+	free(array);
+}
+
+bool equal_user_command(char* userCommand, char* expectedCommand,
+bool *shouldCompareCommand) {
+	if (*shouldCompareCommand) {
+		if (string_equals_ignore_case(userCommand, expectedCommand)) {
 			*shouldCompareCommand = false;
 			return true;
 		}

@@ -34,13 +34,24 @@ char* readFile(char* pathFile);
 bool file_exists(char* filePath, char* mode);
 
 /**
+ * @NAME: getStdinString
+ * @DESC: aloca bloqes de memoria a segun lo va necesitando devuelve un string
+ * @RETURN: retorna un string alocado en memoria dinamica
+ */
+char* getStdinString();
+
+/**
  * @NAME: get_user_commands
  * @DESC: Lee de teclado una linea la separa y devuelve el array de comandos
- * @PARAMS:
- *		int max_buffer - define el tamaño maximo de la entrada por teclado
  * @RETURN: array con comandos
  */
-char** get_user_commands(int max_buffer);
+char** get_user_commands();
+
+/**
+ * @NAME: free_user_commands
+ * @DESC: libera el array de char* generados por get_user_commands
+ */
+void free_user_commands(char** array);
 
 /**
  * @NAME: equal_user_command
