@@ -45,14 +45,16 @@ int main(int argc, char *argv[]) {
 		{
 			puts("Se conecto una CPU");
 
+			list_add(args.listaCPUs,accepted);
 			pthread_t hiloCPU;
-			pthread_create(&hiloCPU,NULL,(void*) comunicacionConCPU,&accepted);
+			pthread_create(&hiloCPU,NULL,(void*) comunicacionConCPU,accepted);
 		}
 		else
 		{
 			puts("Se conecto un Kernell");
 			args.socketClientKernel = accepted;
-			comunicacionConKernel(args.socketClientKernel);
+			pthread_t hiloMemoria;
+			pthread_create(&hiloMemoria,NULL,(void*)comunicacionConKernel,args.socketClientKernel);
 
 		}
 	}

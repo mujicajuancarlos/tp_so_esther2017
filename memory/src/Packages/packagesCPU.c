@@ -9,23 +9,23 @@
 #include "packagesCPU.h"
 
 
-void comunicacionConCPU(pthread_t *hiloCPU){
+void comunicacionConCPU(int fileDescriptor){
 
 	int conexionInterrumpida = 1;
 
 	while(conexionInterrumpida){
 
-		conexionInterrumpida = packagesReceptionCPU(hiloCPU); //Si retorna 0, sale del while
+		conexionInterrumpida = packagesReceptionCPU(fileDescriptor); //Si retorna 0, sale del while
 
 	}
 
 }
 
-int packagesReceptionCPU(pthread_t *hiloCPU){
+int packagesReceptionCPU(int fd){
 
 	Package *packageRecv;
 
-		if(receivePackage(&hiloCPU, packageRecv) != 0){ //Los sends packages van dentro de cada caso, armandose como se debe en cada uno
+		if(receivePackage(fd, packageRecv) != 0){ //Los sends packages van dentro de cada caso, armandose como se debe en cada uno
 		switch(packageRecv->msgCode)
 		{
 		case COD_SOLICITAR_BYTES_PAGE:
