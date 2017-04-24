@@ -28,7 +28,7 @@ void handleMemoria(kernel_struct *args) {
 	int consultaReciv = receivePackage(fileDescripor,paqueteParaRecibir);
 
 		if(consultaReciv != -1){
-			printf("Recibido Corectamente el mensaje del paquete es %s\n",paqueteParaRecibir->message);
+			printf("Recibido Corectamente el mensaje del paquete es %s\n",paqueteParaRecibir->stream);
 		}
 		else{
 			puts("No se pudo recibir");
@@ -85,7 +85,7 @@ void packagesReceptionKernel(int memoryFd){
 		break;
 	case COD_SALUDO:
 
-				printf("Recibido Corectamente el mensaje del paquete es %s\n",package->message);
+				printf("Recibido Corectamente el mensaje del paquete es %s\n",package->stream);
 
 
 		break;

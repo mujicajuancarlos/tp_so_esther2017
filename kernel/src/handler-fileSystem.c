@@ -26,7 +26,7 @@ void handleFileSystem(kernel_struct *args) {
 	Package* package = createEmptyPackage();
 		int consultaReciv = receivePackage(fileDescriptor,package);
 			if(consultaReciv != -1){
-				printf("Recibido correctamente el mensaje del paquete es %s\n",package->message);
+				printf("Recibido correctamente el mensaje del paquete es %s\n",package->stream);
 				}
 				else{
 					puts("No se pudo recibir");
@@ -81,7 +81,7 @@ void handleKernelRequest(kernel_struct*args, Package *package) {
 				break;
 			case COD_SALUDO:
 				printf("Recibido Corectamente el mensaje del paquete es %s\n",
-						package->message);
+						package->stream);
 			break;
 		default:
 			logError("El kernel solicito una accion no permitida");

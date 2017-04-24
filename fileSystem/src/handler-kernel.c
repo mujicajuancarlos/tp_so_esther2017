@@ -74,7 +74,7 @@ void handleKernelRequest(fileSystem_struct *args, Package *package) {
 				break;
 			case COD_SALUDO:
 				logInfo("El kernel %d me envio el siguiente saludo: %s", args->fd_kernel,
-					package->message);
+					package->stream);
 			break;
 		default:
 			logError("El kernel solicito una accion no permitida");
@@ -127,7 +127,7 @@ void packagesSenderKernel(fileSystem_struct *args, int code) {
 void saludoAKernel(int sck){
 	char *mensaje = "Te conectaste kernel";
 	int longMensaje = sizeof(mensaje);
-	Package *paqueteParaEnviar = createPackage(COD_SALUDO,mensaje,longMensaje);
+	Package *paqueteParaEnviar = createPackage(COD_SALUDO,longMensaje,mensaje);
 	int consultaEnvio = sendPackage(sck,paqueteParaEnviar);
 	if(consultaEnvio != -1){
 		puts("Se envio paquete corectamente");

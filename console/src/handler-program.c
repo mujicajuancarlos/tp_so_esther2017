@@ -28,7 +28,7 @@ int handleNewProgram(Program* program) {
 	//armo paquete y lo envio, verifico que no se produzca errores
 	char* message = readFile(program->sourceCodePath, &fsize);
 	logDebug("Creando paquete de inicio de programa para enviar a kernel.");
-	package = createPackage(COD_KC_RUN_PROGRAM, message, fsize);
+	package = createPackage(COD_KC_RUN_PROGRAM, fsize, message);
 	sendStatus = sendPackage(program->fd_client, package);
 	destroyPackage(package);
 	if (sendStatus == -1) {

@@ -49,7 +49,7 @@ void handleKernelRequest(cpu_struct *args, Package *package) {
 	switch (package->msgCode) {
 	case COD_SALUDO:
 		logInfo("El kernel %d me envio el siguiente saludo: %s", fd_kernel,
-				package->message);
+				package->stream);
 		if (sendPackage(fd_memoria, package) == -1)
 			logError("No se pudo enviar el saludo a la memoria fd: %d",
 					fd_memoria);

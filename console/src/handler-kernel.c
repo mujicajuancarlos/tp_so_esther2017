@@ -11,7 +11,7 @@
 void handleKernelRequest(Program* program, Package* package) {
 	switch (package->msgCode) {
 	case COD_KC_RUN_ACCEPT:
-		package->message_long;
+		package->size;
 		addProgram(program);
 		logInfo("Ejecucion aceptada: PROG: %s PID: %d", program->sourceCodePath,
 				program->pid);

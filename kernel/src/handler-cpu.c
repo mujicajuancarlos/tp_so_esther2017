@@ -93,7 +93,7 @@ void handleCpuRequest(int fileDescriptor, Package *package) {
 		break;
 	case COD_SALUDO:
 		logInfo("La cpu %d me envio el siguiente saludo: %s", fileDescriptor,
-				package->message);
+				package->stream);
 		break;
 	default:
 		logError("La cpu solicito una accion no permitida");
@@ -113,7 +113,7 @@ void crearServerSocketParaCpus(kernel_struct* args) {
 
 void crear_registrar_CPU(t_list* listaCPUs, int socketCPU_fd) {
 	char* message = "Conexion con kernel establecida con kernel";
-	Package* package = createPackage(COD_SALUDO,message, strlen(message));
+	Package* package = createPackage(COD_SALUDO, strlen(message), message);
 	sendPackage(socketCPU_fd,package);
 	CPU* cpu = malloc(sizeof(CPU));
 	cpu->cpuFD = socketCPU_fd;

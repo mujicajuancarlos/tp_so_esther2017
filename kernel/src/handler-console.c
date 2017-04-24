@@ -85,41 +85,47 @@ void handleConsolas(kernel_struct *args) {
 
 void handleConsoleRequest(int fileDescriptor, Package *package,
 		kernel_struct *args) {
+	Package* response;
+	char* message = "123";
 	switch (package->msgCode) {
-	case COD_INICIAR_PROGRAMA:
-		logInfo("Ejecutando inicio de programa");
+	case COD_KC_RUN_PROGRAM:
+		response = createPackage(COD_KC_RUN_ACCEPT, 3, message);
+		if (sendPackage(fileDescriptor, response) == -1)
+			logError("No se pudo enviar el mensaje al cpu");
+		else
+			logInfo("Programa iniciado");
 		break;
-	case COD_FINALIZAR_PROGRAMA:
-		logInfo("Ejecutando finalizacion de programa");
+	case COD_KC_END_PROGRAM:
+		logInfo("Terminar ejecucion");
 		break;
-	case COD_SALUDO:
-		logInfo("La consola %d me envio el siguiente saludo: %s",
-				fileDescriptor, package->message);
-		logInfo("Replicando mensaje en cpus");
-		void _send_message(CPU* cpu) {
-			if (sendPackage(cpu->cpuFD, package) == -1)
-				logError("No se pudo enviar el mensaje al cpu fd: %d", cpu->cpuFD);
-			else
-				logInfo("Se envió el mensaje a la cpu fd: %d", cpu->cpuFD);
-		}
-		list_iterate(args->listaCPUs, (void*) _send_message);
-		if (args->socketClientFileSystem != -1) {
-			if (sendPackage(args->socketClientFileSystem, package) == -1)
-				logError("No se pudo enviar el mensaje al file system fd: %d",
-						args->socketClientFileSystem);
-			else
-				logInfo("Se envió el mensaje a la file system fd: %d",
-						args->socketClientFileSystem);
-		}
-		if (args->socketClientMemoria != -1) {
-			if (sendPackage(args->socketClientMemoria, package) == -1)
-				logError("No se pudo enviar el mensaje a la memoria fd: %d",
-						args->socketClientMemoria);
-			else
-				logInfo("Se envió el mensaje a la memoria fd: %d",
-						args->socketClientMemoria);
-		}
-		break;
+//	case COD_SALUDO:
+//		logInfo("La consola %d me envio el siguiente saludo: %s",
+//				fileDescriptor, package->message);
+//		logInfo("Replicando mensaje en cpus");
+//		void _send_message(CPU* cpu) {
+//			if (sendPackage(cpu->cpuFD, package) == -1)
+//				logError("No se pudo enviar el mensaje al cpu fd: %d", cpu->cpuFD);
+//			else
+//				logInfo("Se envió el mensaje a la cpu fd: %d", cpu->cpuFD);
+//		}
+//		list_iterate(args->listaCPUs, (void*) _send_message);
+//		if (args->socketClientFileSystem != -1) {
+//			if (sendPackage(args->socketClientFileSystem, package) == -1)
+//				logError("No se pudo enviar el mensaje al file system fd: %d",
+//						args->socketClientFileSystem);
+//			else
+//				logInfo("Se envió el mensaje a la file system fd: %d",
+//						args->socketClientFileSystem);
+//		}
+//		if (args->socketClientMemoria != -1) {
+//			if (sendPackage(args->socketClientMemoria, package) == -1)
+//				logError("No se pudo enviar el mensaje a la memoria fd: %d",
+//						args->socketClientMemoria);
+//			else
+//				logInfo("Se envió el mensaje a la memoria fd: %d",
+//						args->socketClientMemoria);
+//		}
+//		break;
 	default:
 		logError("La consola solicito una accion no permitida");
 		break;
