@@ -19,8 +19,8 @@
 
 typedef struct Package {
 	uint32_t msgCode;
-	uint32_t message_long;
-	char* message;
+	uint32_t size;
+	char* stream;
 } Package;
 
 /**
@@ -42,11 +42,11 @@ char* serializePackage(Package *package);
  * @DESC: Crea un package con los datos recibidos por parametro, usa malloc para generar la estructura y el mensaje
  * @PARAMS:
  * 		msgCode
- *		message
- *		message_long
+ *		size
+ *		stream
  * @RETURN: un punteto a package
  */
-Package* createPackage(uint32_t msgCode, char* message, uint32_t message_long);
+Package* createPackage(uint32_t msgCode, uint32_t size, char* stream );
 
 /**
  * @NAME: createEmptyPackage

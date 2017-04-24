@@ -30,13 +30,13 @@ int receivePackage(int fileDescriptor, Package *package) {
 	if (status == SEND_OR_RECEIVE_FAILURE)
 		return status;
 
-	status = receiveMessage(fileDescriptor, buffer, sizeof(package->message_long));
-	memcpy(&(package->message_long), buffer, buffer_size);
+	status = receiveMessage(fileDescriptor, buffer, sizeof(package->size));
+	memcpy(&(package->size), buffer, buffer_size);
 	if (status == SEND_OR_RECEIVE_FAILURE)
 			return status;
 
-	package->message = malloc(sizeof(char) * package->message_long);
-	status = receiveMessage(fileDescriptor, package->message, package->message_long);
+	package->stream = malloc(sizeof(char) * package->size);
+	status = receiveMessage(fileDescriptor, package->stream, package->size);
 	if (status == SEND_OR_RECEIVE_FAILURE)
 			return status;
 
