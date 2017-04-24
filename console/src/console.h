@@ -18,22 +18,14 @@
 
 //commons death coders
 #include <dc-commons/logger.h>
-
 #include "configuration.h"
 
 typedef struct {
+	pthread_mutex_t stdoutMutex;
+	pthread_mutex_t programsListMutex;
 	t_list* listaProgramas;
 	Configuration* config;
 } console_struct;
-
-typedef struct {
-	int pid;
-	time_t startDate;
-	time_t endDate;
-	int fd_client;
-	char* sourceCodePath;
-	console_struct* console;
-} Program;
 
 void initializeStruct(console_struct* args, Configuration* config);
 

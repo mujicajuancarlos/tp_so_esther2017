@@ -15,15 +15,14 @@
 #include <dc-commons/socket-client.h>
 #include <dc-commons/socket-message.h>
 #include <dc-commons/utils.h>
-#include <dc-commons/protocol-kernel-console.h>
 #include "console.h"
+#include "program.h"
+#include "handler-kernel.h"
 
 int handleNewProgram(Program *program);
 
-void handleKernelRequest(Program *program, Package* package);
+void addProgram(Program* program);
 
-Program* createNewProgram(console_struct* console, char* sourceCodePath);
-
-void destroyProgram(Program* program);
+void removeProgram(Program* program);
 
 #endif /* HANDLER_PROGRAM_H_ */

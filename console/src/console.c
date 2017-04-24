@@ -33,7 +33,9 @@ int main(int argc, char *argv[]) {
 	return EXIT_SUCCESS;
 }
 
-void initializeStruct(console_struct *args, Configuration *config){
-	args->listaProgramas = list_create();
-	args->config = config;
+void initializeStruct(console_struct *consoleStruct, Configuration *config){
+	consoleStruct->listaProgramas = list_create();
+	consoleStruct->config = config;
+	pthread_mutex_init(&(consoleStruct->stdoutMutex),NULL);
+	pthread_mutex_init(&(consoleStruct->programsListMutex),NULL);
 }
