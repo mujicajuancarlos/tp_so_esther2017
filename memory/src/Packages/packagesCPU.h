@@ -11,10 +11,10 @@
 #include "memory.h"
 
 // Memory se pone a recibir y enviar packages con un CPU
-void comunicacionConCPU(unsigned long int hiloCPU);
+void comunicacionConCPU(int fileDescriptor);
 
 //Recibe y desempaqueta los packages provenientes de una CPU
-void packagesReceptionCPU(unsigned long int hiloCPU, int continuador);
+int packagesReceptionCPU(int fd);
 
 //Empaqueta y envia packages al CPU
 void packagesSenderCPU(unsigned long int hiloCPU, int expulsador);
