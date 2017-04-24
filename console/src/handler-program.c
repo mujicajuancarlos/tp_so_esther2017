@@ -26,10 +26,11 @@ int handleNewProgram(Program* program) {
 	}
 
 	//armo paquete y lo envio, verifico que no se produzca errores
-	char* message = readFile(program->sourceCodePath, &fsize);
+	char* stream = readFile(program->sourceCodePath, &fsize);
 	logDebug("Creando paquete de inicio de programa para enviar a kernel.");
-	package = createPackage(COD_KC_RUN_PROGRAM, fsize, message);
+	package = createPackage(COD_KC_RUN_PROGRAM_REQUEST, fsize, stream);
 	sendStatus = sendPackage(program->fd_client, package);
+	free(stream);
 	destroyPackage(package);
 	if (sendStatus == -1) {
 		logError("No se pudo enviar datos al kernel");

@@ -50,6 +50,8 @@ void handleUserRequest(console_struct* consoleStruct) {
 
 		if (equal_user_command(commands[0], COD_CONSOLE_STOP_PROGRAM, &shouldCompareCommand)) {
 			puts("stop");
+			//COD_KC_STOP_PROGRAM_REQUEST
+			//handleCommand_end_program(consoleStruct, commands, &shouldCompareCommand);
 		}
 
 		if (shouldCompareCommand) {

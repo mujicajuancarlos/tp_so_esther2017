@@ -10,11 +10,18 @@
 
 void handleKernelRequest(Program* program, Package* package) {
 	switch (package->msgCode) {
-	case COD_KC_RUN_ACCEPT:
+	case COD_KC_RUN_PROGRAM_RESPONSE:
 		package->size;
 		addProgram(program);
 		logInfo("Ejecucion aceptada: PROG: %s PID: %d", program->sourceCodePath,
 				program->pid);
+		break;
+	case COD_KC_STOP_PROGRAM_RESPONSE:
+		//SIRVE CUANDO EL USUARIO SOLICITA FINALIZAR EL PROGRAMA DESDE CONSOLA
+		break;
+	case COD_KC_PRINT_STDOUT:
+		//un programa solicita imprimir por pantalla. semaforizar e imprimir.
+		//"para simplificar me viene el string completo para hacer puts"
 		break;
 	case COD_KC_END_PROGRAM:
 		program->endDate = time(NULL);
