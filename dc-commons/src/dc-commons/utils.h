@@ -21,7 +21,7 @@
  *		char* path del archivo
  * @RETURN: char* contenido del archivo
  */
-char* readFile(char* pathFile);
+char* readFile(char* pathFile, long* fsize);
 
 /**
  * @NAME: file_exists

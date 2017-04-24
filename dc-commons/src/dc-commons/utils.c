@@ -7,10 +7,9 @@
 
 #include "utils.h"
 
-char* readFile(char* pathFile) {
+char* readFile(char* pathFile, long* fsize) {
 	FILE *file;
 	char* buffer;
-	long fsize;
 
 	if ((file = fopen(pathFile, "r")) == NULL) {
 		logError("Error al abrir el archivo %s", pathFile);
@@ -21,16 +20,16 @@ char* readFile(char* pathFile) {
 
 	//Obtengo el tamanio del archivo
 	fseek(file, 0, SEEK_END);
-	fsize = ftell(file);
+	*fsize = ftell(file);
 	fseek(file, 0, SEEK_SET);
 
 	//Cargo el archivo en el buffer
-	buffer = malloc(fsize + 1);
-	fread(buffer, fsize, 1, file);
+	buffer = malloc(*fsize + 1);
+	fread(buffer, *fsize, 1, file);
 	fclose(file);
 
 	//Agrego el caracter de fin al buffer
-	buffer[fsize] = 0;
+	buffer[*fsize] = 0;
 
 	logDebug("Archivo leido: \n %s", buffer);
 
