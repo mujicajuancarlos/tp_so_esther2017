@@ -54,6 +54,6 @@ int packagesReceptionCPU(int fd){
 		}
 }
 
-void packagesSenderCPU(unsigned long int hiloCPU, int expulsador){
+void packagesSenderCPU(int cpufd){
 
 }

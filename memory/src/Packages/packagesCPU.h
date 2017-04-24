@@ -17,7 +17,7 @@ void comunicacionConCPU(int fileDescriptor);
 int packagesReceptionCPU(int fd);
 
 //Empaqueta y envia packages al CPU
-void packagesSenderCPU(unsigned long int hiloCPU, int expulsador);
+void packagesSenderCPU(int cpufd);
 
 
 #endif /* PACKAGES_PACKAGESCPU_H_ */
