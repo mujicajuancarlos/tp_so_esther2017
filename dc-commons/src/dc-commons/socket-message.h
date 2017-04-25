@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <sys/socket.h>
 
 #include <commons/error.h>
 
@@ -20,9 +21,38 @@
 #define SEND_OR_RECEIVE_FAILURE -1
 #define SEND_OR_RECEIVE_SUCCESS 0
 
+
+
+
 /**
  * Funciones
  */
+
+
+/**
+ * @NAME: createAndSendPackage
+ * @DESC: crea y envia por socket un package, si devuelve NULL significa que hubo error. IMPORTANTE:
+ * 	No olvidar ejecutar destroyPackage despues de utilizar los datos del mismo
+ * @PARAMS:
+ *		fileDescriptor
+ *		msgCode -> codigo de operacion
+ *		size -> tamaño del stream
+ *		stream -> puntero a una cadena de bytes, su tamaño esta determinado por size.
+ * @RETURN: puntero a package si el envio fue OK, NULL si hubo algun error;
+ */
+Package* createAndSendPackage(int fileDescriptor, uint32_t msgCode,
+		uint32_t size, char* stream);
+
+/**
+ * @NAME: createAndReceivePackage
+ * @DESC: crea y recibe por socket un package, si devuelve NULL significa que hubo error. IMPORTANTE:
+ * 	No olvidar ejecutar destroyPackage despues de utilizar los datos del mismo
+ * @PARAMS:
+ *		fileDescriptor
+ * @RETURN: puntero a package si la recepcion fue OK, NULL si hubo algun error;
+ */
+Package* createAndReceivePackage(int fileDescriptor);
+
 
 /**
  * @NAME: sendPackage
@@ -52,21 +82,23 @@ int receivePackage(int fileDescriptor, Package *package);
  * @DESC: Escribe en un file descriptor, y garantiza que todos los bytes sean enviados
  * @PARAMS:
  *		fileDescriptor
- *		message
+ *		buffer
  *		sizeOfMessage
+ *		int flags
  * @RETURN: la cantidad de bytes enviados, o -1 si hubo algun error
  */
-int sendMessage(int fileDescriptor, char *message, int sizeOfMessage);
+int sendMessage(int socket, char *buffer, int sizeOfMessage, int flags);
 
 /**
  * @NAME: receiveMessage
  * @DESC: Recibe datos de un file descriptor hasta alcanzar el tamaño definido, los almacena en el buffer
  * @PARAMS:
  *		fileDescriptor
- *		message
+ *		buffer
  *		sizeOfMessage
+ *		flags
  * @RETURN: la cantidad de bytes recibidos, o -1 si hubo algun error
  */
-int receiveMessage(int fileDescriptor, char *message, int sizeOfMessage);
+int receiveMessage(int fileDescriptor, char *buffer, int sizeOfMessage, int flags);
 
 #endif /* SRC_DC_COMMONS_SOCKET_MESSAGE_H_ */

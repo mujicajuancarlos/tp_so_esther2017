@@ -62,7 +62,7 @@ Package* createEmptyPackage();
  * 		puntero a package
  * @RETURN: suma de los sizeof de los atributo de la estructura
  */
-int sizePackage(Package *package);
+size_t sizePackage(Package *package);
 
 /**
  * @NAME: sizePackage
