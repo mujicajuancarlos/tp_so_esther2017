@@ -55,7 +55,7 @@ int handleNewProgram(Program* program) {
 			if (program->pid == -1) { // pid -1 correnponde a un programa no recibio la aprobacion de kernel
 				pthread_mutex_lock(&(program->console->stdoutMutex));
 				printf(
-						"\tSe cancelo la ejecucion del programa %s, kernel no esta disponible.",
+						"\tSe cancelo la ejecucion del programa %s, kernel no esta disponible.\n",
 						program->sourceCodePath);
 				pthread_mutex_unlock(&(program->console->stdoutMutex));
 			} else {

@@ -6,6 +6,7 @@
  */
 
 #include "handler-console.h"
+#include <dc-commons/serialization.h>
 
 void handleConsolas(kernel_struct *args) {
 
@@ -86,10 +87,12 @@ void handleConsolas(kernel_struct *args) {
 void handleConsoleRequest(int fileDescriptor, Package *package,
 		kernel_struct *args) {
 	Package* response;
-	char* message = "123";
+	char* stream;
 	switch (package->msgCode) {
-	case COD_KC_RUN_PROGRAM:
-		response = createPackage(COD_KC_RUN_ACCEPT, 3, message);
+	case COD_KC_RUN_PROGRAM_REQUEST:
+		stream = serialize_int(2014);
+		response = createPackage(COD_KC_RUN_PROGRAM_RESPONSE, sizeof(int), stream);
+		free(stream);
 		if (sendPackage(fileDescriptor, response) == -1)
 			logError("No se pudo enviar el mensaje al cpu");
 		else
@@ -147,11 +150,11 @@ void nuevaConsola(t_list* listaConsolas, int socketConsola_fd) {
 	//este es el momento que deberia crearse una nueva cpu
 	//TODO a completar
 	//crear una nueva cpu, responder adecuadamente al cliente para comenzar el proceso
-	char* message = "Hola, te acabas de conectar al servidor kernel";
-	if (send(socketConsola_fd, message, strlen(message), 0)
-			!= strlen(message)) {
-		logError("No se pudo enviar el mensaje al nuevo cliente conectado");
-	}
-	logInfo("Se envio la respuesta de conexion para el cliente %d",
-			socketConsola_fd);
+//	char* message = "Hola, te acabas de conectar al servidor kernel";
+//	if (send(socketConsola_fd, message, strlen(message), 0)
+//			!= strlen(message)) {
+//		logError("No se pudo enviar el mensaje al nuevo cliente conectado");
+//	}
+//	logInfo("Se envio la respuesta de conexion para el cliente %d",
+//			socketConsola_fd);
 }

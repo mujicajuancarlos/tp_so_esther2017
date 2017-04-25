@@ -8,6 +8,7 @@
 #ifndef HANDLER_KERNEL_H_
 #define HANDLER_KERNEL_H_
 
+#include <dc-commons/serialization.h>
 #include "handler-program.h"
 
 void handleKernelRequest(Program *program, Package* package);
