@@ -9,8 +9,9 @@
 
 Package* createPackage(uint32_t msgCode, uint32_t size, char* stream) {
 	Package *package = malloc(sizeof(Package));
-	package->stream = malloc(sizeof(char) * size);
-	memcpy(package->stream, stream, size);
+	size_t sizeBuffer = (sizeof(char) * size);
+	package->stream = malloc(sizeBuffer);
+	memcpy(package->stream, stream, sizeBuffer);
 	package->size = size;
 	package->msgCode = msgCode;
 	return package;
@@ -25,8 +26,11 @@ Package* createEmptyPackage() {
 }
 
 size_t sizePackage(Package *package) {
-	return sizeof(uint32_t) + sizeof(uint32_t)
-			+ (sizeof(char) * package->size);
+	size_t total;
+	total = sizeof(uint32_t) + sizeof(uint32_t);
+	if(package->stream != NULL)
+		total += sizeof(char) * package->size;
+	return total;
 }
 
 void destroyPackage(Package* package) {

@@ -15,6 +15,7 @@
 #include <dc-commons/socket-client.h>
 #include <dc-commons/socket-message.h>
 #include <dc-commons/utils.h>
+#include <dc-commons/protocol-kernel-console.h>
 #include "console.h"
 #include "program.h"
 #include "handler-kernel.h"
