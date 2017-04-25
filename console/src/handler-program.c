@@ -53,7 +53,7 @@ int handleNewProgram(Program* program) {
 			logError("El kernel cerro la conexion para FD: %d",
 					program->fd_client);
 			close(program->fd_client);
-			if (program->pid == -1) { // pid -1 correnponde a un programa no recibio la aprobacion de kernel
+			if (program->pid == -1) { // pid -1 correnponde a un programa que nunca llego a ejecutar
 				pthread_mutex_lock(&(program->console->stdoutMutex));
 				printf(
 						"Se cancelo la ejecucion del programa %s, kernel no esta disponible.",
@@ -61,6 +61,7 @@ int handleNewProgram(Program* program) {
 				pthread_mutex_unlock(&(program->console->stdoutMutex));
 				printNewLine(program->console->stdoutMutex);
 			} else {
+				//llego a ejecutar pero el kernel lo cancelo
 				program->endDate = time(NULL);
 				pthread_mutex_lock(&(program->console->stdoutMutex));
 				printf("Se cancelo la ejecucion del programa:");

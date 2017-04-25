@@ -9,7 +9,9 @@
 #define HANDLER_KERNEL_H_
 
 #include <dc-commons/serialization.h>
+#include <dc-commons/protocol-kernel-console.h>
 #include "handler-program.h"
+#include "printing-message.h"
 
 void handleKernelRequest(Program *program, Package* package);
 
