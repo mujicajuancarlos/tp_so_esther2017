@@ -9,7 +9,7 @@
 
 void printHeaderProgram(){
 	printf("\nPID\tC.IMPR.\tFECHA INICIO\tHORA INICIO\tFECHA FIN\tHORA FIN\tT.EJECUTADO\tCODIGO FUENTE\n");
-	printf("======================================================================================================\n");
+	printf("==============================================================================================================\n");
 }
 
 void printProgram(Program* program){
@@ -39,9 +39,9 @@ void printProgram(Program* program){
 		printf ("%s\t", buffer);
 		printIntervalTime(&(program->startDate), &(program->endDate));
 	}else{
-		printf ("%s\t", none);
-		printf ("%s\t", none);
-		printf ("%s\t", none);
+		printf ("%s\t\t", none);
+		printf ("%s\t\t", none);
+		printf ("%s\t\t", none);
 	}
 	//print file
 	printf ("%s\n", program->sourceCodePath);

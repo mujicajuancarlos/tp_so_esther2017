@@ -73,6 +73,7 @@ int handleNewProgram(Program* program) {
 		destroyPackage(package);
 	}
 	destroyProgram(program);
+	close(program->fd_client);
 	pthread_exit(EXIT_SUCCESS);
 }
 

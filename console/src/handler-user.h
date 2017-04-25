@@ -19,4 +19,16 @@ void handleUserRequest(console_struct* args);
 
 void handleCommand_start_program(console_struct* console, char** commands);
 
+void handleCommand_info_program(console_struct* consoleStruct, char** commands);
+
+void handleCommand_info_all_program(console_struct* consoleStruct, char** commands);
+
+void handleCommand_info_by_pid_program(console_struct* consoleStruct, char** commands);
+
+void handleCommand_end_program(console_struct* consoleStruct, char** commands);
+
+void handleCommand_end_all_program(console_struct* consoleStruct, char** commands);
+
+void handleCommand_end_by_pid_program(console_struct* consoleStruct, char** commands);
+
 #endif /* HANDLER_USER_H_ */

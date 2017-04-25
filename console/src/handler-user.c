@@ -17,53 +17,55 @@ void handleUserRequest(console_struct* consoleStruct) {
 		shouldCompareCommand = true;
 
 		if (*commands != NULL) {
-			if (shouldCompareCommand && equal_user_command(commands[0], COD_CONSOLE_HELP)) {
+			if (shouldCompareCommand
+					&& equal_user_command(commands[0], COD_CONSOLE_HELP)) {
 				shouldCompareCommand = false;
 				printCommandsHelp(consoleStruct->stdoutMutex);
 			}
 
-			if (shouldCompareCommand && equal_user_command(commands[0], COD_CONSOLE_RESET)) {
+			if (shouldCompareCommand
+					&& equal_user_command(commands[0], COD_CONSOLE_RESET)) {
 				shouldCompareCommand = false;
 				puts("reseteo");
 			}
 
-			if (shouldCompareCommand && equal_user_command(commands[0], COD_CONSOLE_EXIT)) {
+			if (shouldCompareCommand
+					&& equal_user_command(commands[0], COD_CONSOLE_EXIT)) {
 				shouldCompareCommand = false;
 				puts("exit");
 				exit = true;
 			}
 
-			if (shouldCompareCommand && equal_user_command(commands[0], COD_CONSOLE_CLEAR)) {
+			if (shouldCompareCommand
+					&& equal_user_command(commands[0], COD_CONSOLE_CLEAR)) {
 				shouldCompareCommand = false;
 				pthread_mutex_lock(&(consoleStruct->stdoutMutex));
 				system("clear");
 				pthread_mutex_unlock(&(consoleStruct->stdoutMutex));
 			}
 
-			if (shouldCompareCommand && equal_user_command(commands[0], COD_CONSOLE_START_PROGRAM)) {
+			if (shouldCompareCommand && equal_user_command(commands[0],
+			COD_CONSOLE_START_PROGRAM)) {
 				shouldCompareCommand = false;
 				handleCommand_start_program(consoleStruct, commands);
 			}
 
-			if (shouldCompareCommand && equal_user_command(commands[0], COD_CONSOLE_INFO_PROGRAM)) {
+			if (shouldCompareCommand && equal_user_command(commands[0],
+			COD_CONSOLE_INFO_PROGRAM)) {
 				shouldCompareCommand = false;
-				pthread_mutex_lock(&(consoleStruct->stdoutMutex));
-				puts("info");
-				pthread_mutex_unlock(&(consoleStruct->stdoutMutex));
+				handleCommand_info_program(consoleStruct, commands);
 			}
 
-			if (shouldCompareCommand && equal_user_command(commands[0], COD_CONSOLE_STOP_PROGRAM)) {
+			if (shouldCompareCommand && equal_user_command(commands[0],
+			COD_CONSOLE_STOP_PROGRAM)) {
 				shouldCompareCommand = false;
-				puts("stop");
-				//COD_KC_STOP_PROGRAM_REQUEST
-				//handleCommand_end_program(consoleStruct, commands, &shouldCompareCommand);
+				handleCommand_end_program(consoleStruct, commands);
 			}
 		}
 
 		if (shouldCompareCommand) {
 			pthread_mutex_lock(&(consoleStruct->stdoutMutex));
-			printf(
-					"«%s» no es un comando válido. Si necesita ayuda use: «%s»",
+			printf("«%s» no es un comando válido. Si necesita ayuda use: «%s»",
 					commands[0], COD_CONSOLE_HELP);
 			pthread_mutex_unlock(&(consoleStruct->stdoutMutex));
 		}
@@ -83,13 +85,72 @@ void handleCommand_start_program(console_struct* consoleStruct, char** commands)
 			pthread_attr_setdetachstate(&threadAttr, PTHREAD_CREATE_DETACHED);
 			logInfo("Creando una nueva estructura de programa para  %s",
 					commands[1]);
-			Program* program = createNewProgram(consoleStruct, commands[1]);//no olvidar librerar memoria al finalizar el hilo
+			Program* program = createNewProgram(consoleStruct, commands[1]); //no olvidar librerar memoria al finalizar el hilo
 			logDebug("Creando el hilo para ejectar %s", commands[1]);
 			pthread_create(&hiloPrograma, &threadAttr, (void*) handleNewProgram,
 					program);
 			logDebug("Hilo ejecutando %s", commands[1]);
 		} else
 			printFileNotFound(consoleStruct->stdoutMutex, commands[1]);
+	} else
+		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
+}
+
+void handleCommand_info_program(console_struct* consoleStruct, char** commands) {
+	if (commands[1] != NULL) {
+		if (equal_user_command(commands[1], OPT_ALL)) {
+			handleCommand_info_all_program(consoleStruct, commands);
+		}
+		if (equal_user_command(commands[1], OPT_PID)) {
+			handleCommand_info_by_pid_program(consoleStruct, commands);
+		}
+	} else
+		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
+}
+
+void handleCommand_info_all_program(console_struct* consoleStruct, char** commands) {
+	if (commands[2] == NULL) {
+		void printElement(void* element) {
+			Program* anProgram = (Program*) element;
+			printProgram(anProgram);
+		}
+		pthread_mutex_lock(&(consoleStruct->stdoutMutex));
+		printHeaderProgram();
+		list_iterate(consoleStruct->listaProgramas, printElement);
+		pthread_mutex_unlock(&(consoleStruct->stdoutMutex));
+	} else
+		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
+}
+
+void handleCommand_info_by_pid_program(console_struct* consoleStruct, char** commands) {
+	if (commands[2] != NULL && commands[3] == NULL) {
+
+	} else
+		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
+}
+
+void handleCommand_end_program(console_struct* consoleStruct, char** commands) {
+	if (commands[1] != NULL) {
+		if (equal_user_command(commands[1], OPT_ALL)) {
+			handleCommand_end_all_program(consoleStruct, commands);
+		}
+		if (equal_user_command(commands[1], OPT_PID)) {
+			handleCommand_end_by_pid_program(consoleStruct, commands);
+		}
+	} else
+		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
+}
+
+void handleCommand_end_all_program(console_struct* consoleStruct, char** commands) {
+	if (commands[2] == NULL) {
+
+	} else
+		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
+}
+
+void handleCommand_end_by_pid_program(console_struct* consoleStruct, char** commands) {
+	if (commands[2] != NULL && commands[3] == NULL) {
+
 	} else
 		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
 }
