@@ -49,7 +49,7 @@ bool file_exists(char* filePath, char* mode) {
 char* getStdinString() {
 
 	unsigned int maxlen = 16, size = 16;
-	char* buffer = (char*) malloc(maxlen);
+	char* buffer = malloc(maxlen);
 
 	int ch = EOF;
 	int pos = 0;
@@ -83,13 +83,6 @@ void free_user_commands(char** array) {
 	free(array);
 }
 
-bool equal_user_command(char* userCommand, char* expectedCommand,
-bool *shouldCompareCommand) {
-	if (*shouldCompareCommand) {
-		if (string_equals_ignore_case(userCommand, expectedCommand)) {
-			*shouldCompareCommand = false;
-			return true;
-		}
-	}
-	return false;
+bool equal_user_command(char* userCommand, char* expectedCommand) {
+	return string_equals_ignore_case(userCommand, expectedCommand);
 }

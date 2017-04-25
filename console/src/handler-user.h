@@ -16,15 +16,17 @@
 
 void handleUserRequest(console_struct* args);
 
-void handleCommand_start_program(console_struct* console, char** commands, bool *shouldCompareCommand);
+void handleCommand_start_program(console_struct* console, char** commands);
 
-void printFileNotFound(char* filePath);
+void printNewLine(pthread_mutex_t stdoutMutex);
 
-void printInvalidArguments(char* command);
+void printFileNotFound(pthread_mutex_t stdoutMutex, char* filePath);
 
-void printInvalidOptions(char* command);
+void printInvalidArguments(pthread_mutex_t stdoutMutex, char* command);
 
-void printCommandsHelp();
+void printInvalidOptions(pthread_mutex_t stdoutMutex, char* command);
+
+void printCommandsHelp(pthread_mutex_t stdoutMutex);
 
 void printWelcome();
 

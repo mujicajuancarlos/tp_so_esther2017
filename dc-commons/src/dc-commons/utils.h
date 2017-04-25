@@ -55,14 +55,12 @@ void free_user_commands(char** array);
 
 /**
  * @NAME: equal_user_command
- * @DESC: si shouldCompareCommand es true comparo userCommand y expectedCommand, si son iguales devuelvo true y actualizo shouldCompareCommand con false
- * 		en otros casos retorna falso
+ * @DESC: si son iguales devuelvo true en otros casos retorna falso
  * @PARAMS:
  *		userCommand string que ingreso el usuario
  *		expectedCommand string que se esperaba
- *		shouldCompareCommand booleano que define si la comparacion se realiza o no
  * @RETURN: bool
  */
-bool equal_user_command(char* userCommand, char* expectedCommand, bool *shouldCompareCommand);
+bool equal_user_command(char* userCommand, char* expectedCommand);
 
 #endif /* SRC_DC_COMMONS_UTILS_H_ */

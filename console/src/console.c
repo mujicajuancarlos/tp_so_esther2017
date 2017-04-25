@@ -15,7 +15,6 @@ console_struct consoleStruct;
 
 int main(int argc, char *argv[]) {
 
-
 	Configuration *config = config_with(argc > 1 ? argv[1] : NULL);
 	initLogMutex(config->log_file, config->log_program_name,
 			config->log_print_console,
