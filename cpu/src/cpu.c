@@ -13,6 +13,8 @@
 
 #include "cpu.h"
 #include "handler-kernel.h"
+#include "parser/parser.h"
+#include "parser/metadata_program.h"
 
 void mensajeParaConectarseAMemory(int memory);
 int main(int argc, char *argv[]) {
