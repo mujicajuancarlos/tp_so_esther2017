@@ -33,6 +33,7 @@
 								<option id="gnu.c.link.option.libs.837246854" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="commons"/>
 									<listOptionValue builtIn="false" value="dc-commons"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="parser-ansiop"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.386022286" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
