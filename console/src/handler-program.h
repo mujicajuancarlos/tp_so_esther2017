@@ -22,6 +22,8 @@
 
 int handleNewProgram(Program *program);
 
+void sendEndProgramRequest(Program* program, console_struct* consoleStruct);
+
 void addProgram(Program* program);
 
 void removeProgram(Program* program);

@@ -8,7 +8,6 @@
 
 #include "handler-program.h"
 
-
 int handleNewProgram(Program* program) {
 
 	Package* package;
@@ -75,6 +74,21 @@ int handleNewProgram(Program* program) {
 	destroyProgram(program);
 	close(program->fd_client);
 	pthread_exit(EXIT_SUCCESS);
+}
+
+void sendEndProgramRequest(Program* program, console_struct* consoleStruct){
+	char* pidStream = serialize_int(program->pid);
+	Package* package = createAndSendPackage(program->fd_client, COD_KC_STOP_PROGRAM_REQUEST, sizeof(int), pidStream);
+	if(package != NULL){
+		logInfo("Se envio la solicitud para finalizar el programa %d", program->pid);
+	}else{
+		logError("No se envio la solicitud para finalizar el programa %d", program->pid);
+		pthread_mutex_lock(&(program->console->stdoutMutex));
+		printf("No se pudo procesar el pedido para pid %d, kernel no acepta peticiones.", program->pid);
+		pthread_mutex_unlock(&(program->console->stdoutMutex));
+	}
+	free(pidStream);
+	destroyPackage(package);
 }
 
 void addProgram(Program* program) {

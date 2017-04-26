@@ -24,15 +24,8 @@ void handleUserRequest(console_struct* consoleStruct) {
 			}
 
 			if (shouldCompareCommand
-					&& equal_user_command(commands[0], COD_CONSOLE_RESET)) {
-				shouldCompareCommand = false;
-				puts("reseteo");
-			}
-
-			if (shouldCompareCommand
 					&& equal_user_command(commands[0], COD_CONSOLE_EXIT)) {
 				shouldCompareCommand = false;
-				puts("exit");
 				exit = true;
 			}
 
@@ -117,7 +110,9 @@ void handleCommand_info_all_program(console_struct* consoleStruct,
 		}
 		pthread_mutex_lock(&(consoleStruct->stdoutMutex));
 		printHeaderProgram();
+		pthread_mutex_lock(&(consoleStruct->programsListMutex));
 		list_iterate(consoleStruct->listaProgramas, printElement);
+		pthread_mutex_unlock(&(consoleStruct->programsListMutex));
 		pthread_mutex_unlock(&(consoleStruct->stdoutMutex));
 	} else
 		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
@@ -131,7 +126,9 @@ void handleCommand_info_by_pid_program(console_struct* consoleStruct,
 			Program* anProgram = (Program*) element;
 			return pid_isEqual(anProgram, pid);
 		}
+		pthread_mutex_lock(&(consoleStruct->programsListMutex));
 		Program* program = list_find(consoleStruct->listaProgramas, condicion);
+		pthread_mutex_unlock(&(consoleStruct->programsListMutex));
 		if (program != NULL) {
 			pthread_mutex_lock(&(consoleStruct->stdoutMutex));
 			printHeaderProgram();
@@ -161,7 +158,13 @@ void handleCommand_end_program(console_struct* consoleStruct, char** commands) {
 void handleCommand_end_all_program(console_struct* consoleStruct,
 		char** commands) {
 	if (commands[2] == NULL) {
-
+		void actionByElement(void* element) {
+			Program* anProgram = (Program*) element;
+			sendEndProgramRequest(anProgram, consoleStruct);
+		}
+		pthread_mutex_lock(&(consoleStruct->programsListMutex));
+		list_iterate(consoleStruct->listaProgramas, actionByElement);
+		pthread_mutex_unlock(&(consoleStruct->programsListMutex));
 	} else
 		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
 }
@@ -169,7 +172,21 @@ void handleCommand_end_all_program(console_struct* consoleStruct,
 void handleCommand_end_by_pid_program(console_struct* consoleStruct,
 		char** commands) {
 	if (commands[2] != NULL && commands[3] == NULL) {
-
+		int pid = atoi(commands[2]);
+		bool condicion(void* element) {
+			Program* anProgram = (Program*) element;
+			return pid_isEqual(anProgram, pid);
+		}
+		pthread_mutex_lock(&(consoleStruct->programsListMutex));
+		Program* program = list_find(consoleStruct->listaProgramas, condicion);
+		pthread_mutex_unlock(&(consoleStruct->programsListMutex));
+		if (program != NULL) {
+			sendEndProgramRequest(program, consoleStruct);
+		} else {
+			pthread_mutex_lock(&(consoleStruct->stdoutMutex));
+			printf("El pid %d no existe.\n", pid);
+			pthread_mutex_unlock(&(consoleStruct->stdoutMutex));
+		}
 	} else
 		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
 }

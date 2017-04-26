@@ -56,7 +56,6 @@ void printCommandsHelp(pthread_mutex_t stdoutMutex) {
 			COD_CONSOLE_STOP_PROGRAM, OPT_PID);
 
 	printf("\t%s\t\t\tLimpia la pantalla\n", COD_CONSOLE_CLEAR);
-	printf("\t%s\t\t\tRestablece el proceso por completo\n", COD_CONSOLE_RESET);
 	printf("\t%s\t\t\tFinaliza el proceso\n", COD_CONSOLE_EXIT);
 	pthread_mutex_unlock(&stdoutMutex);
 }

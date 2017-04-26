@@ -11,6 +11,10 @@ bool pid_isEqual(Program* program, int pid){
 	return program->pid == pid;
 }
 
+finalizeProgram(Program* program, console_struct* console){
+
+}
+
 Program* createNewProgram(console_struct* console, char* sourceCodePath) {
 	Program *program = malloc(sizeof(Program));
 	program->startDate = time(NULL);

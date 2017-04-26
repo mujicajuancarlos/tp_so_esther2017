@@ -9,7 +9,6 @@
 #define PROTOCOL_CONSOLE_USER_H_
 
 #define COD_CONSOLE_HELP "-help"
-#define COD_CONSOLE_RESET "reset"
 #define COD_CONSOLE_EXIT "exit"
 #define COD_CONSOLE_CLEAR "clear"
 #define COD_CONSOLE_START_PROGRAM "run"
