@@ -15,6 +15,7 @@ int atiendoCliente(int numero_sck);
 int main(int argc, char *argv[]) {
 
 	memory_struct args;
+	int memoriaPrincipal; // Ver el tipo y cómo retorna la función memoriaPrincipal()
 
 	puts("Cargando archivo externo de configuration");
 	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
@@ -23,6 +24,8 @@ int main(int argc, char *argv[]) {
 			log_level_from_string(config->log_level));
 
 	logInfo("Iniciando el proceso Memoria");
+
+	memoriaPrincipal = memoriaPrincipal(config, memoriaPrincipal);
 
 	initializeStruct(&args, config);
 
@@ -84,7 +87,11 @@ int atiendoCliente(int aceptado) {
 	return bytes_recv;
 }
 
+int memoriaPrincipal(Configuration *config){
 
+	int memoriaPrincipal = malloc(config->tamanio_memoria);
+	return memoriaPrincipal;
+}
 
 
 
