@@ -22,14 +22,16 @@ typedef struct {
 	console_struct* console;
 } Program;
 
+bool pid_isEqual(Program* program, int pid);
+
+Program* createNewProgram(console_struct* console, char* sourceCodePath);
+
+void destroyProgram(Program* program);
+
 void printHeaderProgram();
 
 void printProgram(Program* program);
 
 void printIntervalTime(time_t* startTime, time_t* endTime);
-
-Program* createNewProgram(console_struct* console, char* sourceCodePath);
-
-void destroyProgram(Program* program);
 
 #endif /* PROGRAM_H_ */

@@ -7,6 +7,29 @@
 
 #include "program.h"
 
+bool pid_isEqual(Program* program, int pid){
+	return program->pid == pid;
+}
+
+Program* createNewProgram(console_struct* console, char* sourceCodePath) {
+	Program *program = malloc(sizeof(Program));
+	program->startDate = time(NULL);
+	program->endDate = 0;
+	program->fd_client = -1;
+	program->pid = -1;
+	program->printSize = 0;
+	program->sourceCodePath = string_duplicate(sourceCodePath);
+	program->console = console;
+	return program;
+}
+
+void destroyProgram(Program* program) {
+	if (program != NULL) {
+		free(program->sourceCodePath);
+	}
+	free(program);
+}
+
 void printHeaderProgram(){
 	printf("\nPID\tC.IMPR.\tFECHA INICIO\tHORA INICIO\tFECHA FIN\tHORA FIN\tT.EJECUTADO\tCODIGO FUENTE\n");
 	printf("==============================================================================================================\n");
@@ -60,23 +83,4 @@ void printIntervalTime(time_t* startTime, time_t* endTime) {
 	diff_t-=min*ONE_HOUR;
 	sec=diff_t;
 	printf("%.2i:%.2i:%.2i \t",hour,min,sec);
-}
-
-Program* createNewProgram(console_struct* console, char* sourceCodePath) {
-	Program *program = malloc(sizeof(Program));
-	program->startDate = time(NULL);
-	program->endDate = 0;
-	program->fd_client = -1;
-	program->pid = -1;
-	program->printSize = 0;
-	program->sourceCodePath = string_duplicate(sourceCodePath);
-	program->console = console;
-	return program;
-}
-
-void destroyProgram(Program* program) {
-	if (program != NULL) {
-		free(program->sourceCodePath);
-	}
-	free(program);
 }

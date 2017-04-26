@@ -108,7 +108,8 @@ void handleCommand_info_program(console_struct* consoleStruct, char** commands) 
 		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
 }
 
-void handleCommand_info_all_program(console_struct* consoleStruct, char** commands) {
+void handleCommand_info_all_program(console_struct* consoleStruct,
+		char** commands) {
 	if (commands[2] == NULL) {
 		void printElement(void* element) {
 			Program* anProgram = (Program*) element;
@@ -122,9 +123,25 @@ void handleCommand_info_all_program(console_struct* consoleStruct, char** comman
 		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
 }
 
-void handleCommand_info_by_pid_program(console_struct* consoleStruct, char** commands) {
+void handleCommand_info_by_pid_program(console_struct* consoleStruct,
+		char** commands) {
 	if (commands[2] != NULL && commands[3] == NULL) {
-
+		int pid = atoi(commands[2]);
+		bool condicion(void* element) {
+			Program* anProgram = (Program*) element;
+			return pid_isEqual(anProgram, pid);
+		}
+		Program* program = list_find(consoleStruct->listaProgramas, condicion);
+		if (program != NULL) {
+			pthread_mutex_lock(&(consoleStruct->stdoutMutex));
+			printHeaderProgram();
+			printProgram(program);
+			pthread_mutex_unlock(&(consoleStruct->stdoutMutex));
+		} else {
+			pthread_mutex_lock(&(consoleStruct->stdoutMutex));
+			printf("El pid %d no existe.\n", pid);
+			pthread_mutex_unlock(&(consoleStruct->stdoutMutex));
+		}
 	} else
 		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
 }
@@ -141,14 +158,16 @@ void handleCommand_end_program(console_struct* consoleStruct, char** commands) {
 		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
 }
 
-void handleCommand_end_all_program(console_struct* consoleStruct, char** commands) {
+void handleCommand_end_all_program(console_struct* consoleStruct,
+		char** commands) {
 	if (commands[2] == NULL) {
 
 	} else
 		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
 }
 
-void handleCommand_end_by_pid_program(console_struct* consoleStruct, char** commands) {
+void handleCommand_end_by_pid_program(console_struct* consoleStruct,
+		char** commands) {
 	if (commands[2] != NULL && commands[3] == NULL) {
 
 	} else

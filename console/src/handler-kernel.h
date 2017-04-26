@@ -8,6 +8,7 @@
 #ifndef HANDLER_KERNEL_H_
 #define HANDLER_KERNEL_H_
 
+#include <commons/string.h>
 #include <dc-commons/serialization.h>
 #include <dc-commons/protocol-kernel-console.h>
 #include "handler-program.h"

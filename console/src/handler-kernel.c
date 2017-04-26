@@ -9,6 +9,7 @@
 
 void handleKernelRequest(Program* program, Package* package) {
 	bool status;
+	char* message;
 	switch (package->msgCode) {
 	case COD_KC_RUN_PROGRAM_RESPONSE:
 		program->pid = deserialize_int(package->stream);
@@ -42,9 +43,11 @@ void handleKernelRequest(Program* program, Package* package) {
 		}
 		break;
 	case COD_KC_PRINT_STDOUT:
+		message = string_substring_until(package->stream, package->size);
 		pthread_mutex_lock(&(program->console->stdoutMutex));
-		printf("\nPID: %d, > %s", program->pid, package->stream);
+		printf("\nPID: %d, > %s", program->pid, message);
 		pthread_mutex_unlock(&(program->console->stdoutMutex));
+		free(message);
 		printNewLine(program->console->stdoutMutex);
 		break;
 	case COD_KC_END_PROGRAM:
