@@ -115,9 +115,6 @@ void crear_registrar_CPU(t_list* listaCPUs, int socketCPU_fd) {
 	char* message = "Conexion con kernel establecida con kernel";
 	Package* package = createPackage(COD_SALUDO, strlen(message), message);
 	sendPackage(socketCPU_fd,package);
-	CPU* cpu = malloc(sizeof(CPU));
-	cpu->cpuFD = socketCPU_fd;
-	cpu->libre = 1;
-	cpu->pid = socketCPU_fd;
+	CPU* cpu = createCPU(socketCPU_fd);
 	list_add(listaCPUs, cpu);
 }

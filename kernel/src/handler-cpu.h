@@ -13,6 +13,7 @@
 #include <dc-commons/protocol-kernel-cpu.h>
 
 #include "kernel.h"
+#include "cpu.h"
 #include "commonFunctions.h"
 
 void handleCPUs(kernel_struct *args);

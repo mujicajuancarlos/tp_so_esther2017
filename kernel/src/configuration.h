@@ -8,10 +8,11 @@
 #ifndef CONFIGURATION_CONFIGURATION_H_
 #define CONFIGURATION_CONFIGURATION_H_
 
-//commoms
+//import commoms library
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/log.h>
+#include <commons/error.h>
 #include <dc-commons/config.h>
 
 //configuration file keys

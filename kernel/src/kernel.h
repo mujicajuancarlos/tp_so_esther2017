@@ -34,13 +34,6 @@ typedef struct kernel_struct {
 	Configuration* config;
 } kernel_struct;
 
-//estructura para representar una CPU conectada al kernel
-typedef struct CPU {
-    int cpuFD;	//file descriptor del socket del cpu
-    int pid;	//PID del proceso que esta ejecutando actualmente
-    int libre;	// 0:ocupado / 1:libre
-} CPU;
-
 /**
  * inicializo la estructura
  */
