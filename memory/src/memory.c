@@ -15,7 +15,7 @@ int atiendoCliente(int numero_sck);
 int main(int argc, char *argv[]) {
 
 	memory_struct args;
-	int memoriaPrincipal; // Ver el tipo y cómo retorna la función memoriaPrincipal()
+	int * memoriaPrincipal; // Ver el tipo y cómo retorna la función memoriaPrincipal(); ¿Va int?
 
 	puts("Cargando archivo externo de configuration");
 	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 
 	logInfo("Iniciando el proceso Memoria");
 
-	memoriaPrincipal = memoriaPrincipal(config, memoriaPrincipal);
+	memoriaPrincipal = memoriaPrincipal(config);
 
 	initializeStruct(&args, config);
 
@@ -87,34 +87,10 @@ int atiendoCliente(int aceptado) {
 	return bytes_recv;
 }
 
-int memoriaPrincipal(Configuration *config){
+int* memoriaPrincipal(Configuration *config){
 
-	int memoriaPrincipal = malloc(config->tamanio_memoria);
-	return memoriaPrincipal;
+	int *tmp = malloc(config->tamanio_memoria);
+	return tmp;
 }
 
-
-
-/*
-//forma de implementar el envio de informacion entre procesos
-int status;
-uint32_t size_message = 200;
-uint32_t code = COD_SALUDO;
-int exit = 0;
-while (exit == 0) {
-	printf("\nIngrese un mensaje:\n");
-	char* message = malloc(sizeof(char) * size_message);
-	fgets(message, size_message, stdin);
-	if (strcmp(message, "") == 0 || strcmp(message, "exit") == 0)
-		exit = 1;
-	else {
-		Package *package = createPackage(code, message, size_message);
-		status = sendPackage(args.socketServer, package);
-		if (status != -1)
-			printf("\nEnvio OK\n");
-		destroyPackage(package);
-	}
-	free(message);
-}
-*/
 
