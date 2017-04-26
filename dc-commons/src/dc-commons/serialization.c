@@ -10,7 +10,7 @@
 
 char *serialize_int(int value){
 	size_t size = sizeof(int);
-	char *stream = malloc(size);
+	char *stream = calloc(1, size);
 	memcpy(stream, &value, size);
 	return stream;
 }
@@ -22,4 +22,6 @@ int deserialize_int(char* stream){
 	return value;
 }
 
-
+char* deserialize_string(char* stream, size_t length){
+	return string_substring_until(stream, length);
+}

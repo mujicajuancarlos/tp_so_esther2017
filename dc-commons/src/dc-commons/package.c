@@ -8,9 +8,9 @@
 #include "package.h"
 
 Package* createPackage(uint32_t msgCode, uint32_t size, char* stream) {
-	Package *package = malloc(sizeof(Package));
+	Package *package = calloc(1, sizeof(Package));
 	size_t sizeBuffer = (sizeof(char) * size);
-	package->stream = malloc(sizeBuffer);
+	package->stream = calloc(1, sizeBuffer);
 	memcpy(package->stream, stream, sizeBuffer);
 	package->size = size;
 	package->msgCode = msgCode;
@@ -18,7 +18,7 @@ Package* createPackage(uint32_t msgCode, uint32_t size, char* stream) {
 }
 
 Package* createEmptyPackage() {
-	Package *package = malloc(sizeof(Package));
+	Package *package = calloc(1, sizeof(Package));
 	package->stream = NULL;
 	package->size = 0;
 	package->msgCode = 0;

@@ -11,6 +11,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <commons/string.h>
 
 /**
  * @NAME: serialize_int
@@ -31,5 +32,16 @@ char *serialize_int(int value);
  * 		int, NO HAGO FREE DEL STREAM, POR LO CUAL DEBES HACERLO VOS AFUERA DE ESTA FUNCION
  */
 int deserialize_int(char* stream);
+
+/**
+ * @NAME: deserialize_string
+ * @DESC: recibe un stream y el tamaño que deseas extraer y devuelve un string
+ * @PARAMS:
+ * 		char* stream
+ * 		size_t tamañano del string
+ * @RETURN:
+ * 		string, NO OLVIDAR HACER FREE DEL string
+ */
+char* deserialize_string(char* stream, size_t length);
 
 #endif /* SRC_DC_COMMONS_SERIALIZATION_H_ */
