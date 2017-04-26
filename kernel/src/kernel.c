@@ -9,57 +9,64 @@
  */
 
 #include "kernel.h"
+#include "handler-user.h"
 #include "handler-console.h"
 #include "handler-cpu.h"
 #include "handler-memory.h"
 #include "handler-fileSystem.h"
 
+kernel_struct kernelStruct;
+
 int main(int argc, char *argv[]) {
 
-	kernel_struct args;
 
-	puts("Cargando archivo externo de configuration");
+
 	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
 	initLogMutex(config->log_file, config->log_program_name,
 			config->log_print_console,
 			log_level_from_string(config->log_level));
 
 	logInfo("Inicializado proceso kernel");
+	initializeStruct(&kernelStruct, config);
 
-	initializeStruct(&args, config);
+	logInfo("Imprimo bienvenida al programa");
+	printWelcome();
 
-	handleMemoria(&args);
-	handleFileSystem(&args);
+	handleMemoria(&kernelStruct);
+	handleFileSystem(&kernelStruct);
 
 	logInfo("Inicializando lista de cpu");
 
 
 	/* Parte de creacion de servidor kernel para aceptar conexiones de consolas y cpu */
 	logInfo("Inicializando sockets servidor");
-	crearSockets(&args);
+	crearSockets(&kernelStruct);
 
 	logInfo("Creando el hilo para mantener CPU's");
 	pthread_t hiloCpu;
-	pthread_create(&hiloCpu, NULL, (void*) handleCPUs, &args);
+	pthread_create(&hiloCpu, NULL, (void*) handleCPUs, &kernelStruct);
 
 	logInfo("Creando el hilo para mantener Consolas's");
 	pthread_t hiloConsola;
-	pthread_create(&hiloConsola, NULL, (void*) handleConsolas, &args);
+	pthread_create(&hiloConsola, NULL, (void*) handleConsolas, &kernelStruct);
 
-	pthread_join(hiloCpu, NULL);
-	pthread_join(hiloConsola, NULL);
+	logInfo("Inicia el lector de comandos para el usuario");
+	handleUserRequest(&kernelStruct);
 
 	return EXIT_SUCCESS;
 }
 
-void initializeStruct(kernel_struct* args, Configuration* config){
-	args->config = config;
-	inicializarArray(MAX_CPUS, args->cpuSockets);
-	inicializarArray(MAX_CONSOLAS, args->consolaSockets);
-	args->listaCPUs = list_create();
-	args->listaConsolas = list_create();
-	args->socketClientFileSystem = -1;
-	args->socketClientMemoria = -1;
-	args->socketServerCPU = -1;
-	args->socketServerConsola = -1;
+void initializeStruct(kernel_struct* kernelStruct, Configuration* config){
+	kernelStruct->config = config;
+	inicializarArray(MAX_CPUS, kernelStruct->cpuSockets);
+	inicializarArray(MAX_CONSOLAS, kernelStruct->consolaSockets);
+	kernelStruct->cpuList = list_create();
+	kernelStruct->processList = list_create();
+	kernelStruct->socketClientFileSystem = -1;
+	kernelStruct->socketClientMemoria = -1;
+	kernelStruct->socketServerCPU = -1;
+	kernelStruct->socketServerConsola = -1;
+	pthread_mutex_init(&(kernelStruct->stdoutMutex),NULL);
+	pthread_mutex_init(&(kernelStruct->cpuListMutex),NULL);
+	pthread_mutex_init(&(kernelStruct->processListMutex),NULL);
 }

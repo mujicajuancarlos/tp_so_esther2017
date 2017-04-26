@@ -1,22 +1,15 @@
 /*
- * printing-message.c
+ * printing-messages.c
  *
- *  Created on: 25/4/2017
+ *  Created on: 26/4/2017
  *      Author: utnso
  */
 
-#include "printing-message.h"
-
+#include "printing-messages.h"
 
 void printNewLine(pthread_mutex_t stdoutMutex){
 	pthread_mutex_lock(&stdoutMutex);
 	printf("\n > ");
-	pthread_mutex_unlock(&stdoutMutex);
-}
-
-void printFileNotFound(pthread_mutex_t stdoutMutex, char* filePath) {
-	pthread_mutex_lock(&stdoutMutex);
-	printf("No se pudo acceder al archivo «%s».", filePath);
 	pthread_mutex_unlock(&stdoutMutex);
 }
 
@@ -41,9 +34,6 @@ void printCommandsHelp(pthread_mutex_t stdoutMutex) {
 	printf("\nForma de uso: «command» [«option»] [«args»]\n\n");
 	puts("Lista de comandos permitidos:");
 
-	printf("\t%s «path»\t\tInicia el programa ansisop descrito en «path»\n",
-			COD_CONSOLE_START_PROGRAM);
-
 	printf(
 			"\t%s %s\t\tMuestra informacion de todos los programas en ejecución\n",
 			COD_CONSOLE_INFO_PROGRAM, OPT_ALL);
@@ -64,6 +54,6 @@ void printWelcome() {
 	puts("_____________________________________________________");
 	puts("_________ Bienvenido a Esther - Death Coders ________");
 	puts("________________ UTN-FRBA SO 1C-2017 ________________");
-	puts("___________________<< Consola >>_____________________");
+	puts("____________________<< Kernel >>_____________________");
 	puts("_____________________________________________________\n");
 }

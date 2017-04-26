@@ -9,7 +9,7 @@
 
 void handleCPUs(kernel_struct *args) {
 
-	t_list* listaCPUs = args->listaCPUs;
+	t_list* listaCPUs = args->cpuList;
 	int socketServidor = args->socketServerCPU; // file descriptor del socket servidor
 
 	fd_set descriptoresLectura; //defino el descriptor de lectura

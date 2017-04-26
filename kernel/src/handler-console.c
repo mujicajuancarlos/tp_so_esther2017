@@ -10,7 +10,7 @@
 
 void handleConsolas(kernel_struct *args) {
 
-	t_list* listaConsolas = args->listaConsolas;
+	t_list* listaConsolas = args->processList;
 	int socketServidor = args->socketServerConsola; // file descriptor del socket servidor
 
 	fd_set descriptoresLectura; //defino el descriptor de lectura
