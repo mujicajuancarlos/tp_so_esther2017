@@ -16,7 +16,6 @@
 #include "parser/parser.h"
 #include "parser/metadata_program.h"
 
-void mensajeParaConectarseAMemory(int memory);
 int main(int argc, char *argv[]) {
 
 	cpu_struct args;
@@ -54,12 +53,4 @@ int main(int argc, char *argv[]) {
 	handleKernel(&args);
 
 	return EXIT_SUCCESS;
-}
-
-void mensajeParaConectarseAMemory(int sck_memory){
-			char* message = "CPU";
-			int len = strlen(message);
-			if(send(sck_memory, message, len, 0) != -1){
-				puts("Se mando mensaje a memoria corectamente");
-			};
 }

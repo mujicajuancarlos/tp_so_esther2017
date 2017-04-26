@@ -33,7 +33,7 @@ void handleKernel(cpu_struct *args) {
 		if (FD_ISSET(fd_kernel, &descriptoresLectura)) {
 			Package* package = createEmptyPackage();
 			if (receivePackage(fd_kernel, package) == 0)
-				handleKernelRequest(args, package);
+				packagesReceptionKernel(args, package);
 			else
 				logError("Error al intentar recibir los datos del FD: %d",
 						fd_kernel);
@@ -42,7 +42,7 @@ void handleKernel(cpu_struct *args) {
 	}
 }
 
-void handleKernelRequest(cpu_struct *args, Package *package) {
+void packagesReceptionKernel(cpu_struct *args, Package *package) {
 	int fd_kernel = args->socketClientKernel;
 	int fd_memoria = args->socketClientMemoria;
 
@@ -59,5 +59,41 @@ void handleKernelRequest(cpu_struct *args, Package *package) {
 	default:
 		logError("El kernel solicito una accion no permitida");
 		break;
+	case COD_ENVIO_PCB:
+		/* recepcion de PCB*/
+		break;
+	case COD_NOTIFICACION_FIN_EJECUCION:
+		break;
 	}
+}
+
+void packagesSenderKernel(int memoryfd, int code){
+
+	if(code < 0){
+
+		puts("La especificada, no es una operacion valida");
+
+	}
+	else {
+
+		switch(code)
+		{
+				case COD_ANSISOP_IMPRIMIR:
+					//Solicitar bytes de una página... solicitarBytes(&hiloCPU) (dentro de esta funcion se hace lo que tiene resolver y arma un paquete con la respuesta
+					break;
+				case COD_ANSISOP_SARAZA:
+					//Almacenar bytes en una página
+					break;
+				case COD_SALUDO:
+					//Hace lo que tiene que hacer
+					break;
+				case COD_ENVIO_PCB:
+					//Hace lo que tiene que hacer
+					break;
+				case COD_NOTIFICACION_FIN_EJECUCION:
+						break;
+
+				}
+				}
+
 }

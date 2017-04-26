@@ -1,5 +1,5 @@
 /*
- * configiguration_memory.c
+ * configuration_memory.c
  *
  *  Created on: 5/4/2017
  *      Author: utnso
@@ -39,6 +39,7 @@ Configuration* config_with(char *config_file) {
 	config_set_int_valid_value(&config->cache_x_proceso, temporalConfig, CACHE_X_PROC);
 	config_set_string_valid_value(&config->reemplazo_cache, temporalConfig, REEMPLAZO_CACHE);
 	config_set_int_valid_value(&config->retardo_memoria, temporalConfig, RETARDO_MEMORIA);
+	config_set_int_valid_value(&config->tamanio_memoria,temporalConfig, TAMANIO_MEMORIA);
 
 	//configuracion de log
 	config_set_string_valid_value(&config->log_level, temporalConfig, LOG_LEVEL);

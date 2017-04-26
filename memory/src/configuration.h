@@ -1,5 +1,4 @@
-/*
- * configuration_memory.h
+/* configuration_memory.h
  *
  *  Created on: 5/4/2017
  *      Author: utnso
@@ -29,11 +28,14 @@
 #define CACHE_X_PROC "CACHE_X_PROC"
 #define REEMPLAZO_CACHE "REEMPLAZO_CACHE"
 #define RETARDO_MEMORIA "RETARDO_MEMORIA"
+#define TAMANIO_MEMORIA "TAMANIO_MEMORIA"
+
 //log keys
 #define LOG_LEVEL "LOG_LEVEL"
 #define LOG_FILE "LOG_FILE"
 #define LOG_PROGRAM_NAME "LOG_PROGRAM_NAME"
 #define LOG_PRINT_CONSOLE "LOG_PRINT_CONSOLE"
+
 
 typedef struct Configuration {
 	int puerto;
@@ -47,6 +49,7 @@ typedef struct Configuration {
 	char* log_file;
 	char* log_program_name;
 	bool log_print_console;
+	int tamanio_memoria;
 } Configuration;
 
 Configuration* config;

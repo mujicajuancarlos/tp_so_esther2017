@@ -34,6 +34,8 @@ void packagesReceptionMemory(int fd){
 		case COD_SALUDO:
 			//Hace lo que tiene que hacer
 			break;
+		case COD_PROXIMA_SENTENCIA_A_EJECUTAR:
+			break;
 		}
 		}
 }
@@ -63,6 +65,9 @@ void packagesSenderMemory(int memoryfd, int code){
 					break;
 				case COD_SALUDO:
 					saludoAMemory(memoryfd);
+					break;
+				case COD_PROXIMA_SENTENCIA_A_EJECUTAR:
+					break;
 				}
 				}
 
@@ -81,3 +86,13 @@ void saludoAMemory(int sck){
 	}
 
 }
+
+
+void mensajeParaConectarseAMemory(int sck_memory){
+			char* message = "CPU";
+			int len = strlen(message);
+			if(send(sck_memory, message, len, 0) != -1){
+				puts("Se mando mensaje a memoria corectamente");
+			};
+}
+
