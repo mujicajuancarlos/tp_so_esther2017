@@ -13,7 +13,7 @@
 
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
-#include <dc-commons/protocol-kernel-cpu.h>.h>
+#include <dc-commons/protocol-kernel-cpu.h>
 
 #include "cpu.h"
 
@@ -25,6 +25,7 @@ void handleKernel(cpu_struct *args);
 /**
  * Manejo los pedidos del KERNEL
  */
-void handleKernelRequest(cpu_struct *args, Package *package);
+void packagesReceptionKernel(cpu_struct *args, Package *package);
+void packagesSenderKernel(int memoryfd, int code);
 
 #endif /* HANDLER_KERNEL_H_ */

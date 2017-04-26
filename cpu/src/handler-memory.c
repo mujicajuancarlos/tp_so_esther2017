@@ -34,6 +34,8 @@ void packagesReceptionMemory(int fd){
 		case COD_SALUDO:
 			//Hace lo que tiene que hacer
 			break;
+		case COD_PROXIMA_SENTENCIA_A_EJECUTAR:
+			break;
 		}
 		}
 }
@@ -63,6 +65,9 @@ void packagesSenderMemory(int memoryfd, int code){
 					break;
 				case COD_SALUDO:
 					saludoAMemory(memoryfd);
+					break;
+				case COD_PROXIMA_SENTENCIA_A_EJECUTAR:
+					break;
 				}
 				}
 
