@@ -81,3 +81,13 @@ void saludoAMemory(int sck){
 	}
 
 }
+
+
+void mensajeParaConectarseAMemory(int sck_memory){
+			char* message = "CPU";
+			int len = strlen(message);
+			if(send(sck_memory, message, len, 0) != -1){
+				puts("Se mando mensaje a memoria corectamente");
+			};
+}
+

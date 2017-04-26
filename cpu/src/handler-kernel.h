@@ -13,7 +13,7 @@
 
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
-#include <dc-commons/protocol-kernel-console.h>
+#include <dc-commons/protocol-kernel-cpu.h>.h>
 
 #include "cpu.h"
 

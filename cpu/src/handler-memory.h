@@ -12,10 +12,11 @@
 
 
 //Recibe y desempaqueta los packages provenientes de la Memory
-int packagesReceptionMemory(int fd);
+void packagesReceptionMemory(int fd);
 
 //Empaqueta y envia packages a la Memory
 void packagesSenderMemory(int memoryfd, int code);
+void mensajeParaConectarseAMemory(int memory);
 
 
 #endif /* HANDLER_MEMORY_H_ */
