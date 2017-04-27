@@ -35,7 +35,7 @@ void packagesReceptionKernel(int kernelfd){
 		break;
 	case COD_SALUDO:
 		logInfo("El kernel %d me envio el siguiente saludo: %s", kernelfd,
-				package->stream);
+				package->message);
 		break;
 	}
 	destroyPackage(package);

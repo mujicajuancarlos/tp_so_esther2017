@@ -25,7 +25,13 @@ int main(int argc, char *argv[]) {
 
 	logInfo("Iniciando el proceso Memoria");
 
-	memoriaPrincipal = memoriaPrincipal(config);
+	// Se reserva espacio de memoria contigua para simular la Memoria Principal del sistema
+
+	memoriaPrincipal = malloc(config->tamanio_memoria);
+	if (memoriaPrincipal == NULL){
+		logError("Error al crear la Memoria Principal");
+	}
+
 
 	initializeStruct(&args, config);
 
@@ -85,12 +91,6 @@ int atiendoCliente(int aceptado) {
 	puts("Te escuche");
 	free(buffer);
 	return bytes_recv;
-}
-
-int* memoriaPrincipal(Configuration *config){
-
-	int *tmp = malloc(config->tamanio_memoria);
-	return tmp;
 }
 
 
