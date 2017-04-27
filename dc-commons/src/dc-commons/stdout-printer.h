@@ -33,6 +33,12 @@ void printMessage(const char* message_template, ...);
 void lockPrinter();
 
 /**
+ * @NAME: clearScreem
+ * @DESC: Limpia la pantala de comandos
+ */
+void clearScreem();
+
+/**
  * @NAME: lockPrinter
  * @DESC: unlock printer mutex
  */
@@ -52,7 +58,11 @@ void printerDestroy();
 
 void printNewLine();
 
+void printPidNotFound(int pid);
+
 void printFileNotFound(char* filePath);
+
+void printInvalidCommand(char* command);
 
 void printInvalidArguments(char* argument, char* command);
 

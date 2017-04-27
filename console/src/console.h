@@ -15,13 +15,13 @@
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/log.h>
+#include <dc-commons/stdout-printer.h>
 
 //commons death coders
 #include <dc-commons/logger.h>
 #include "configuration.h"
 
 typedef struct {
-	pthread_mutex_t stdoutMutex;
 	pthread_mutex_t programsListMutex;
 	t_list* listaProgramas;
 	Configuration* config;

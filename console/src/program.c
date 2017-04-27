@@ -7,12 +7,8 @@
 
 #include "program.h"
 
-bool pid_isEqual(Program* program, int pid){
+bool pid_isEqual(Program* program, int pid) {
 	return program->pid == pid;
-}
-
-finalizeProgram(Program* program, console_struct* console){
-
 }
 
 Program* createNewProgram(console_struct* console, char* sourceCodePath) {
@@ -34,45 +30,47 @@ void destroyProgram(Program* program) {
 	free(program);
 }
 
-void printHeaderProgram(){
-	printf("\nPID\tC.IMPR.\tFECHA INICIO\tHORA INICIO\tFECHA FIN\tHORA FIN\tT.EJECUTADO\tCODIGO FUENTE\n");
-	printf("==============================================================================================================\n");
+void printProgramStatus(Program* program, char* statusMessage) {
+	lockPrinter();
+	printf("\n%s:\n\n", statusMessage);
+	printHeaderProgram();
+	printProgram(program);
+	unlockPrinter();
+	printNewLine();
 }
 
-void printProgram(Program* program){
+void printHeaderProgram() {
+	printf("\n%5s\t%15s\t%20s\t%20s\t%15s\t\t%-20s\n%s\n", "PID", "IMPRESIONES", "INICIO",
+			"FIN", "T.EJECUTADO", "CODIGO FUENTE",
+			"==============================================================================================================");
+}
+
+void printProgram(Program* program) {
 	int size = 20;
 	char* none = "-";
-	char* dateFormat = "%Y/%m/%d";
-	char* timeFormat = "%H:%M:%S";
+	char* dateFormat = "%Y/%m/%d %H:%M:%S";
 	char* buffer = malloc(sizeof(char) * size);
-	//print pid
+//print pid
 	if (program->pid != -1)
-		printf("%d\t",program->pid);
+		printf("%5d\t", program->pid);
 	else
-		printf ("%s\t", none);
-	//print cant. imporesiones
-	printf("%d\t",program->printSize);
-	//print start date
-	strftime (buffer, size, dateFormat, localtime(&(program->startDate)));
-	printf ("%s\t", buffer);
-	//print start time
-	strftime (buffer, size, timeFormat, localtime(&(program->startDate)));
-	printf ("%s\t", buffer);
-	//print end and internal date
-	if(program->endDate != 0){
-		strftime (buffer, size, dateFormat, localtime(&(program->endDate)));
-		printf ("%s\t", buffer);
-		strftime (buffer, size, timeFormat, localtime(&(program->endDate)));
-		printf ("%s\t", buffer);
+		printf("%5s\t", none);
+//print cant. imporesiones
+	printf("%15d\t", program->printSize);
+//print start date
+	strftime(buffer, size, dateFormat, localtime(&(program->startDate)));
+	printf("%20s\t", buffer);
+//print end and internal date
+	if (program->endDate != 0) {
+		strftime(buffer, size, dateFormat, localtime(&(program->endDate)));
+		printf("%20s\t", buffer);
 		printIntervalTime(&(program->startDate), &(program->endDate));
-	}else{
-		printf ("%s\t\t", none);
-		printf ("%s\t\t", none);
-		printf ("%s\t\t", none);
+	} else {
+		printf("%20s\t", none);
+		printf("%15s\t", none);
 	}
-	//print file
-	printf ("%s\n", program->sourceCodePath);
-	printf("\n");
+//print file
+	printf("\t%-20s\n", program->sourceCodePath);
 	free(buffer);
 }
 
@@ -81,10 +79,11 @@ void printIntervalTime(time_t* startTime, time_t* endTime) {
 	const int ONE_MINUE = 60;
 	double diff_t = difftime(*endTime, *startTime);
 	int hour, min, sec;
-	hour=diff_t/ONE_HOUR;
-	diff_t-=hour*ONE_HOUR;
-	min=diff_t/ONE_MINUE;
-	diff_t-=min*ONE_HOUR;
-	sec=diff_t;
-	printf("%.2i:%.2i:%.2i \t",hour,min,sec);
+	hour = diff_t / ONE_HOUR;
+	diff_t -= hour * ONE_HOUR;
+	min = diff_t / ONE_MINUE;
+	diff_t -= min * ONE_HOUR;
+	sec = diff_t;
+	printf("%6s %2.2i:%2.2i:%2.2i\t", "", hour, min, sec);
+
 }

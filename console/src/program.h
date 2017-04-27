@@ -28,6 +28,8 @@ Program* createNewProgram(console_struct* console, char* sourceCodePath);
 
 void destroyProgram(Program* program);
 
+void printProgramStatus(Program* program, char* statusMessage);
+
 void printHeaderProgram();
 
 void printProgram(Program* program);

@@ -14,12 +14,7 @@ void handleKernelRequest(Program* program, Package* package) {
 	case COD_KC_RUN_PROGRAM_RESPONSE:
 		program->pid = deserialize_int(package->stream);
 		addProgram(program);
-		pthread_mutex_lock(&(program->console->stdoutMutex));
-		printf("Inicio programa %s con pid %d", program->sourceCodePath,
-				program->pid);
-		printProgram(program);
-		pthread_mutex_unlock(&(program->console->stdoutMutex));
-		printNewLine(program->console->stdoutMutex);
+		printProgramStatus(program,"Inició el programa");
 		logInfo("Ejecucion aceptada: PROG: %s PID: %d", program->sourceCodePath,
 				program->pid);
 		break;
@@ -27,36 +22,21 @@ void handleKernelRequest(Program* program, Package* package) {
 		status = deserialize_int(package->stream);
 		if (status) {
 			program->endDate = time(NULL);
-			pthread_mutex_lock(&(program->console->stdoutMutex));
-			printf("\nHa finalizado el programa:\n");
-			printProgram(program);
-			pthread_mutex_unlock(&(program->console->stdoutMutex));
-			printNewLine(program->console->stdoutMutex);
+			printProgramStatus(program,"Finalizó el programa");
 			removeProgram(program);
 			logInfo("La solicitud del usuario fue exitosa PID: %d", program->pid);
 		} else {
-			pthread_mutex_lock(&(program->console->stdoutMutex));
-			printf("\nTu solicitud fue rechazada:\n");
-			printProgram(program);
-			pthread_mutex_unlock(&(program->console->stdoutMutex));
-			printNewLine(program->console->stdoutMutex);
+			printProgramStatus(program,"Solicitud rechazada sobre el programa");
 		}
 		break;
 	case COD_KC_PRINT_STDOUT:
 		message = string_substring_until(package->stream, package->size);
-		pthread_mutex_lock(&(program->console->stdoutMutex));
-		printf("\nPID: %d, > %s", program->pid, message);
-		pthread_mutex_unlock(&(program->console->stdoutMutex));
+		printMessage("\nPID: %d, > %s", program->pid, message);
 		free(message);
-		printNewLine(program->console->stdoutMutex);
 		break;
 	case COD_KC_END_PROGRAM:
 		program->endDate = time(NULL);
-		pthread_mutex_lock(&(program->console->stdoutMutex));
-		printf("Finalizo la ejecucion del programa:");
-		printProgram(program);
-		pthread_mutex_unlock(&(program->console->stdoutMutex));
-		printNewLine(program->console->stdoutMutex);
+		printProgramStatus(program,"Finalizó el programa");
 		removeProgram(program);
 		logInfo("Kernel indico la finalizacion del programa %d", program->pid);
 		break;

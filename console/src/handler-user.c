@@ -12,7 +12,7 @@ void handleUserRequest(console_struct* consoleStruct) {
 	bool exit = false;
 	bool shouldCompareCommand;
 	while (!exit) {
-		printNewLine(consoleStruct->stdoutMutex);
+		printNewLine();
 		char** commands = get_user_commands();
 		shouldCompareCommand = true;
 
@@ -20,7 +20,7 @@ void handleUserRequest(console_struct* consoleStruct) {
 			if (shouldCompareCommand
 					&& equal_user_command(commands[0], COD_CONSOLE_HELP)) {
 				shouldCompareCommand = false;
-				printCommandsHelp(consoleStruct->stdoutMutex);
+				printCommandsHelp();
 			}
 
 			if (shouldCompareCommand
@@ -32,9 +32,7 @@ void handleUserRequest(console_struct* consoleStruct) {
 			if (shouldCompareCommand
 					&& equal_user_command(commands[0], COD_CONSOLE_CLEAR)) {
 				shouldCompareCommand = false;
-				pthread_mutex_lock(&(consoleStruct->stdoutMutex));
-				system("clear");
-				pthread_mutex_unlock(&(consoleStruct->stdoutMutex));
+				clearScreem();
 			}
 
 			if (shouldCompareCommand && equal_user_command(commands[0],
@@ -57,10 +55,7 @@ void handleUserRequest(console_struct* consoleStruct) {
 		}
 
 		if (shouldCompareCommand) {
-			pthread_mutex_lock(&(consoleStruct->stdoutMutex));
-			printf("«%s» no es un comando válido. Si necesita ayuda use: «%s»",
-					commands[0], COD_CONSOLE_HELP);
-			pthread_mutex_unlock(&(consoleStruct->stdoutMutex));
+			printInvalidCommand(commands[0]);
 		}
 
 		free_user_commands(commands);
@@ -84,9 +79,9 @@ void handleCommand_start_program(console_struct* consoleStruct, char** commands)
 					program);
 			logDebug("Hilo ejecutando %s", commands[1]);
 		} else
-			printFileNotFound(consoleStruct->stdoutMutex, commands[1]);
+			printFileNotFound(commands[1]);
 	} else
-		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
+		printInvalidArguments(commands[2], commands[0]);
 }
 
 void handleCommand_info_program(console_struct* consoleStruct, char** commands) {
@@ -98,7 +93,7 @@ void handleCommand_info_program(console_struct* consoleStruct, char** commands) 
 			handleCommand_info_by_pid_program(consoleStruct, commands);
 		}
 	} else
-		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
+		printInvalidArguments("", commands[0]);
 }
 
 void handleCommand_info_all_program(console_struct* consoleStruct,
@@ -108,14 +103,14 @@ void handleCommand_info_all_program(console_struct* consoleStruct,
 			Program* anProgram = (Program*) element;
 			printProgram(anProgram);
 		}
-		pthread_mutex_lock(&(consoleStruct->stdoutMutex));
+		lockPrinter();
 		printHeaderProgram();
 		pthread_mutex_lock(&(consoleStruct->programsListMutex));
 		list_iterate(consoleStruct->listaProgramas, printElement);
 		pthread_mutex_unlock(&(consoleStruct->programsListMutex));
-		pthread_mutex_unlock(&(consoleStruct->stdoutMutex));
+		unlockPrinter();
 	} else
-		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
+		printInvalidArguments(commands[2], commands[0]);
 }
 
 void handleCommand_info_by_pid_program(console_struct* consoleStruct,
@@ -130,17 +125,15 @@ void handleCommand_info_by_pid_program(console_struct* consoleStruct,
 		Program* program = list_find(consoleStruct->listaProgramas, condicion);
 		pthread_mutex_unlock(&(consoleStruct->programsListMutex));
 		if (program != NULL) {
-			pthread_mutex_lock(&(consoleStruct->stdoutMutex));
+			lockPrinter();
 			printHeaderProgram();
 			printProgram(program);
-			pthread_mutex_unlock(&(consoleStruct->stdoutMutex));
+			unlockPrinter();
 		} else {
-			pthread_mutex_lock(&(consoleStruct->stdoutMutex));
-			printf("El pid %d no existe.\n", pid);
-			pthread_mutex_unlock(&(consoleStruct->stdoutMutex));
+			printPidNotFound(pid);
 		}
 	} else
-		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
+		printInvalidArguments("", commands[0]);
 }
 
 void handleCommand_end_program(console_struct* consoleStruct, char** commands) {
@@ -152,7 +145,7 @@ void handleCommand_end_program(console_struct* consoleStruct, char** commands) {
 			handleCommand_end_by_pid_program(consoleStruct, commands);
 		}
 	} else
-		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
+		printInvalidArguments("", commands[0]);
 }
 
 void handleCommand_end_all_program(console_struct* consoleStruct,
@@ -166,7 +159,7 @@ void handleCommand_end_all_program(console_struct* consoleStruct,
 		list_iterate(consoleStruct->listaProgramas, actionByElement);
 		pthread_mutex_unlock(&(consoleStruct->programsListMutex));
 	} else
-		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
+		printInvalidArguments(commands[2], commands[0]);
 }
 
 void handleCommand_end_by_pid_program(console_struct* consoleStruct,
@@ -183,10 +176,40 @@ void handleCommand_end_by_pid_program(console_struct* consoleStruct,
 		if (program != NULL) {
 			sendEndProgramRequest(program, consoleStruct);
 		} else {
-			pthread_mutex_lock(&(consoleStruct->stdoutMutex));
-			printf("El pid %d no existe.\n", pid);
-			pthread_mutex_unlock(&(consoleStruct->stdoutMutex));
+			printPidNotFound(pid);
 		}
 	} else
-		printInvalidArguments(consoleStruct->stdoutMutex, commands[0]);
+		printInvalidArguments("", commands[0]);
+}
+
+void printCommandsHelp() {
+
+	lockPrinter();
+
+	char* patter = "%10s %-5s %-5s\t- %-40s\n";
+	printf("\nForma de uso: «command» [«option»] [«args»]\n\n");
+	puts("Lista de comandos permitidos:");
+
+	printf(patter,
+	COD_CONSOLE_START_PROGRAM, "«path»", "", "Inicia el programa ansisop descrito en «path»");
+
+	printf(patter,
+	COD_CONSOLE_INFO_PROGRAM, OPT_ALL, "",
+			"Muestra informacion de todos los programas en ejecución");
+	printf(patter,
+	COD_CONSOLE_INFO_PROGRAM, OPT_PID, "«pid»",
+			"Muestra informacion del programa con «pid»");
+
+	printf(patter,
+	COD_CONSOLE_STOP_PROGRAM, OPT_ALL, "",
+			"Detiene la ejecución de todos los programas");
+	printf(patter,
+	COD_CONSOLE_STOP_PROGRAM, OPT_PID, "«pid»",
+			"Detiene la ejecución del programa con «pid»");
+
+	printf(patter, COD_CONSOLE_CLEAR, "", "", "Limpia la pantalla");
+
+	printf(patter, COD_CONSOLE_EXIT, "", "", "Finaliza el proceso");
+
+	unlockPrinter();
 }

@@ -19,10 +19,7 @@ int handleNewProgram(Program* program) {
 			program->console->config->puerto_kernel);
 	if (program->fd_client == -1) {
 		logError("No se pudo establecer conexion con el kernel");
-		pthread_mutex_lock(&(program->console->stdoutMutex));
-		puts("No se pudo iniciar el programa, kernel no acepta conexiones.");
-		pthread_mutex_unlock(&(program->console->stdoutMutex));
-		printNewLine(program->console->stdoutMutex);
+		printMessage("No se pudo iniciar el programa, kernel no acepta conexiones.");
 		pthread_exit(NULL);
 	}
 
@@ -33,10 +30,7 @@ int handleNewProgram(Program* program) {
 	free(stream);
 	if (package == NULL) {
 		logError("No se pudo enviar datos al kernel");
-		pthread_mutex_lock(&(program->console->stdoutMutex));
-		printf("No se pudo iniciar el programa, kernel no acepta peticiones.");
-		pthread_mutex_unlock(&(program->console->stdoutMutex));
-		printNewLine(program->console->stdoutMutex);
+		printMessage("No se pudo iniciar el programa, kernel no acepta peticiones.");
 		pthread_exit(NULL);
 	}
 	destroyPackage(package);
@@ -53,19 +47,11 @@ int handleNewProgram(Program* program) {
 					program->fd_client);
 			close(program->fd_client);
 			if (program->pid == -1) { // pid -1 correnponde a un programa que nunca llego a ejecutar
-				pthread_mutex_lock(&(program->console->stdoutMutex));
-				printf(
-						"Se cancelo la ejecucion del programa %s, kernel no esta disponible.",
-						program->sourceCodePath);
-				pthread_mutex_unlock(&(program->console->stdoutMutex));
-				printNewLine(program->console->stdoutMutex);
+				printMessage("Se cancelo la ejecucion del programa %s, kernel no esta disponible.", program->sourceCodePath);
 			} else {
 				//llego a ejecutar pero el kernel lo cancelo
 				program->endDate = time(NULL);
-				pthread_mutex_lock(&(program->console->stdoutMutex));
-				printf("Se cancelo la ejecucion del programa:");
-				pthread_mutex_unlock(&(program->console->stdoutMutex));
-				printNewLine(program->console->stdoutMutex);
+				printProgramStatus(program, "Se cancelo la ejecucion del programa");
 				removeProgram(program);
 			}
 		}
@@ -83,9 +69,7 @@ void sendEndProgramRequest(Program* program, console_struct* consoleStruct){
 		logInfo("Se envio la solicitud para finalizar el programa %d", program->pid);
 	}else{
 		logError("No se envio la solicitud para finalizar el programa %d", program->pid);
-		pthread_mutex_lock(&(program->console->stdoutMutex));
-		printf("No se pudo procesar el pedido para pid %d, kernel no acepta peticiones.", program->pid);
-		pthread_mutex_unlock(&(program->console->stdoutMutex));
+		printProgramStatus(program, "Kernel no acepta peticiones, no se pudo procesar el pedido para el programa");
 	}
 	free(pidStream);
 	destroyPackage(package);

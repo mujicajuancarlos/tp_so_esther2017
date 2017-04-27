@@ -25,8 +25,23 @@ void printNewLine() {
 	printMessage("");
 }
 
+void clearScreem() {
+	lockPrinter();
+	system("clear");
+	unlockPrinter();
+}
+
+void printPidNotFound(int pid){
+	printMessage("No se encontro un proceso con pid %d.\n", pid);
+}
+
 void printFileNotFound(char* filePath) {
 	printMessage("No se pudo acceder al archivo «%s».", filePath);
+}
+
+void printInvalidCommand(char* command) {
+	printMessage("«%s» no es un comando válido.\nSi necesita ayuda use: «%s».",
+			command, HELP_COMMAND);
 }
 
 void printInvalidArguments(char* argument, char* command) {
@@ -42,20 +57,21 @@ void printInvalidOptions(char* option, char* command) {
 }
 
 void printWelcome(char* processName) {
+	int tab = 10 - (strlen(processName) / 2);
 	lockPrinter();
 	puts("__________________________________________________________");
 	puts("___________ Bienvenido a Esther - Death Coders ___________");
 	puts("__________________ UTN-FRBA SO 1C-2017 ___________________");
-	printf("________________<<%*s>>__________________",10 - strlen(processName)/2, processName);
+	printf("______________<<< %*s%s%*s >>>_______________\n", tab, "", processName, tab, "");
 	puts("__________________________________________________________");
 	unlockPrinter();
 }
 
-void lockPrinter(){
+void lockPrinter() {
 	pthread_mutex_lock(&printerMutex);
 }
 
-void unlockPrinter(){
+void unlockPrinter() {
 	pthread_mutex_unlock(&printerMutex);
 }
 

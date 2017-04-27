@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 	initializeStruct(&consoleStruct, config);
 
 	logInfo("Imprimo bienvenida al programa");
-	printWelcome();
+	printWelcome("Consola");
 
 	logInfo("Inicia el lector de comandos para el usuario");
 	handleUserRequest(&consoleStruct);
@@ -35,6 +35,6 @@ int main(int argc, char *argv[]) {
 void initializeStruct(console_struct *consoleStruct, Configuration *config){
 	consoleStruct->listaProgramas = list_create();
 	consoleStruct->config = config;
-	pthread_mutex_init(&(consoleStruct->stdoutMutex),NULL);
+	initPrinterMutex();
 	pthread_mutex_init(&(consoleStruct->programsListMutex),NULL);
 }

@@ -9,10 +9,12 @@
 #define HANDLER_USER_H_
 
 #include <stdbool.h>
+
 #include <commons/string.h>
 #include <dc-commons/utils.h>
+#include <dc-commons/stdout-printer.h>
+
 #include "handler-program.h"
-#include "printing-message.h"
 #include "protocol-console-user.h"
 
 void handleUserRequest(console_struct* args);
@@ -30,5 +32,7 @@ void handleCommand_end_program(console_struct* consoleStruct, char** commands);
 void handleCommand_end_all_program(console_struct* consoleStruct, char** commands);
 
 void handleCommand_end_by_pid_program(console_struct* consoleStruct, char** commands);
+
+void printCommandsHelp();
 
 #endif /* HANDLER_USER_H_ */
