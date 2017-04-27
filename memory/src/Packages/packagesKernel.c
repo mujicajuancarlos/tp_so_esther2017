@@ -19,12 +19,13 @@ void comunicacionConKernel(int socketKernelfd){
 
 void packagesReceptionKernel(int kernelfd){
 
-	Package* package = createEmptyPackage();
+	Package* packageRecv = createEmptyPackage();
 
-	if(receivePackage(kernelfd, package) != 0){
-	switch(package->msgCode)
+	if(receivePackage(kernelfd, packageRecv) != 0){
+	switch(packageRecv->msgCode)
 	{
 	case COD_INICIALIZAR_PROGRAMA:
+
 		break;
 	case COD_ESCRITURA_PAGE:
 		//Hace lo que tiene que hacer
@@ -52,7 +53,7 @@ void packagesSenderKernel(int kernelfd, int code){ //Cuando se le pide al proces
 
 	}
 	else {
-
+		//VER MÁS ABAJO
 		switch(code)
 		{
 			case COD_ESCRITURA_PAGE:
@@ -105,3 +106,20 @@ void exceptionTo(int destinationfd, char *exception){
 	}
 
 }
+
+/*
+typedef struct Package {
+	uint32_t msgCode;
+	uint32_t message_long;
+	ker_mem_type* message;
+} Package;
+
+typedef struct k_m_type{
+	uint32_t programID;
+	uint32_t paginas_requeridas;
+	uint32_t page_number;
+	uint32_t offset;
+	uint32_t tamanio;
+	char* buffer;
+};
+*/

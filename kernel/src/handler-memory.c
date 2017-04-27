@@ -38,7 +38,7 @@ void handleMemoria(kernel_struct *args) {
 	}
 }
 
-void packagesSenderMemory(int kernelfd, int code){
+void packagesSenderMemory(int memoryfd, int code){
 
 	if(code < 0){
 
@@ -49,6 +49,9 @@ void packagesSenderMemory(int kernelfd, int code){
 
 		switch(code)
 		{
+			case COD_INICIALIZAR_PROG:
+				inicializarPrograma(memoryfd,code,programID,framesRequeridos);
+				break;
 			case COD_ESCRITURA_PAGE:
 				//En realidad, no tiene que devolver nada, pero podemos hacer un send a Kernel o CPU diciendo que fue exitoso
 				break;
