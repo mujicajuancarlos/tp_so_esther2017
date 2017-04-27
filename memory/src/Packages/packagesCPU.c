@@ -21,7 +21,7 @@ void comunicacionConCPU(int fileDescriptor){
 
 }
 
-int packagesReceptionCPU(int fd){
+int packagesReceptionCPU(int cpufd){
 
 	Package *packageRecv;
 
@@ -29,6 +29,7 @@ int packagesReceptionCPU(int fd){
 		switch(packageRecv->msgCode)
 		{
 		case COD_SOLICITAR_BYTES_PAGE:
+			//solicitarBytes(cpufd);
 			//Solicitar bytes de una página... solicitarBytes(&hiloCPU) (dentro de esta funcion se hace lo que tiene resolver y arma un paquete con la respuesta
 			break;
 		case COD_ESCRITURA_PAGE:

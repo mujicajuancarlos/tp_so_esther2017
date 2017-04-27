@@ -24,6 +24,8 @@ void packagesReceptionKernel(int kernelfd){
 	if(receivePackage(kernelfd, package) != 0){
 	switch(package->msgCode)
 	{
+	case COD_INICIALIZAR_PROGRAMA:
+		break;
 	case COD_ESCRITURA_PAGE:
 		//Hace lo que tiene que hacer
 		break;
