@@ -26,6 +26,7 @@
 #include "configuration.h"
 #include "Packages/packagesKernel.h"
 #include "Packages/packagesCPU.h"
+#include "handler-memory.h"
 
 //estructura princial del cpu
 typedef struct memory_struct {

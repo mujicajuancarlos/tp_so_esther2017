@@ -35,38 +35,11 @@ int main(int argc, char *argv[]) {
 
 	initializeStruct(&args, config);
 
-	/*Creo Server con las funciones de dc-commons*/
-	logInfo("Esperando conexiones...");
+	// Creo hilo para el manejo de las estructuras (Comunicaciones con Kernel y CPUs)
+	pthread_t hiloHandleConnection;
+	pthread_create(&hiloHandleConnection,NULL,(void*) handleMemory,(config,args));
 
-	args.socketServer = crearSocketServer(args.config->puerto);
-	if (args.socketServer == -1) {
-		logError("No se pudo crear el server de memoria");
-		exit(-1);
-	}
-	logInfo("Server Socket de memoria esta escuchando");
 
-	while(args.socketServer !=- 1){
-
-		int accepted = aceptarConexionCliente(args.socketServer);
-		int recibido = atiendoCliente(accepted);
-
-		if (recibido == 3)
-		{
-			puts("Se conecto una CPU");
-
-			list_add(args.listaCPUs,accepted);
-			pthread_t hiloCPU;
-			pthread_create(&hiloCPU,NULL,(void*) comunicacionConCPU,accepted);
-		}
-		else
-		{
-			puts("Se conecto un Kernell");
-			args.socketClientKernel = accepted;
-			pthread_t hiloMemoria;
-			pthread_create(&hiloMemoria,NULL,(void*)comunicacionConKernel,args.socketClientKernel);
-
-		}
-	}
 
 	for (;;);
 
