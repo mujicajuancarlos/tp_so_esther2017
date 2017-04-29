@@ -59,7 +59,7 @@ int aceptarConexionCliente(int socketServerFileDescriptor) {
 			&longitudCliente);
 
 	if (newSocketFileDescriptor == -1) {
-		error_show("Socket accept failed FD: %d\n", socketServerFileDescriptor);
+		error_show("No se pudo aceptar una nueva conexion FD: %d\n", socketServerFileDescriptor);
 		return SOCKET_FAILURE;
 	}
 

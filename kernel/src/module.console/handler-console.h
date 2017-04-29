@@ -26,4 +26,7 @@ void handleNewProcess(Process* newProcess);
 
 void handleProgramRequest(Process* newProcess, Package* package);
 
+//TODO eliminar cuando este implementado el asignador de pids
+int random_number(int min_num, int max_num);
+
 #endif /* HANDLER_CONSOLE_H_ */

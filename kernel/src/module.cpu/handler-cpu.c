@@ -13,7 +13,8 @@ void handleCPUs(kernel_struct *kernelStruct) {
 
 	while (1) {
 
-		newSocket = aceptarConexionCliente(kernelStruct->socketServerConsola);
+		logInfo("Esperando nuevas conexiones de cpu's.");
+		newSocket = aceptarConexionCliente(kernelStruct->socketServerCPU);
 
 		if (newSocket != -1) {
 			logInfo("Se conecto una nueva CPU");

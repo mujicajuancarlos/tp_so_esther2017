@@ -22,6 +22,9 @@ int main(int argc, char *argv[]) {
 	logInfo("Inicializado proceso kernel");
 	initializeStruct(&kernelStruct, config);
 
+	logInfo("Creacion de sockets cliente y server");
+	createSockets(&kernelStruct);
+
 	logInfo("Imprimo bienvenida al programa");
 	printWelcome("Kernel");
 
