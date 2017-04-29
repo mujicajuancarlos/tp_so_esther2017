@@ -101,15 +101,7 @@ void handleCpuRequest(int fileDescriptor, Package *package) {
 	}
 }
 
-void crearServerSocketParaCpus(kernel_struct* args) {
-	//server socket para atender los pedidos del cpu
-	args->socketServerCPU = crearSocketServer(args->config->puerto_cpu);
-	if (args->socketServerCPU == -1) {
-		logError("No se pudo crear el server para cpu's");
-		exit(-1);
-	}
-	logInfo("Server Socket de cpu's esta escuchando");
-}
+
 
 void crear_registrar_CPU(t_list* listaCPUs, int socketCPU_fd) {
 	char* message = "Conexion con kernel establecida con kernel";

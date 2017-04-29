@@ -136,15 +136,7 @@ void handleConsoleRequest(int fileDescriptor, Package *package,
 
 }
 
-void crearServerSocketParaConsola(kernel_struct* args) {
-	//server socket para atender los pedidos de la consola
-	args->socketServerConsola = crearSocketServer(args->config->puerto_program);
-	if (args->socketServerConsola == -1) {
-		logError("No se pudo crear el server para las consolas");
-		exit(-1);
-	}
-	logInfo("Server Socket de consolas esta escuchando");
-}
+
 
 void nuevaConsola(t_list* listaConsolas, int socketConsola_fd) {
 	//este es el momento que deberia crearse una nueva cpu

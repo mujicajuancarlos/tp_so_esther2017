@@ -19,8 +19,6 @@ kernel_struct kernelStruct;
 
 int main(int argc, char *argv[]) {
 
-
-
 	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
 	initLogMutex(config->log_file, config->log_program_name,
 			config->log_print_console,
@@ -30,17 +28,12 @@ int main(int argc, char *argv[]) {
 	initializeStruct(&kernelStruct, config);
 
 	logInfo("Imprimo bienvenida al programa");
-	printWelcome();
+	printWelcome("Kernel");
 
 	handleMemoria(&kernelStruct);
 	handleFileSystem(&kernelStruct);
 
 	logInfo("Inicializando lista de cpu");
-
-
-	/* Parte de creacion de servidor kernel para aceptar conexiones de consolas y cpu */
-	logInfo("Inicializando sockets servidor");
-	crearSockets(&kernelStruct);
 
 	logInfo("Creando el hilo para mantener CPU's");
 	pthread_t hiloCpu;
@@ -66,7 +59,10 @@ void initializeStruct(kernel_struct* kernelStruct, Configuration* config){
 	kernelStruct->socketClientMemoria = -1;
 	kernelStruct->socketServerCPU = -1;
 	kernelStruct->socketServerConsola = -1;
-	pthread_mutex_init(&(kernelStruct->stdoutMutex),NULL);
-	pthread_mutex_init(&(kernelStruct->cpuListMutex),NULL);
-	pthread_mutex_init(&(kernelStruct->processListMutex),NULL);
+
+	//server socket para atender los pedidos de la consola
+	crearServerSocketParaConsola(kernelStruct);
+	//server socket para atender los pedidos del cpu
+	crearServerSocketParaCpus(kernelStruct);
+
 }
