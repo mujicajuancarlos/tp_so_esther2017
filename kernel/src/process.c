@@ -5,7 +5,7 @@
  *      Author: utnso
  */
 
-#include "ansisopProcess.h"
+#include "process.h"
 
 Process* createProcess(int socket) {
 	Process* cpu = malloc(sizeof(Process));

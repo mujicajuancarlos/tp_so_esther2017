@@ -12,8 +12,6 @@
 #include "handler-user.h"
 #include "handler-console.h"
 #include "handler-cpu.h"
-#include "handler-memory.h"
-#include "handler-fileSystem.h"
 
 kernel_struct kernelStruct;
 
@@ -30,11 +28,6 @@ int main(int argc, char *argv[]) {
 	logInfo("Imprimo bienvenida al programa");
 	printWelcome("Kernel");
 
-	handleMemoria(&kernelStruct);
-	handleFileSystem(&kernelStruct);
-
-	logInfo("Inicializando lista de cpu");
-
 	logInfo("Creando el hilo para mantener CPU's");
 	pthread_t hiloCpu;
 	pthread_create(&hiloCpu, NULL, (void*) handleCPUs, &kernelStruct);
@@ -49,6 +42,13 @@ int main(int argc, char *argv[]) {
 	return EXIT_SUCCESS;
 }
 
+void createSockets(kernel_struct* kernelStruct) {
+	createConsoleServerSocket(kernelStruct);
+	createCpuServerSocket(kernelStruct);
+	createMemoryClientSocket(kernelStruct);
+	createFileSystemClientSocket(kernelStruct);
+}
+
 void initializeStruct(kernel_struct* kernelStruct, Configuration* config){
 	kernelStruct->config = config;
 	inicializarArray(MAX_CPUS, kernelStruct->cpuSockets);
@@ -59,10 +59,4 @@ void initializeStruct(kernel_struct* kernelStruct, Configuration* config){
 	kernelStruct->socketClientMemoria = -1;
 	kernelStruct->socketServerCPU = -1;
 	kernelStruct->socketServerConsola = -1;
-
-	//server socket para atender los pedidos de la consola
-	crearServerSocketParaConsola(kernelStruct);
-	//server socket para atender los pedidos del cpu
-	crearServerSocketParaCpus(kernelStruct);
-
 }

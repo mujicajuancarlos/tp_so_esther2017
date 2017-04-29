@@ -10,33 +10,16 @@
 
 
 #include <commons/config.h>
-#include <commons/collections/list.h>
 #include <dc-commons/logger.h>
-#include "configuration.h"
+#include "kernelStruct.h"
+#include "connection.h"
 #include "printing-messages.h"
 
-#define MAX_CPUS 20	//cantidad de CPUs que se pueden conectar
-#define MAX_CONSOLAS 20	//cantidad de Consolas que se pueden conectar
 
 /**
- * DEFINICION DE ESTRUCTURAS
+ * genero los sockets server y clientes para conectarme con los otros procesos
  */
-
-//estructura princial del kernel
-typedef struct kernel_struct {
-	int socketServerCPU;
-	int socketServerConsola;
-	int socketClientMemoria;
-	int socketClientFileSystem;
-	int cpuSockets[MAX_CPUS];
-	int consolaSockets[MAX_CONSOLAS];
-	pthread_mutex_t stdoutMutex;
-	pthread_mutex_t cpuListMutex;
-	pthread_mutex_t processListMutex;
-	t_list* cpuList;
-	t_list* processList;
-	Configuration* config;
-} kernel_struct;
+void createSockets(kernel_struct* kernelStruct);
 
 /**
  * inicializo la estructura

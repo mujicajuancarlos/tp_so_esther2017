@@ -7,14 +7,6 @@
 
 #include "commonFunctions.h"
 
-void crearSockets(kernel_struct *args) {
-
-	//server socket para atender los pedidos de la consola
-	crearServerSocketParaConsola(args);
-
-	//server socket para atender los pedidos del cpu
-	crearServerSocketParaCpus(args);
-}
 
 
 

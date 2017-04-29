@@ -5,8 +5,8 @@
  *      Author: utnso
  */
 
-#ifndef ANSISOPPROCESS_H_
-#define ANSISOPPROCESS_H_
+#ifndef PROCESS_H_
+#define PROCESS_H_
 
 #include <stdlib.h>
 
@@ -19,4 +19,4 @@ Process* createProcess(int socket);
 
 void destroyProcess(Process* process);
 
-#endif /* ANSISOPPROCESS_H_ */
+#endif /* PROCESS_H_ */

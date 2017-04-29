@@ -8,7 +8,12 @@
 #ifndef CONNECTION_H_
 #define CONNECTION_H_
 
-void crearServerSocketParaCpus(kernel_struct* args);
+#include <dc-commons/logger.h>
+#include <dc-commons/socket-client.h>
+#include <dc-commons/socket-server.h>
+#include "kernelStruct.h"
+
+void createCpuServerSocket(kernel_struct* args);
 
 void createConsoleServerSocket(kernel_struct* args);
 

@@ -5,12 +5,14 @@
  *      Author: utnso
  */
 
+
+
 #include "connection.h"
 
 /**
  * Creo el socket server para cpus
  */
-void crearServerSocketParaCpus(kernel_struct* args) {
+void createCpuServerSocket(kernel_struct* args) {
 	args->socketServerCPU = crearSocketServer(args->config->puerto_cpu);
 	if (args->socketServerCPU == -1) {
 		logError("No se pudo crear el server para cpu's");

@@ -13,7 +13,6 @@
 #include "kernel.h"
 #include "handler-console.h"
 #include "handler-cpu.h"
-#include "handler-memory.h"
 /**
  * DEFINICION DE FUNCIONES
  */
