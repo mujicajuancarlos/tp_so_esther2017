@@ -9,30 +9,38 @@
  */
 
 #include "fileSystem.h"
-#include "handler-kernel.h"
+
+fileSystem_struct fsStruct;
 
 int main(int argc, char *argv[]) {
 
-	fileSystem_struct args;
-
-	puts("Cargando archivo externo de configuration");
 	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
-	args.config = config;
 	initLogMutex(config->log_file, config->log_program_name,
 			config->log_print_console,
 			log_level_from_string(config->log_level));
 
-	logInfo("Iniciando el proceso File System");
+	logInfo("Inicializado proceso kernel");
+	initializeStruct(&fsStruct, config);
 
-	logInfo("Creando socket server para kernel");
-	int fd_fileSystem = crearSocketServer(args.config->puerto);
-	if (fd_fileSystem == -1) {
-		logError("No se pudo crear el socket server");
-		return EXIT_FAILURE;
-	} else
-		args.socketServer = fd_fileSystem;
+	logInfo("Creacion de socket server");
+	createKernelServerSocket(&fsStruct);
 
-	handleKernel(&args);
+	handleKernel(&fsStruct);
 
 	return EXIT_SUCCESS;
+}
+
+void createKernelServerSocket(fileSystem_struct* fsStruct) {
+
+	logInfo("Creando socket server para file system");
+	fsStruct->socketServer = crearSocketServer(fsStruct->config->puerto);
+	if (fsStruct->socketServer == -1) {
+		logError("No se pudo crear el server para el kernel");
+		exit(-1);
+	}
+	logInfo("Server Socket de file system esta escuchando");
+}
+
+void initializeStruct(fileSystem_struct* fsStruct, Configuration* config) {
+	fsStruct->config = config;
 }

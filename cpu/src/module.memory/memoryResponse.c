@@ -9,5 +9,5 @@
 
 
 /**
- * TODO Implementar funciones para recibir la respuesta de la memoria
+ * TODO Implementar funciones para RESPONDER la respuesta de la memoria
  */

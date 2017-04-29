@@ -11,7 +11,7 @@ void handleConsolas(kernel_struct* kernelStruct) {
 
 	int newSocket;
 
-	while (1) {
+	while (true) {
 
 		logInfo("Esperando nuevas conexiones desde la consola.");
 		newSocket = aceptarConexionCliente(kernelStruct->socketServerConsola);

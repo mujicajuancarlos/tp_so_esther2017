@@ -15,15 +15,11 @@
 #include <commons/config.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/socket-server.h>
-#include <dc-commons/logger.h>
-#include <dc-commons/package.h>
-#include <dc-commons/socket-message.h>
-#include "configuration.h"
+#include "handler-kernel.h"
+#include "fileSystemStruct.h"
 
-typedef struct fileSystem_struct{
-	int socketServer;
-	int fd_kernel;
-	Configuration* config;
-} fileSystem_struct;
+void createKernelServerSocket(fileSystem_struct* fsStruct);
+
+void initializeStruct(fileSystem_struct* fsStruct, Configuration* config);
 
 #endif /* FILESYSTEM_H_ */
