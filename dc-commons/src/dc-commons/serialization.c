@@ -8,7 +8,7 @@
 #include "serialization.h"
 
 
-char *serialize_int(int value){
+char* serialize_int(int value){
 	size_t size = sizeof(int);
 	char *stream = calloc(1, size);
 	memcpy(stream, &value, size);

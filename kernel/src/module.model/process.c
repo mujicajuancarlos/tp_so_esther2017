@@ -7,11 +7,12 @@
 
 #include "process.h"
 
-Process* createProcess(int socket) {
-	Process* cpu = malloc(sizeof(Process));
-	cpu->fileDescriptor = socket;
-	cpu->pid = 0;
-	return cpu;
+Process* createProcess(int socket,kernel_struct* kernelStruct) {
+	Process* newProcess = malloc(sizeof(Process));
+	newProcess->fileDescriptor = socket;
+	newProcess->pid = 0;
+	newProcess->kernelStruct = kernelStruct;
+	return newProcess;
 }
 
 void destroyProcess(Process* process) {

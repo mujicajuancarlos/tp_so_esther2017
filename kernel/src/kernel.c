@@ -25,17 +25,18 @@ int main(int argc, char *argv[]) {
 	logInfo("Imprimo bienvenida al programa");
 	printWelcome("Kernel");
 
-	logInfo("Creando el hilo para mantener CPU's");
-	pthread_t hiloCpu;
-	pthread_create(&hiloCpu, NULL, (void*) handleCPUs, &kernelStruct);
-
 	logInfo("Creando el hilo para mantener Consolas's");
 	pthread_t hiloConsola;
 	pthread_create(&hiloConsola, NULL, (void*) handleConsolas, &kernelStruct);
 
+	logInfo("Creando el hilo para mantener CPU's");
+	pthread_t hiloCpu;
+	pthread_create(&hiloCpu, NULL, (void*) handleCPUs, &kernelStruct);
+
 	logInfo("Creando el hilo para el planificador");
 	pthread_t hiloPlanificador;
-	pthread_create(&hiloPlanificador, NULL, (void*) handlePlanning, &kernelStruct);
+	pthread_create(&hiloPlanificador, NULL, (void*) handlePlanning,
+			&kernelStruct);
 
 	logInfo("Inicia el lector de comandos para el usuario");
 	handleUserRequest(&kernelStruct);
