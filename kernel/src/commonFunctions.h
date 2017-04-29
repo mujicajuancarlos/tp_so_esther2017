@@ -10,9 +10,7 @@
 
 #include <dc-commons/socket-server.h>
 
-#include "kernel.h"
-#include "handler-console.h"
-#include "handler-cpu.h"
+#include "kernelStruct.h"
 /**
  * DEFINICION DE FUNCIONES
  */

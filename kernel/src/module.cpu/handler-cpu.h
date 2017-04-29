@@ -12,9 +12,9 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-kernel-cpu.h>
 
-#include "kernel.h"
-#include "cpu.h"
-#include "commonFunctions.h"
+#include "../kernelStruct.h"
+#include "../module.model/cpu.h"
+#include "../commonFunctions.h"
 
 void handleCPUs(kernel_struct *args);
 void handleCpuRequest(int fileDescriptor, Package *package);

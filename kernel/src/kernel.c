@@ -9,9 +9,6 @@
  */
 
 #include "kernel.h"
-#include "handler-user.h"
-#include "handler-console.h"
-#include "handler-cpu.h"
 
 kernel_struct kernelStruct;
 
@@ -36,6 +33,10 @@ int main(int argc, char *argv[]) {
 	pthread_t hiloConsola;
 	pthread_create(&hiloConsola, NULL, (void*) handleConsolas, &kernelStruct);
 
+	logInfo("Creando el hilo para el planificador");
+	pthread_t hiloPlanificador;
+	pthread_create(&hiloPlanificador, NULL, (void*) handlePlanning, &kernelStruct);
+
 	logInfo("Inicia el lector de comandos para el usuario");
 	handleUserRequest(&kernelStruct);
 
@@ -49,7 +50,7 @@ void createSockets(kernel_struct* kernelStruct) {
 	createFileSystemClientSocket(kernelStruct);
 }
 
-void initializeStruct(kernel_struct* kernelStruct, Configuration* config){
+void initializeStruct(kernel_struct* kernelStruct, Configuration* config) {
 	kernelStruct->config = config;
 	inicializarArray(MAX_CPUS, kernelStruct->cpuSockets);
 	inicializarArray(MAX_CONSOLAS, kernelStruct->consolaSockets);

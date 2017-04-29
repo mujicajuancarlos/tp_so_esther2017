@@ -14,6 +14,7 @@
 #define COD_CONSOLE_INFO_PROGRAM "info"
 #define COD_CONSOLE_STOP_PROGRAM "stop"
 #define OPT_ALL "-all"
+#define OPT_STATE "-s"
 #define OPT_PID "-p"
 
 #endif /* PROTOCOL_KERNEL_USER_H_ */

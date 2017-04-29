@@ -10,12 +10,28 @@
 
 #include <stdbool.h>
 #include <pthread.h>
-
-#include "printing-messages.h"
+#include <dc-commons/stdout-printer.h>
+#include <dc-commons/utils.h>
+#include "../kernelStruct.h"
 #include "protocol-kernel-user.h"
-#include "kernel.h"
-
 
 void handleUserRequest(kernel_struct* kernelStruct);
+
+void handleCommand_info_program(kernel_struct* kernelStruct, char** commands);
+
+void handleCommand_info_all_program(kernel_struct* kernelStruct,
+		char** commands);
+
+void handleCommand_info_by_pid_program(kernel_struct* kernelStruct,
+		char** commands);
+
+void handleCommand_end_program(kernel_struct* kernelStruct, char** commands);
+
+void handleCommand_end_all_program(kernel_struct* kernelStruct, char** commands);
+
+void handleCommand_end_by_pid_program(kernel_struct* kernelStruct,
+		char** commands);
+
+void printCommandsHelp();
 
 #endif /* HANDLER_USER_C_ */

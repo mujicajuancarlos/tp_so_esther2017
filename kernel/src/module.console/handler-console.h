@@ -13,8 +13,8 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-kernel-console.h>
 
-#include "kernel.h"
-#include "commonFunctions.h"
+#include "../kernelStruct.h"
+#include "../commonFunctions.h"
 
 void handleConsolas(kernel_struct *args);
 void handleConsoleRequest(int fileDescriptor, Package *package, kernel_struct *args);

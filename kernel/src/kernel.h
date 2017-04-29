@@ -11,9 +11,14 @@
 
 #include <commons/config.h>
 #include <dc-commons/logger.h>
+
+#include "module.cpu/handler-cpu.h"
+#include "module.console/handler-console.h"
+#include "module.planning/handler-planning.h"
+#include "module.userInterface/handler-user.h"
+
 #include "kernelStruct.h"
 #include "connection.h"
-#include "printing-messages.h"
 
 
 /**
