@@ -12,20 +12,17 @@
 #include <errno.h>
 
 #include <dc-commons/package.h>
+#include <dc-commons/logger.h>
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-kernel-cpu.h>
 #include "cpuStruct.h"
-#include "cpu.h"
 
-/**
- * Maneja la conexion princial del KERNEL
- */
 void handleKernel(cpu_struct *args);
 
 /**
- * Manejo los pedidos del KERNEL
+ * Manejo un request del kernel
  */
-void packagesReceptionKernel(cpu_struct *args, Package *package);
-void packagesSenderKernel(int memoryfd, int code);
+void handleKernelRequest(cpu_struct *args, Package* package);
+
 
 #endif /* HANDLER_KERNEL_H_ */

@@ -67,6 +67,7 @@ void handleProgramRequest(Process* newProcess, Package* package) {
 		stream = serialize_int(pid);
 		response = createPackage(COD_KC_RUN_PROGRAM_RESPONSE, sizeof(int),
 				stream);
+
 		free(stream);
 		if (sendPackage(newProcess->fileDescriptor, response) == -1)
 			logError("No se pudo enviar la respuesta a la consola");
