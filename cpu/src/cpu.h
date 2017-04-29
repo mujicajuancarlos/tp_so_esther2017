@@ -12,16 +12,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <parser/parser.h>
+#include <parser/metadata_program.h>
 #include <commons/config.h>
-#include <dc-commons/socket-client.h>
 #include <dc-commons/logger.h>
+#include "handler-kernel.h"
+#include "cpuStruct.h"
 #include "configuration.h"
+#include "connection.h"
 
-//estructura princial del cpu
-typedef struct cpu_struct {
-	int socketClientKernel;
-	int socketClientMemoria;
-	Configuration* config;
-} cpu_struct;
+
+void initializeStruct(cpu_struct* cpuStruct, Configuration* config);
+
+void createSockets(cpu_struct* cpuStruct);
 
 #endif /* CPU_H_ */

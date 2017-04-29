@@ -8,7 +8,10 @@
 #ifndef HANDLER_MEMORY_H_
 #define HANDLER_MEMORY_H_
 
-#include "cpu.h"
+#include <dc-commons/protocol-memory-cpu.h>
+#include <dc-commons/package.h>
+#include <dc-commons/socket-message.h>
+#include "cpuStruct.h"
 
 
 //Recibe y desempaqueta los packages provenientes de la Memory

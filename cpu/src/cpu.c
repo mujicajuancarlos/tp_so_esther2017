@@ -8,49 +8,37 @@
  ============================================================================
  */
 
-
-
-
 #include "cpu.h"
-#include "handler-kernel.h"
-#include "parser/parser.h"
-#include "parser/metadata_program.h"
+
+cpu_struct cpuStruct;
 
 int main(int argc, char *argv[]) {
 
-	cpu_struct args;
-
 	puts("Cargando archivo externo de configuration");
 	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
-	args.config = config;
+	cpuStruct.config = config;
 	initLogMutex(config->log_file, config->log_program_name,
 			config->log_print_console,
 			log_level_from_string(config->log_level));
 
 	logInfo("Iniciando el proceso CPU");
+	initializeStruct(&cpuStruct, config);
 
-	logInfo("Creando socket cliente para memoria");
-	int fd_memoria = crearSocketCliente(config->ip_memoria,
-			config->puerto_memoria);
-	if(fd_memoria == -1){
-		logError("No se pudo establecer conexion con la memoria");
-		return EXIT_FAILURE;
-	}
-	else {
-		args.socketClientMemoria = fd_memoria;
-		mensajeParaConectarseAMemory(fd_memoria);
+	logInfo("Creacion de sockets cliente");
+	createSockets(&cpuStruct);
 
-	}
-
-	logInfo("Creando socket cliente para kernel");
-	int fd_kernel = crearSocketCliente(config->ip_kernel,
-			config->puerto_kernel);
-	if(fd_kernel == -1) {
-		logError("No se pudo establecer conexion con el kernel");
-		return EXIT_FAILURE;
-	}else args.socketClientKernel = fd_kernel;
-
-	handleKernel(&args);
+	handleKernel(&cpuStruct);
 
 	return EXIT_SUCCESS;
+}
+
+void createSockets(cpu_struct* cpuStruct) {
+	createMemoryClientSocket(cpuStruct);
+	createKernelClientSocket(cpuStruct);
+}
+
+void initializeStruct(cpu_struct* cpuStruct, Configuration* config) {
+	cpuStruct->config = config;
+	cpuStruct->socketClientKernel = -1;
+	cpuStruct->socketClientMemoria = -1;
 }

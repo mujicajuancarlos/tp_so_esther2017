@@ -14,7 +14,7 @@
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-kernel-cpu.h>
-
+#include "cpuStruct.h"
 #include "cpu.h"
 
 /**
