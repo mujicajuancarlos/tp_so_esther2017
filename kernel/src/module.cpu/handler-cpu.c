@@ -7,106 +7,49 @@
 
 #include "handler-cpu.h"
 
-void handleCPUs(kernel_struct *args) {
+void handleCPUs(kernel_struct *kernelStruct) {
 
-	t_list* listaCPUs = args->cpuList;
-	int socketServidor = args->socketServerCPU; // file descriptor del socket servidor
+	int newSocket;
 
-	fd_set descriptoresLectura; //defino el descriptor de lectura
-	int i;
-	int activity;
-	int socketClientDescriptor;
-	int max_socketDescriptor = socketServidor;
-
-	/* Bucle infinito.
-	 * Se atiende a si hay más clientes para conectar y a los mensajes enviados
-	 * por los clientes ya conectados */
 	while (1) {
 
-		//borra el set de descriptiores
-		FD_ZERO(&descriptoresLectura);
-		//relaciona los descriptores con el socket server de cpu's
-		FD_SET(socketServidor, &descriptoresLectura);
+		newSocket = aceptarConexionCliente(kernelStruct->socketServerConsola);
 
-		//add child sockets to set
-
-		for (i = 0; i < MAX_CPUS; i++) {
-
-			socketClientDescriptor = (args->cpuSockets)[i];
-
-			//si es un descriptor valido entonces lo agrego al set para que pueda leer paquetes
-			if (socketClientDescriptor > 0)
-				FD_SET(socketClientDescriptor, &descriptoresLectura);
-
-			//si el nuevo socketDescriptos es mayor al que tenia lo actualizo
-			//Esto es necesario para la funcion select
-			if (socketClientDescriptor > max_socketDescriptor)
-				max_socketDescriptor = socketClientDescriptor;
+		if (newSocket != -1) {
+			logInfo("Se conecto una nueva CPU");
+			pthread_t hiloPrograma;
+			pthread_attr_t threadAttr;
+			pthread_attr_init(&threadAttr);
+			pthread_attr_setdetachstate(&threadAttr, PTHREAD_CREATE_DETACHED);
+			logInfo("Creando cpu con FD %d", newSocket);
+			CPU* newCpu = createCPU(newSocket, kernelStruct); //no olvidar librerar memoria al finalizar el hilo
+			logDebug("Creando el hilo para mantener cpu con FD %d", newSocket);
+			pthread_create(&hiloPrograma, &threadAttr, (void*) handleNewCPU,
+					newCpu);
+			logDebug("Hilo ejecutando cpu con FD %d", newSocket);
 		}
-
-		logInfo("Esperando nuevas conexiones y mensajes");
-		/* Espera indefinida hasta que alguno de los descriptores tenga algo
-		 * que decir -> puede ser producido por:
-		 * 1. Nuevo cliente solicitando conectarse
-		 * 2. Un cliente ya conectado que envía un mensaje*/
-		activity = select(max_socketDescriptor + 1, &descriptoresLectura,
-		NULL, NULL,
-		NULL);
-		if ((activity < 0) && (errno != EINTR))
-			logError("Error al hacer el select del socket server de cpu");
-
-		// Verifico si algún cliente que ya estaba conectado ha enviado un mensaje
-		for (i = 0; i < MAX_CPUS; i++) {
-			socketClientDescriptor = (args->cpuSockets)[i];
-			if (FD_ISSET(socketClientDescriptor, &descriptoresLectura)) {
-				//creo un packete para almacenar la informacion recibida
-				Package* package = createEmptyPackage();
-				if (receivePackage(socketClientDescriptor, package) == 0)
-					handleCpuRequest(socketClientDescriptor, package);
-				else
-					logError("Error al intentar recibir los datos del FD: %d",
-							socketClientDescriptor);
-				destroyPackage(package);
-			}
-		}
-
-		// Verifico si hay un nuevo cliente tratado de conectarse
-		if (FD_ISSET(socketServidor, &descriptoresLectura)) {
-			socketClientDescriptor = registrarFileDescriptorInArray(
-					socketServidor, args->cpuSockets, MAX_CPUS);
-			if (socketClientDescriptor != -1) {
-				crear_registrar_CPU(listaCPUs, socketClientDescriptor);
-			}
-		}
-
-	}
-
-}
-
-void handleCpuRequest(int fileDescriptor, Package *package) {
-	switch (package->msgCode) {
-	case COD_ANSISOP_IMPRIMIR:
-		logInfo("Ejecutando syscall imprimir");
-		break;
-	case COD_ANSISOP_SARAZA:
-		logInfo("Ejecutando syscall saraza");
-		break;
-	case COD_SALUDO:
-		logInfo("La cpu %d me envio el siguiente saludo: %s", fileDescriptor,
-				package->stream);
-		break;
-	default:
-		logError("La cpu solicito una accion no permitida");
-		break;
 	}
 }
 
+void handleNewCPU(CPU* newCpu) {
 
+	Package* package;
+	bool running = true;
+	while (running) {
 
-void crear_registrar_CPU(t_list* listaCPUs, int socketCPU_fd) {
-	char* message = "Conexion con kernel establecida con kernel";
-	Package* package = createPackage(COD_SALUDO, strlen(message), message);
-	sendPackage(socketCPU_fd,package);
-	CPU* cpu = createCPU(socketCPU_fd);
-	list_add(listaCPUs, cpu);
+		package = createAndReceivePackage(newCpu->fileDescriptor);
+		if (package != NULL) {
+			//TODO COMPLETAR FUNCIONALIDAD
+			//handleProgramRequest(newCpu, package);
+		} else {
+			running = false;
+			logError("Se desconecto la cpu con FD: %d",
+					newCpu->fileDescriptor);
+		}
+		destroyPackage(package);
+	}
+
+	destroyCPU(newCpu);
+	close(newCpu->fileDescriptor);
+	pthread_exit(EXIT_SUCCESS);
 }

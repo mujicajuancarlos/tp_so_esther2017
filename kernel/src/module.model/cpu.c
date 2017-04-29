@@ -8,11 +8,12 @@
 #include "cpu.h"
 
 
-CPU* createCPU(int socket) {
+CPU* createCPU(int socket, kernel_struct* kernelStruct) {
 	CPU* cpu = malloc(sizeof(CPU));
 	cpu->fileDescriptor = socket;
 	cpu->libre = true;
 	cpu->pid = 0;
+	cpu->kernelStruct = kernelStruct;
 	return cpu;
 }
 

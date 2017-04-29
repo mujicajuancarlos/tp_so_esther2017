@@ -53,8 +53,6 @@ void createSockets(kernel_struct* kernelStruct) {
 
 void initializeStruct(kernel_struct* kernelStruct, Configuration* config) {
 	kernelStruct->config = config;
-	inicializarArray(MAX_CPUS, kernelStruct->cpuSockets);
-	inicializarArray(MAX_CONSOLAS, kernelStruct->consolaSockets);
 	kernelStruct->cpuList = list_create();
 	kernelStruct->processList = list_create();
 	kernelStruct->socketClientFileSystem = -1;

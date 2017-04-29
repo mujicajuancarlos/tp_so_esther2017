@@ -16,7 +16,7 @@ void handleConsolas(kernel_struct* kernelStruct) {
 		newSocket = aceptarConexionCliente(kernelStruct->socketServerConsola);
 
 		if (newSocket != -1) {
-			logInfo("El proceso consola se conectó para ejecutar un programa ansisop %s");
+			logInfo("El proceso consola se conectó para ejecutar un programa ansisop");
 			pthread_t hiloPrograma;
 			pthread_attr_t threadAttr;
 			pthread_attr_init(&threadAttr);
