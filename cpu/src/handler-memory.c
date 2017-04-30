@@ -1,5 +1,5 @@
 /*
- * handler-memory.c
+  * handler-memory.c
  *
  *  Created on: 23/4/2017
  *      Author: utnso
@@ -25,9 +25,6 @@ void packagesReceptionMemory(int fd) {
 			//Hace lo que tiene que hacer
 			break;
 		case COD_ACTUALIZAR_ESTRUCTURA:
-			//Hace lo que tiene que hacer
-			break;
-		case COD_SALUDO:
 			//Hace lo que tiene que hacer
 			break;
 		case COD_PROXIMA_SENTENCIA_A_EJECUTAR:
@@ -57,9 +54,6 @@ void packagesSenderMemory(int memoryfd, int code) {
 		case COD_ACTUALIZAR_ESTRUCTURA:
 			//Hace lo que tiene que hacer
 			break;
-		case COD_SALUDO:
-			saludoAMemory(memoryfd);
-			break;
 		case COD_PROXIMA_SENTENCIA_A_EJECUTAR:
 			break;
 		}
@@ -67,19 +61,7 @@ void packagesSenderMemory(int memoryfd, int code) {
 
 }
 
-void saludoAMemory(int sck) {
-	char *mensaje = "Te conectaste memory";
-	int longMensaje = sizeof(mensaje);
-	Package *paqueteParaEnviar = createPackage(COD_SALUDO, longMensaje,
-			mensaje);
-	int consultaEnvio = sendPackage(sck, paqueteParaEnviar);
-	if (consultaEnvio != -1) {
-		puts("Se envio paquete corectamente");
-	} else {
-		puts("Error en el envio");
-	}
 
-}
 
 void mensajeParaConectarseAMemory(int sck_memory) {
 	char* message = "CPU";
