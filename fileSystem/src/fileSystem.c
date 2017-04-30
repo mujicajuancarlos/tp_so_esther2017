@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 	logInfo("Inicializado proceso kernel");
 	initializeStruct(&fsStruct, config);
 
-	logInfo("Creacion de socket server");
+	logInfo("Creando socket server para file system");
 	createKernelServerSocket(&fsStruct);
 
 	handleKernel(&fsStruct);
@@ -32,7 +32,6 @@ int main(int argc, char *argv[]) {
 
 void createKernelServerSocket(fileSystem_struct* fsStruct) {
 
-	logInfo("Creando socket server para file system");
 	fsStruct->socketServer = crearSocketServer(fsStruct->config->puerto);
 	if (fsStruct->socketServer == -1) {
 		logError("No se pudo crear el server para el kernel");
