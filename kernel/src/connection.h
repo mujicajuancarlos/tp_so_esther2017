@@ -9,8 +9,12 @@
 #define CONNECTION_H_
 
 #include <dc-commons/logger.h>
+#include <dc-commons/package.h>
 #include <dc-commons/socket-client.h>
 #include <dc-commons/socket-server.h>
+#include <dc-commons/socket-message.h>
+#include <dc-commons/protocol-memory-identification.h>
+#include <dc-commons/protocol-memory-kernel.h>
 #include "kernelStruct.h"
 
 void createCpuServerSocket(kernel_struct* args);
