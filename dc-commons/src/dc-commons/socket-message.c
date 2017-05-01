@@ -15,8 +15,10 @@ Package* createAndSendPackage(int fileDescriptor, uint32_t msgCode,
 	result = sendPackage(fileDescriptor, package);
 	if (result == SEND_OR_RECEIVE_SUCCESS)
 		return package;
-	else
+	else {
+		destroyPackage(package);
 		return NULL;
+	}
 }
 
 Package* createAndReceivePackage(int fileDescriptor) {
@@ -26,8 +28,10 @@ Package* createAndReceivePackage(int fileDescriptor) {
 	result = receivePackage(fileDescriptor, package);
 	if (result == SEND_OR_RECEIVE_SUCCESS)
 		return package;
-	else
+	else{
+		destroyPackage(package);
 		return NULL;
+	}
 }
 
 int sendPackage(int fileDescriptor, Package *package) {
