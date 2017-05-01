@@ -9,6 +9,9 @@
 #define CONNECTION_H_
 
 #include <dc-commons/socket-client.h>
+#include <dc-commons/socket-message.h>
+#include <dc-commons/protocol-memory-identification.h>
+#include <dc-commons/protocol-memory-cpu.h>
 #include <dc-commons/logger.h>
 #include "cpuStruct.h"
 
