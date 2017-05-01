@@ -25,14 +25,20 @@ int main(int argc, char *argv[]) {
 	logInfo("Creando socket server para memoria");
 	createMemoryServerSocket(&memoryStruct);
 
-	handleClients(&memoryStruct);
+	logInfo("Creando el hilo atender a los clientes");
+	pthread_t hiloClientes;
+	pthread_create(&hiloClientes, NULL,(void*) handleClients, &memoryStruct);
+
+	logInfo("Inicia el lector de comandos para el usuario");
+	handleUserRequest(&memoryStruct);
 
 	return EXIT_SUCCESS;
 }
 
 void createMemoryServerSocket(memory_struct* memoryStruct) {
 
-	memoryStruct->socketServer = crearSocketServer(memoryStruct->config->puerto);
+	memoryStruct->socketServer = crearSocketServer(
+			memoryStruct->config->puerto);
 	if (memoryStruct->socketServer == -1) {
 		logError("No se pudo crear el socket server");
 		exit(-1);
@@ -44,7 +50,7 @@ void initializeStruct(memory_struct* memoryStruct, Configuration* config) {
 	memoryStruct->config = config;
 	memoryStruct->socketServer = -1;
 	memoryStruct->socketClientKernel = -1;
-	pthread_mutex_init(&(memoryStruct->socketClientKernelMutex),NULL);
+	pthread_mutex_init(&(memoryStruct->socketClientKernelMutex), NULL);
 	memoryStruct->listaCPUs = list_create();
-	pthread_mutex_init(&(memoryStruct->listaCPUsMutex),NULL);
+	pthread_mutex_init(&(memoryStruct->listaCPUsMutex), NULL);
 }
