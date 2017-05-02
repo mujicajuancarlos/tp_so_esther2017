@@ -36,6 +36,16 @@ char* readFile(char* pathFile, long* fsize) {
 	return buffer;
 }
 
+void writeFile(char* buffer, char* pathFile, long* fsize) {
+	FILE *file;
+
+	file = fopen(pathFile, "w");  // w for write, b for binary
+
+	fwrite(buffer, (size_t) 1, (size_t) fsize, file); // write 10 bytes from our buffer
+
+	fclose(file);
+}
+
 bool file_exists(char* filePath, char* mode) {
 	FILE *file;
 	file = fopen(filePath, mode);
