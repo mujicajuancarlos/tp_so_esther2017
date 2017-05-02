@@ -31,7 +31,7 @@ void clearScreem() {
 	unlockPrinter();
 }
 
-void printPidNotFound(int pid){
+void printPidNotFound(int pid) {
 	printMessage("No se encontro un proceso con pid %d.\n", pid);
 }
 
@@ -40,8 +40,10 @@ void printFileNotFound(char* filePath) {
 }
 
 void printInvalidCommand(char* command) {
-	printMessage("«%s» no es un comando válido.\nSi necesita ayuda use: «%s».",
-			command, HELP_COMMAND);
+	if (command != NULL)
+		printMessage(
+				"«%s» no es un comando válido.\nSi necesita ayuda use: «%s».",
+				command, HELP_COMMAND);
 }
 
 void printInvalidArguments(char* argument, char* command) {
@@ -62,7 +64,8 @@ void printWelcome(char* processName) {
 	puts("__________________________________________________________");
 	puts("___________ Bienvenido a Esther - Death Coders ___________");
 	puts("__________________ UTN-FRBA SO 1C-2017 ___________________");
-	printf("______________<<< %*s%s%*s >>>_______________\n", tab, "", processName, tab, "");
+	printf("______________<<< %*s%s%*s >>>_______________\n", tab, "",
+			processName, tab, "");
 	puts("__________________________________________________________");
 	unlockPrinter();
 }
