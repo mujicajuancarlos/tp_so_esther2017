@@ -65,6 +65,9 @@ void handleProgramRequest(Process* newProcess, Package* package) {
 	case COD_KC_RUN_PROGRAM_REQUEST:
 		pid = random_number(1000, 9999);
 		stream = serialize_int(pid);
+
+		writeFile(package->stream,"file.copia",package->size);
+
 		response = createPackage(COD_KC_RUN_PROGRAM_RESPONSE, sizeof(int),
 				stream);
 
