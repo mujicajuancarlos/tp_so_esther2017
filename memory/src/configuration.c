@@ -39,13 +39,12 @@ Configuration* config_with(char *config_file) {
 	config_set_int_valid_value(&config->cache_x_proceso, temporalConfig, CACHE_X_PROC);
 	config_set_string_valid_value(&config->reemplazo_cache, temporalConfig, REEMPLAZO_CACHE);
 	config_set_int_valid_value(&config->retardo_memoria, temporalConfig, RETARDO_MEMORIA);
-	config_set_int_valid_value(&config->tamanio_memoria,temporalConfig, TAMANIO_MEMORIA);
 
 	//configuracion de log
 	config_set_string_valid_value(&config->log_level, temporalConfig, LOG_LEVEL);
 	config_set_string_valid_value(&config->log_file, temporalConfig, LOG_FILE);
 	config_set_string_valid_value(&config->log_program_name, temporalConfig, LOG_PROGRAM_NAME);
-	config_set_int_valid_value(&config->log_print_console, temporalConfig, LOG_PRINT_CONSOLE);
+	config_set_bool_valid_value(&config->log_print_console, temporalConfig, LOG_PRINT_CONSOLE);
 
 	config_destroy(temporalConfig);
 

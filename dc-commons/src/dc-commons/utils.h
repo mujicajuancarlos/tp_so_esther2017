@@ -23,7 +23,7 @@
  */
 char* readFile(char* pathFile, long* fsize);
 
-void writeFile(char* buffer, char* pathFile, long* fsize);
+void writeFile(char* buffer, char* pathFile, long fsize);
 
 /**
  * @NAME: file_exists

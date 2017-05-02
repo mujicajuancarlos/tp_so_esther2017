@@ -14,9 +14,11 @@
 
 //import commoms library
 #include <commons/collections/list.h>
+#include <commons/error.h>
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/log.h>
+#include <dc-commons/config.h>
 
 //keys de configuracion
 #define DEFAULT_CONFIG_PATH "../memory.conf"
@@ -28,7 +30,6 @@
 #define CACHE_X_PROC "CACHE_X_PROC"
 #define REEMPLAZO_CACHE "REEMPLAZO_CACHE"
 #define RETARDO_MEMORIA "RETARDO_MEMORIA"
-#define TAMANIO_MEMORIA "TAMANIO_MEMORIA"
 
 //log keys
 #define LOG_LEVEL "LOG_LEVEL"
@@ -49,7 +50,6 @@ typedef struct Configuration {
 	char* log_file;
 	char* log_program_name;
 	bool log_print_console;
-	int tamanio_memoria;
 } Configuration;
 
 Configuration* config;

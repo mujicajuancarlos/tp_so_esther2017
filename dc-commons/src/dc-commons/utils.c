@@ -36,7 +36,7 @@ char* readFile(char* pathFile, long* fsize) {
 	return buffer;
 }
 
-void writeFile(char* buffer, char* pathFile, long* fsize) {
+void writeFile(char* buffer, char* pathFile, long fsize) {
 	FILE *file;
 
 	file = fopen(pathFile, "w");  // w for write, b for binary

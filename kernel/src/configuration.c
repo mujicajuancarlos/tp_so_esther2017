@@ -51,7 +51,7 @@ Configuration* config_with(char *config_file) {
 	config_set_string_valid_value(&config->log_level, temporalConfig, LOG_LEVEL);
 	config_set_string_valid_value(&config->log_file, temporalConfig, LOG_FILE);
 	config_set_string_valid_value(&config->log_program_name, temporalConfig, LOG_PROGRAM_NAME);
-	config_set_int_valid_value(&config->log_print_console, temporalConfig, LOG_PRINT_CONSOLE);
+	config_set_bool_valid_value(&config->log_print_console, temporalConfig, LOG_PRINT_CONSOLE);
 
 	config_destroy(temporalConfig);
 
