@@ -1,0 +1,37 @@
+/*
+ * handler-user.c
+ *
+ *  Created on: 26/4/2017
+ *      Author: utnso
+ */
+
+#ifndef HANDLER_USER_C_
+#define HANDLER_USER_C_
+
+#include <stdbool.h>
+#include <pthread.h>
+#include <dc-commons/stdout-printer.h>
+#include <dc-commons/utils.h>
+#include "../kernelStruct.h"
+#include "protocol-kernel-user.h"
+
+void handleUserRequest(kernel_struct* kernelStruct);
+
+void handleCommand_info_program(kernel_struct* kernelStruct, char** commands);
+
+void handleCommand_info_all_program(kernel_struct* kernelStruct,
+		char** commands);
+
+void handleCommand_info_by_pid_program(kernel_struct* kernelStruct,
+		char** commands);
+
+void handleCommand_end_program(kernel_struct* kernelStruct, char** commands);
+
+void handleCommand_end_all_program(kernel_struct* kernelStruct, char** commands);
+
+void handleCommand_end_by_pid_program(kernel_struct* kernelStruct,
+		char** commands);
+
+void printCommandsHelp();
+
+#endif /* HANDLER_USER_C_ */

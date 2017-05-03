@@ -1,0 +1,21 @@
+/*
+ * protocol-kernel-console.h
+ *
+ *  Created on: 14/4/2017
+ *      Author: utnso
+ */
+
+#ifndef SRC_DC_COMMONS_PROTOCOL_KERNEL_CONSOLE_H_
+#define SRC_DC_COMMONS_PROTOCOL_KERNEL_CONSOLE_H_
+
+//prefijo = KC ; between 100 - 199
+
+#define COD_KC_RUN_PROGRAM_REQUEST 101
+#define COD_KC_RUN_PROGRAM_RESPONSE 102
+#define COD_KC_STOP_PROGRAM_REQUEST 103
+#define COD_KC_STOP_PROGRAM_RESPONSE 104
+#define COD_KC_PRINT_STDOUT 105
+#define COD_KC_END_PROGRAM 106
+
+
+#endif /* SRC_DC_COMMONS_PROTOCOL_KERNEL_CONSOLE_H_ */
