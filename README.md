@@ -1,13 +1,13 @@
-# tp-2017-1c-DeathCoders
+#tp-2017-1c-Los-5-Fant-sticos
 
 
-## Death Coders Commons Library for C ##
+## tp-2017-1c-Los-5-Fant-sticos  Library for C ##
 
 
 ## Guía de Instalación: ##
 
 
-	- Clonar el proyecto deathCoders
+	- Clonar el proyecto tp-2017-1c-Los-5-Fant-sticos
 	- Desde consola ir al directorio del proyecto /dc-commons
 	- `sudo make install` -> instala la biblioteca en el sistema
 	- `sudo make uninstall` -> desinstala la biblioteca
