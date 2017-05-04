@@ -17,6 +17,7 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/serialization.h>
 #include <dc-commons/protocol-kernel-console.h>
+#include "consoleRequests.h"
 #include "../module.model/process.h"
 #include "../kernelStruct.h"
 
@@ -24,9 +25,6 @@ void handleConsolas(kernel_struct *args);
 
 void handleNewProcess(Process* newProcess);
 
-void handleProgramRequest(Process* newProcess, Package* package);
-
-//TODO eliminar cuando este implementado el asignador de pids
-int random_number(int min_num, int max_num);
+void handleConsoleRequestForProcess(Process* newProcess, Package* package);
 
 #endif /* HANDLER_CONSOLE_H_ */

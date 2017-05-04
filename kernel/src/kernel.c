@@ -62,4 +62,6 @@ void initializeStruct(kernel_struct* kernelStruct, Configuration* config) {
 	kernelStruct->socketClientMemoria = -1;
 	kernelStruct->socketServerCPU = -1;
 	kernelStruct->socketServerConsola = -1;
+
+	initializeCurrentPidMutex();
 }

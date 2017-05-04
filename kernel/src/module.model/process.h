@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include "../kernelStruct.h"
 
+#define FIRST_PID 1000
+
 typedef struct Process {
     int fileDescriptor;	//file descriptor del socket del cpu
     int pid;	//PID del proceso que esta ejecutando actualmente
@@ -20,5 +22,11 @@ typedef struct Process {
 Process* createProcess(int socket,kernel_struct* kernelStruct);
 
 void destroyProcess(Process* process);
+
+void initializeCurrentPidMutex();
+
+void destroyCurrentPidMutex();
+
+int getNextPID();
 
 #endif /* PROCESS_H_ */
