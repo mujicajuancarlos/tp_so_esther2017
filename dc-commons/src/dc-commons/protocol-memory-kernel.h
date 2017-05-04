@@ -12,9 +12,13 @@
 
 #define COD_HANDSHAKE_KERNEL 400
 
-#define COD_INICIALIZAR_PROGRAMA 401
-#define COD_ESCRITURA_PAGE 402 // Almacenar bytes en una página
-#define COD_ASIGN_PAGE_PROCESS 403 // Asignar páginas a proceso
-#define COD_FINALIZAR_PROGRAMA 404
+#define COD_SAVE_NEW_PROGRAM 401 //para almacenar el cod ansisop
+#define COD_SAVE_NEW_PROGRAM_OK 402 //respuesta ok para el cod COD_SAVE_NEW_PROGRAM
+
+#define COD_MEMORY_FULL 409 //indica que no hay mas espacio
+
+/**
+ * todo seguir definiendo
+ */
 
 #endif /* SRC_DC_COMMONS_PROTOCOL_MEMORY_KERNEL_H_ */
