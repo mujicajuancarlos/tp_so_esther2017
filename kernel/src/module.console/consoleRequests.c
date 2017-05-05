@@ -31,7 +31,7 @@ void startNewProcess(Process* process, Package* package) {
 	t_new_sourceCode_request* request = create_new_sourceCode_request(
 			process->pid, process->kernelStruct->config->stack_size,
 			package->size, package->stream);
-	char* tmpStream = serialize_new_sourceCode_request(request);
+	tmpStream = serialize_new_sourceCode_request(request);
 	tmpPackage = createAndSendPackage(
 			process->kernelStruct->socketClientMemoria, COD_SAVE_NEW_PROGRAM,
 			size_new_sourceCode_request(request), tmpStream);
