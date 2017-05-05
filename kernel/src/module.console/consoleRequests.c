@@ -74,6 +74,7 @@ void startNewProcess(Process* process, Package* package) {
 		tmpStream = serialize_int(process->pid);
 		tmpPackage = createAndSendPackage(process->fileDescriptor,
 		COD_KC_RUN_PROGRAM_RESPONSE, sizeof(int), tmpStream);
+		//TODO MOVER EL PROCESO AL ESTADO READY
 	}
 
 	free(tmpPackage);

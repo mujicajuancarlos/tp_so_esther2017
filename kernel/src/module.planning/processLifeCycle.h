@@ -1,0 +1,22 @@
+/*
+ * processLifeCycle.h
+ *
+ *  Created on: 5/5/2017
+ *      Author: utnso
+ */
+
+#ifndef MODULE_PLANNING_PROCESSLIFECYCLE_H_
+#define MODULE_PLANNING_PROCESSLIFECYCLE_H_
+
+#include <stddef.h>
+#include <commons/collections/queue.h>
+
+typedef struct {
+	t_queue* new;
+	t_queue* ready;
+	t_list* execute;
+	t_queue* block;
+	t_queue* exit;
+} t_planningStates;
+
+#endif /* MODULE_PLANNING_PROCESSLIFECYCLE_H_ */
