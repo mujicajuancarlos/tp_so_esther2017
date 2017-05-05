@@ -9,7 +9,11 @@
 #define MODULE_PLANNING_PROCESSLIFECYCLE_H_
 
 #include <stddef.h>
+#include <stdlib.h>
+#include <pthread.h>
 #include <commons/collections/queue.h>
+#include <dc-commons/logger.h>
+
 
 typedef struct {
 	t_queue* new;
