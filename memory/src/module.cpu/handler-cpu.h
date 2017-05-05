@@ -11,7 +11,7 @@
 #include <dc-commons/logger.h>
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
-#include <dc-commons/protocol-memory-kernel.h>
+#include <dc-commons/protocol-memory-cpu.h>
 #include "../memoryClient.h"
 #include "cpu.h"
 

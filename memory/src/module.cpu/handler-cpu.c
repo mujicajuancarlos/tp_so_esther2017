@@ -35,9 +35,11 @@ void handleCpuRequest(CPU* cpu, Package* package) {
 	 */
 
 	switch (package->msgCode) {
-	case COD_ESCRITURA_PAGE:
+	case COD_SOLICITAR_BYTES_PAGE:
 
-		break;
+
+
+	break;
 	default:
 		logError("El kernel solicito una accion desconocida FD: %d Cod: %d",
 				cpu->fileDescriptor, package->msgCode);

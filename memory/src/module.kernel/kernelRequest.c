@@ -33,7 +33,7 @@ void handleKernelRequest(memory_struct* newProcess, Package* package) {
 	 */
 
 	switch (package->msgCode) {
-	case COD_ESCRITURA_PAGE:
+	case COD_SAVE_NEW_PROGRAM:
 
 		break;
 	default:
