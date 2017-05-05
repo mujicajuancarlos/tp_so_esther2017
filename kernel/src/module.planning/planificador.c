@@ -6,6 +6,7 @@
 
 
 int planificar(int argc, char *argv[]) {
+	//pthread_mutex_init(&readyListMutex, NULL);
 
 	//LEVANTO EL ARCHIVO DE CONFIG
 	//Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
@@ -92,6 +93,11 @@ void agregarALista(char * programa) {
 
 	int antesDeAgregar = listaDeListo->elements_count; //Guardo Cuantos hay en la Lista Antes de agregar
 
+	//MUTEX  PARA PRIORIZAR BLOQUEADOS Y RR SOBRE NUEVOS
+	/*pthread_mutex_lock(&readyListMutex);
+	list_add(listaDeListo, pcb);
+	pthread_mutex_unlock(&readyListMutex);
+	*/
 	list_add(listaDeListo, pcb);
 
 	int despuesDeAgregar = listaDeListo->elements_count; //Guardo cuantos hay despues..
@@ -105,10 +111,10 @@ void agregarALista(char * programa) {
 		perror("Lista no agregada."); //Si despues de agregar no es mayor a antes, significa que no se pudo agregar a la lista por lo que nos da error.
 
 	}
-
+	pthread_exit(NULL);
 }
 
-
+/*
 static  t_hilos *hilo_create(pthread_t thread, char * m, int  r) {
 
 	t_hilos *nuevo = malloc(sizeof(t_hilos));
@@ -120,7 +126,8 @@ static  t_hilos *hilo_create(pthread_t thread, char * m, int  r) {
 
 }
 
-
+*/
+/*
 static  t_pcb *pcb_create(int PID, char * contextoDeEjecucion) {
 
 	t_pcb *nuevo = malloc(sizeof(t_pcb)); //Reservo tamaño para lag estructura PCB
@@ -136,7 +143,7 @@ static  t_pcb *pcb_create(int PID, char * contextoDeEjecucion) {
     return nuevo;
 
 }
-
+*/
 
 int enviarMensajeDePCBaMemoria(int socketMemoria, t_pcb * nodoPCB) {
 
@@ -169,9 +176,10 @@ void empaquetarPCB(unsigned char *buffer,t_pcb * nodoPCB)
 	*/
 
 	printf("PCB a enviar: PID: %d,  Estado: %d, PC: %d, Quantum: %d, Archivo: %s\n",
+	nodoPCB->PID,nodoPCB->contextoEjecucion);
 
 	//nodoPCB->PID,nodoPCB->estado,nodoPCB->pc,nodoPCB->quantum,nodoPCB->contextoEjecucion);
-	nodoPCB->PID,nodoPCB->contextoEjecucion);
+
 
 	//tamanioBuffer = pack(buffer,SECUENCIA_PCB,nodoPCB->PID,nodoPCB->estado,nodoPCB->pc,nodoPCB->quantum,nodoPCB->contextoEjecucion);
 	tamanioBuffer = pack(buffer,SECUENCIA_PCB,&nodoPCB->PID,nodoPCB->contextoEjecucion);
@@ -195,10 +203,10 @@ void desempaquetarPCB(unsigned char *buffer,t_pcb * nodoPCB){
 
 	nodoPCB->contextoEjecucion = programa;
 
-	printf("PCB recibido: PID: %d,  Archivo: %s\n",
+	printf("PCB recibido: PID: %d,  Archivo: %s\n",nodoPCB->PID,nodoPCB->contextoEjecucion);
 
 			//nodoPCB->PID,nodoPCB->estado,nodoPCB->pc,nodoPCB->quantum,nodoPCB->contextoEjecucion);
-			nodoPCB->PID,nodoPCB->contextoEjecucion);
+
 }
 
 

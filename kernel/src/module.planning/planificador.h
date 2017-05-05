@@ -128,6 +128,7 @@ typedef struct hilo {
 
 
 int contadorPID = 0;
+pthread_mutex_t readyListMutex;
 int clientePlanificador = 0;
 int servidorPlanificador = 0;
 int socketMemoria = -1;
