@@ -1,44 +1,37 @@
 /*
- * kernelRequest.c
+ * handler-kernel.c
  *
  *  Created on: 29/4/2017
  *      Author: utnso
  */
 
-#include "handler-kernel.h"
+#include "kernelRequest.h"
 
-void handleKernel(memory_struct* memoryStruct) {
+/**
+ * esta funcion es invocada cuando se solicita generar espacio para un nuevo programa
+ */
+void startNewProcess(Package* package){
+	t_new_sourceCode_request* request = deserialize_new_sourceCode_request(package->stream);
 
-	Package* package;
-	bool running = true;
-	while (running) {
+	request->pid;
+	request->stackSize;
+	request->sourceCodeSize;
+	request->sourceCode;
 
-		package = createAndReceivePackage(memoryStruct->socketClientKernel);
-		if (package != NULL) {
-			handleKernelRequest(memoryStruct, package);
-		} else {
-			running = false;
-			logError("Kernel cerro la conexion para FD: %d",
-					memoryStruct->socketClientKernel);
-		}
-		destroyPackage(package);
-	}
 
-	close(memoryStruct->socketClientKernel);
-}
 
-void handleKernelRequest(memory_struct* newProcess, Package* package) {
+
 	/**
-	 * TODO completar con las funcionalidades que solicita el kernel
+	 *
+	 *
+	 *
+	 * reservo paginas para este proceso y respondo al kernel
+	 * 		- si pude reservar lo solicitado entonces le indico al kernel cuales fueron las paginas reservadas (lista o array de paginas)
+	 * 		- si no pude reservar devuelvo lista vacia o mejor un error x ej: COD_MEMORY_FULL
+	 *
+	 *
+	 *
 	 */
 
-	switch (package->msgCode) {
-	case COD_SAVE_NEW_PROGRAM:
-
-		break;
-	default:
-		logError("El kernel solicito una accion desconocida FD: %d Cod: %d",
-				newProcess->socketClientKernel, package->msgCode);
-		break;
-	}
+	destroy_new_sourceCode_request(request);
 }

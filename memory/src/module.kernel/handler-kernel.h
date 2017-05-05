@@ -12,6 +12,7 @@
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-memory-kernel.h>
+#include "kernelRequest.h"
 #include "../memoryClient.h"
 
 void handleKernel(memory_struct* memoryStruct);
