@@ -1,9 +1,4 @@
-
-
-
 #include "planificador.h"
-
-
 
 int planificar(int argc, char *argv[]) {
 	//pthread_mutex_init(&readyListMutex, NULL);
@@ -21,51 +16,37 @@ int planificar(int argc, char *argv[]) {
 	pthread_t thread1;
 	pthread_t thread2;
 
-	char *m1 = "consola";
 	char *m2 = "despachador";
-
-	int r1;
 	int r2;
-
-//	r1 = pthread_create( &thread1, NULL, &consola, (void*) m1); FALTA CREAR O LINKEAR CON LA CONSOLA
 	r2 = pthread_create( &thread2, NULL, &enviarPCBaMemoria, (void*) m2);
-
-	pthread_join( thread1, NULL);
 	pthread_join( thread2, NULL);
-
-	return 1;
+return 1;
 
 }
-
 
 
 void* enviarPCBaMemoria() {
 
 	sem_wait(&mutexMemoria);
 	while(1) {
-		sem_wait(&semProgramas);
+			sem_wait(&semProgramas);
 
-		if (listaDeListo->elements_count > 0) {
-			//sem_wait(sem_Memoria_conectada);
-			t_pcb * nodoPCB =  list_get(listaDeListo, 0);
+			if (listaDeListo->elements_count > 0) {
+				//sem_wait(sem_Memoria_conectada);
+				t_pcb * nodoPCB =  list_get(listaDeListo, 0);
 
-			int err = enviarMensajeDePCBaMemoria(socketMemoria, nodoPCB); //Guardo el retorno de la funcion en una var para saber si dio error
+				int err = enviarMensajeDePCBaMemoria(socketMemoria, nodoPCB); //Guardo el retorno de la funcion en una var para saber si dio error
 
 			if (err <= 0){ //Error en el envío
+
 				printf("No se pudo enviar el PCB %d",nodoPCB->PID);
-			} else { //Enviado correctamente
+			}
+			else
+			{ //Enviado correctamente
 
 				list_remove(listaDeListo, 0); //< Saca de lista ready
 
 				list_add(listaDeEjecutado,nodoPCB ); //< Se agrega a la lista de ejecucion
-/*
-				t_resp_Memoria_plan * nodoRespuesta;
-				int nbytes;
-				nodoRespuesta = malloc(sizeof(t_resp_Memoria_plan));
-				while ((nbytes = socketRecibirMensaje(socketMemoria, nodoRespuesta,sizeof(t_nodo_mem)) > 0)){
-					interpretarLinea(nodoRespuesta);
-				}//fin while recibir rta
-*/
 			}//Cierra el err
 
 		}//cierra if cantidad de elementos
@@ -98,6 +79,7 @@ void agregarALista(char * programa) {
 	list_add(listaDeListo, pcb);
 	pthread_mutex_unlock(&readyListMutex);
 	*/
+
 	list_add(listaDeListo, pcb);
 
 	int despuesDeAgregar = listaDeListo->elements_count; //Guardo cuantos hay despues..
@@ -165,23 +147,9 @@ void empaquetarPCB(unsigned char *buffer,t_pcb * nodoPCB)
 {
 	unsigned int tamanioBuffer;
 
-	/*
-	t_pcb * pcb1 = malloc(sizeof(t_pcb));
-	pcb1->PID = 0;
-	pcb1->contextoEjecucion = malloc(strlen("programa3.cod"));
-	strcpy(pcb1->contextoEjecucion,"programa3.cod");
-	pcb1->pc=3;
-	pcb1->estado=LISTO;
-	pcb1->quantum=5;
-	*/
-
 	printf("PCB a enviar: PID: %d,  Estado: %d, PC: %d, Quantum: %d, Archivo: %s\n",
 	nodoPCB->PID,nodoPCB->contextoEjecucion);
 
-	//nodoPCB->PID,nodoPCB->estado,nodoPCB->pc,nodoPCB->quantum,nodoPCB->contextoEjecucion);
-
-
-	//tamanioBuffer = pack(buffer,SECUENCIA_PCB,nodoPCB->PID,nodoPCB->estado,nodoPCB->pc,nodoPCB->quantum,nodoPCB->contextoEjecucion);
 	tamanioBuffer = pack(buffer,SECUENCIA_PCB,&nodoPCB->PID,nodoPCB->contextoEjecucion);
 
 	packi16(buffer+1, tamanioBuffer); // store packet size in packet for kicks
@@ -194,29 +162,16 @@ void empaquetarPCB(unsigned char *buffer,t_pcb * nodoPCB)
 
 void desempaquetarPCB(unsigned char *buffer,t_pcb * nodoPCB){
 
-	//t_pcb * pcb = malloc(sizeof(t_pcb));
-
 	char programa[50];
 
-//	unpack(buffer,SECUENCIA_PCB,&nodoPCB->PID,&nodoPCB->estado,&nodoPCB->pc,&nodoPCB->quantum,programa);
 	unpack(buffer,SECUENCIA_PCB,&nodoPCB->PID,programa);
 
 	nodoPCB->contextoEjecucion = programa;
 
 	printf("PCB recibido: PID: %d,  Archivo: %s\n",nodoPCB->PID,nodoPCB->contextoEjecucion);
 
-			//nodoPCB->PID,nodoPCB->estado,nodoPCB->pc,nodoPCB->quantum,nodoPCB->contextoEjecucion);
 
 }
-
-
-
-
-
-
-
-
-
 
 	/* EJEMPLO DE ENVIO / RECEPCION PARA PROBAR EN MAIN
 
@@ -239,8 +194,6 @@ void desempaquetarPCB(unsigned char *buffer,t_pcb * nodoPCB){
 	empaquetarPCB(buffer,pcb1);
 
 	puts("pcb enviado.");
-
-
 
 	t_pcb * pcb = malloc(sizeof(t_pcb));
 

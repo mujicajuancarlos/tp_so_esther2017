@@ -40,26 +40,12 @@
 
 #define SECUENCIA_PCB "hhhhs"
 
-
-
 //estados del pcb
 
 #define LISTO 1
 #define BLOQUEADO 2
 #define FINALIZADO 4
 #define EJECUTANDO 3
-
-
-
-//tipos de resuesta
-
-#define INICIAR 1
-#define LEER 2
-#define ESCRIBIR 3
-#define FINALIZAR 6
-#define ENTRADA_SALIDA 4
-#define QUANTUM_ACABADO 5
-
 
 
 /* el estado puede ser:
@@ -92,28 +78,6 @@ typedef struct NODO_MEM {
 
 } __attribute__ ((packed)) t_nodo_mem;
 
-/*
-
-typedef struct NODO_RTA_Memoria_PLAN {
-
-	uint32_t tipo;
-
-	uint32_t exito;
-
-	uint32_t valor;
-
-	uint32_t idMemoria;
-
-	uint32_t PID;
-
-	uint32_t pc;
-
-
-
-} __attribute__ ((packed)) t_resp_Memoria_plan;
-
-*/
-
 typedef struct hilo {
 
 	pthread_t thread;
@@ -122,10 +86,6 @@ typedef struct hilo {
 	int  r;
 
 } t_hilos;
-
-
-
-
 
 int contadorPID = 0;
 pthread_mutex_t readyListMutex;
@@ -138,10 +98,9 @@ char comando[100];
 int quantumcfg = 0;
 
 
-
 //void levantarCfg();
 
-void* consola();
+//void* consola();
 
 //int programaValido(char * programa);
 
@@ -149,21 +108,17 @@ void agregarALista(char * programa);
 
 void* enviarPCBaMemoria();
 
-//void interpretarLinea(t_resp_Memoria_plan * nodoRespuesta);
-
-static t_hilos *hilo_create(pthread_t thread, char * m, int  r);
-
-static t_pcb *pcb_create(int PID, char * contextoDeEjecucion);
-
 int enviarMensajeDePCBaMemoria(int socketMemoria, t_pcb * nodoPCB);
-
-
 
 void empaquetarPCB(unsigned char *buffer,t_pcb * nodoPCB);
 
-
 void desempaquetarPCB(unsigned char *buffer,t_pcb * nodoPCB);
 
+//void interpretarLinea(t_resp_Memoria_plan * nodoRespuesta);
+
+//static t_hilos *hilo_create(pthread_t thread, char * m, int  r);
+
+//static t_pcb *pcb_create(int PID, char * contextoDeEjecucion);
 
 
 t_list * listaDeListo;
@@ -173,9 +128,6 @@ t_list * listaDeBloqueado;
 t_list * listaDeEjecutado;
 
 t_list * listaDeHilos;
-
-//t_log * archivoLog;
-
 
 
 #endif
