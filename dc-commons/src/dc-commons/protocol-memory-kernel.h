@@ -8,6 +8,10 @@
 #ifndef SRC_DC_COMMONS_PROTOCOL_MEMORY_KERNEL_H_
 #define SRC_DC_COMMONS_PROTOCOL_MEMORY_KERNEL_H_
 
+#include <stdint.h>
+#include <stddef.h>
+#include <string.h>
+#include <stdlib.h>
 //prefijo = KC ; between 400 - 499
 
 #define COD_HANDSHAKE_KERNEL 400
@@ -19,6 +23,25 @@
 
 /**
  * todo seguir definiendo
+ */
+
+
+/**
+ * Estructuras y funciones recervar paginas para un nuevo proceso
+ */
+typedef struct {
+	uint32_t pid;
+	uint32_t stackSize;
+	uint32_t sourceCodeSize;
+	char* sourceCode;
+} t_new_sourceCode_request;
+t_new_sourceCode_request* create_new_sourceCode_request(uint32_t pid, uint32_t stackSize, uint32_t sourceCodeSize, char* sourceCode);
+void destroy_new_sourceCode_request(t_new_sourceCode_request* request);
+size_t size_new_sourceCode_request(t_new_sourceCode_request* request);
+char* serialize_new_sourceCode_request(t_new_sourceCode_request* request);
+t_new_sourceCode_request* deserialize_new_sourceCode_request(char* stream);
+/**
+ * FIN
  */
 
 #endif /* SRC_DC_COMMONS_PROTOCOL_MEMORY_KERNEL_H_ */
