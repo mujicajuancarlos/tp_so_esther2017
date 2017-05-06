@@ -3,6 +3,7 @@
 	<name>console</name>
 	<comment></comment>
 	<projects>
+		<project>dc-commons</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
