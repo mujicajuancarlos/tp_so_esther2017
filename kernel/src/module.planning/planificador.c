@@ -34,8 +34,8 @@ void* enviarPCBaMemoria() {
 			if (listaDeListo->elements_count > 0) {
 				//sem_wait(sem_Memoria_conectada);
 				t_pcb * nodoPCB =  list_get(listaDeListo, 0);
-
-				int err = enviarMensajeDePCBaMemoria(socketMemoria, nodoPCB); //Guardo el retorno de la funcion en una var para saber si dio error
+				int err;
+				// err = enviarMensajeDePCBaMemoria(socketMemoria, nodoPCB); //Guardo el retorno de la funcion en una var para saber si dio error
 
 			if (err <= 0){ //Error en el envío
 

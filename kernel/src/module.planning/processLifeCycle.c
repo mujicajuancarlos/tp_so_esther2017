@@ -15,9 +15,44 @@ pthread_mutex_t blockListMutex;
 
 t_planningStates* states;
 
+void sendToREADY(Process* process) {
+	pthread_mutex_lock(&readyListMutex);
+	queue_push(states->ready , process);
+	pthread_mutex_unlock(&readyListMutex);
+	logTrace("El proceso %d ingresó a la lista de READY", process->pid);
+}
+
+void sendToEXEC(Process* process) {
+	pthread_mutex_lock(&executeListMutex);
+	list_add(states->execute, process);
+	pthread_mutex_unlock(&executeListMutex);
+	logTrace("El proceso %d ingresó a la lista de EXECUTE", process->pid);
+}
+
+void sendToBLOCK(Process* process) {
+	pthread_mutex_lock(&blockListMutex);
+	queue_push(states->block, process);
+	pthread_mutex_unlock(&blockListMutex);
+	logTrace("El proceso %d ingresó a la lista de BLOCK", process->pid);
+}
+
+void sendToEXIT(Process* process) {
+	pthread_mutex_lock(&exitListMutex);
+	queue_push(states->exit, process);
+	pthread_mutex_unlock(&exitListMutex);
+	logTrace("El proceso %d ingresó a la lista de EXIT", process->pid);
+}
+
+void sendToNEW(Process* process) {
+	pthread_mutex_lock(&newListMutex);
+	queue_push(states->exit, process);
+	pthread_mutex_unlock(&newListMutex);
+	logTrace("El proceso %d ingresó a la lista de NEW", process->pid);
+}
+
 void initializeProcessLifeCycle() {
 
-	logTrace("Inicializando Estados del Planificador");
+	logTrace("Inicializando t_planningStates del Planificador");
 	states = malloc(sizeof(t_planningStates));
 
 	states->execute = list_create();

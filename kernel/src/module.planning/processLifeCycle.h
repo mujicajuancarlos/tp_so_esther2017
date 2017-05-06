@@ -13,6 +13,7 @@
 #include <pthread.h>
 #include <commons/collections/queue.h>
 #include <dc-commons/logger.h>
+#include "../module.model/process.h"
 
 
 typedef struct {
