@@ -61,10 +61,11 @@ PCB* deserialize_PCB(char* stream);
 
 // t_stack_program
 t_stack_program* create_new_stack();
-void destroy_stack(t_stack_program* stack);
-char* serialize_stack(t_stack_program* stack);
-uint32_t sizeOf_stack(t_stack_program* stack);
-t_stack_program* deserialize_stack(char* stream);
+void destroy_stackIndex(t_stack_program* contexto, uint32_t context_len);
+char* serialize_stack(t_stack_program** contextos, uint32_t contextos_length);
+//uint32_t sizeOf_stack(t_stack_program* stack);
+t_stack_program* deserialize_stack(char* stream,uint32_t contextos_length);
+uint32_t getLong_stack(t_stack_program* contextos, uint32_t contextos_length);
 //******************************************
 
 // t_variable
@@ -73,6 +74,12 @@ t_stack_program* deserialize_stack(char* stream);
 //char* serialize_variable(t_variable* variable);
 //uint32_t sizeOf_variable(t_variable* variable);
 //t_variable* deserialize_variable(char* stream);
+char* serializar_array_variables(t_variable** variables, uint32_t len);
+t_variable* deserializar_array_variables(char* stream, uint32_t len);
 //******************************************
-
+void crearNuevoContexto(PCB* pcb);
+void destruirContextoActual(PCB* pcb, int size_pagina);
+char* serializar_contexto(t_stack_program* contexto);
+uint32_t getLong_contexto(t_stack_program* contexto);
+t_stack_program* deserializar_contexto(char* stream);
 #endif /* SRC_DC_COMMONS_PROTOCOL_KERNEL_CPU_H_ */
