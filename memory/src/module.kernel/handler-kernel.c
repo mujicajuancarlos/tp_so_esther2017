@@ -34,7 +34,7 @@ void handleKernelRequest(memory_struct* newProcess, Package* package) {
 
 	switch (package->msgCode) {
 	case COD_SAVE_NEW_PROGRAM:
-		startNewProcess(package);
+		startNewProcess(package, newProcess);
 		break;
 	default:
 		logError("El kernel solicito una accion desconocida FD: %d Cod: %d",

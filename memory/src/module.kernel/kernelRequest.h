@@ -10,7 +10,8 @@
 
 #include <dc-commons/package.h>
 #include <dc-commons/protocol-memory-kernel.h>
+#include "../memoryStruct.h"
 
-void startNewProcess(Package* package);
+void startNewProcess(Package* package, memory_struct* memoryStruct);
 
 #endif /* MODULE_KERNEL_KERNELREQUEST_H_ */
