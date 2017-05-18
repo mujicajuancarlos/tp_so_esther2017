@@ -42,67 +42,58 @@ void startNewProcess(Package* package, memory_struct* memoryStruct){
 	destroy_new_sourceCode_request(request);
 }
 
-/* devuelve el numero de pagina global (el que figura en la tabla de referencias), para
- * un proceso y pagina de proceso especificados. devuelve -1 si no existe la pagina de
- * proceso buscada*/
-int getGlobalMemoryPage (memory_struct* memoryStruct, int processId, int processPage) {
-	int globalPage;
-	for (globalPage = 0; globalPage < list_size (memoryStruct->referenceTable); globalPage++) {
-		table_element *element = (table_element *) list_get (memoryStruct->referenceTable, globalPage);
-		if ((element->pid == processId) && (element->procPage == processPage))
-			return (globalPage);
+/* devuelve la pagina global*/
+memory_page *getGlobalMemoryPage (memory_struct* memoryStruct, int processId, int processPage) {
+
+	t_list* thisProcessPages;
+	thisProcessPages = list_create ();
+
+	bool *onlyThisProcess (memory_page *page) {
+			return (page->pid == processId);
 	}
+
+	thisProcessPages = list_filter (memoryStruct->referenceTable, onlyThisProcess);
+
+	bool *onlyThisPage (memory_page *page) {
+		return (page->procPage == processPage);
+	}
+
+	return ((memory_page*) list_find (thisProcessPages, onlyThisPage));
+}
+
+
+/* le agrego una pagina nueva de memoria para el proceso especificado. devuelve -1 si no habia espacio para pagina nueva, o 0 si se añadio
+ * correctamente */
+int newMemoryPage (memory_struct* memoryStruct, int processId, int processPage) {
+	int i;
+	for (i = 0; i < list_size (memoryStruct->referenceTable); i++) {
+		memory_page *newPage;
+		newPage = list_get (memoryStruct->referenceTable, i);
+		if (newPage->isFree) {
+			newPage->pid = processId;
+			newPage->procPage = processPage;
+			newPage->isFree = false;
+			list_replace (memoryStruct->referenceTable, i, newPage);
+			return 0;
+		}
+	}
+
+	// si el ciclo termino significa que no había espacio, debería volver algun error
 	return (-1);
 }
 
-/* devuelve la dirección de memoria donde comienza una pagina */
-void *getPageAddress (memory_struct* memoryStruct, int processId, int processPage) {
-	int globalPage = getGlobalMemoryPage (memoryStruct, processId, processPage);
-
-	if (globalPage == -1)
-		return (NULL);
-	else
-		return (memoryStruct->memory + globalPage * memoryStruct->pageSize);
-}
-
-// hay espacio en memoria para pagina nueva?
-bool spaceForNewPage (memory_struct* memoryStruct) {
-	int last = list_size (memoryStruct->referenceTable) + 1;
-	if ((last * memoryStruct->pageSize) >= (memoryStruct->memorySize))
-		return false;
-	else
-		return true;
-}
-
-/* le agrego una pagina nueva de memoria para el proceso especificado. devuelve -1 si no habia espacio para pagina nueva, o el
- * numero de pagina global si se añadio correctamente */
-int newMemoryPage (memory_struct* memoryStruct, int processId, int processPage) {
-	if (!spaceForNewPage (memoryStruct))
-		return (-1);
-
-	// lo agrego a la tabla de referencias
-	table_element *newElement = malloc (sizeof (table_element));
-	newElement->pid = processId;
-	newElement->procPage = processPage;
-	newElement->globPage = list_size (memoryStruct->referenceTable);
-	list_add (memoryStruct->referenceTable, (table_element*) newElement);
-
-	// devuelvo el indice global
-	return (newElement->globPage);
-}
-
-
-/* se mandó a escribir de esta dirección */
+/* se mandó a escribir a esta dirección */
 void processWrite (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset) {
-
-	void *memAddress = getPageAddress (memoryStruct, processId, processPage) + offset;
+	memory_page *globalPage = getGlobalMemoryPage (memoryStruct, processId, processPage);
+	void *memAddress =  globalPage->startAddress + offset;
 
 	/* aquí ya estaríamos ubicados en la dirección donde se nos manda a escribir */
 }
 
 /* se mandó a leer de esta dirección */
 void processRead (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset) {
-	void *memAddress = getPageAddress (memoryStruct, processId, processPage) + offset;
+	memory_page *globalPage = getGlobalMemoryPage (memoryStruct, processId, processPage);
+	void *memAddress = globalPage->startAddress + offset;
 
 	/* aquí comenzaría el dato que se pide leer*/
 
@@ -110,4 +101,33 @@ void processRead (memory_struct* memoryStruct, int processId, int processPage, u
 
 void memoryDump () {
 	/* dump de memoria */
+}
+
+void assignNewPages (memory_struct* memoryStruct, int processId, int pages) {
+	/* asigno paginas nuevas a un proceso si me pide el kernel*/
+	t_list* myProcessPages;
+	myProcessPages = list_create ();
+
+	bool *onlyThisProcess (memory_page *page) {
+		return (page->pid == processId);
+	}
+
+	myProcessPages = list_filter (memoryStruct->referenceTable, onlyThisProcess);
+
+	if (list_is_empty (myProcessPages)) {
+		// significa que no existe ese pid
+	}
+
+	int maxPage = list_size (myProcessPages);
+	int i;
+
+	for (i = 0; i < pages; i++) {
+		if (newMemoryPage (memoryStruct, processId, maxPage++) == -1)
+			return; // devolver error porque no hay espacio para pagina nueva
+	}
+	// si el ciclo termina entonces las paginas se agregaron con exito
+}
+
+void endProcess () {
+	/* se deberían liberar las páginas que ocupaba el proceso */
 }
