@@ -12,16 +12,13 @@
 #include <stdint.h>
 #include "configuration.h"
 
-typedef struct table_element {
+typedef struct memory_page {
+	void* startAddress;
 	int pid;
 	int procPage;
 	int globPage;
-} table_element;
-
-typedef struct __attribute__((packed)) heap_meta_data {
-	uint32_t size;
 	bool isFree;
-} heap_meta_data;
+} memory_page;
 
 typedef struct memory_struct {
 	int socketServer;
