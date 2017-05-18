@@ -6,25 +6,21 @@
  */
 
 #include "consoleRequests.h"
+#include <dc-commons/protocol-memory-kernel.h>
+
 
 /**
  * Se ejecuta cuando la consola envia el package con codigo COD_KC_RUN_PROGRAM_REQUEST
  * Debo enviarle a la consola el pid si se pudo iniciar el proceso, o un cod de error si fallo
  *
  */
+
 void startNewProcess(Process* process, Package* package) {
 
 	Package* tmpPackage;
 	char* tmpStream;
 	bool hasError = false;
 
-	//TODO creacion del PCB
-	//PCB* newPCB = buildNewPCB(process,package);
-
-	process->pid = getNextPID();
-
-	logInfo("Generando la metadata para el proceso %d", process->pid);
-	t_metadata_program* metadata = metadata_desde_literal(package->stream); //TODO probrar si alcanza con el stream, si no funciona hay que agregarle un \0
 
 	logInfo("Enviando codigo ansisop del proceso %d a la memoria",
 			process->pid);
@@ -50,6 +46,17 @@ void startNewProcess(Process* process, Package* package) {
 					"Memoria indico que el codigo ansisop para el proceso %d fue exitoso",
 					process->pid);
 			destroyPackage(tmpPackage);
+
+			process->pid = getNextPID();
+
+		logInfo("Generando la metadata para el proceso %d", process->pid);
+		t_metadata_program* metadata = metadata_desde_literal(package->stream); //TODO probrar si alcanza con el stream, si no funciona hay que agregarle un \0
+
+		//TODO creacion del PCB
+		//VERIFICAR
+		PCB* newPCB = create_new_PBC(process->pid,0,metadata);
+		//Y LUEGO QUE?
+
 		} else {
 			logError(
 					"Memoria indico que el codigo ansisop para el proceso %d no se pudo procesar",
@@ -75,8 +82,12 @@ void startNewProcess(Process* process, Package* package) {
 		tmpPackage = createAndSendPackage(process->fileDescriptor,
 		COD_KC_RUN_PROGRAM_RESPONSE, sizeof(int), tmpStream);
 		//TODO MOVER EL PROCESO AL ESTADO READY
+		//VERIFICAR
+		//sendToREADY(process);
 	}
 
 	free(tmpPackage);
 	destroyPackage(package);
 }
+
+

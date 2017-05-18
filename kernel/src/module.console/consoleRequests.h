@@ -16,6 +16,7 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/serialization.h>
 #include <dc-commons/protocol-kernel-console.h>
+#include <dc-commons/protocol-kernel-cpu.h>
 #include <dc-commons/protocol-memory-kernel.h>
 #include "../module.model/process.h"
 
