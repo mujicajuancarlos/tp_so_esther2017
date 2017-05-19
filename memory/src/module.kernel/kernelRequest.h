@@ -14,4 +14,16 @@
 
 void startNewProcess(Package* package, memory_struct* memoryStruct);
 
+void startNewProcessTest (int processId, int stackSize, int sourceCodeSize, memory_struct* memoryStruct);
+
+void assignNewPages (memory_struct* memoryStruct, int processId, int pages);
+
+void processWrite (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset, uint32_t size);
+
+void processRead (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset, uint32_t size);
+
+void memoryDump (); // NO DEBERÍA ESTAR ACA PORQUE ES UNA FUNCION DE LA CONSOLA DE LA MEMORIA
+
+void endProcess (memory_struct *memoryStruct, int processId, int processPage);
+
 #endif /* MODULE_KERNEL_KERNELREQUEST_H_ */

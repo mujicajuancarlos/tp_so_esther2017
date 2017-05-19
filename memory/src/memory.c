@@ -9,6 +9,7 @@
  */
 
 #include "memory.h"
+#include "module.kernel/kernelRequest.h" // BORRAR LÍNEA UNA VEZ SE TERMINE DE DEBBUGEAR EN MEMORIA //
 
 memory_struct memoryStruct;
 
@@ -61,8 +62,8 @@ void initializeStruct(memory_struct* memoryStruct, Configuration* config) {
 
 	int i;
 	int totalPages = memoryStruct->memorySize / memoryStruct->pageSize;
-	for (i = 0; i < 200; i++) {
-		memory_page *p;
+	for (i = 0; i < totalPages; i++) {
+		memory_page *p = malloc (sizeof (memory_page));
 		p->globPage = i;
 		p->isFree = true;
 		p->pid = 0;
@@ -70,4 +71,6 @@ void initializeStruct(memory_struct* memoryStruct, Configuration* config) {
 		p->startAddress = memoryStruct->memory + memoryStruct->pageSize * i;
 		list_add (memoryStruct->referenceTable, p);
 	}
+
+	startNewProcessTest (1, 2, 1000, memoryStruct);
 }

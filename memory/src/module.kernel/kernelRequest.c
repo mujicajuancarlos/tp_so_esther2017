@@ -17,29 +17,28 @@ void startNewProcess(Package* package, memory_struct* memoryStruct){
 	request->sourceCodeSize;
 	request->sourceCode;
 
-	int index = 0;
-	uint32_t totalSize = request->sourceCodeSize + (request->stackSize * memoryStruct->pageSize);
+	/* en realidad aca hay una cuenta que debería estar haciendo el kernel. kernel debería simplementer informar el numero de paginas que quiere
+	 * ya sean stack, heap... a la memoria no le interesa para que las va a usar, para la memoria todas las paginas son iguales */
 
+	int index = 0;
+	int totalSize = request->sourceCodeSize + request->stackSize * memoryStruct->pageSize;
 	while (totalSize > 0) {
 		if (newMemoryPage (memoryStruct, request->pid, index++) == -1)
 			return; // devolver error porque no hay espacio para pagina nueva
-		else
-			totalSize-= memoryStruct->pageSize;
+		totalSize-= memoryStruct->pageSize;
 	}
 
-	/**
-	 *
-	 *
-	 *
-	 * reservo paginas para este proceso y respondo al kernel
-	 * 		- si pude reservar lo solicitado entonces vuelve a la función que la llamo
-	 * 		- si no pude reservar devuelvo un error x ej: COD_MEMORY_FULL
-	 *
-	 *
-	 *
-	 */
-
 	destroy_new_sourceCode_request(request);
+}
+
+void startNewProcessTest (int processId, int stackSize, int sourceCodeSize, memory_struct* memoryStruct) {
+	int index = 0;
+	int totalSize = sourceCodeSize + stackSize * memoryStruct->pageSize;
+	while (totalSize > 0) {
+		if (newMemoryPage (memoryStruct, processId, index++) == -1)
+			return; // devolver error porque no hay espacio para pagina nueva
+		totalSize-= memoryStruct->pageSize;
+	}
 }
 
 /* devuelve la pagina global*/
@@ -47,15 +46,14 @@ memory_page *getGlobalMemoryPage (memory_struct* memoryStruct, int processId, in
 
 	t_list* thisProcessPages;
 	thisProcessPages = list_create ();
-
-	bool *onlyThisProcess (memory_page *page) {
-			return (page->pid == processId);
+	bool onlyThisProcess (memory_page page) {
+			return (page.pid == processId);
 	}
 
 	thisProcessPages = list_filter (memoryStruct->referenceTable, onlyThisProcess);
 
-	bool *onlyThisPage (memory_page *page) {
-		return (page->procPage == processPage);
+	bool onlyThisPage (memory_page page) {
+		return (page.procPage == processPage);
 	}
 
 	return ((memory_page*) list_find (thisProcessPages, onlyThisPage));
@@ -83,20 +81,31 @@ int newMemoryPage (memory_struct* memoryStruct, int processId, int processPage) 
 }
 
 /* se mandó a escribir a esta dirección */
-void processWrite (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset) {
+void processWrite (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset, uint32_t size) {
 	memory_page *globalPage = getGlobalMemoryPage (memoryStruct, processId, processPage);
-	void *memAddress =  globalPage->startAddress + offset;
+	char *memAddress =  globalPage->startAddress + offset;
 
-	/* aquí ya estaríamos ubicados en la dirección donde se nos manda a escribir */
+	/* este en realidad seria un array de chars que recibo */
+	char data [size];
+	int i;
+	for (i = 0; i < size; i++)
+		memAddress[i] = data[i];
+
+	// cuando el ciclo termine se transcribió el dato completo
 }
 
 /* se mandó a leer de esta dirección */
-void processRead (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset) {
+void processRead (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset, uint32_t size) {
 	memory_page *globalPage = getGlobalMemoryPage (memoryStruct, processId, processPage);
-	void *memAddress = globalPage->startAddress + offset;
+	char *memAddress = globalPage->startAddress + offset;
 
-	/* aquí comenzaría el dato que se pide leer*/
+	char data [size];
+	int i;
+	for (i = 0;i < size; i++)
+		data[i] = memAddress[i];
 
+	/* este es un arreglo de char que le tengo que poder mandar al kernel como respuesta
+	 * el kernel despues sabiendo el tipo hace: type *variableName = (type*) arrayRecibido; */
 }
 
 void memoryDump () {
@@ -108,8 +117,8 @@ void assignNewPages (memory_struct* memoryStruct, int processId, int pages) {
 	t_list* myProcessPages;
 	myProcessPages = list_create ();
 
-	bool *onlyThisProcess (memory_page *page) {
-		return (page->pid == processId);
+	bool onlyThisProcess (memory_page page) {
+		return (page.pid == processId);
 	}
 
 	myProcessPages = list_filter (memoryStruct->referenceTable, onlyThisProcess);
@@ -128,6 +137,27 @@ void assignNewPages (memory_struct* memoryStruct, int processId, int pages) {
 	// si el ciclo termina entonces las paginas se agregaron con exito
 }
 
-void endProcess () {
-	/* se deberían liberar las páginas que ocupaba el proceso */
+void freePage (memory_page* page) {
+	page->pid = 0;
+	page->isFree = true;
+	page->procPage = 0;
+}
+
+void endProcess (memory_struct *memoryStruct, int processId, int processPage) {
+	/* si terminamos un proceso, las paginas que utilizaba se vuelven a poner como disponibles para utilizar */
+	t_list* thisProcessPages;
+	thisProcessPages = list_create ();
+
+	bool onlyThisProcess (memory_page page) {
+			return (page.pid == processId);
+	}
+
+	thisProcessPages = list_filter (memoryStruct->referenceTable, onlyThisProcess);
+
+	if (list_size (thisProcessPages) > 0) {
+		int i;
+		for (i = 0; i < list_size (thisProcessPages); i++)
+			freePage ((memory_page*) list_get (thisProcessPages, i));
+	}
+
 }
