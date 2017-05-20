@@ -144,7 +144,7 @@ char* serialize_stack(t_stack_program** contextos, uint32_t contextos_length) {
 		uint32_t total_size = getLong_stack(aux_contextos, contextos_length);
 		char *stream = malloc(sizeof(char)*total_size);
 
-		int offset = 0;
+		uint32_t offset = 0;
 
 		int i;
 		for (i = 0; i < contextos_length; i++) {
@@ -160,7 +160,7 @@ char* serialize_stack(t_stack_program** contextos, uint32_t contextos_length) {
 
 t_stack_program* deserialize_stack(char* stream, uint32_t contextos_length) {
 	//t_stack_program* stack = malloc(sizeof(stack));
-	int offset = 0;
+	uint32_t offset = 0;
 
 		//t_stack_program* contextos = NULL;
 		t_stack_program* contextos = malloc(sizeof(t_stack_program)*contextos_length);
@@ -227,7 +227,7 @@ char* serializar_contexto(t_stack_program* contexto){
 	uint32_t total_size = getLong_contexto(contexto);
 	char *stream = malloc(sizeof(char)*total_size);
 
-	int offset = 0;
+	uint32_t offset = 0;
 
 	//cantidad de argumentos
 	serialize_and_copy_value(stream,&(contexto->arg_len),sizeof(uint32_t),&offset);
@@ -258,7 +258,7 @@ char* serializar_contexto(t_stack_program* contexto){
 
 t_stack_program* deserializar_contexto(char* stream){
 	t_stack_program* context = malloc(sizeof(t_stack_program));
-	int offset = 0;
+	uint32_t offset = 0;
 
 	//cantidad de argumentos
 	deserialize_and_copy_value(&(context->arg_len),stream,sizeof(uint32_t),&offset);
@@ -306,7 +306,7 @@ char* serializar_array_variables(t_variable** variables, uint32_t len){
 	char *stream = malloc(sizeof(t_variable)*len);
 	t_variable* aux_variables = *variables;
 
-	int offset = 0;
+	uint32_t offset = 0;
 
 	int i;
 	for (i = 0; i < len; i++) {
@@ -319,7 +319,7 @@ char* serializar_array_variables(t_variable** variables, uint32_t len){
 }
 
 t_variable* deserializar_array_variables(char* stream, uint32_t len){
-	int offset = 0;
+	uint32_t offset = 0;
 
 	t_variable* variables = NULL;
 	int i;
