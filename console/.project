@@ -24,11 +24,4 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>dc-commons</name>
-			<type>2</type>
-			<location>/home/utnso/Desarrollo/workspace/deathCoders/dc-commons/src/dc-commons</location>
-		</link>
-	</linkedResources>
 </projectDescription>
