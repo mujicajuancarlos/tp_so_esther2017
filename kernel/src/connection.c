@@ -55,9 +55,10 @@ void createMemoryClientSocket(kernel_struct* kernel_struct) {
 		if(package != NULL && package->msgCode == COD_GET_IDENTIFICATION){
 			destroyPackage(package);
 			package = createAndSendPackage(kernel_struct->socketClientMemoria, COD_HANDSHAKE_KERNEL, 0 , NULL);
-			if(package != NULL)
+			if(package != NULL){
 				destroyPackage(package);
-			else {
+				loadMemoryPageSize(kernel_struct); //con esta instruccion voy a solicitar el tamaño de pagina a la memoria
+			}else {
 				logError("No se pudo completar el handshake con la memoria");
 				kernel_struct->socketClientMemoria = -1;
 			}

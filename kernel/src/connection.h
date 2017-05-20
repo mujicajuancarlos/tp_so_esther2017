@@ -15,6 +15,7 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-memory-identification.h>
 #include <dc-commons/protocol-memory-kernel.h>
+#include "module.memory/memoryManager.h"
 #include "kernelStruct.h"
 
 void createCpuServerSocket(kernel_struct* args);

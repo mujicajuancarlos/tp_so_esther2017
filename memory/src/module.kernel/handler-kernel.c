@@ -27,18 +27,21 @@ void handleKernel(memory_struct* memoryStruct) {
 	close(memoryStruct->socketClientKernel);
 }
 
-void handleKernelRequest(memory_struct* newProcess, Package* package) {
+void handleKernelRequest(memory_struct* memory_struct, Package* package) {
 	/**
 	 * TODO completar con las funcionalidades que solicita el kernel
 	 */
 
 	switch (package->msgCode) {
 	case COD_SAVE_NEW_PROGRAM:
-		startNewProcess(package, newProcess);
+		startNewProcess(package, memory_struct);
+		break;
+	case COD_PAGE_SIZE_REQUEST:
+		sendPageSize(memory_struct);
 		break;
 	default:
 		logError("El kernel solicito una accion desconocida FD: %d Cod: %d",
-				newProcess->socketClientKernel, package->msgCode);
+				memory_struct->socketClientKernel, package->msgCode);
 		break;
 	}
 }

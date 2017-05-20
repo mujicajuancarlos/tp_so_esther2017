@@ -23,6 +23,7 @@ typedef struct kernel_struct {
 	int socketClientFileSystem;
 	int cpuSockets[MAX_CPUS];
 	int consolaSockets[MAX_CONSOLAS];
+	int pageSize;
 	pthread_mutex_t stdoutMutex;
 	pthread_mutex_t cpuListMutex;
 	pthread_mutex_t processListMutex;

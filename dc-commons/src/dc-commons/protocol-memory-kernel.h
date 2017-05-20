@@ -18,6 +18,8 @@
 
 #define COD_SAVE_NEW_PROGRAM 401 //para almacenar el cod ansisop
 #define COD_SAVE_NEW_PROGRAM_OK 402 //respuesta ok para el cod COD_SAVE_NEW_PROGRAM
+#define COD_PAGE_SIZE_REQUEST 403 //para solicitar el tamaño de pagina
+#define COD_PAGE_SIZE_RESPONSE 404 //para devolver el tmaño de pagina
 
 #define COD_MEMORY_FULL 409 //indica que no hay mas espacio
 
