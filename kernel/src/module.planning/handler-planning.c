@@ -7,8 +7,13 @@
 
 #include "handler-planning.h"
 
-void handlePlanning(kernel_struct *args) {
+void handlePlanning(kernel_struct *kernel_struct) {
+
+	initializeProcessLifeCycle();
 
 	//nada por ahora
 	for(;;);
+
+
+	destroyProcessLifeCycle();
 }
