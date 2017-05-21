@@ -7,80 +7,75 @@
 
 #include "protocol-memory-kernel.h"
 
-/**
- * funciones recervar paginas para un nuevo proceso
- */
-t_new_sourceCode_request* create_new_sourceCode_request(uint32_t pid,
-		uint32_t stackSize, uint32_t sourceCodeSize, char* sourceCode) {
-	t_new_sourceCode_request* request = calloc(1,
-			sizeof(t_new_sourceCode_request));
-	size_t sizeBuffer = (sizeof(char) * sourceCodeSize);
-	request->sourceCode = calloc(1, sizeBuffer);
-	memcpy(request->sourceCode, sourceCode, sizeBuffer);
-	request->pid = pid;
-	request->stackSize = stackSize;
-	request->sourceCodeSize = sourceCodeSize;
-	return request;
+size_t sizeof_t_AddPagesToProcess(){
+	return (sizeof(uint32_t) * 2);
 }
-void destroy_new_sourceCode_request(t_new_sourceCode_request* request) {
-	if (request != NULL) {
-		if (request->sourceCode != NULL)
-			free(request->sourceCode);
-		free(request);
-	}
+size_t sizeof_t_GetPageBytes(){
+	return (sizeof(uint32_t) * 4);
 }
-size_t size_new_sourceCode_request(t_new_sourceCode_request* request) {
-	size_t total;
-	total = sizeof(uint32_t) * 3;
-	if (request->sourceCode != NULL)
-		total += sizeof(char) * request->sourceCodeSize;
-	return total;
+
+t_AddPagesToProcess* create_t_AddPagesToProcess(int pid, int size){
+	t_AddPagesToProcess* object = malloc(sizeof_t_AddPagesToProcess());
+	object->pid = pid;
+	object->size = size;
+	return object;
 }
-char* serialize_new_sourceCode_request(t_new_sourceCode_request* request) {
-	char *stream = calloc(1, size_new_sourceCode_request(request));
 
-	int offset = 0;
-	size_t size_to_copy = sizeof(uint32_t);
+char* serialize_t_SetPageBytes(t_SetPageBytes* object) {
+	char *stream = malloc(sizeof_t_SetPageBytes(object));
+	uint32_t offset = 0;
 
-	memcpy(stream + offset, &(request->pid), size_to_copy);
-	offset += size_to_copy;
-
-	memcpy(stream + offset, &(request->stackSize), size_to_copy);
-	offset += size_to_copy;
-
-	memcpy(stream + offset, &(request->sourceCodeSize), size_to_copy);
-	offset += size_to_copy;
-
-	if (request->sourceCodeSize > 0) {
-		size_to_copy = sizeof(char) * request->sourceCodeSize;
-		memcpy(stream + offset, request->sourceCode, size_to_copy);
-	}
+	serialize_and_copy_value(stream, &(object->pid), sizeof(uint32_t), &offset);
+	serialize_and_copy_value(stream, &(object->pageNumber), sizeof(uint32_t),
+			&offset);
+	serialize_and_copy_value(stream, &(object->offset), sizeof(uint32_t),
+			&offset);
+	serialize_and_copy_value(stream, &(object->size), sizeof(uint32_t),
+			&offset);
+	serialize_and_copy_value(stream, &(object->buffer),
+			sizeof(char) * object->size, &offset);
 
 	return stream;
 }
-t_new_sourceCode_request* deserialize_new_sourceCode_request(char* stream) {
 
-	t_new_sourceCode_request* request = calloc(1,
-			sizeof(t_new_sourceCode_request));
-	int offset = 0;
-	size_t size_to_copy = sizeof(uint32_t);
+t_SetPageBytes* deserialize_t_SetPageBytes(char* stream) {
+	t_SetPageBytes* object = malloc(sizeof(t_SetPageBytes));
+	uint32_t offset = 0;
 
-	//char *buffer = malloc(buffer_size);
+	deserialize_and_copy_value(&(object->pid), stream, sizeof(uint32_t),
+			&offset);
+	deserialize_and_copy_value(&(object->pageNumber), stream, sizeof(uint32_t),
+			&offset);
+	deserialize_and_copy_value(&(object->offset), stream, sizeof(uint32_t),
+			&offset);
+	deserialize_and_copy_value(&(object->size), stream, sizeof(uint32_t),
+			&offset);
 
-	memcpy(&(request->pid), stream + offset, size_to_copy);
-	offset += size_to_copy;
+	size_t sizeBuffer = (sizeof(char) * object->size);
+	object->buffer = calloc(1, sizeBuffer);
+	deserialize_and_copy_value(&(object->buffer), stream,
+			sizeof(char) * object->size, &offset);
 
-	memcpy(&(request->stackSize), stream + offset, size_to_copy);
-	offset += size_to_copy;
+	return object;
+}
 
-	memcpy(&(request->sourceCodeSize), stream + offset, size_to_copy);
-	offset += size_to_copy;
+size_t sizeof_t_SetPageBytes(t_SetPageBytes* object) {
+	return (sizeof(uint32_t) * 4) + sizeof(char) * object->size;
+}
 
-	if (request->sourceCodeSize > 0) {
-		size_to_copy = sizeof(char) * request->sourceCodeSize;
-		request->sourceCode = calloc(1, size_to_copy);
-		memcpy(request->sourceCode, stream + offset, size_to_copy);
+t_SetPageBytes* create_t_SetPageBytes(uint32_t size, char* buffer) {
+	t_SetPageBytes* object = malloc(sizeof(t_SetPageBytes));
+	object->size = size;
+	size_t sizeBuffer = (sizeof(char) * size);
+	object->buffer = calloc(1, sizeBuffer);
+	memcpy(object->buffer, buffer, sizeBuffer);
+	return object;
+}
+
+void destroy_t_SetPageBytes(t_SetPageBytes* object) {
+	if (object != NULL) {
+		if (object->buffer != NULL)
+			free(object->buffer);
+		free(object);
 	}
-
-	return request;
 }

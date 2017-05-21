@@ -12,6 +12,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdlib.h>
+#include "serialization.h"
 //prefijo = KC ; between 400 - 499
 
 #define COD_HANDSHAKE_KERNEL 400
@@ -35,7 +36,7 @@
 
 /*
  * Solicitar bytes de una página
- *	Parámetros: [Identificador del Programa] [Páginas requeridas]
+ *	Parámetros: [Identificador del Programa], [#página], [offset] y [tamaño]
  */
 #define COD_GET_PAGE_BYTES_REQUEST 405
 #define COD_GET_PAGE_BYTES_RESPONSE 406
@@ -62,32 +63,37 @@
 #define COD_END_PROCESS_RESPONSE 411
 
 
-/*
- * codigo de error para indicar que no hay mas memoria todo mover a un archivo global de errores
- */
-#define COD_MEMORY_FULL 444 //indica que no hay mas espacio
-
-/**
- * todo seguir definiendo
- */
-
-/**
- * Estructuras y funciones recervar paginas para un nuevo proceso
- */
 typedef struct {
 	uint32_t pid;
-	uint32_t stackSize;
-	uint32_t sourceCodeSize;
-	char* sourceCode;
-} t_new_sourceCode_request;
-t_new_sourceCode_request* create_new_sourceCode_request(uint32_t pid,
-		uint32_t stackSize, uint32_t sourceCodeSize, char* sourceCode);
-void destroy_new_sourceCode_request(t_new_sourceCode_request* request);
-size_t size_new_sourceCode_request(t_new_sourceCode_request* request);
-char* serialize_new_sourceCode_request(t_new_sourceCode_request* request);
-t_new_sourceCode_request* deserialize_new_sourceCode_request(char* stream);
-/**
- * FIN
- */
+	uint32_t size;
+} t_AddPagesToProcess;
+
+typedef struct {
+	uint32_t pid;
+	uint32_t pageNumber;
+	uint32_t offset;
+	uint32_t size;
+} t_GetPageBytes;
+
+typedef struct {
+	uint32_t pid;
+	uint32_t pageNumber;
+	uint32_t offset;
+	uint32_t size;
+	char* buffer;
+} t_SetPageBytes;
+
+size_t sizeof_t_AddPagesToProcess();
+size_t sizeof_t_GetPageBytes();
+
+t_AddPagesToProcess* create_t_AddPagesToProcess(int pid, int size);
+
+char* serialize_t_SetPageBytes(t_SetPageBytes* object);
+t_SetPageBytes* deserialize_t_SetPageBytes(char* stream);
+
+size_t sizeof_t_SetPageBytes(t_SetPageBytes* object);
+
+t_SetPageBytes* create_t_SetPageBytes(uint32_t size, char* buffer);
+void destroy_t_SetPageBytes(t_SetPageBytes* object);
 
 #endif /* SRC_DC_COMMONS_PROTOCOL_MEMORY_KERNEL_H_ */
