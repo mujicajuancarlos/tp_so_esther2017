@@ -17,18 +17,32 @@
 
 
 typedef struct {
-	t_queue* new;
+	t_list* new;
 	t_queue* ready;
 	t_list* execute;
 	t_queue* block;
 	t_queue* exit;
 } t_planningStates;
 
+void moveFromNewToReady(Process* process);
+void moveFromExcecToReady(Process* process);
+void moveFromExcecToExit(Process* process);
+void moveFromExcecToBlock(Process* process);
+
 void sendToREADY(Process* process);
+Process* popToREADY();
+
 void sendToEXEC(Process* process);
+void removeFromEXEC(Process* process);
+
 void sendToBLOCK(Process* process);
+Process* popToBLOCK();
+
 void sendToEXIT(Process* process);
+Process* popToEXIT();
+
 void sendToNEW(Process* process);
+void removeFromNEW(Process* process);
 
 void initializeProcessLifeCycle();
 void destroyProcessLifeCycle();
