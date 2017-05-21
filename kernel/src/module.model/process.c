@@ -49,7 +49,9 @@ void createPcbForNewProcess(Process* process, Package* package) {
 
 	uint32_t stackFirstPage = 1; //todo este dato se obtiene en base a los datos que me devuelve la memoria
 
+	logInfo("Generando el pcb para el proceso %d", process->pid);
 	PCB* pcb = create_new_PCB(process->pid, stackFirstPage, metadata);
 
+	logInfo("Pcb asociado al proceso de pid %d", process->pid);
 	process->pcb = pcb;
 }
