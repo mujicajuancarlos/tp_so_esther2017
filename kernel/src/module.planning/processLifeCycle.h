@@ -24,4 +24,13 @@ typedef struct {
 	t_queue* exit;
 } t_planningStates;
 
+void sendToREADY(Process* process);
+void sendToEXEC(Process* process);
+void sendToBLOCK(Process* process);
+void sendToEXIT(Process* process);
+void sendToNEW(Process* process);
+
+void initializeProcessLifeCycle();
+void destroyProcessLifeCycle();
+
 #endif /* MODULE_PLANNING_PROCESSLIFECYCLE_H_ */
