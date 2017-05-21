@@ -37,7 +37,7 @@ void startNewProcess(Process* process, Package* package) {
 
 	sendSourceCodeForNewProcess(process, package);
 
-	//createPcbForNewProcess(process, package);
+	createPcbForNewProcess(process, package);
 
 	sendToREADY(process);
 

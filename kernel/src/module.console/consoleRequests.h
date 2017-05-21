@@ -10,7 +10,6 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
-#include <parser/metadata_program.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>

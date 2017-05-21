@@ -52,7 +52,7 @@ typedef struct {
 
 
 // PBC
-PCB* create_new_PBC(uint32_t pid, uint32_t stackFirstPage, t_metadata_program* metadata);
+PCB* create_new_PCB(uint32_t pid, uint32_t stackFirstPage, t_metadata_program* metadata);
 void destroy_PBC(PCB* pbc);
 char* serialize_PCB(PCB* pcb);
 uint32_t sizeOf_PCB(PCB* pcb);
@@ -82,4 +82,5 @@ void destruirContextoActual(PCB* pcb, int size_pagina);
 char* serializar_contexto(t_stack_program* contexto);
 uint32_t getLong_contexto(t_stack_program* contexto);
 t_stack_program* deserializar_contexto(char* stream);
+
 #endif /* SRC_DC_COMMONS_PROTOCOL_KERNEL_CPU_H_ */
