@@ -70,11 +70,11 @@ void initializeProcessLifeCycle() {
 
 void destroyProcessLifeCycle() {
 
-//	list_destroy_and_destroy_elements(states->execute, (void*) destroyPCB);
-//	queue_destroy_and_destroy_elements(states->exit, (void*) destroyPCB);
-//	queue_destroy_and_destroy_elements(states->new, (void*) destroyPCB);
-//	queue_destroy_and_destroy_elements(states->ready, (void*) destroyPCB);
-//	queue_destroy_and_destroy_elements(states->block, (void*) destroyPCB);
+	list_destroy_and_destroy_elements(states->execute, (void*) destroyProcess);
+	queue_destroy_and_destroy_elements(states->exit, (void*) destroyProcess);
+	queue_destroy_and_destroy_elements(states->new, (void*) destroyProcess);
+	queue_destroy_and_destroy_elements(states->ready, (void*) destroyProcess);
+	queue_destroy_and_destroy_elements(states->block, (void*) destroyProcess);
 
 	pthread_mutex_destroy(&executeListMutex);
 	pthread_mutex_destroy(&exitListMutex);
