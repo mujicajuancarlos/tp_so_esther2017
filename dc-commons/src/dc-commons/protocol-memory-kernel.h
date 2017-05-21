@@ -62,6 +62,13 @@
 #define COD_END_PROCESS_REQUEST 410
 #define COD_END_PROCESS_RESPONSE 411
 
+/**
+ * STATUS CODES (INTERNOS)
+ */
+
+#define ERROR_MEMORY_FULL 450
+#define ERROR_SEGMENTATION_FAULT 451
+
 
 typedef struct {
 	uint32_t pid;
