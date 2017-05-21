@@ -18,6 +18,9 @@
 #include <dc-commons/protocol-kernel-console.h>
 #include <dc-commons/protocol-kernel-cpu.h>
 #include <dc-commons/protocol-memory-kernel.h>
+#include "../module.memory/memoryRequests.h"
+#include "../module.planning/processLifeCycle.h"
+#include "../module.planning/multiprogramming.h"
 #include "../module.model/process.h"
 
 void startNewProcess(Process* process, Package* package);
