@@ -44,6 +44,8 @@ int main(int argc, char *argv[]) {
 	logInfo("Inicia el lector de comandos para el usuario");
 	handleUserRequest(&kernelStruct);
 
+	destroyKernelStructs(&kernelStruct, config);
+
 	return EXIT_SUCCESS;
 }
 
@@ -63,4 +65,14 @@ void initializeStruct(kernel_struct* kernelStruct, Configuration* config) {
 	kernelStruct->socketServerConsola = -1;
 
 	initializeCurrentPidMutex();
+	initializeProcessLifeCycle();
+}
+
+void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config){
+
+	free(kernelStruct);
+	free(config);
+
+	destroyCurrentPidMutex();
+	destroyProcessLifeCycle();
 }

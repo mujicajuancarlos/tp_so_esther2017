@@ -57,10 +57,10 @@ void handleNewProcess(Process* newProcess) {
 	pthread_exit(EXIT_SUCCESS);
 }
 
-void handleConsoleRequestForProcess(Process* newProcess, Package* package) {
+void handleConsoleRequestForProcess(Process* process, Package* package) {
 	switch (package->msgCode) {
 	case COD_KC_RUN_PROGRAM_REQUEST:
-		startNewProcess(newProcess, package);
+		startNewProcess(process, package);
 		break;
 	case COD_KC_END_PROGRAM:
 		logInfo("Terminar ejecucion");

@@ -18,7 +18,7 @@
 #define FIRST_PID 1000
 
 typedef struct Process {
-    int fileDescriptor;	//file descriptor del socket del cpu
+    int fileDescriptor;	//file descriptor del socket de la consola
     int pid;	//PID del proceso que esta ejecutando actualmente
     PCB* pcb;
     kernel_struct* kernelStruct;

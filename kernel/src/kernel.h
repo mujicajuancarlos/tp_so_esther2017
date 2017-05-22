@@ -32,4 +32,6 @@ void createSockets(kernel_struct* kernelStruct);
  */
 void initializeStruct(kernel_struct* args, Configuration* config);
 
+void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config);
+
 #endif /* KERNEL_H_ */

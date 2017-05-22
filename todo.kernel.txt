@@ -1,2 +1,263 @@
 #Tareas para realizar en Kernel
 
+1.- Semaforo para recursos de cpu
+	debe ser inicializado en 0 cuando inicial el kernel
+	debe ser incrementado cuando:
+		- se incorpora una nueva cpu
+		- la cpu informa fin de ejecucion
+	debe ser decrementado cuando:
+		- el planificador envia a ejecutar un pcb
+	debe ser destruido cuando finaliza el proceso kernel
+
+2.- Semaforo para recursos de procesos en ready
+	debe ser inicializado en 0 cuando inicia las estructuras de ciclo de vida
+	debe incrementarse cuando:
+		- se agrega un proceso a la lista de ready
+	debe decrementarse cuando:
+		- se quita un elemento de la lista de ready
+	debe ser destruido cuando finalizan las estructuras del ciclo de vida
+
+3.- Administrar la lista de cpus del kernel
+	generar mutex para proteger la lista (inicializar y destruir apropiadamente)
+	agregar cpu a la lista cuando se conecte un nuevo fileDescriptor de cpu
+	eliminar cpu de la lista cuando el fileDescriptor se cierre
+
+4.- Obtener instancia de cpu disponible
+	no recibe parametros
+	devuelve una cpu con libre (al momento de devolverla se setea el atributo libre en false)
+	las acciones deben estar dentro de un mutex que controle la lista de cpus del kernel
+
+5.- Obtener el proximo proceso ready a ejecutar
+	recibe como parametro kernel_struct para obtener el algoritmo a utilizar
+	en base al algoritmo (if o swich) obtener el proceso (obtener el proceso incluye extraerlo de la cola "hacer el pop")
+	las acciones deben estar dentro del mutex que controla la lista de listos
+	
+6.- Enviar a ejecutar un pcb al cpu
+	recibe como parametro un proceso y una cpu
+	crea y envia un package que contiene:
+		file descriptor de la cpu (se encuentra como atributo de cpu)
+		codigo de mensaje (ver protocolo-kernel-cpu si no existe el codigo agregarlo)
+		pcb serializado (el pcb se encuentra en el proceso)
+	verificar que el envio fue exitoso (package != NULL)
+		si fue exitoso finalizo mi tarea
+		si no fue exitoso se debe:
+			informar el error
+			agregar el proceso a la cola de listos
+			quitar la cpu de la lista de cpu (tener cuidado con el semaforo ya se hizo el wait por lo cual al sacarlo de la lista no hace falta hacer otro waitl) 
+
+7.- Finalizar un proceso por peticion de la consola
+	en base a la arquitectura que manejamos este pedido llega al hilo del proceso a finalizar
+	ver la funcion handleConsoleRequestForProcess del archivo handler-console.c
+	generar la funcion que va a recibir como parametro el proceso a finalizar y realiza las siguientes acciones
+		buscar el proceso en las diferentes lista y colas
+			si se encuentra en new, ready, blocked (si estaba en ready tener cuidado con el semaphoro de procesos ready)
+				sacarlo de la lista
+			si esta en exec
+				dejar ejecutar
+				despues de la ejecucion enviar el proceso a exit
+			si esta en exit
+				loguear el error
+		agregar el proceso a la lista de exit almacenando el exit code  (agregar el error en los exitCodes)
+	finalizar el hilo del proceso
+
+8.- generar mensaje de rechazo para la consola
+	esta funcion es usada cuando no se pudo reservar las paginas en la memoria
+	recibe como parametro el proceso
+	crea y envia un package al file descriptor de la consola
+		fd = el file descriptor se encuentra como atributo del proceso
+		code = generar un codigo en el protocolo kernel consola
+		message = NULL
+	Agregar esta funcionalidad en los lugares que se vea conveniente (cuando se realiza la operacion de reservar paginas para un proceso nuevo)
+
+9.- generar la funcionalidad para finalizar procesos desde la consola del kernel
+	agregar el comando al manejador de la consola del kernel
+	agregarlo al manejador
+	generar la funcion de finalizacion (ver tarea 7 porque es similar)
+	comunicar a la consola que se finalizo el programa (agregar la funcionalidad dentro del proyecto consola - finalizar el hilo del programa)
+	finalizar el hilo del proceso
+
+10.- generar mutex para syscall de memoria
+	debe ser inicializado en 1 cuando inicial el kernel
+	debe ser decrementado cuando:
+		- el manejador de solicitudes de cpu solicita una syscall de memoria
+	debe ser incrementado cuando:
+		- la syscall se haya terminado de ejecutar
+	debe ser destruido cuando finaliza el proceso kernel
+
+11.- generar mutex para syscall de memoria
+	debe ser inicializado en 1 cuando inicial el kernel
+	debe ser decrementado cuando:
+		- el manejador de solicitudes de cpu solicita una syscall de file system
+	debe ser incrementado cuando:
+		- la syscall se haya terminado de ejecutar
+	debe ser destruido cuando finaliza el proceso kernel
+
+12.- generar el manejador para syscall
+	la cpu envia una solicitud de syscall
+	el kernel guarda el contento de ejecucion del proceso
+		guarda el pcb enviado por la cpu
+		mueve el proceso de la lista de ejecutando hacia la lista de bloqueados (tener cuidado con el semaforo de procesos ready)
+		dependiendo el tipo de syscall invoca:
+			manjedor de syscall memoria en un hilo nuevo (parametro a definir)
+			manejador de syscall file system en un hilo nuevo (parametro a definir)
+
+13.- generar manejador de syscall memoria
+	decremento el mutex de syscall de memoria
+	swich para diferenciar la accion a ejecutar
+		(acciones a definir)
+	incremento el mutex de syscall de memoria
+	muevo el proceso de bloqueado a ready (existe la posibilidad que el proceso no este mas en bloqueado a causa de una finalizacion anticipada o por un error en ese caso no hace falta el movimiento)
+
+14.- generar manejador de syscall file system
+	decremento el mutex de syscall de file system
+	swich para diferenciar la accion a ejecutar
+		(acciones a definir)
+	incremento el mutex de syscall de file system
+	muevo el proceso de bloqueado a ready (existe la posibilidad que el proceso no este mas en bloqueado a causa de una finalizacion anticipada o por un error en ese caso no hace falta el movimiento)
+
+15.- manejo de semaforos globales del sistema
+	inicializacion de semaforos en base al archivo de configuracion
+	generar funciones genericas para hacer wait y signal sobre los semaforos del sistema
+		recibe como parametro el puntero del semaforo
+		signal o wait segun corresponda
+
+16.- crear estructura t_fIleDescriptor
+	la estructura tendra los siguientes campos
+		numero de fd: int
+		path del archivo: char*
+		open: int -> cantidad de procesos que lo tienen abierto
+	generar la funcion createNew_t_fIleDescriptor
+	generar la funcion ddddtroyNew_t_fIleDescriptor
+
+17.- crear estructura t_processFIleDescriptor
+	la estructura tendra los siguientes campos
+		flags char[2]
+		fileDescriptor: t_fIleDescriptor
+	generar la funcion createNew_t_processFIleDescriptor
+	generar la funcion ddddtroyNew_t_processFIleDescriptor
+
+18.- crear la representacion de una tabla global de archivos
+	generar una lista de t_fIleDescriptor y agregarlo a la estructura kernel_struct
+	generar el mutex e inicializarlo para proteger este recurso
+	crear funciones
+		agregar t_fIleDescriptor a la lista (usando el mutex)
+		remover  t_fIleDescriptor a la lista (usando el mutex)
+		incrementar open de un file descriptor
+		decrementar open de un file descriptor (si open es cero debe eliminarse de la lista de archivos)
+
+19.- crear la representacion de una tabla de archivos por proceso
+	generar una lista de t_processFIleDescriptorr y agregarlo a la estructura process
+	crear funciones
+		agregar t_processFIleDescriptor a la lista
+		remover  t_processFIleDescriptor a la lista (usando el mutex)
+
+20. agregar la funcionalidad para detectar la escritura en el file descriptor 1
+	En las syscall una de las acciones es escribir en un fd,
+	agregar logica para detectar que el fd es 1, en ese caso se debe enviar un package a la consola correspondiente
+	crear y enviar el package
+		file descriptor - encuentra en el process
+		code - generar el codigo si no existe
+		message - lo que se haya enviado a escribir en el fd 1
+
+21. validacion de acciones de archivos
+	parametros t_processFIleDescriptor, accion
+	si la accion no se encuentra en el flag de t_processFIleDescriptor lanza error
+	si lanza error seteo el exit code
+	muevo el proceso a exit (ver en detalle mas adelante)
+
+22. crear funcionalidad para operar archivos
+	parametros: proceso, fileDescriptor, accion
+	accion -> create, read, write (modelarlos como enum)
+	buscar el file descriptor dentro del proceso (si es read o write y no esta lanzar error)
+		generar funcionalidad de busqueda de file descriptors
+	sobre el elemento encontravo ejecutar la validacion de permisos de la tarea 21
+
+23.- generar la funcionalidad abrir archivo
+	parametros: path, flags
+	genera el file descriptor
+	envio la solicitud de creacion al file system
+	si esta todo ok
+		agrego a la tabla global de archivos
+		genero el process file descriptor
+		agrego a la tabla de archivos del proceso
+	si no esta ok
+		muevo el proceso a exit con el exit code
+
+24. generar la funcionalidad leer archivo
+	parametros: file descriptor, offset, tamaño
+	busca el file descriptor para obtener el path
+	solicita al file system los datos
+		crear y enviar packete con:
+			fd del file system: lo tiene el kernel_struct
+			codigo : generarlo en el protocol-fileSystem-kernel
+			stream: serializar los datos (path, offset, size)
+		crear y recbir datos del file system
+	si surgio error ejecutar la rutina de finalizacion de proceso con el codigo de error adecuado
+	si no hay error enviar a ready (ver donde se almacena el dato obtenido del fs)
+
+25.- generar la funcionalidad para escribir en un archivo
+	parametros: file descriptor, offset, buffer, tamaño
+	busca el file descriptor para obtener el path
+	solicita al file system los guardar los datos
+		crear y enviar packete con:
+			fd del file system: lo tiene el kernel_struct
+			codigo : generarlo en el protocol-fileSystem-kernel
+			stream: serializar los datos (path, offset, size, buffer)
+		crear y recbir datos del file system
+	si surgio error ejecutar la rutina de finalizacion de proceso con el codigo de error adecuado
+	si no hay error enviar a ready 
+	
+26.- generar la funcionalidad cerrar archivo
+	parametros: file descriptor
+	busca el file descriptor y lo quita de la lista de tabla de archivos del proceso
+	decrementar el atributo open del file descriptor
+
+27.- generar la funcionalidad de finalizacion inesperada de proceso (prioritario - es muy usado)
+	parametros: proceso, exit code
+	buscar el proceso en las diferentes lista y colas
+		si se encuentra en new, ready, blocked (si estaba en ready tener cuidado con el semaphoro de procesos ready)
+			sacarlo de la lista
+		si esta en exec
+			enviar una interrupcion a la cpu para que deje de ejecutar (no hace falta guardar los cambios en la pcb)
+			pasar la cpu a libre , incrementar el semaforo de recurso de cpu
+			sacar el proceso de exec
+		si esta en exit
+			loguear el error
+	agregar el proceso a la lista de exit almacenando el exit code  (agregar el error en los exitCodes)
+	informar a la consola sobre la finalizacion
+	finalizar el hilo del proceso
+
+28.- generar funcionalidad que permita imprimir por consola un proceso  (modo lista)
+	parametro: proceso
+	datos a mostrar
+		pid
+		status
+		exit code
+
+29.- generar funcionalidad que permita imprimir por consola un proceso (full)
+	parametro: proceso
+	datos a mostrar: ver pagina 18, seccion consola del kernel, punto 2
+	para este punto hay que generar una funcionalidad para buscar un proceso en todo el sistems (todos los estados)
+
+30.- generar funcionalidad que permita mostrar por consola todos los procesos del sistema
+
+31.- generar funcionalidad que permita mostrar por consola los procesos de un determinado estado
+
+32.- generar funcionalidad que permita mostrar por consola la tabla global de archivos
+
+33.- generar funcionalidad que permita modificar el grado de multiprogramacion
+	recibe como parametro un int, representa el nuevo valor
+
+34.- generar funcionalidad para bloquear y desbloquear el planificador del sistema (mutex antes de evaluar los semaforos)
+
+
+
+
+
+
+
+
+
+
+
+
