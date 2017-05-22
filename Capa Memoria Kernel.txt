@@ -1,0 +1,65 @@
+Estructura pag 12
+ir agregando bloques con heap metadata
+
+como la memoria solo tiene de cod y stack, se pide una pag nueva para memoria dinamica.
+buscar  pagina libre o sino crearlo, 
+
+-manejar la syscall
+
+
+-creacion de paginas para codigo fuente.
+
+
+1.- Administrar las variables globales (!varGlobal)
+
+	Debe ser inicializadas en 0 desde la CFG cuando arranca el kernel.
+	Deben ser compartidas por todos los procesos, y tener acceso.
+	*SE DEBEN RECONOCER en otra funcion/proceso
+	recibe como parametro una variable global, debe ser el nombre de la variable a leer/escribir
+
+2.- Pedir Pagina de memoria Dinamica
+	Se debe pedir una pag dedicada para la atencion de una syscall
+	Se permite almacenar mas de un bloque dentro de cada pagina.
+	Si no se puede obtener la memoria pedida, finalizar el proceso.
+
+
+3.- Crear tabla para la mantencion del Heap.
+	Debe gestionar las paginas utilizadas para Heap.
+	Esta asociada al PCB
+	Debe contener PID, Numero de Pagina, y tamaño disponible dentro de la misma(respecto a esto ultimo nose si sera o ya esta disponible desde la memoria una funcion q devuelva cuanto le queda a esa pag)
+
+4.- Pedir nueva tabla a Memoria
+	En el caso que una pagina no sea suficiente.
+
+5.- Definir estructura Metadata para la gestion de la pagina.
+
+	//Como cada pagina de memo dinamica puede almacenar uno o mas bloques, para saber la consistencia de cada bloque usamos el struct
+
+	typedef struct HeapMetadata {
+		uint32_t size,
+		Bool isFree
+	}
+	
+	// Nos permite saber la seccion de memoria en las cual el proceso puede trabajar
+	* Siempre debe existir al menos una estructura en cada pagina del heap. y tambien al menos una nos indica la cantidad de bytes libres q hay (incluso 0)
+
+
+Nota.- El valor a retornar por la syscall es la primer posición del bloque de
+datos reservado disponible.-
+
+5.- Conocer el tamaño maximo de cada pagina
+	se puede hacer a traves del calculo:
+	MaximoPag = Tamaño Pagina - 10 bytes ( serian 5 del struct inicial y 5 del final)
+
+6.- Liberar memoria
+	parametro: Puntero a estructura de metadata.
+	Debe setearle el isFree a True.
+
+7.- Confeccionar algun Algoritmo para Evitar Fragmentacion externa.
+	lo tendremos q ver juntos o cuando termine lo anterior chequeo esto
+
+8.- Libero todas las paginas?
+	Funcion de type Bool
+	Es llamada al finalizar un proceso
+	Debe retornar true si se liberaron todas las estructuras en las paginas de heap.
+
