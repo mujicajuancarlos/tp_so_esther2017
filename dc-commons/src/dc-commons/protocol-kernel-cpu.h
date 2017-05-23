@@ -17,7 +17,11 @@
 
 #define COD_CPU_RUN_PCB 201
 
-
+//TODO verificar los codigos
+#define COD_CPU_END_EXECUTION 110
+#define COD_CPU_END_QUANTUM 111
+#define COD_CPU_MEMORY_SYSTEM_CALL 112
+#define COD_CPU_FS_SYSTEM_CALL 113
 
 typedef struct dir_memoria {
 	uint32_t pagina;

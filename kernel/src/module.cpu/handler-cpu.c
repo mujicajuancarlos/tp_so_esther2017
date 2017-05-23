@@ -35,22 +35,48 @@ void handleCPUs(kernel_struct *kernelStruct) {
 void handleNewCPU(CPU* newCpu) {
 
 	Package* package;
+	addCPU(newCpu);
 	bool running = true;
 	while (running) {
 
 		package = createAndReceivePackage(newCpu->fileDescriptor);
 		if (package != NULL) {
-			//TODO COMPLETAR FUNCIONALIDAD
-			//handleProgramRequest(newCpu, package);
+			handleCPURequest(newCpu, package);
 		} else {
 			running = false;
-			logError("Se desconecto la cpu con FD: %d",
-					newCpu->fileDescriptor);
+			logError("Se desconecto la cpu con FD: %d", newCpu->fileDescriptor);
 		}
 		destroyPackage(package);
 	}
 
-	destroyCPU(newCpu);
+	removeCPU(newCpu);//no hace falta decrementar siempre y cuando salga de error
 	close(newCpu->fileDescriptor);
 	pthread_exit(EXIT_SUCCESS);
+}
+
+void handleCPURequest(CPU* cpu, Package* package) {
+	switch (package->msgCode) {
+	case COD_CPU_END_EXECUTION:
+		// rutina de proceso finalizado -> actualizar pcb
+		markFreeCPU(cpu);
+		break;
+	case COD_CPU_END_QUANTUM:
+		// rutina para guardar el pcb
+		//rutina  para mover el proceso ready
+		markFreeCPU(cpu);
+		break;
+	case COD_CPU_MEMORY_SYSTEM_CALL:
+		//rutina de proceso bloqueado -> actualizar pcb
+		markFreeCPU(cpu);
+		break;
+	case COD_CPU_FS_SYSTEM_CALL:
+		//rutina de proceso bloqueado -> actualizar pcb
+		markFreeCPU(cpu);
+		break;
+	default:
+		logError("La cpu %d envio un mensaje desconocido", cpu->fileDescriptor);
+		markFreeCPU(cpu);
+		//todo verificar que hacemos en este caso
+		break;
+	}
 }

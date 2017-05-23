@@ -59,7 +59,7 @@ void decrementMultiprogrammingLevel(int* number) {
 }
 
 /*
- * usar esta funcion desde el planificador
+ * realizo el signal del semaforo + logueo
  */
 void _incrementMultiprogrammingLevel(){
 	sem_post(&multiprogrammingLevelSem);
@@ -67,7 +67,7 @@ void _incrementMultiprogrammingLevel(){
 }
 
 /*
- * usar esta funcion desde el planificador
+ * realizo wait del semaforo + logueo
  */
 void _decrementMultiprogrammingLevel(){
 	sem_wait(&multiprogrammingLevelSem);

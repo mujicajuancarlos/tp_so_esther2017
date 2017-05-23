@@ -20,8 +20,6 @@ typedef struct kernel_struct {
 	int socketClientFileSystem;
 	int pageSize;
 	pthread_mutex_t stdoutMutex;
-	pthread_mutex_t cpuListMutex;
-	t_list* cpuList;
 	Configuration* config;
 } kernel_struct;
 
