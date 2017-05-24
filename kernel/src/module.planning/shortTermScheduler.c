@@ -18,11 +18,11 @@ void destroyshortTermScheduler() {
 }
 
 void shortTermScheduler_lock() {
-	pthread_mutex_lock(&readyListMutex);
+	pthread_mutex_lock(&shortTermSchedulerMutex);
 	logInfo("Planificador de corto plazo bloqueado");
 }
 
 void shortTermScheduler_unlock() {
-	pthread_mutex_unlock(&readyListMutex);
+	pthread_mutex_unlock(&shortTermSchedulerMutex);
 	logInfo("Planificador de corto plazo desbloqueado");
 }

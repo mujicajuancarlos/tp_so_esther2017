@@ -5,8 +5,8 @@
  *      Author: utnso
  */
 
-#ifndef MODULE_PLANNING_MULTIPROGRAMMING_H_
-#define MODULE_PLANNING_MULTIPROGRAMMING_H_
+#ifndef MODULE_PLANNING_LONGTERMSCHEDULER_H_
+#define MODULE_PLANNING_LONGTERMSCHEDULER_H_
 
 #include <semaphore.h>
 #include <pthread.h>
@@ -15,7 +15,7 @@
 
 void initializeMultiprogrammingLevel(kernel_struct* kernel_struct);
 
-void destroyMultiprogrammingLevel(kernel_struct* kernel_struct);
+void destroyMultiprogrammingLevel();
 
 void updateMultiprogrammingLevel(kernel_struct* kernel_struct, int newLevel);
 
@@ -27,4 +27,4 @@ void _incrementMultiprogrammingLevel();
 
 void _decrementMultiprogrammingLevel();
 
-#endif /* MODULE_PLANNING_MULTIPROGRAMMING_H_ */
+#endif /* MODULE_PLANNING_LONGTERMSCHEDULER_H_ */
