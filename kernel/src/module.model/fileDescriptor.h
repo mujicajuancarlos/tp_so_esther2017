@@ -9,12 +9,12 @@
 #define MODULE_MODEL_FILEDESCRIPTOR_H_
 
 #include <stdlib.h>
+#include <stdint.h>
 
 typedef struct {
-	uint32_t fd;
-	char* path;
-	uint32_t open;
-}t_fIleDescriptor;
-
+	uint32_t fd; //numero de FileDescriptor
+	char* path;  //Path del archivo
+	uint32_t open; //cantidad de procesos que lo tienen abierto
+}t_fileDescriptor;
 
 #endif /* MODULE_MODEL_FILEDESCRIPTOR_H_ */
