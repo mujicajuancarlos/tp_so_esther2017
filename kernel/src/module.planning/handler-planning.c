@@ -7,10 +7,11 @@
 
 #include "handler-planning.h"
 
+pthread_mutex_t mutexP;
 void handlePlanning(kernel_struct *kernel_struct) {
 
 	while (true) {
-
+		pthread_mutex_lock(&mutexP);
 		/**1. mutex de habilitacion del planificador
 		 * 2. wait del semaforo de cpus disponibles + obtener la instancia de cpu disponible
 		 * 		CPU* cpu = searchAndMarkBusyCPU()
@@ -18,6 +19,7 @@ void handlePlanning(kernel_struct *kernel_struct) {
 		 * 4. solicito al algoritmo que me de el siguiente proceso ready (sacar el proceso de la lista ready)
 		 * 5. enviar a ejecutar el proceso seleccionado por el algoritmo a la cpu seleccionada
 		 */
+		pthread_mutex_unlock(&mutexP);
 	}
 
 }

@@ -6,10 +6,9 @@
  */
 #include "fileDescriptor.h"
 
-int main(){
 
 
-t_fileDescriptor* createNew_t_fileDescriptor(path){
+t_fileDescriptor* createNew_t_fileDescriptor(char* path){
 
 	t_fileDescriptor* newFD = malloc(sizeof(t_fileDescriptor));
 	newFD->fd = getFD();
@@ -19,8 +18,10 @@ t_fileDescriptor* createNew_t_fileDescriptor(path){
 	return newFD;
 }
 
-void destroy_t_filedescriptor(fd){
+void destroy_t_filedescriptor(t_fileDescriptor* fd){
+	free(fd->path);
 	free(fd);
+
 }
 
 int getFD(){
@@ -31,5 +32,3 @@ int getFD(){
 	return aux;
 }
 
-return 0;
-}
