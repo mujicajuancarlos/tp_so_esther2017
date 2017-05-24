@@ -8,9 +8,20 @@
 
 int main(){
 
-/*
-t_fileDescriptor createNew_t_fileDescriptor();
-void destroy_t_filedescriptor(fd);
-*/
+
+t_fileDescriptor* createNew_t_fileDescriptor(path){
+
+	t_fileDescriptor* newFD = malloc(sizeof(t_fileDescriptor));
+	newFD->fd = getFD();
+	newFD->path = path;
+	newFD->open= 0;
+
+	return newFD;
+}
+
+void destroy_t_filedescriptor(fd){
+	free(fd);
+}
+
 return 0;
 }

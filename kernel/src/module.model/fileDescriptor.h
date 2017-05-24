@@ -17,4 +17,8 @@ typedef struct {
 	uint32_t open; //cantidad de procesos que lo tienen abierto
 }t_fileDescriptor;
 
+
+
+t_fileDescriptor* createNew_t_fileDescriptor(char*);
+void destroy_t_filedescriptor(t_fileDescriptor);
 #endif /* MODULE_MODEL_FILEDESCRIPTOR_H_ */
