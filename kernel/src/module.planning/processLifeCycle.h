@@ -23,6 +23,16 @@ typedef struct {
 	t_queue* exit;
 } t_planningStates;
 
+/*
+enum enum_planningStates {
+  new,
+  ready,
+  execute,
+  block,
+  ex,
+};  // Must end with a semicolon like a struct
+*/
+
 void moveFromNewToReady(Process* process);
 void moveFromExcecToReady(Process* process);
 void moveFromExcecToExit(Process* process);
@@ -47,5 +57,8 @@ t_planningStates* getStates();
 
 void initializeProcessLifeCycle();
 void destroyProcessLifeCycle();
+
+
+
 
 #endif /* MODULE_PLANNING_PROCESSLIFECYCLE_H_ */

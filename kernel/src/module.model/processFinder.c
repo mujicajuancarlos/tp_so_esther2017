@@ -14,10 +14,10 @@ Process* getProcessByPID(int pidParam){
 
 	while (encontrado == 0){
 		encontrado = list_find(states->new,condicion);
-		encontrado = list_find(states->ready,condicion);
+		encontrado = list_find(states->ready->elements,condicion);
 		encontrado = list_find(states->execute,condicion);
-		encontrado = list_find(states->block,condicion);
-		encontrado = list_find(states->exit,condicion);
+		encontrado = list_find(states->block->elements,condicion);
+		encontrado = list_find(states->exit->elements,condicion);
 	}
 
 	return encontrado;
@@ -32,10 +32,11 @@ char*  getProcessState(Process* proceso){
 		}
 
 		Process* new = list_find(states->new,condicion);
-		Process* ready = list_find(states->ready,condicion);
+		Process* ready = list_find(states->ready->elements,condicion);
 		Process* execute = list_find(states->execute,condicion);
-		Process* block = list_find(states->block,condicion);
-		Process* exit = list_find(states->exit,condicion);
+		Process* block = list_find(states->block->elements,condicion);
+		Process* exit = list_find(states->exit->elements,condicion);
+
 
 		if (new != 0){
 			return "new";
@@ -52,6 +53,7 @@ char*  getProcessState(Process* proceso){
 		else if (exit != 0){
 			return "exit";
 		}
-		// else "MENSAJE DE PROCESO NO ENCONTRADO"
+		else
+			return "NO ENCONTRADO";
 
 }
