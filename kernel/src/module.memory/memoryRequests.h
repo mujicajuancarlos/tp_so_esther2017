@@ -18,6 +18,7 @@
 #include "../module.planning/processLifeCycle.h"
 #include "../module.model/process.h"
 #include "../kernelStruct.h"
+#include "../module.console/consoleResponse.h"
 
 
 void loadMemoryPageSize(kernel_struct* kernel_struct);

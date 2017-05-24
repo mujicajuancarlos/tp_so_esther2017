@@ -53,6 +53,8 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 			sizeof_t_AddPagesToProcess(), (char*) content);	//todo verificar que content se envie como char*
 
 	if (tmpPackage == NULL) {
+		//Función de mensaje de rechazo porque no se pudo reservar pag en memoria
+		consoleResponseRepulseMessage(process);
 		destroyPackage(tmpPackage);
 		free(content);
 		logError(
@@ -77,6 +79,8 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 					process->pid);
 			break;
 		case ERROR_MEMORY_FULL:
+			//Función de mensaje de rechazo porque no se pudo reservar pag en memoria
+			consoleResponseRepulseMessage(process);
 			logInfo(
 					"La memoria indica que no hay espacio para el proceso pid %d",
 					process->pid);
