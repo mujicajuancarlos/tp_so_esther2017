@@ -16,9 +16,12 @@
 
 #include "../kernelStruct.h"
 #include "../module.model/cpu.h"
+#include "cpuAdministrator.h"
 
 void handleCPUs(kernel_struct *args);
 
 void handleNewCPU(CPU* newCpu);
+
+void handleCPURequest(CPU* cpu, Package* package);
 
 #endif /* HANDLER_CPU_H_ */

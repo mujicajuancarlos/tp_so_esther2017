@@ -15,7 +15,6 @@
 #include <dc-commons/logger.h>
 #include "../module.model/process.h"
 
-
 typedef struct {
 	t_list* new;
 	t_queue* ready;
@@ -43,6 +42,8 @@ Process* popToEXIT();
 
 void sendToNEW(Process* process);
 void removeFromNEW(Process* process);
+
+t_planningStates* getStates();
 
 void initializeProcessLifeCycle();
 void destroyProcessLifeCycle();

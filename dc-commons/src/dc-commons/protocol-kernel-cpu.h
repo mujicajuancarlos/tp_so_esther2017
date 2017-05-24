@@ -17,7 +17,11 @@
 
 #define COD_CPU_RUN_PCB 201
 
-
+//TODO verificar los codigos
+#define COD_CPU_END_EXECUTION 110
+#define COD_CPU_END_QUANTUM 111
+#define COD_CPU_MEMORY_SYSTEM_CALL 112
+#define COD_CPU_FS_SYSTEM_CALL 113
 
 typedef struct dir_memoria {
 	uint32_t pagina;
@@ -48,6 +52,7 @@ typedef struct {
 	t_metadata_program* metadata;	//indice de codigo
 	t_stack_program* stack;	//context
 	uint32_t stackSize;			//tamaño stackIndex
+	uint32_t exit_code; //Agrego Exit Code a PCB (No hace falta serializar, usa solo Kernel)
 } PCB;
 
 

@@ -213,3 +213,6 @@ void printCommandsHelp() {
 
 	unlockPrinter();
 }
+
+
+

@@ -42,12 +42,13 @@ int getNextPID() {
 	return next;
 }
 
-void createPcbForNewProcess(Process* process, Package* package) {
+void createPcbForNewProcess(Process* process, Package* sourceCodePackage) {
 
 	logInfo("Generando la metadata para el proceso %d", process->pid);
-	t_metadata_program* metadata = metadata_desde_literal(package->stream);
+	t_metadata_program* metadata = metadata_desde_literal(sourceCodePackage->stream);
 
-	uint32_t stackFirstPage = 1; //todo este dato se obtiene en base a los datos que me devuelve la memoria
+	//el va despues del codigo, por lo tanto con esta cuenta puedo saber cual es la primer pagina del stack
+	uint32_t stackFirstPage = sourceCodePackage->size / process->kernelStruct->pageSize;
 
 	logInfo("Generando el pcb para el proceso %d", process->pid);
 	PCB* pcb = create_new_PCB(process->pid, stackFirstPage, metadata);
@@ -55,3 +56,20 @@ void createPcbForNewProcess(Process* process, Package* package) {
 	logInfo("Pcb asociado al proceso de pid %d", process->pid);
 	process->pcb = pcb;
 }
+
+
+void printProcess(Process* proceso){
+	//imprimo pid
+		printf("%d", proceso->pid);
+
+	//imprimo estado
+		printf(getProcessState(proceso));
+
+	//imprimo exit code
+		printf("%d", proceso->pcb->exit_code);
+}
+
+
+
+
+

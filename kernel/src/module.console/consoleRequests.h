@@ -19,8 +19,8 @@
 #include <dc-commons/protocol-memory-kernel.h>
 #include "../module.memory/memoryRequests.h"
 #include "../module.planning/processLifeCycle.h"
-#include "../module.planning/multiprogramming.h"
 #include "../module.model/process.h"
+#include "../module.planning/longTermScheduler.h"
 
 void startNewProcess(Process* process, Package* package);
 

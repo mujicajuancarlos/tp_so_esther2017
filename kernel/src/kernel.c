@@ -41,8 +41,14 @@ int main(int argc, char *argv[]) {
 	pthread_create(&hiloPlanificador, NULL, (void*) handlePlanning,
 			&kernelStruct);
 
+
+
 	logInfo("Inicia el lector de comandos para el usuario");
 	handleUserRequest(&kernelStruct);
+
+	printf("holitas");
+
+
 
 	destroyKernelStructs(&kernelStruct, config);
 
@@ -58,14 +64,14 @@ void createSockets(kernel_struct* kernelStruct) {
 
 void initializeStruct(kernel_struct* kernelStruct, Configuration* config) {
 	kernelStruct->config = config;
-	kernelStruct->cpuList = list_create();
 	kernelStruct->socketClientFileSystem = -1;
 	kernelStruct->socketClientMemoria = -1;
 	kernelStruct->socketServerCPU = -1;
 	kernelStruct->socketServerConsola = -1;
 
 	initializeCurrentPidMutex();
-	initializeProcessLifeCycle();
+	initializeScheduler(kernelStruct);
+	initializeCpuAdministrator();
 }
 
 void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config){
@@ -74,5 +80,6 @@ void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config){
 	free(config);
 
 	destroyCurrentPidMutex();
-	destroyProcessLifeCycle();
+	destroyScheduler();
+	destroyCpuAdministrator();
 }

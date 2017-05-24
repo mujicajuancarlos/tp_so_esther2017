@@ -5,7 +5,7 @@
  *      Author: utnso
  */
 
-#include "multiprogramming.h"
+#include "longTermScheduler.h"
 
 sem_t multiprogrammingLevelSem;
 
@@ -14,7 +14,7 @@ void initializeMultiprogrammingLevel(kernel_struct* kernel_struct) {
 			kernel_struct->config->grado_multiprog);
 }
 
-void destroyMultiprogrammingLevel(kernel_struct* kernel_struct) {
+void destroyMultiprogrammingLevel() {
 	sem_destroy(&multiprogrammingLevelSem);
 }
 
@@ -59,7 +59,7 @@ void decrementMultiprogrammingLevel(int* number) {
 }
 
 /*
- * usar esta funcion desde el planificador
+ * realizo el signal del semaforo + logueo
  */
 void _incrementMultiprogrammingLevel(){
 	sem_post(&multiprogrammingLevelSem);
@@ -67,7 +67,7 @@ void _incrementMultiprogrammingLevel(){
 }
 
 /*
- * usar esta funcion desde el planificador
+ * realizo wait del semaforo + logueo
  */
 void _decrementMultiprogrammingLevel(){
 	sem_wait(&multiprogrammingLevelSem);

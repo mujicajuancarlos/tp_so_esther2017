@@ -8,7 +8,12 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include src/configuration/subdir.mk
+-include src/module.userInterface/subdir.mk
+-include src/module.planning/subdir.mk
+-include src/module.model/subdir.mk
+-include src/module.memory/subdir.mk
+-include src/module.cpu/subdir.mk
+-include src/module.console/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
 -include objects.mk
@@ -30,7 +35,7 @@ all: kernel
 kernel: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc  -o "kernel" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/utnso/tp-2017-1c-Los-5-Fant-sticos/dc-commons" -o "kernel" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

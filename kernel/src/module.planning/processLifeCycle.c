@@ -119,6 +119,10 @@ void removeFromNEW(Process* process) {
 	logTrace("El proceso %d salio de la lista de EXECUTE", process->pid);
 }
 
+t_planningStates* getStates(){
+	return states;
+}
+
 void initializeProcessLifeCycle() {
 
 	logTrace("Inicializando t_planningStates del Planificador");
