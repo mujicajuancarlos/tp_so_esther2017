@@ -70,7 +70,7 @@ void initializeStruct(kernel_struct* kernelStruct, Configuration* config) {
 	kernelStruct->socketServerConsola = -1;
 
 	initializeCurrentPidMutex();
-	initializeProcessLifeCycle();
+	initializeScheduler(kernelStruct);
 	initializeCpuAdministrator();
 }
 
@@ -80,6 +80,6 @@ void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config){
 	free(config);
 
 	destroyCurrentPidMutex();
-	destroyProcessLifeCycle();
+	destroyScheduler();
 	destroyCpuAdministrator();
 }

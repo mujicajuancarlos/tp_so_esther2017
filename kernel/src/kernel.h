@@ -16,6 +16,7 @@
 #include "module.model/process.h"
 #include "module.console/handler-console.h"
 #include "module.planning/handler-planning.h"
+#include "module.planning/scheduler.h"
 #include "module.cpu/cpuAdministrator.h"
 #include "module.userInterface/handler-user.h"
 

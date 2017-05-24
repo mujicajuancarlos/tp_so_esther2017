@@ -5,7 +5,7 @@
  *      Author: utnso
  */
 
-#include "multiprogramming.h"
+#include "longTermScheduler.h"
 
 sem_t multiprogrammingLevelSem;
 
@@ -14,7 +14,7 @@ void initializeMultiprogrammingLevel(kernel_struct* kernel_struct) {
 			kernel_struct->config->grado_multiprog);
 }
 
-void destroyMultiprogrammingLevel(kernel_struct* kernel_struct) {
+void destroyMultiprogrammingLevel() {
 	sem_destroy(&multiprogrammingLevelSem);
 }
 
