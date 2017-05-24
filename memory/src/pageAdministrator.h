@@ -14,12 +14,14 @@
 
 void assignNewPages (memory_struct* memoryStruct, int processId, int pages);
 
-void processWrite (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset, uint32_t size);
+int newMemoryPage (memory_struct* memoryStruct, int processId, int processPage);
+
+void processWrite (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset, uint32_t size, char data []);
 
 void processRead (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset, uint32_t size);
 
-void memoryDump (); // NO DEBERÍA ESTAR ACA PORQUE ES UNA FUNCION DE LA CONSOLA DE LA MEMORIA
+void memoryDump (memory_struct* memoryStruct); // NO DEBERÍA ESTAR ACA PORQUE ES UNA FUNCION DE LA CONSOLA DE LA MEMORIA
 
-void endProcess (memory_struct *memoryStruct, int processId, int processPage);
+void endProcess (memory_struct *memoryStruct, int processId);
 
 #endif /* PAGEADMINISTRATOR_H_ */

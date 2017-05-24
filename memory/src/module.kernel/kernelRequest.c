@@ -9,6 +9,7 @@
 /**
  * esta funcion es invocada cuando se solicita generar espacio para un nuevo programa
  */
+
 void startNewProcess(Package* package, memory_struct* memoryStruct){
 	t_new_sourceCode_request* request = deserialize_new_sourceCode_request(package->stream);
 
@@ -24,7 +25,7 @@ void startNewProcess(Package* package, memory_struct* memoryStruct){
 	}
 
 	destroy_new_sourceCode_request(request);
-}
+}*
 
 void sendPageSize(memory_struct* memoryStruct){
 	char* stream = serialize_int(memoryStruct->config->marco_size);
