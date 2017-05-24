@@ -29,6 +29,12 @@ void handleKernelRequest(Program* program, Package* package) {
 			printProgramStatus(program,"Solicitud rechazada sobre el programa");
 		}
 		break;
+
+	case COD_KC_CANT_RUN_PROGRAM_RESPONSE:
+			printProgramStatus(program,"Solicitud Rechazada");
+			removeProgram(program);
+			break;
+
 	case COD_KC_PRINT_STDOUT:
 		message = string_substring_until(package->stream, package->size);
 		printMessage("\nPID: %d, > %s", program->pid, message);
