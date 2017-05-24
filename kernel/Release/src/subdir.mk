@@ -4,24 +4,18 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/commonFunctions.c \
-../src/handler-console.c \
-../src/handler-cpu.c \
-../src/handler-memory.c \
+../src/configuration.c \
+../src/connection.c \
 ../src/kernel.c 
 
 OBJS += \
-./src/commonFunctions.o \
-./src/handler-console.o \
-./src/handler-cpu.o \
-./src/handler-memory.o \
+./src/configuration.o \
+./src/connection.o \
 ./src/kernel.o 
 
 C_DEPS += \
-./src/commonFunctions.d \
-./src/handler-console.d \
-./src/handler-cpu.d \
-./src/handler-memory.d \
+./src/configuration.d \
+./src/connection.d \
 ./src/kernel.d 
 
 

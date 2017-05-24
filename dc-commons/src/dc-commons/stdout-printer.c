@@ -62,7 +62,7 @@ void printWelcome(char* processName) {
 	int tab = 10 - (strlen(processName) / 2);
 	lockPrinter();
 	puts("__________________________________________________________");
-	puts("___________ Bienvenido a Esther - Death Coders ___________");
+	puts("___________ Bienvenido a Esther - Los 5 Fantasticos ___________");
 	puts("__________________ UTN-FRBA SO 1C-2017 ___________________");
 	printf("______________<<< %*s%s%*s >>>_______________\n", tab, "",
 			processName, tab, "");

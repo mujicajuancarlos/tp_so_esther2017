@@ -14,6 +14,8 @@
 #include <dc-commons/utils.h>
 #include "../kernelStruct.h"
 #include "protocol-kernel-user.h"
+#include "../module.model/process.h"
+
 
 void handleUserRequest(kernel_struct* kernelStruct);
 

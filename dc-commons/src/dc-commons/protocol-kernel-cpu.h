@@ -52,6 +52,7 @@ typedef struct {
 	t_metadata_program* metadata;	//indice de codigo
 	t_stack_program* stack;	//context
 	uint32_t stackSize;			//tamaño stackIndex
+	uint32_t exit_code; //Agrego Exit Code a PCB (No hace falta serializar, usa solo Kernel)
 } PCB;
 
 

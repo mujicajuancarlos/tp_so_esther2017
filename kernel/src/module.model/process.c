@@ -55,3 +55,20 @@ void createPcbForNewProcess(Process* process, Package* package) {
 	logInfo("Pcb asociado al proceso de pid %d", process->pid);
 	process->pcb = pcb;
 }
+
+
+void printProcess(Process* proceso){
+	//imprimo pid
+		printf("%d", proceso->pid);
+
+	//imprimo estado
+		printf(getProcessState(proceso));
+
+	//imprimo exit code
+		printf("%d", proceso->pcb->exit_code);
+}
+
+
+
+
+

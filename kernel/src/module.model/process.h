@@ -14,6 +14,7 @@
 #include <dc-commons/protocol-kernel-cpu.h>
 #include <dc-commons/package.h>
 #include "../kernelStruct.h"
+#include "../commons/collections/list.h"
 
 #define FIRST_PID 1000
 
