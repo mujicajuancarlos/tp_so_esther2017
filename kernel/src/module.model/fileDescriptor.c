@@ -23,5 +23,13 @@ void destroy_t_filedescriptor(fd){
 	free(fd);
 }
 
+int getFD(){
+	int fd=0;
+	int aux;
+	aux=fd;
+	fd++;
+	return aux;
+}
+
 return 0;
 }
