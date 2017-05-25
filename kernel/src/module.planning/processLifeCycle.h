@@ -14,6 +14,7 @@
 #include <commons/collections/queue.h>
 #include <dc-commons/logger.h>
 #include "../module.model/process.h"
+#include "shortTermScheduler.h"
 
 typedef struct {
 	t_list* new;

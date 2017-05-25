@@ -38,12 +38,14 @@ void moveFromExcecToBlock(Process* process) {
 void sendToREADY(Process* process) {
 	pthread_mutex_lock(&readyListMutex);
 	queue_push(states->ready, process);
+	processInReady_signal();
 	pthread_mutex_unlock(&readyListMutex);
 	logTrace("El proceso %d ingresó a la lista de READY", process->pid);
 }
 
 Process* popToREADY() {
 	Process* process;
+	processInReady_wait();
 	pthread_mutex_lock(&readyListMutex);
 	process = queue_pop(states->ready);
 	pthread_mutex_unlock(&readyListMutex);

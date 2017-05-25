@@ -8,10 +8,10 @@
 #ifndef MODULE_PLANNING_HANDLER_PLANNING_H_
 #define MODULE_PLANNING_HANDLER_PLANNING_H_
 
-
-#include "../kernelStruct.h"
 #include <dc-commons/protocol-kernel-cpu.h>
-#include "processLifeCycle.h"
+#include "../kernelStruct.h"
+#include "../module.cpu/cpuAdministrator.h"
+#include "scheduler.h"
 
 void handlePlanning(kernel_struct *args);
 
