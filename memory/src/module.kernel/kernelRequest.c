@@ -42,8 +42,24 @@ void startNewProcessTest (int processId, int stackSize, int sourceCodeSize, memo
 		totalSize-= memoryStruct->pageSize;
 	}
 }
-/*
-char* saveData () {
 
+void saveData (Package* package, memory_struct* memoryStruct) {
+	t_PageBytes* pageBytes = deserialize_t_PageBytes (package->stream);
+	processWrite (memoryStruct, pageBytes);
+
+	char* buf = malloc (pageBytes->size);
+	t_PageBytes* pageBytesOut;
+	pageBytesOut = create_t_PageBytes(pageBytes->size, buf);
+	Package* packageOut;
+	packageOut = serialize_t_PageBytes(pageBytesOut);
+
+	readData (packageOut, memoryStruct);
+	destroy_t_PageBytes (pageBytes);
 }
-*/
+
+void readData (Package* package, memory_struct* memoryStruct) {
+	t_PageBytes* pageBytes = deserialize_t_PageBytes (package->stream);
+	processRead (memoryStruct, pageBytes);
+	// mandar pageBytes->buffer
+	Package* outPackage = createAndSendPackage (memoryStruct->socketClientKernel, COD_GET_PAGE_BYTES_RESPONSE, pageBytes->size, pageBytes->buffer);
+}

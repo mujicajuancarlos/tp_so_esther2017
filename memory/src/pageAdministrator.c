@@ -53,24 +53,24 @@ int newMemoryPage (memory_struct* memoryStruct, int processId, int processPage) 
 }
 
 /* se mandó a escribir a esta dirección */
-void processWrite (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset, uint32_t size, char* buffer) {
-	memory_page *globalPage = getGlobalMemoryPage (memoryStruct, processId, processPage);
-	char *memAddress =  globalPage->startAddress + offset;
-
-	memcpy (memAddress, buffer, size);
-}
-
-/* se mandó a leer de esta dirección */
-char* processRead (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset, uint32_t size) {
-	memory_page *globalPage = getGlobalMemoryPage (memoryStruct, processId, processPage);
-	char *memAddress = globalPage->startAddress + offset;
+void processWrite (memory_struct* memoryStruct, t_PageBytes* dataInfo) {
+	memory_page *globalPage = getGlobalMemoryPage (memoryStruct, dataInfo->pid, dataInfo->pageNumber);
+	char *memAddress =  globalPage->startAddress + dataInfo->offset;
 
 	/* verificar que no se sobrepase la pagina
 	 * error si la pagina a la que salta no es del mismo proceso */
-	char* data = malloc (size);
-	memcpy (data, memAddress, size);
+	memcpy (memAddress, dataInfo->buffer, dataInfo->size);
+}
 
-	return (data);
+/* se mandó a leer de esta dirección */
+void processRead (memory_struct* memoryStruct, t_PageBytes* dataInfo) {
+	memory_page *globalPage = getGlobalMemoryPage (memoryStruct, dataInfo->pid, dataInfo->pageNumber);
+	char *memAddress = globalPage->startAddress + dataInfo->offset;
+
+	/* verificar que no se sobrepase la pagina
+	 * error si la pagina a la que salta no es del mismo proceso */
+	memcpy (dataInfo->buffer, memAddress, dataInfo->size);
+
 }
 
 void memoryDump (memory_struct* memoryStruct) {
