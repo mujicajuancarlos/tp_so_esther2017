@@ -71,6 +71,4 @@ void initializeStruct(memory_struct* memoryStruct, Configuration* config) {
 		p->startAddress = memoryStruct->memory + memoryStruct->pageSize * i;
 		list_add (memoryStruct->referenceTable, p);
 	}
-
-	processRead (memoryStruct, 1, 1, 5, sizeof (int));
 }

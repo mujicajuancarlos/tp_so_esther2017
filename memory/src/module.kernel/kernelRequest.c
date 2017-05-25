@@ -32,3 +32,18 @@ void sendPageSize(memory_struct* memoryStruct){
 	free(stream);
 	destroyPackage(package);
 }
+
+void startNewProcessTest (int processId, int stackSize, int sourceCodeSize, memory_struct* memoryStruct) {
+	int index = 0;
+	int totalSize = sourceCodeSize + stackSize * memoryStruct->pageSize;
+	while (totalSize > 0) {
+		if (newMemoryPage (memoryStruct, processId, index++) == -1)
+			return; // devolver error porque no hay espacio para pagina nueva
+		totalSize-= memoryStruct->pageSize;
+	}
+}
+/*
+char* saveData () {
+
+}
+*/

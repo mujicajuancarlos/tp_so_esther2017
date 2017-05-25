@@ -53,42 +53,24 @@ int newMemoryPage (memory_struct* memoryStruct, int processId, int processPage) 
 }
 
 /* se mandó a escribir a esta dirección */
-void processWrite (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset, uint32_t size, char data []) {
+void processWrite (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset, uint32_t size, char* buffer) {
 	memory_page *globalPage = getGlobalMemoryPage (memoryStruct, processId, processPage);
 	char *memAddress =  globalPage->startAddress + offset;
 
-	/* este en realidad seria un array de chars que recibo */
-	int i;
-	for (i = 0; i < size; i++)
-		memAddress[i] = data[i];
-
-	int test = (int *) memAddress;
-	// cuando el ciclo termine se transcribió el dato completo
+	memcpy (memAddress, buffer, size);
 }
 
 /* se mandó a leer de esta dirección */
-void processRead (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset, uint32_t size) {
+char* processRead (memory_struct* memoryStruct, int processId, int processPage, uint32_t offset, uint32_t size) {
 	memory_page *globalPage = getGlobalMemoryPage (memoryStruct, processId, processPage);
-	void *memAddress = globalPage->startAddress + offset;
+	char *memAddress = globalPage->startAddress + offset;
 
+	/* verificar que no se sobrepase la pagina
+	 * error si la pagina a la que salta no es del mismo proceso */
 	char* data = malloc (size);
 	memcpy (data, memAddress, size);
 
-	char bytesArray [size];
-	int i;
-	for (i = 0; i < size;i ++) {
-		bytesArray [i] = data[i];
-	}
-
-	// aca el bytesArray es lo que se estaria mandando
-
-	/* Una vez llega a destino para poder leer el dato habria que hacer:
-	tipo_esperado* elDato = (tipo_esperado*) bytesArrayRecibidos;
-	*/
-
-	free (data);
-	/* este es un arreglo de char que le tengo que poder mandar al kernel como respuesta
-	 * el kernel despues sabiendo el tipo hace: type *variableName = (type*) arrayRecibido; */
+	return (data);
 }
 
 void memoryDump (memory_struct* memoryStruct) {
