@@ -32,7 +32,7 @@
  *	Parámetros: [Identificador del Programa] [Páginas requeridas]
  */
 #define COD_NEW_PROCESS_REQUEST 403
-#define COD_NEW_PROCESS_RESPONSE 404
+#define COD_NEW_PROCESS_RESPONSE_OK 404
 
 /*
  * Solicitar bytes de una página
@@ -59,8 +59,8 @@
  * Finalizar programa
  *	Parámetros: [Identificador del Programa]
  */
-#define COD_END_PROCESS_REQUEST 410
-#define COD_END_PROCESS_RESPONSE 411
+#define COD_END_PROCESS_REQUEST 412
+#define COD_END_PROCESS_RESPONSE 413
 
 /**
  * STATUS CODES (INTERNOS)

@@ -11,21 +11,17 @@
  */
 
 void startNewProcess(Package* package, memory_struct* memoryStruct){
-	t_new_sourceCode_request* request = deserialize_new_sourceCode_request(package->stream);
 
-	/* en realidad aca hay una cuenta que debería estar haciendo el kernel. kernel debería simplementer informar el numero de paginas que quiere
-	 * ya sean stack, heap... a la memoria no le interesa para que las va a usar, para la memoria todas las paginas son iguales */
+	t_AddPagesToProcess* requestInfo = package->stream;
 
-	int index = 0;
-	int totalSize = request->sourceCodeSize + request->stackSize * memoryStruct->pageSize;
-	while (totalSize > 0) {
-		if (newMemoryPage (memoryStruct, request->pid, index++) == -1)
-			return; // devolver error porque no hay espacio para pagina nueva
-		totalSize-= memoryStruct->pageSize;
-	}
+	requestInfo->pid; // pid del nuevo proceso
+	requestInfo->size; // cantidad de paginas solicitadas
 
-	destroy_new_sourceCode_request(request);
-}*
+	//todo reservar paginas
+		//asignar las paginas
+			//si esta todo ok responder al kernel con COD_NEW_PROCESS_RESPONSE_OK
+			//si no se pudo responder con el mensaje adecuado ej: ERROR_MEMORY_FULL
+}
 
 void sendPageSize(memory_struct* memoryStruct){
 	char* stream = serialize_int(memoryStruct->config->marco_size);
@@ -35,14 +31,4 @@ void sendPageSize(memory_struct* memoryStruct){
 		logError("Fallo el envio del tamaño de frame hacia el kernel");
 	free(stream);
 	destroyPackage(package);
-}
-
-void startNewProcessTest (int processId, int stackSize, int sourceCodeSize, memory_struct* memoryStruct) {
-	int index = 0;
-	int totalSize = sourceCodeSize + stackSize * memoryStruct->pageSize;
-	while (totalSize > 0) {
-		if (newMemoryPage (memoryStruct, processId, index++) == -1)
-			return; // devolver error porque no hay espacio para pagina nueva
-		totalSize-= memoryStruct->pageSize;
-	}
 }

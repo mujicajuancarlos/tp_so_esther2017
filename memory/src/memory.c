@@ -72,7 +72,5 @@ void initializeStruct(memory_struct* memoryStruct, Configuration* config) {
 		list_add (memoryStruct->referenceTable, p);
 	}
 
-
-	startNewProcessTest (1, 2, 1000, memoryStruct);
 	processRead (memoryStruct, 1, 1, 5, sizeof (int));
 }

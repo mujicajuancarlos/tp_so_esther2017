@@ -74,7 +74,7 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 			process->kernelStruct->socketClientMemoria);
 	if (tmpPackage != NULL) {
 		switch (tmpPackage->msgCode) {
-		case COD_NEW_PROCESS_RESPONSE:
+		case COD_NEW_PROCESS_RESPONSE_OK:
 			logInfo("La memoria reservo las paginas para el proceso pid %d",
 					process->pid);
 			break;

@@ -17,8 +17,6 @@
 
 void startNewProcess(Package* package, memory_struct* memoryStruct);
 
-void startNewProcessTest (int processId, int stackSize, int sourceCodeSize, memory_struct* memoryStruct);
-
 void sendPageSize(memory_struct* memoryStruct);
 
 #endif /* MODULE_KERNEL_KERNELREQUEST_H_ */
