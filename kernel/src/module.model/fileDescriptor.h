@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <commons/collections/list.h>
 
 typedef struct {
 	uint32_t fd; //numero de FileDescriptor
@@ -18,8 +19,15 @@ typedef struct {
 }t_fileDescriptor;
 
 
+void initializefileDescriptors();
 
-/*t_fileDescriptor* createNew_t_fileDescriptor(char*);
-void destroy_t_filedescriptor(t_fileDescriptor);
-int getFD();*/
+void destroyfileDescriptors();
+
+void fileDescriptors_lock();
+
+void fileDescriptors_unlock();
+
+t_fileDescriptor* createNew_t_fileDescriptor(char*);
+void destroy_t_filedescriptor(t_fileDescriptor*);
+int getFD();
 #endif /* MODULE_MODEL_FILEDESCRIPTOR_H_ */

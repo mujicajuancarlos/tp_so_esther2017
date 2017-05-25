@@ -19,6 +19,7 @@ typedef struct kernel_struct {
 	int socketClientMemoria;
 	int socketClientFileSystem;
 	int pageSize;
+	t_list* tablaGlobalFD;
 	pthread_mutex_t stdoutMutex;
 	Configuration* config;
 } kernel_struct;
