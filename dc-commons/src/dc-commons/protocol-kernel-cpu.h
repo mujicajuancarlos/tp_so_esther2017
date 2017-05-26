@@ -15,13 +15,29 @@
 
 //prefijo = CPU ; between 200 - 299
 
-#define COD_CPU_RUN_PCB 201
+#define COD_EXEC_NEW_PCB 201 //para ejecutar un nuevo pcb
+#define COD_CONTINUE_EXECUTION 202 //para continuar la ejecucion
+#define COD_CONTEXT_SWITCH_REQUEST 203 //para solicitar a la cpu que me devuelva el pcb actualizado
+#define COD_CONTEXT_SWITCH_RESPONSE 204 //para responder el pcb
+//para finalizar ejecucion
+#define COD_PROGRAM_FINISHED 205 //el programa termino
+#define COD_SIGNAL_DISCONNECTED 206 //le llego una señal de desconeccion a la cpu -> dejara de dar servicio
+//no bloqueantes
+#define COD_GET_SHARED_VAR 207
+#define COD_SET_SHARED_VAR 208
+#define COD_SEM_WAIT 209
+#define COD_SEM_SIGNAL 210
+//bloqueantes FS
+#define COD_OPEN_FD 211
+#define COD_DELETE_FD 212
+#define COD_CLOSE_FD 213
+#define COD_SEED_FD 214
+#define COD_WRITE_FD 215
+#define COD_READ_FD 216
+//bloqueantes MEMORY
+#define COD_MALLOC_MEMORY 217
+#define COD_FREE_MEMORY 218
 
-//TODO verificar los codigos
-#define COD_CPU_END_EXECUTION 110
-#define COD_CPU_END_QUANTUM 111
-#define COD_CPU_MEMORY_SYSTEM_CALL 112
-#define COD_CPU_FS_SYSTEM_CALL 113
 
 typedef struct dir_memoria {
 	uint32_t pagina;

@@ -25,16 +25,15 @@ int getAlgorithmIndex(char* name){
 	return -1;
 }
 
-void execute_RoundRobin_scheduling(kernel_struct *kernel_struct, CPU* selectedCPU){
+void execute_RoundRobin_scheduling(kernel_struct* kernel_struct, CPU* selectedCPU){
 	Process* process = getReadyProcess_with_FIFO();
-	//todo a la espera de la respuesta de los ayudates para tratar lo del quantum
-
+	process->quantum = kernel_struct->config->quantum;
 	startProcessExecution(process, selectedCPU);
 }
 
 void execute_FIFO_scheduling(kernel_struct *kernel_struct, CPU* selectedCPU){
 	Process* process = getReadyProcess_with_FIFO();
-
+	process->quantum = WITHOUT_QUANTUM;
 	startProcessExecution(process, selectedCPU);
 }
 
