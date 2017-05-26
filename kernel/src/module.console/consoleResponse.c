@@ -13,7 +13,8 @@ void consoleResponseRepulseMessage(Process* newProcess) {
 	bool running = true;
 	while (running) {
 
-		package = createAndReceivePackage(newProcess->fileDescriptor);
+		package = createAndSendPackage(newProcess->fileDescriptor,
+				COD_KC_CANT_RUN_PROGRAM_REQUEST,0,NULL);
 
 		switch (package->msgCode)
 		{

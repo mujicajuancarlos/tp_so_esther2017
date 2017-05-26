@@ -75,6 +75,7 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 	if (tmpPackage != NULL) {
 		switch (tmpPackage->msgCode) {
 		case COD_NEW_PROCESS_RESPONSE:
+			consoleResponseRepulseMessage(process);
 			logInfo("La memoria reservo las paginas para el proceso pid %d",
 					process->pid);
 			break;
