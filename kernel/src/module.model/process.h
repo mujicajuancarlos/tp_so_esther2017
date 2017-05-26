@@ -23,6 +23,7 @@
 typedef struct Process {
     int fileDescriptor;	//file descriptor del socket de la consola
     int pid;	//PID del proceso que esta ejecutando actualmente
+    int quantum;
     PCB* pcb;
     kernel_struct* kernelStruct;
 } Process;

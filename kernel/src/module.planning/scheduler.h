@@ -17,6 +17,7 @@
 
 #define ROUND_ROBIN 1
 #define FIFO 2
+#define WITHOUT_QUANTUM -1
 
 void initializeScheduler(kernel_struct* kernelStruct);
 

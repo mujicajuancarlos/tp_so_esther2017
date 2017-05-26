@@ -7,10 +7,13 @@
 
 #include "cpuRequest.h"
 
-
 void startProcessExecution(Process* selectedProcess, CPU* selectedCPU){
-
-
-
-	//todo generar paquete con el pcb del proceso seleccionado y enviarlo al fd de la cpu seleccionada
+	sendToEXEC(selectedProcess);
+	selectedCPU->pid = selectedProcess->pid;
+	logInfo("Iniciando ejecucion de pid: %d en cpu: %d",selectedProcess->pid,selectedCPU->fileDescriptor);
+	char* buffer = serialize_PCB(selectedProcess->pcb);
+	uint32_t size = sizeOf_PCB(selectedProcess->pcb);
+	Package* package =  createAndSendPackage(selectedCPU->fileDescriptor,COD_EXEC_NEW_PCB,size,buffer);
+	free(buffer);
+	destroyPackage(package);
 }
