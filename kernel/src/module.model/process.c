@@ -63,13 +63,12 @@ void printProcess(Process* proceso){
 		printf("%d", proceso->pid);
 
 	//imprimo estado
-		printf(getProcessState(proceso));
+		char* state = getProcessState(proceso);
+		printf("%s", state);
 
 	//imprimo exit code
 		printf("%d", proceso->pcb->exit_code);
 }
-
-
 
 
 

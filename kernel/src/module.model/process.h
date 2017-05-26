@@ -9,12 +9,14 @@
 #define PROCESS_H_
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <parser/metadata_program.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/protocol-kernel-cpu.h>
 #include <dc-commons/package.h>
 #include "../kernelStruct.h"
 #include "../commons/collections/list.h"
+
 
 #define FIRST_PID 1000
 
@@ -36,5 +38,7 @@ void destroyCurrentPidMutex();
 int getNextPID();
 
 void createPcbForNewProcess(Process* process, Package* package);
+
+char*  getProcessState(Process*);
 
 #endif /* PROCESS_H_ */

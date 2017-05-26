@@ -14,6 +14,7 @@
 #include <commons/collections/queue.h>
 #include <dc-commons/logger.h>
 #include "../module.model/process.h"
+#include "shortTermScheduler.h"
 
 typedef struct {
 	t_list* new;
@@ -22,6 +23,16 @@ typedef struct {
 	t_queue* block;
 	t_queue* exit;
 } t_planningStates;
+
+/*
+enum enum_planningStates {
+  new,
+  ready,
+  execute,
+  block,
+  ex,
+};  // Must end with a semicolon like a struct
+*/
 
 void moveFromNewToReady(Process* process);
 void moveFromExcecToReady(Process* process);
@@ -47,5 +58,8 @@ t_planningStates* getStates();
 
 void initializeProcessLifeCycle();
 void destroyProcessLifeCycle();
+
+
+
 
 #endif /* MODULE_PLANNING_PROCESSLIFECYCLE_H_ */

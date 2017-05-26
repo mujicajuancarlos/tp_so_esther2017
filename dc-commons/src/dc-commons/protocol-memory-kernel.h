@@ -32,7 +32,7 @@
  *	Parámetros: [Identificador del Programa] [Páginas requeridas]
  */
 #define COD_NEW_PROCESS_REQUEST 403
-#define COD_NEW_PROCESS_RESPONSE 404
+#define COD_NEW_PROCESS_RESPONSE_OK 404
 
 /*
  * Solicitar bytes de una página
@@ -59,8 +59,8 @@
  * Finalizar programa
  *	Parámetros: [Identificador del Programa]
  */
-#define COD_END_PROCESS_REQUEST 410
-#define COD_END_PROCESS_RESPONSE 411
+#define COD_END_PROCESS_REQUEST 412
+#define COD_END_PROCESS_RESPONSE 413
 
 /**
  * STATUS CODES (INTERNOS)
@@ -80,27 +80,20 @@ typedef struct {
 	uint32_t pageNumber;
 	uint32_t offset;
 	uint32_t size;
-} t_GetPageBytes;
-
-typedef struct {
-	uint32_t pid;
-	uint32_t pageNumber;
-	uint32_t offset;
-	uint32_t size;
 	char* buffer;
-} t_SetPageBytes;
+} t_PageBytes;
 
 size_t sizeof_t_AddPagesToProcess();
 size_t sizeof_t_GetPageBytes();
 
 t_AddPagesToProcess* create_t_AddPagesToProcess(int pid, int size);
 
-char* serialize_t_SetPageBytes(t_SetPageBytes* object);
-t_SetPageBytes* deserialize_t_SetPageBytes(char* stream);
+char* serialize_t_PageBytes(t_PageBytes* object);
+t_PageBytes* deserialize_t_PageBytes(char* stream);
 
-size_t sizeof_t_SetPageBytes(t_SetPageBytes* object);
+size_t sizeof_t_PageBytes(t_PageBytes* object);
 
-t_SetPageBytes* create_t_SetPageBytes(uint32_t size, char* buffer);
-void destroy_t_SetPageBytes(t_SetPageBytes* object);
+t_PageBytes* create_t_PageBytes(uint32_t size, char* buffer);
+void destroy_t_PageBytes(t_PageBytes* object);
 
 #endif /* SRC_DC_COMMONS_PROTOCOL_MEMORY_KERNEL_H_ */

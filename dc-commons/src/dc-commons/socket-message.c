@@ -28,7 +28,7 @@ Package* createAndReceivePackage(int fileDescriptor) {
 	result = receivePackage(fileDescriptor, package);
 	if (result == SEND_OR_RECEIVE_SUCCESS)
 		return package;
-	else{
+	else {
 		destroyPackage(package);
 		return NULL;
 	}
@@ -93,6 +93,9 @@ int sendMessage(int socket, char *buffer, int sizeOfMessage, int flags) {
 		bytes_written = send(socket, aux_buffer,
 				sizeOfMessage - total_bytes_written, flags);
 
+		if (bytes_written == 0)
+			logWarning("La funcion 'recv(...)' retorno 0, FD: %d\n", socket);
+
 		if (bytes_written == -1) {
 			error_show(
 					"La funcion 'send(...)' retorno -1, FD: %d, bytes enviados antes del error: %d\n",
@@ -131,6 +134,9 @@ int receiveMessage(int socket, char *buffer, int sizeOfMessage, int flags) {
 
 		bytes_received = recv(socket, aux_buffer,
 				sizeOfMessage - total_bytes_received, flags);
+
+		if (bytes_received == 0)
+			logWarning("La funcion 'recv(...)' retorno 0, FD: %d\n", socket);
 
 		switch (errno) { //errno indica el tipo de error
 		case EINTR: //tipo EINTR si hubo interrupcion en el sistema

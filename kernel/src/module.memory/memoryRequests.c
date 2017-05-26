@@ -74,8 +74,12 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 			process->kernelStruct->socketClientMemoria);
 	if (tmpPackage != NULL) {
 		switch (tmpPackage->msgCode) {
+<<<<<<< HEAD
 		case COD_NEW_PROCESS_RESPONSE:
 			consoleResponseRepulseMessage(process);
+=======
+		case COD_NEW_PROCESS_RESPONSE_OK:
+>>>>>>> 32ce1d50e14d5ed7698763cf9b908d1b29323af3
 			logInfo("La memoria reservo las paginas para el proceso pid %d",
 					process->pid);
 			break;
@@ -115,7 +119,7 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 	Package* tmpPackage;
 	u_int32_t offset = 0;
 	u_int32_t sizeBuffer;
-	t_SetPageBytes* content;
+	t_PageBytes* content;
 	int pagesNumber = sourceCodePackage->size / process->kernelStruct->pageSize;
 	int index;
 
@@ -125,7 +129,7 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 				(sourceCodePackage->size - offset > sourceCodePackage->size) ?
 						process->kernelStruct->pageSize :
 						sourceCodePackage->size - offset;
-		content = create_t_SetPageBytes(sizeBuffer,
+		content = create_t_PageBytes(sizeBuffer,
 				sourceCodePackage->stream + offset);
 		content->pageNumber = index;
 		content->offset = 0;
@@ -136,12 +140,12 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 				content->pid, content->pageNumber, content->offset,
 				content->size);
 		createAndSendPackage(process->kernelStruct->socketClientMemoria,
-		COD_SAVE_PAGE_BYTES_REQUEST, sizeof_t_SetPageBytes(content),
+		COD_SAVE_PAGE_BYTES_REQUEST, sizeof_t_PageBytes(content),
 				(char*) content);//todo verificar que content se envie como char*
 
 		if (tmpPackage == NULL) {
 			destroyPackage(tmpPackage);
-			destroy_t_SetPageBytes(content);
+			destroy_t_PageBytes(content);
 			logError(
 					"No se pudo almacenar el codigo fuente en la memoria para el pid %d",
 					process->pid);
@@ -165,14 +169,14 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 						"La memoria indica que no hay espacio para el proceso pid %d",
 						process->pid);
 				destroyPackage(tmpPackage);
-				destroy_t_SetPageBytes(content);
+				destroy_t_PageBytes(content);
 				removeFromNEW(process);
 				exit(ERROR_WITHOUT_RESOURCES);
 				break;
 			default:
 				logError("La memoria envio un mensaje no esperado");
 				destroyPackage(tmpPackage);
-				destroy_t_SetPageBytes(content);
+				destroy_t_PageBytes(content);
 				exit(ERROR_MESSAGE_CODE_UNKNOWN);
 				break;
 			}
@@ -182,12 +186,12 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 					"No se recibio la respuesta de la memoria para el proceso pid %d",
 					process->pid);
 			destroyPackage(tmpPackage);
-			destroy_t_SetPageBytes(content);
+			destroy_t_PageBytes(content);
 			removeFromNEW(process);
 			exit(ERROR_NETWORK_DISCONNECTED);
 		}
 
-		destroy_t_SetPageBytes(content);
+		destroy_t_PageBytes(content);
 		destroyPackage(tmpPackage);
 	}
 

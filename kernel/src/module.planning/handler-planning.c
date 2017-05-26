@@ -7,17 +7,27 @@
 
 #include "handler-planning.h"
 
+pthread_mutex_t mutexP;
 void handlePlanning(kernel_struct *kernel_struct) {
-
+	CPU* cpu;
+	int algorithm;
 	while (true) {
-
-		/**1. mutex de habilitacion del planificador
-		 * 2. wait del semaforo de cpus disponibles + obtener la instancia de cpu disponible
-		 * 		CPU* cpu = searchAndMarkBusyCPU()
-		 * 3. wait del semaforo de procesos en ready
-		 * 4. solicito al algoritmo que me de el siguiente proceso ready (sacar el proceso de la lista ready)
-		 * 5. enviar a ejecutar el proceso seleccionado por el algoritmo a la cpu seleccionada
-		 */
+		shortTermScheduler_lock();
+		cpu = searchAndMarkBusyCPU();
+		algorithm = getAlgorithmIndex(kernel_struct->config->algoritmo);
+		switch (algorithm) {
+		case ROUND_ROBIN:
+			execute_RoundRobin_scheduling(kernel_struct, cpu);
+			break;
+		case FIFO:
+			execute_FIFO_scheduling(kernel_struct, cpu);
+			break;
+		default:
+			logError("El algoritmo de planificacion ingresado en el archivo de configuracion no es valido");
+			exit (-1);
+			break;
+		}
+		shortTermScheduler_unlock();
 	}
 
 }

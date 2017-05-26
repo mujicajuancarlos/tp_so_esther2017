@@ -33,11 +33,20 @@ void handleKernelRequest(memory_struct* memory_struct, Package* package) {
 	 */
 
 	switch (package->msgCode) {
-	case COD_SAVE_NEW_PROGRAM:
+	case COD_PAGE_SIZE_REQUEST: //para pedir el tamaño de pagina
+		sendPageSize(memory_struct);
+		break;
+	case COD_NEW_PROCESS_REQUEST: //para solicitar la reserva de n paginas para un proceso nuevo
 		startNewProcess(package, memory_struct);
 		break;
-	case COD_PAGE_SIZE_REQUEST:
-		sendPageSize(memory_struct);
+	case COD_SAVE_PAGE_BYTES_REQUEST: //para guardar bytes en una pagina
+		//todo realizar la funcion
+		break;
+	case COD_ADD_PROCESS_PAGES_REQUEST: //para agregar paginas adicionales a un proceso existente
+		//todo realizar la funcion
+		break;
+	case COD_END_PROCESS_REQUEST: //para liberar paginas de un proceso que finalizo
+		//todo realizar la funcion
 		break;
 	default:
 		logError("El kernel solicito una accion desconocida FD: %d Cod: %d",

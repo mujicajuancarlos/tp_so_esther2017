@@ -10,9 +10,6 @@
 size_t sizeof_t_AddPagesToProcess(){
 	return (sizeof(uint32_t) * 2);
 }
-size_t sizeof_t_GetPageBytes(){
-	return (sizeof(uint32_t) * 4);
-}
 
 t_AddPagesToProcess* create_t_AddPagesToProcess(int pid, int size){
 	t_AddPagesToProcess* object = malloc(sizeof_t_AddPagesToProcess());
@@ -21,8 +18,8 @@ t_AddPagesToProcess* create_t_AddPagesToProcess(int pid, int size){
 	return object;
 }
 
-char* serialize_t_SetPageBytes(t_SetPageBytes* object) {
-	char *stream = malloc(sizeof_t_SetPageBytes(object));
+char* serialize_t_PageBytes(t_PageBytes* object) {
+	char *stream = malloc(sizeof_t_PageBytes(object));
 	uint32_t offset = 0;
 
 	serialize_and_copy_value(stream, &(object->pid), sizeof(uint32_t), &offset);
@@ -38,8 +35,8 @@ char* serialize_t_SetPageBytes(t_SetPageBytes* object) {
 	return stream;
 }
 
-t_SetPageBytes* deserialize_t_SetPageBytes(char* stream) {
-	t_SetPageBytes* object = malloc(sizeof(t_SetPageBytes));
+t_PageBytes* deserialize_t_PageBytes(char* stream) {
+	t_PageBytes* object = malloc(sizeof(t_PageBytes));
 	uint32_t offset = 0;
 
 	deserialize_and_copy_value(&(object->pid), stream, sizeof(uint32_t),
@@ -59,12 +56,12 @@ t_SetPageBytes* deserialize_t_SetPageBytes(char* stream) {
 	return object;
 }
 
-size_t sizeof_t_SetPageBytes(t_SetPageBytes* object) {
+size_t sizeof_t_PageBytes(t_PageBytes* object) {
 	return (sizeof(uint32_t) * 4) + sizeof(char) * object->size;
 }
 
-t_SetPageBytes* create_t_SetPageBytes(uint32_t size, char* buffer) {
-	t_SetPageBytes* object = malloc(sizeof(t_SetPageBytes));
+t_PageBytes* create_t_PageBytes(uint32_t size, char* buffer) {
+	t_PageBytes* object = malloc(sizeof(t_PageBytes));
 	object->size = size;
 	size_t sizeBuffer = (sizeof(char) * size);
 	object->buffer = calloc(1, sizeBuffer);
@@ -72,7 +69,7 @@ t_SetPageBytes* create_t_SetPageBytes(uint32_t size, char* buffer) {
 	return object;
 }
 
-void destroy_t_SetPageBytes(t_SetPageBytes* object) {
+void destroy_t_PageBytes(t_PageBytes* object) {
 	if (object != NULL) {
 		if (object->buffer != NULL)
 			free(object->buffer);
