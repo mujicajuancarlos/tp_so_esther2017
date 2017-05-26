@@ -31,6 +31,7 @@ typedef struct memory_struct {
 	uint32_t pageSize;
 	void* memory;
 	t_list* referenceTable;
+	int memorySleep;
 } memory_struct;
 
 #endif /* MEMORYSTRUCT_H_ */

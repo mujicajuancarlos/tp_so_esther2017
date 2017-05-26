@@ -14,13 +14,30 @@ void startNewProcess(Package* package, memory_struct* memoryStruct){
 
 	t_AddPagesToProcess* requestInfo = package->stream;
 
-	requestInfo->pid; // pid del nuevo proceso
-	requestInfo->size; // cantidad de paginas solicitadas
+	Package* outPackage;
+	int status = assignNewPages(memoryStruct, requestInfo->pid, requestInfo->size);
 
-	//todo reservar paginas
-		//asignar las paginas
-			//si esta todo ok responder al kernel con COD_NEW_PROCESS_RESPONSE_OK
-			//si no se pudo responder con el mensaje adecuado ej: ERROR_MEMORY_FULL
+	if (status == 0)
+		outPackage = createAndSendPackage (memoryStruct->socketClientKernel, COD_NEW_PROCESS_RESPONSE_OK, 0, NULL);
+	else
+		outPackage = createAndSendPackage (memoryStruct->socketClientKernel, ERROR_MEMORY_FULL, 0, NULL);
+
+	destroyPackage (outPackage);
+}
+
+void addNewPages (Package* package, memory_struct* memoryStruct) {
+
+	t_AddPagesToProcess* requestInfo = package->stream;
+
+	Package* outPackage;
+	int status = assignNewPages (memoryStruct, requestInfo->pid, requestInfo->size);
+
+	if (status == 0)
+		outPackage = createAndSendPackage (memoryStruct->socketClientKernel, COD_ADD_PROCESS_PAGES_RESPONSE, 0, NULL);
+	else
+		outPackage = createAndSendPackage (memoryStruct->socketClientKernel, ERROR_MEMORY_FULL, 0, NULL);
+
+	destroyPackage (outPackage);
 }
 
 void sendPageSize(memory_struct* memoryStruct){
@@ -33,33 +50,47 @@ void sendPageSize(memory_struct* memoryStruct){
 	destroyPackage(package);
 }
 
-void startNewProcessTest (int processId, int stackSize, int sourceCodeSize, memory_struct* memoryStruct) {
-	int index = 0;
-	int totalSize = sourceCodeSize + stackSize * memoryStruct->pageSize;
-	while (totalSize > 0) {
-		if (newMemoryPage (memoryStruct, processId, index++) == -1)
-			return; // devolver error porque no hay espacio para pagina nueva
-		totalSize-= memoryStruct->pageSize;
-	}
+void startNewProcessTest (int processId, int pages, memory_struct* memoryStruct) {
+	Package* outPackage;
+	int status = assignNewPages (memoryStruct, processId, pages);
+
+	if (status == 0)
+		outPackage = createAndSendPackage (memoryStruct->socketClientKernel, COD_NEW_PROCESS_RESPONSE_OK, 0, NULL);
+	else
+		outPackage = createAndSendPackage (memoryStruct->socketClientKernel, ERROR_MEMORY_FULL, 0, NULL);
+
+	destroyPackage (outPackage);
 }
 
 void saveData (Package* package, memory_struct* memoryStruct) {
 	t_PageBytes* pageBytes = deserialize_t_PageBytes (package->stream);
-	processWrite (memoryStruct, pageBytes);
+	Package* outPackage;
+	int status = processWrite (memoryStruct, pageBytes);
 
-	char* buf = malloc (pageBytes->size);
-	t_PageBytes* pageBytesOut;
-	pageBytesOut = create_t_PageBytes(pageBytes->size, buf);
-	Package* packageOut;
-	packageOut = serialize_t_PageBytes(pageBytesOut);
+	if (status == 0)
+		outPackage = createAndSendPackage (memoryStruct->socketClientKernel, COD_SAVE_PAGE_BYTES_RESPONSE, 0, NULL);
+	else
+		outPackage = createAndSendPackage (memoryStruct->socketClientKernel, ERROR_SEGMENTATION_FAULT, 0, NULL);
 
-	readData (packageOut, memoryStruct);
+	destroyPackage (outPackage);
 	destroy_t_PageBytes (pageBytes);
 }
 
 void readData (Package* package, memory_struct* memoryStruct) {
 	t_PageBytes* pageBytes = deserialize_t_PageBytes (package->stream);
-	processRead (memoryStruct, pageBytes);
-	// mandar pageBytes->buffer
-	Package* outPackage = createAndSendPackage (memoryStruct->socketClientKernel, COD_GET_PAGE_BYTES_RESPONSE, pageBytes->size, pageBytes->buffer);
+	Package* outPackage;
+
+	int status = processRead (memoryStruct, pageBytes);
+
+	if (status == 0)
+		outPackage = createAndSendPackage (memoryStruct->socketClientKernel, COD_GET_PAGE_BYTES_RESPONSE, pageBytes->size, pageBytes->buffer);
+	else
+		outPackage = createAndSendPackage (memoryStruct->socketClientKernel, ERROR_SEGMENTATION_FAULT, 0, NULL);
+
+	destroy_t_PageBytes(pageBytes);
+	destroyPackage (outPackage);
+}
+
+void endProcess (memory_struct* memoryStruct, int pid) {
+	freeProcess (memoryStruct, pid);
 }

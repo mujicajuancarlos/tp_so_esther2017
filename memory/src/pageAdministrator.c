@@ -7,7 +7,6 @@
 
 #include "pageAdministrator.h"
 
-/* devuelve la pagina global*/
 memory_page *getGlobalMemoryPage (memory_struct* memoryStruct, int processId, int processPage) {
 
 	t_list* thisProcessPages;
@@ -25,52 +24,32 @@ memory_page *getGlobalMemoryPage (memory_struct* memoryStruct, int processId, in
 	return ((memory_page*) list_find (thisProcessPages, onlyThisPage));
 }
 
-
-/* le agrego una pagina nueva de memoria para el proceso especificado. devuelve -1 si no habia espacio para pagina nueva, o 0 si se añadio
- * correctamente */
-int newMemoryPage (memory_struct* memoryStruct, int processId, int processPage) {
-	t_list *freePages;
-	freePages = list_create();
-
-	bool onlyFreePages (memory_page *page) {
-			return (page->isFree);
-	}
-
-	freePages = list_filter (memoryStruct->referenceTable, onlyFreePages);
-
-	if (list_size (freePages) == 0)
-		return (-1); // no hay paginas libres
-	else {
-		memory_page *newPage;
-		newPage = list_get (freePages, 0);
-		newPage->pid = processId;
-		newPage->procPage = processPage;
-		newPage->isFree =false;
-		list_replace (memoryStruct->referenceTable, newPage->globPage, newPage);
-		printf ("Se crea pagina nro %i para proceso nro %i\n", newPage->procPage, newPage->pid);
-		return 0;
-	}
-}
-
-/* se mandó a escribir a esta dirección */
-void processWrite (memory_struct* memoryStruct, t_PageBytes* dataInfo) {
-	memory_page *globalPage = getGlobalMemoryPage (memoryStruct, dataInfo->pid, dataInfo->pageNumber);
-	char *memAddress =  globalPage->startAddress + dataInfo->offset;
-
-	/* verificar que no se sobrepase la pagina
-	 * error si la pagina a la que salta no es del mismo proceso */
-	memcpy (memAddress, dataInfo->buffer, dataInfo->size);
-}
-
-/* se mandó a leer de esta dirección */
-void processRead (memory_struct* memoryStruct, t_PageBytes* dataInfo) {
+int processWrite (memory_struct* memoryStruct, t_PageBytes* dataInfo) {
 	memory_page *globalPage = getGlobalMemoryPage (memoryStruct, dataInfo->pid, dataInfo->pageNumber);
 	char *memAddress = globalPage->startAddress + dataInfo->offset;
 
-	/* verificar que no se sobrepase la pagina
-	 * error si la pagina a la que salta no es del mismo proceso */
-	memcpy (dataInfo->buffer, memAddress, dataInfo->size);
+	if ((dataInfo->offset + dataInfo->size) > memoryStruct->pageSize) {
+		// segmentation fault
+		return (-1);
+	}
+	else
+		memcpy (memAddress, dataInfo->buffer, dataInfo->size);
 
+	return 0;
+}
+
+int processRead (memory_struct* memoryStruct, t_PageBytes* dataInfo) {
+	memory_page *globalPage = getGlobalMemoryPage (memoryStruct, dataInfo->pid, dataInfo->pageNumber);
+	char *memAddress = globalPage->startAddress + dataInfo->offset;
+
+	if ((dataInfo->offset + dataInfo->size) > memoryStruct->pageSize) {
+		// segmentation fault
+		return (-1);
+	}
+	else
+		memcpy (dataInfo->buffer, memAddress, dataInfo->size);
+
+	return 0;
 }
 
 void memoryDump (memory_struct* memoryStruct) {
@@ -89,7 +68,7 @@ void memoryDump (memory_struct* memoryStruct) {
 	}
 }
 
-void assignNewPages (memory_struct* memoryStruct, int processId, int pages) {
+int assignNewPages (memory_struct* memoryStruct, int processId, int pages) {
 	/* asigno paginas nuevas a un proceso si me pide el kernel*/
 	t_list* myProcessPages;
 	myProcessPages = list_create ();
@@ -100,18 +79,36 @@ void assignNewPages (memory_struct* memoryStruct, int processId, int pages) {
 
 	myProcessPages = list_filter (memoryStruct->referenceTable, onlyThisProcess);
 
-	if (list_is_empty (myProcessPages)) {
-		return;// significa que no existe ese pid, salta error
-	}
-
 	int maxPage = list_size (myProcessPages);
 	int i;
 
-	for (i = 0; i < pages; i++) {
-		if (newMemoryPage (memoryStruct, processId, maxPage++) == -1)
-			return; // devolver error porque no hay espacio para pagina nueva
+	t_list *freePages;
+	freePages = list_create();
+
+	bool onlyFreePages (memory_page *page) {
+			return (page->isFree);
 	}
-	// si el ciclo termina entonces las paginas se agregaron con exito
+
+	freePages = list_filter (memoryStruct->referenceTable, onlyFreePages);
+
+	if (list_size (freePages) >= pages) {
+		for (i = 0; i < pages; i++) {
+			memory_page *newPage;
+			newPage = list_get (freePages, i);
+			newPage->pid = processId;
+			newPage->procPage = maxPage++;
+			newPage->isFree =false;
+			list_replace (memoryStruct->referenceTable, newPage->globPage, newPage);
+			printf ("Se crea pagina nro %i para proceso nro %i. Pagina global: %i\n", newPage->procPage, newPage->pid, newPage->globPage);
+			// responder que se agregaron las paginas OK
+		}
+		return 0;
+	}
+	else {
+		printf ("ERROR: no hay tantas paginas disponibles\n");
+		// error, porque no se puede cubrir el pedido de todas esas paginas
+		return (-1);
+	}
 }
 
 void freePage (memory_page* page) {
@@ -120,8 +117,7 @@ void freePage (memory_page* page) {
 	page->procPage = 0;
 }
 
-void endProcess (memory_struct *memoryStruct, int processId) {
-	/* si terminamos un proceso, las paginas que utilizaba se vuelven a poner como disponibles para utilizar */
+void freeProcess (memory_struct *memoryStruct, int processId) {
 	t_list* thisProcessPages;
 	thisProcessPages = list_create ();
 

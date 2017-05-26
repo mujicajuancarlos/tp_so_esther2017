@@ -40,6 +40,11 @@ void handleUserRequest(memory_struct* memoryStruct){
 				shouldCompareCommand = false;
 				handleCommand_dump(memoryStruct, commands);
 			}
+
+			if (shouldCompareCommand && equal_user_command(commands[0], COD_CONSOLE_SLEEP)) {
+				shouldCompareCommand = false;
+				handleCommand_set_sleep (memoryStruct, commands);
+			}
 		}
 
 		if (shouldCompareCommand) {
@@ -52,33 +57,78 @@ void handleUserRequest(memory_struct* memoryStruct){
 
 void handleCommand_dump(memory_struct* memoryStruct, char** commands) {
 	if (commands[1] != NULL) {
-		if (equal_user_command(commands[1], OPT_ALL)) {
-			handleCommand_dump_all(memoryStruct, commands);
+		if (equal_user_command(commands[1], OPT_CACHE)) {
+			handleCommand_dump_cache(memoryStruct, commands);
 		}
-		if (equal_user_command(commands[1], OPT_PAGE)) {
-			handleCommand_dump_page(memoryStruct, commands);
+		if (equal_user_command(commands[1], OPT_STRUCTURE)) {
+			handleCommand_dump_structure(memoryStruct, commands);
+		}
+		if (equal_user_command(commands[1], OPT_CONTENT)) {
+					handleCommand_dump_content(memoryStruct, commands);
 		}
 	} else
 		printInvalidArguments("", commands[0]);
 }
 
-void handleCommand_dump_all(memory_struct* memoryStruct, char** commands) {
+void handleCommand_dump_cache(memory_struct* memoryStruct, char** commands) {
 	if (commands[2] == NULL) {
 /*
- * TODO imprimir todas las paginas
+ * TODO dump completo de la cache
  */
 	} else
 		printInvalidArguments(commands[2], commands[0]);
 }
 
-void handleCommand_dump_page(memory_struct* memoryStruct,
+void handleCommand_dump_structure(memory_struct* memoryStruct,
 		char** commands) {
 	if (commands[2] != NULL && commands[3] == NULL) {
 /*
- * TODO buscar e imprimir una pagina
+ * TODO estado de tabla de paginas y listado de procesos activos
  */
 	} else
 		printInvalidArguments("", commands[0]);
+}
+
+void handleCommand_dump_content(memory_struct* kernelStruct, char** commands) {
+	if (commands[2] != NULL && commands[3] == NULL) {
+/*
+ * TODO datos almacenados en la memoria de todos los procesos o de alguno en particular
+ */
+	} else
+		printInvalidArguments("", commands[0]);
+}
+
+void handleCommand_set_sleep (memory_struct* memoryStruct, char** commands) {
+
+	if (commands[1] != NULL) {
+		if (equal_user_command(commands[1], OPT_MILISECONDS)) {
+			handleCommand_set_sleep_to_value(memoryStruct, commands);
+		}
+	} else
+		printInvalidArguments("", commands[0]);
+
+}
+
+void handleCommand_set_sleep_to_value (memory_struct* memoryStruct, char** commands) {
+	int maxValue = 100;
+	int minValue = 0;
+
+
+	if (commands[2] != NULL && commands[3] == NULL) {
+		int newValue = atoi (commands[2]);
+
+		if (newValue > maxValue)
+			memoryStruct->memorySleep = maxValue;
+		else if (newValue < minValue)
+			memoryStruct->memorySleep = minValue;
+		else
+			memoryStruct->memorySleep = newValue;
+	}
+
+	else
+		printInvalidArguments("", commands[0]);
+
+	printf ("%i\n", memoryStruct->memorySleep);
 }
 
 void printCommandsHelp() {

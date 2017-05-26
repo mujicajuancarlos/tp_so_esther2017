@@ -17,6 +17,14 @@
 
 void startNewProcess(Package* package, memory_struct* memoryStruct);
 
+void addNewPages (Package* package, memory_struct* memoryStruct);
+
 void sendPageSize(memory_struct* memoryStruct);
+
+void saveData (Package* package, memory_struct* memoryStruct);
+
+void readData (Package* package, memory_struct* memoryStruct);
+
+void endProcess (memory_struct* memoryStruct, int pid);
 
 #endif /* MODULE_KERNEL_KERNELREQUEST_H_ */

@@ -59,6 +59,7 @@ void initializeStruct(memory_struct* memoryStruct, Configuration* config) {
 	memoryStruct->pageSize = 512; // por ahora quiero probar harcodeado
 	memoryStruct->memory = (void*) malloc (memoryStruct->memorySize);
 	memoryStruct->referenceTable = list_create();
+	memoryStruct->memorySleep = 0;
 
 	int i;
 	int totalPages = memoryStruct->memorySize / memoryStruct->pageSize;
