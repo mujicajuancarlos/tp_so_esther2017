@@ -10,8 +10,23 @@
 
 #include <dc-commons/logger.h>
 #include <dc-commons/package.h>
+#include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-kernel-cpu.h>
+#include "../cpuStruct.h"
+
+
+#define FLAG_OK 0
+#define FLAG_STACKOVERFLOW -1
+#define FLAG_SEGMENTATION_FAULT -2
 
 void loadPCB(PCB* newPCB);
+
+void ansisopExecuteInstruccion(cpu_struct* cpuStruct);
+
+void unloadPCB(cpu_struct* cpuStruct);
+
+char* getNextInstruction(cpu_struct* cpuStruct);
+
+char* getInstructionFromMemory(cpu_struct* cpuStruct, t_puntero_instruccion offset, t_size length);
 
 #endif /* MODULE_CORE_CPU_CORE_H_ */

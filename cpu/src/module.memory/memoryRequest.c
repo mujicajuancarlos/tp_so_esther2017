@@ -8,7 +8,8 @@
 #include "memoryRequest.h"
 
 
-
-/**
- * TODO Implementar funciones para SOLICITAR cosas a la memoria
- */
+char* getPageBytes(cpu_struct* cpuStruct, int pageNumber, int offset, int size){
+	char* buffer = "devulvo los bytes del buffer";
+	//Package* package = createAndSendPackage(cpuStruct->socketClientMemoria, COD_GET_PAGE_BYTES_REQUEST, )
+	return buffer;
+}
