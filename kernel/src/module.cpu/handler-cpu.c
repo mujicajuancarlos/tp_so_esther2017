@@ -55,7 +55,7 @@ void handleNewCPU(CPU* newCpu) {
 }
 
 void handleCPURequest(CPU* cpu, Package* package) {
-	switch (package->msgCode) {
+/*	switch (package->msgCode) {
 	case COD_CPU_END_EXECUTION:
 		// rutina de proceso finalizado -> actualizar pcb
 		markFreeCPU(cpu);
@@ -78,5 +78,5 @@ void handleCPURequest(CPU* cpu, Package* package) {
 		markFreeCPU(cpu);
 		//todo verificar que hacemos en este caso
 		break;
-	}
+	}*/
 }

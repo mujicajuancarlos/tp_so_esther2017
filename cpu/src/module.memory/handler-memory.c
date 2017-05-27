@@ -13,7 +13,7 @@ void packagesReceptionMemory(int fd) {
 
 	Package *packageRecv = createAndReceivePackage(fd);
 
-	if (packageRecv != NULL) {
+	/*if (packageRecv != NULL) {
 		switch (packageRecv->msgCode) {
 		case COD_SOLICITAR_BYTES_PAGE:
 			//Solicitar bytes de una página... solicitarBytes(&hiloCPU) (dentro de esta funcion se hace lo que tiene resolver y arma un paquete con la respuesta
@@ -30,12 +30,12 @@ void packagesReceptionMemory(int fd) {
 		case COD_PROXIMA_SENTENCIA_A_EJECUTAR:
 			break;
 		}
-	}
+	}*/
 }
 
 void packagesSenderMemory(int memoryfd, int code) {
 
-	if (code < 0) {
+	/*if (code < 0) {
 
 		puts("La especificada, no es una operacion valida");
 
@@ -57,7 +57,7 @@ void packagesSenderMemory(int memoryfd, int code) {
 		case COD_PROXIMA_SENTENCIA_A_EJECUTAR:
 			break;
 		}
-	}
+	}*/
 
 }
 

@@ -14,6 +14,7 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-process-exitCodes.h>
 #include <dc-commons/protocol-memory-kernel.h>
+#include <dc-commons/protocol-errors.h>
 #include <dc-commons/serialization.h>
 #include "../module.planning/processLifeCycle.h"
 #include "../module.model/process.h"

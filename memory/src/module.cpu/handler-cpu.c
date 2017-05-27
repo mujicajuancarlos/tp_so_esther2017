@@ -35,7 +35,7 @@ void handleCpuRequest(CPU* cpu, Package* package) {
 	 */
 
 	switch (package->msgCode) {
-	case COD_SOLICITAR_BYTES_PAGE:
+	case COD_GET_PAGE_BYTES_REQUEST:
 
 
 

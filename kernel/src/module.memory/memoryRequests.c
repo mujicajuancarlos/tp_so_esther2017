@@ -17,7 +17,7 @@ void loadMemoryPageSize(kernel_struct* kernel_struct) {
 	NULL);
 	if (package == NULL) {
 		logError("No se pudo solicitar el tamaño de pagina");
-		exit(ERROR_NETWORK_DISCONNECTED);
+		exit(ERROR_DISCONNECTED_SOCKET);
 	}
 	destroyPackage(package);
 
@@ -28,7 +28,7 @@ void loadMemoryPageSize(kernel_struct* kernel_struct) {
 		kernel_struct->pageSize = deserialize_int(package->stream);
 	} else {
 		logError("La memoria respondio con una accion no permitida.");
-		exit(ERROR_MESSAGE_CODE_UNKNOWN);
+		exit(ERROR_UNKNOWN_MESSAGE_CODE);
 	}
 
 }
@@ -61,7 +61,7 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 				"No se pudo solicitar la reserva de paginas para el proceso pid %d",
 				process->pid);
 		removeFromNEW(process);
-		exit(ERROR_NETWORK_DISCONNECTED);
+		exit(ERROR_DISCONNECTED_SOCKET);
 	}
 
 	destroyPackage(tmpPackage);
@@ -93,7 +93,7 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 			logError("La memoria envio un mensaje no esperado");
 			destroyPackage(tmpPackage);
 			free(content);
-			exit(ERROR_MESSAGE_CODE_UNKNOWN);
+			exit(ERROR_UNKNOWN_MESSAGE_CODE);
 			break;
 		}
 	} else {
@@ -104,7 +104,7 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 		destroyPackage(tmpPackage);
 		free(content);
 		removeFromNEW(process);
-		exit(ERROR_NETWORK_DISCONNECTED);
+		exit(ERROR_DISCONNECTED_SOCKET);
 	}
 
 	destroyPackage(tmpPackage);
@@ -145,7 +145,7 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 					"No se pudo almacenar el codigo fuente en la memoria para el pid %d",
 					process->pid);
 			removeFromNEW(process);
-			exit(ERROR_NETWORK_DISCONNECTED);
+			exit(ERROR_DISCONNECTED_SOCKET);
 		}
 		destroyPackage(tmpPackage);
 
@@ -172,7 +172,7 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 				logError("La memoria envio un mensaje no esperado");
 				destroyPackage(tmpPackage);
 				destroy_t_PageBytes(content);
-				exit(ERROR_MESSAGE_CODE_UNKNOWN);
+				exit(ERROR_UNKNOWN_MESSAGE_CODE);
 				break;
 			}
 		} else {
@@ -183,7 +183,7 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 			destroyPackage(tmpPackage);
 			destroy_t_PageBytes(content);
 			removeFromNEW(process);
-			exit(ERROR_NETWORK_DISCONNECTED);
+			exit(ERROR_DISCONNECTED_SOCKET);
 		}
 
 		destroy_t_PageBytes(content);
