@@ -40,7 +40,6 @@ void loadMemoryPageSize(kernel_struct* kernel_struct) {
 void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 	int pagesNumber;
 	Package* tmpPackage;
-
 	pagesNumber = sourceCodePackage->size / process->kernelStruct->pageSize; //como ambos estan bytes me da la cantidad de paginas
 	//agrego la cantidad de paginas para el stack
 	pagesNumber += process->kernelStruct->config->stack_size;
@@ -60,7 +59,6 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 		logError(
 				"No se pudo solicitar la reserva de paginas para el proceso pid %d",
 				process->pid);
-		removeFromNEW(process);
 		exit(ERROR_DISCONNECTED_SOCKET);
 	}
 
@@ -84,7 +82,6 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 			logInfo(
 					"La memoria indica que no hay espacio para el proceso pid %d",
 					process->pid);
-			removeFromNEW(process);
 			destroyPackage(tmpPackage);
 			free(content);
 			exit(ERROR_WITHOUT_RESOURCES);
@@ -92,6 +89,7 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 		default:
 			logError("La memoria envio un mensaje no esperado");
 			destroyPackage(tmpPackage);
+			consoleResponseRepulseMessage(process);
 			free(content);
 			exit(ERROR_UNKNOWN_MESSAGE_CODE);
 			break;
@@ -102,8 +100,8 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 				"No se recibio la respuesta de la memoria para el proceso pid %d",
 				process->pid);
 		destroyPackage(tmpPackage);
+		consoleResponseRepulseMessage(process);
 		free(content);
-		removeFromNEW(process);
 		exit(ERROR_DISCONNECTED_SOCKET);
 	}
 

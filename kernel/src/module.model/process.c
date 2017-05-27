@@ -15,6 +15,7 @@ Process* createProcess(int socket, kernel_struct* kernelStruct) {
 	newProcess->fileDescriptor = socket;
 	newProcess->pid = 0;
 	newProcess->kernelStruct = kernelStruct;
+	newProcess->pcb = NULL;
 	return newProcess;
 }
 

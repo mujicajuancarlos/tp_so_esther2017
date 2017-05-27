@@ -25,6 +25,7 @@ void handleKernelRequest(Program* program, Package* package) {
 			printProgramStatus(program,"Finalizó el programa");
 			removeProgram(program);
 			logInfo("La solicitud del usuario fue exitosa PID: %d", program->pid);
+			destroyProgram(program);
 		} else {
 			printProgramStatus(program,"Solicitud rechazada sobre el programa");
 		}
@@ -33,6 +34,8 @@ void handleKernelRequest(Program* program, Package* package) {
 	case COD_KC_CANT_RUN_PROGRAM_RESPONSE:
 			printProgramStatus(program,"Solicitud Rechazada");
 			removeProgram(program);
+			logInfo("Kernel no pudo iniciar el programa %d", program->pid);
+			destroyProgram(program);
 			break;
 
 	case COD_KC_PRINT_STDOUT:
@@ -45,6 +48,7 @@ void handleKernelRequest(Program* program, Package* package) {
 		printProgramStatus(program,"Finalizó el programa");
 		removeProgram(program);
 		logInfo("Kernel indico la finalizacion del programa %d", program->pid);
+		destroyProgram(program);
 		break;
 	default:
 		logError("Kernel envio una solicitud no valida. Cod: %s",

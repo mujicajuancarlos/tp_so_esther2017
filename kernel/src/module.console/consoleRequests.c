@@ -31,7 +31,7 @@ void startNewProcess(Process* process, Package* package) {
 
 	logInfo("Verifico el grado de multiprogramacion para el pid %d", process->pid);
 	_decrementMultiprogrammingLevel();
-	logInfo("El proceso pid: %d ingreso oficialmente al sistema", process->pid);
+	logInfo("El pid: %d ingreso oficialmente al sistema por el grado de multiprogramacion", process->pid);
 
 	reservePagesForNewProcess(process, package);
 
