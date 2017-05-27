@@ -13,6 +13,10 @@ int errorFlag;
 AnSISOP_funciones ansisop_funtions;
 AnSISOP_kernel ansisop_kernelFunctions;
 
+void setPageSize(int value){
+	pageSize = value;
+}
+
 void loadPCB(PCB* newPCB) {
 	pcb = newPCB;
 	logTrace("Contexto de proceso cargado PID:%d...", pcb->pid);
@@ -50,10 +54,10 @@ char* getNextInstruction(cpu_struct* cpuStruct) {
 			pcb->metadata->instrucciones_serializado[currentPC];
 	t_puntero_instruccion offset = instruction.start;
 	t_size length = instruction.offset;
-	return getInstructionFromMemory(cpuStruct, offset, length);
+	return getDataFromMemory(cpuStruct, offset, length);
 }
 
-char* getInstructionFromMemory(cpu_struct* cpuStruct, t_puntero_instruccion offset, t_size length) {
+char* getDataFromMemory(cpu_struct* cpuStruct, t_puntero_instruccion offset, t_size length) {
 	char* buffer = malloc(length + 1);
 	int bufferOffset = 0;
 	char* tmpBuffer;
@@ -67,7 +71,7 @@ char* getInstructionFromMemory(cpu_struct* cpuStruct, t_puntero_instruccion offs
 		firstByte = (pageNumber == firstPage) ? firstPageOffset : 0;
 		lastByte = (pageNumber == lastPage) ? lastPageOffset : pageSize;
 		tmpBufferSize = lastByte - firstByte;
-		tmpBuffer = getPageBytes(cpuStruct, pageNumber, firstByte, tmpBufferSize);
+		tmpBuffer = getDataFromPage(cpuStruct, pageNumber, firstByte, tmpBufferSize);
 		if (errorFlag == FLAG_OK) {
 			memcpy(buffer + bufferOffset, tmpBuffer, tmpBufferSize);
 			bufferOffset += tmpBufferSize;

@@ -30,9 +30,10 @@ void createMemoryClientSocket(cpu_struct* cpuStruct) {
 		if(package != NULL && package->msgCode == COD_GET_IDENTIFICATION){
 			destroyPackage(package);
 			package = createAndSendPackage(cpuStruct->socketClientMemoria, COD_HANDSHAKE_CPU, 0 , NULL);
-			if(package != NULL)
+			if(package != NULL){
 				destroyPackage(package);
-			else {
+				loadMemoryPageSize(cpuStruct); //con esta instruccion voy a solicitar el tamaño de pagina a la memoria
+			} else {
 				logError("No se pudo completar el handshake con la memoria");
 				cpuStruct->socketClientMemoria = -1;
 			}
