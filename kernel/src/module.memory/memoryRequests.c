@@ -30,7 +30,6 @@ void loadMemoryPageSize(kernel_struct* kernel_struct) {
 		logError("La memoria respondio con una accion no permitida.");
 		exit(ERROR_UNKNOWN_MESSAGE_CODE);
 	}
-
 }
 
 /**
