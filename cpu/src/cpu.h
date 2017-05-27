@@ -16,10 +16,10 @@
 #include <parser/metadata_program.h>
 #include <commons/config.h>
 #include <dc-commons/logger.h>
-#include "handler-kernel.h"
 #include "cpuStruct.h"
 #include "configuration.h"
 #include "connection.h"
+#include "module.kernel/handler-kernel.h"
 
 
 void initializeStruct(cpu_struct* cpuStruct, Configuration* config);

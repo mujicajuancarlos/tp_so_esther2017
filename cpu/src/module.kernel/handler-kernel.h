@@ -5,8 +5,8 @@
  *      Author: utnso
  */
 
-#ifndef HANDLER_KERNEL_H_
-#define HANDLER_KERNEL_H_
+#ifndef MODULE_KERNEL_HANDLER_KERNEL_H_
+#define MODULE_KERNEL_HANDLER_KERNEL_H_
 
 #include <stddef.h>
 #include <errno.h>
@@ -15,7 +15,8 @@
 #include <dc-commons/logger.h>
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-kernel-cpu.h>
-#include "cpuStruct.h"
+#include <dc-commons/protocol-errors.h>
+#include "../cpuStruct.h"
 
 void handleKernel(cpu_struct *args);
 
@@ -25,4 +26,4 @@ void handleKernel(cpu_struct *args);
 void handleKernelRequest(cpu_struct *args, Package* package);
 
 
-#endif /* HANDLER_KERNEL_H_ */
+#endif /* MODULE_KERNEL_HANDLER_KERNEL_H_ */

@@ -5,13 +5,13 @@
  *      Author: utnso
  */
 
-#ifndef HANDLER_MEMORY_H_
-#define HANDLER_MEMORY_H_
+#ifndef MODULE_MEMORY_HANDLER_MEMORY_H_
+#define MODULE_MEMORY_HANDLER_MEMORY_H_
 
 #include <dc-commons/protocol-memory-cpu.h>
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
-#include "cpuStruct.h"
+#include "../cpuStruct.h"
 
 
 //Recibe y desempaqueta los packages provenientes de la Memory
@@ -22,4 +22,4 @@ void packagesSenderMemory(int memoryfd, int code);
 void mensajeParaConectarseAMemory(int memory);
 
 
-#endif /* HANDLER_MEMORY_H_ */
+#endif /* MODULE_MEMORY_HANDLER_MEMORY_H_ */
