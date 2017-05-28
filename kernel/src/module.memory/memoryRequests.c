@@ -121,7 +121,7 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 				(sourceCodePackage->size - offset > sourceCodePackage->size) ?
 						process->kernelStruct->pageSize :
 						sourceCodePackage->size - offset;
-		content = create_t_PageBytes(sizeBuffer,
+		content = create_t_PageBytes(process->pid, index,0,sizeBuffer,
 				sourceCodePackage->stream + offset);
 		content->pageNumber = index;
 		content->offset = 0;
