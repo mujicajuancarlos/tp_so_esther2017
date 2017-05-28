@@ -14,6 +14,8 @@ cpu_struct cpuStruct;
 
 int main(int argc, char *argv[]) {
 
+	configSignalHandlers();
+
 	puts("Cargando archivo externo de configuration");
 	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
 	cpuStruct.config = config;
@@ -41,4 +43,10 @@ void initializeStruct(cpu_struct* cpuStruct, Configuration* config) {
 	cpuStruct->config = config;
 	cpuStruct->socketClientKernel = -1;
 	cpuStruct->socketClientMemoria = -1;
+	initExecutionMutex();
+}
+
+void configSignalHandlers() {
+	if (signal(SIGUSR1, signal_handler) == SIG_ERR)
+		printf("\nNo se pudo configurar el manejador para de señales\n");
 }

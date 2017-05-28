@@ -9,9 +9,7 @@
 
 void reportEndInstruction(cpu_struct* cpuStruct) {
 	logInfo("Informando al kernel que la instruccion se ejecutó correctamente");
-	Package* package = createAndSendPackage(cpuStruct->socketClientKernel,
-	COD_END_INSTRUCCION, 0, NULL);
-	destroyPackage(package);
+	sendPCB(cpuStruct, COD_END_INSTRUCCION);
 }
 
 void reportEndProcess(cpu_struct* cpuStruct) {

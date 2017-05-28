@@ -19,11 +19,15 @@
 #include "cpuStruct.h"
 #include "configuration.h"
 #include "connection.h"
+#include "module.core/cpu-core.h"
+#include "module.core/signalHandler.h"
 #include "module.kernel/handler-kernel.h"
 
 
 void initializeStruct(cpu_struct* cpuStruct, Configuration* config);
 
 void createSockets(cpu_struct* cpuStruct);
+
+void configSignalHandlers();
 
 #endif /* CPU_H_ */

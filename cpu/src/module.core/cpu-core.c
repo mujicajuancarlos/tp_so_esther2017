@@ -10,6 +10,7 @@
 PCB* pcb;
 int pageSize;
 int errorFlag;
+pthread_mutex_t executionMutex;
 
 AnSISOP_funciones ansisop_funtions = { .AnSISOP_definirVariable =
 		ansisop_definirVariable, .AnSISOP_obtenerPosicionVariable =
@@ -31,6 +32,14 @@ AnSISOP_kernel ansisop_kernelFunctions = { .AnSISOP_wait = ansisopKernel_wait,
 		.AnSISOP_cerrar = ansisopKernel_cerrar, .AnSISOP_moverCursor =
 				ansisopKernel_moverCursor, .AnSISOP_escribir =
 				ansisopKernel_escribir, .AnSISOP_leer = ansisopKernel_leer, };
+
+void initExecutionMutex(){
+	pthread_mutex_init(&executionMutex,NULL);
+}
+
+void destroyExecutionMutex(){
+	pthread_mutex_destroy(&executionMutex);
+}
 
 PCB* getPCB() {
 	return pcb;
@@ -63,7 +72,20 @@ bool isFinishedProcess() {
 	return pcb->programCounter > pcb->metadata->instrucciones_size;
 }
 
+/**
+ * me pueden invocar en dos momentos
+ * 	- cuando tengo un pcb -> tengo que realizar acciones para no perder los datos del pcb
+ * 	- cuando no tengo pcb -> finalizo feliz
+ */
+void finalize_CPU_process(){
+	pthread_mutex_lock(&executionMutex);
+		logInfo("Finalizando el proceso porque se recibio la señal SIGUSR1");
+		exit (0);
+	pthread_mutex_unlock(&executionMutex);
+}
+
 void ansisopExecuteInstruccion(cpu_struct* cpuStruct) {
+	pthread_mutex_lock(&executionMutex);
 	errorFlag = FLAG_OK;
 	char* instruccion = getNextInstruction(cpuStruct);
 	if (errorFlag == FLAG_OK) {
@@ -84,6 +106,7 @@ void ansisopExecuteInstruccion(cpu_struct* cpuStruct) {
 	} else {
 		reportExcecutionError(cpuStruct, errorFlag);
 	}
+	pthread_mutex_unlock(&executionMutex);
 }
 
 char* getNextInstruction(cpu_struct* cpuStruct) {

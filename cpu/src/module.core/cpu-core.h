@@ -16,6 +16,9 @@
 #include "../module.kernel/kernelResponse.h"
 #include "error-flags.h"
 
+void initExecutionMutex();
+void destroyExecutionMutex();
+
 PCB* getPCB();
 void loadPCB(PCB* newPCB);
 void unloadPCB();
@@ -25,6 +28,8 @@ void setErrorFlag(int error);
 int getErrorFlag();
 
 void setPageSize(int value);
+
+void finalize_CPU_process();
 
 void ansisopExecuteInstruccion(cpu_struct* cpuStruct);
 
