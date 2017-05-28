@@ -51,7 +51,7 @@ t_PageBytes* deserialize_t_PageBytes(char* stream);
 
 size_t sizeof_t_PageBytes(t_PageBytes* object);
 
-t_PageBytes* create_t_PageBytes(uint32_t size, char* buffer);
+t_PageBytes* create_t_PageBytes(uint32_t pid, uint32_t pageNumber, uint32_t offset, uint32_t size, char* buffer);
 void destroy_t_PageBytes(t_PageBytes* object);
 
 #endif /* SRC_DC_COMMONS_PROTOCOL_MEMORY_CORE_H_ */

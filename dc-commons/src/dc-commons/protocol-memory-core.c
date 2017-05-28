@@ -49,12 +49,14 @@ size_t sizeof_t_PageBytes(t_PageBytes* object) {
 	return (sizeof(uint32_t) * 4) + sizeof(char) * object->size;
 }
 
-t_PageBytes* create_t_PageBytes(uint32_t size, char* buffer) {
+t_PageBytes* create_t_PageBytes(uint32_t pid, uint32_t pageNumber, uint32_t offset, uint32_t size, char* buffer) {
 	t_PageBytes* object = malloc(sizeof(t_PageBytes));
-	object->size = size;
-	size_t sizeBuffer = (sizeof(char) * size);
-	object->buffer = calloc(1, sizeBuffer);
-	memcpy(object->buffer, buffer, sizeBuffer);
+	object->pid = pid;
+	object->pageNumber = pageNumber;
+	object->offset = offset;
+	object->size = (sizeof(char) * size);
+	object->buffer = calloc(1, object->size);
+	memcpy(object->buffer, buffer, object->size);
 	return object;
 }
 
