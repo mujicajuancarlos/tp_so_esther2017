@@ -54,10 +54,11 @@ char* getDataFromPage(cpu_struct* cpuStruct, int pageNumber, int offset,
 		if (package != NULL) {
 			switch (package->msgCode) {
 			case COD_GET_PAGE_BYTES_RESPONSE:
-				logInfo("Solicitud de datos realizada para pid: %d pag: %d offset: %d size: %d",
-			getPCB()->pid, pageNumber, offset, size);
+				logInfo(
+						"Solicitud de datos realizada para pid: %d pag: %d offset: %d size: %d",
+						getPCB()->pid, pageNumber, offset, size);
 				data = deserialize_t_PageBytes(package->stream);
-				memcpy(buffer,data->buffer,bufferSize);
+				memcpy(buffer, data->buffer, bufferSize);
 				destroy_t_PageBytes(data);
 				break;
 			case ERROR_SEGMENTATION_FAULT:
@@ -80,14 +81,15 @@ char* getDataFromPage(cpu_struct* cpuStruct, int pageNumber, int offset,
 		logError("No se pudo enviar la solicitud a la memoria");
 		setErrorFlag(FLAG_DISCONNECTED_MEMORY);
 	}
-	if(getErrorFlag()!=FLAG_OK){
+	if (getErrorFlag() != FLAG_OK) {
 		free(buffer);
 		buffer = NULL;
 	}
 	return buffer;
 }
 
-void saveDataOnPage(cpu_struct* cpuStruct, int pageNumber, int offset, int size, char* buffer){
+void saveDataOnPage(cpu_struct* cpuStruct, int pageNumber, int offset, int size,
+		char* buffer) {
 	Package* package;
 	t_PageBytes* data = create_t_PageBytes(getPCB()->pid, pageNumber, offset,
 			size, buffer);
@@ -105,8 +107,9 @@ void saveDataOnPage(cpu_struct* cpuStruct, int pageNumber, int offset, int size,
 		if (package != NULL) {
 			switch (package->msgCode) {
 			case COD_SAVE_PAGE_BYTES_RESPONSE:
-				logInfo("Solicitud para guardar datos realizada para pid: %d pag: %d offset: %d size: %d",
-							getPCB()->pid, pageNumber, offset, size);
+				logInfo(
+						"Solicitud para guardar datos realizada para pid: %d pag: %d offset: %d size: %d",
+						getPCB()->pid, pageNumber, offset, size);
 				break;
 			case ERROR_SEGMENTATION_FAULT:
 				logError(

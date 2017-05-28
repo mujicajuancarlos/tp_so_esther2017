@@ -13,14 +13,9 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-kernel-cpu.h>
 #include "../module.memory/memoryRequest.h"
+#include "../module.kernel/kernelResponse.h"
 #include "../cpuStruct.h"
-
-
-#define FLAG_OK 0
-#define FLAG_STACKOVERFLOW -1
-#define FLAG_SEGMENTATION_FAULT -2
-#define FLAG_DISCONNECTED_MEMORY -3
-#define FLAG_UNKNOWN_ERROR -4
+#include "error-flags.h"
 
 PCB* getPCB();
 

@@ -13,19 +13,19 @@ int errorFlag;
 AnSISOP_funciones ansisop_funtions;
 AnSISOP_kernel ansisop_kernelFunctions;
 
-PCB* getPCB(){
+PCB* getPCB() {
 	return pcb;
 }
 
-void setErrorFlag(int error){
+void setErrorFlag(int error) {
 	errorFlag = error;
 }
 
-int getErrorFlag(){
+int getErrorFlag() {
 	return errorFlag;
 }
 
-void setPageSize(int value){
+void setPageSize(int value) {
 	pageSize = value;
 }
 
@@ -37,15 +37,20 @@ void loadPCB(PCB* newPCB) {
 void ansisopExecuteInstruccion(cpu_struct* cpuStruct) {
 	errorFlag = FLAG_OK;
 	char* instruccion = getNextInstruction(cpuStruct);
-	pcb->programCounter++;
-
-	logTrace("Ansisop instruction - START");
-	logTrace("Ejecutando '%s'", instruccion);
-	analizadorLinea(instruccion, &ansisop_funtions, &ansisop_kernelFunctions);
-	logTrace("Ansisop instruction - START");
-
-	if (instruccion != NULL)
+	if (errorFlag == FLAG_OK) {
+		pcb->programCounter++;
+		logTrace("Ansisop instruction - START");
+		logTrace("Ejecutando '%s'", instruccion);
+		analizadorLinea(instruccion, &ansisop_funtions,
+				&ansisop_kernelFunctions);
+		logTrace("Ansisop instruction - START");
 		free(instruccion);
+	}
+	if (errorFlag == FLAG_OK){
+		reportEndInstruction(cpuStruct);
+	} else {
+		reportExcecutionError(cpuStruct, errorFlag);
+	}
 }
 
 void unloadPCB(cpu_struct* cpuStruct) {
@@ -66,7 +71,10 @@ char* getNextInstruction(cpu_struct* cpuStruct) {
 			pcb->metadata->instrucciones_serializado[currentPC];
 	t_puntero_instruccion offset = instruction.start;
 	t_size length = instruction.offset;
-	return getDataFromMemory(cpuStruct, 0, offset, length);//0 porque el codigo se almacena en la pag 0 ;)
+	logInfo(
+			"Leyendo de memoria la proxima ejecucion a ejecutar pid: %d offset: %d size: %d",
+			pcb->pid, offset, length);
+	return getDataFromMemory(cpuStruct, 0, offset, length); //0 porque el codigo se almacena en la pag 0 ;)
 }
 
 /**
@@ -74,7 +82,8 @@ char* getNextInstruction(cpu_struct* cpuStruct) {
  * SIN IMPORTAR QUE ESOS DATOS ESTEN PARTIDOS ENTRE DOS O MAS PAGINAS CONTIGUAS
  * ---importante -> hay que pasarle un numero de pagina de inicio -> startPage
  */
-char* getDataFromMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset, t_size length) {
+char* getDataFromMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset,
+		t_size length) {
 	char* buffer = malloc(length + 1);
 	int bufferOffset = 0;
 	char* tmpBuffer;
@@ -88,7 +97,8 @@ char* getDataFromMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset, 
 		firstByte = (pageNumber == firstPage) ? firstPageOffset : 0;
 		lastByte = (pageNumber == lastPage) ? lastPageOffset : pageSize;
 		tmpBufferSize = lastByte - firstByte;
-		tmpBuffer = getDataFromPage(cpuStruct, pageNumber, firstByte, tmpBufferSize);
+		tmpBuffer = getDataFromPage(cpuStruct, pageNumber, firstByte,
+				tmpBufferSize);
 		if (errorFlag == FLAG_OK) {
 			memcpy(buffer + bufferOffset, tmpBuffer, tmpBufferSize);
 			bufferOffset += tmpBufferSize;
@@ -109,7 +119,8 @@ char* getDataFromMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset, 
  * SIN IMPORTAR QUE ESOS DATOS ESTEN PARTIDOS ENTRE DOS O MAS PAGINAS CONTIGUAS
  * ---importante -> hay que pasarle un numero de pagina de inicio -> startPage
  */
-void saveDataOnMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset, t_size length, char* buffer) {
+void saveDataOnMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset,
+		t_size length, char* buffer) {
 	int bufferOffset = 0;
 	char* tmpBuffer;
 	int firstByte, lastByte, pageNumber, tmpBufferSize;
@@ -124,7 +135,8 @@ void saveDataOnMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset, t_
 		tmpBufferSize = lastByte - firstByte;
 		tmpBuffer = malloc(tmpBufferSize);
 		memcpy(tmpBuffer, buffer + bufferOffset, tmpBufferSize);
-		saveDataOnPage(cpuStruct, pageNumber, firstByte, tmpBufferSize, tmpBuffer);
+		saveDataOnPage(cpuStruct, pageNumber, firstByte, tmpBufferSize,
+				tmpBuffer);
 		if (errorFlag == FLAG_OK) {
 			bufferOffset += tmpBufferSize;
 		}
