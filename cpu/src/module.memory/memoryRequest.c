@@ -54,6 +54,8 @@ char* getDataFromPage(cpu_struct* cpuStruct, int pageNumber, int offset,
 		if (package != NULL) {
 			switch (package->msgCode) {
 			case COD_GET_PAGE_BYTES_RESPONSE:
+				logInfo("Solicitud de datos realizada para pid: %d pag: %d offset: %d size: %d",
+			getPCB()->pid, pageNumber, offset, size);
 				data = deserialize_t_PageBytes(package->stream);
 				memcpy(buffer,data->buffer,bufferSize);
 				destroy_t_PageBytes(data);
@@ -83,4 +85,46 @@ char* getDataFromPage(cpu_struct* cpuStruct, int pageNumber, int offset,
 		buffer = NULL;
 	}
 	return buffer;
+}
+
+void saveDataOnPage(cpu_struct* cpuStruct, int pageNumber, int offset, int size, char* buffer){
+	Package* package;
+	t_PageBytes* data = create_t_PageBytes(getPCB()->pid, pageNumber, offset,
+			size, buffer);
+	char* serializedData = serialize_t_PageBytes(data);
+	size_t serializedSize = sizeof_t_PageBytes(data);
+	logTrace("Enviando datos del pid: %d pag: %d offset: %d size: %d",
+			getPCB()->pid, pageNumber, offset, size);
+	package = createAndSendPackage(cpuStruct->socketClientMemoria,
+	COD_SAVE_PAGE_BYTES_REQUEST, serializedSize, serializedData);
+	free(serializedData);
+	destroy_t_PageBytes(data);
+	if (package != NULL) {
+		destroyPackage(package);
+		package = createAndReceivePackage(cpuStruct->socketClientMemoria);
+		if (package != NULL) {
+			switch (package->msgCode) {
+			case COD_SAVE_PAGE_BYTES_RESPONSE:
+				logInfo("Solicitud para guardar datos realizada para pid: %d pag: %d offset: %d size: %d",
+							getPCB()->pid, pageNumber, offset, size);
+				break;
+			case ERROR_SEGMENTATION_FAULT:
+				logError(
+						"La memoria informo que la solicitud produjo SegmentationFault");
+				setErrorFlag(FLAG_SEGMENTATION_FAULT);
+				break;
+			default:
+				logError("La memoria respondio con un codigo no esperado");
+				setErrorFlag(FLAG_UNKNOWN_ERROR);
+				break;
+			}
+			destroyPackage(package);
+		} else {
+			logError("No se pudo recibir la solicitud a la memoria");
+			setErrorFlag(FLAG_DISCONNECTED_MEMORY);
+		}
+	} else {
+		logError("No se pudo enviar la solicitud a la memoria");
+		setErrorFlag(FLAG_DISCONNECTED_MEMORY);
+	}
 }

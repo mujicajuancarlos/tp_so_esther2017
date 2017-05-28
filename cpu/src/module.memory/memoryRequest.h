@@ -20,4 +20,6 @@ void loadMemoryPageSize(cpu_struct* cpuStruct);
 
 char* getDataFromPage(cpu_struct* cpuStruct, int pageNumber, int offset, int size);
 
+void saveDataOnPage(cpu_struct* cpuStruct, int pageNumber, int offset, int size, char* buffer);
+
 #endif /* MODULE_MEMORY_MEMORYREQUEST_H_ */

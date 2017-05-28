@@ -66,16 +66,21 @@ char* getNextInstruction(cpu_struct* cpuStruct) {
 			pcb->metadata->instrucciones_serializado[currentPC];
 	t_puntero_instruccion offset = instruction.start;
 	t_size length = instruction.offset;
-	return getDataFromMemory(cpuStruct, offset, length);
+	return getDataFromMemory(cpuStruct, 0, offset, length);//0 porque el codigo se almacena en la pag 0 ;)
 }
 
-char* getDataFromMemory(cpu_struct* cpuStruct, t_puntero_instruccion offset, t_size length) {
+/**
+ * Soy una funcion generica que sirve para devolver los datos de la memoria
+ * SIN IMPORTAR QUE ESOS DATOS ESTEN PARTIDOS ENTRE DOS O MAS PAGINAS CONTIGUAS
+ * ---importante -> hay que pasarle un numero de pagina de inicio -> startPage
+ */
+char* getDataFromMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset, t_size length) {
 	char* buffer = malloc(length + 1);
 	int bufferOffset = 0;
 	char* tmpBuffer;
 	int firstByte, lastByte, pageNumber, tmpBufferSize;
-	int firstPage = offset / pageSize;
-	int lastPage = (offset + length) / pageSize;
+	int firstPage = startPage + (offset / pageSize);
+	int lastPage = startPage + ((offset + length) / pageSize);
 	int firstPageOffset = offset % pageSize;
 	int lastPageOffset = (offset + length) % pageSize;
 	for (pageNumber = firstPage; errorFlag == FLAG_OK && pageNumber <= lastPage;
@@ -97,4 +102,32 @@ char* getDataFromMemory(cpu_struct* cpuStruct, t_puntero_instruccion offset, t_s
 		buffer = NULL;
 	}
 	return buffer;
+}
+
+/**
+ * Soy una funcion generica que sirve para guardar datos en la memoria
+ * SIN IMPORTAR QUE ESOS DATOS ESTEN PARTIDOS ENTRE DOS O MAS PAGINAS CONTIGUAS
+ * ---importante -> hay que pasarle un numero de pagina de inicio -> startPage
+ */
+void saveDataOnMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset, t_size length, char* buffer) {
+	int bufferOffset = 0;
+	char* tmpBuffer;
+	int firstByte, lastByte, pageNumber, tmpBufferSize;
+	int firstPage = startPage + (offset / pageSize);
+	int lastPage = startPage + ((offset + length) / pageSize);
+	int firstPageOffset = offset % pageSize;
+	int lastPageOffset = (offset + length) % pageSize;
+	for (pageNumber = firstPage; errorFlag == FLAG_OK && pageNumber <= lastPage;
+			++pageNumber) {
+		firstByte = (pageNumber == firstPage) ? firstPageOffset : 0;
+		lastByte = (pageNumber == lastPage) ? lastPageOffset : pageSize;
+		tmpBufferSize = lastByte - firstByte;
+		tmpBuffer = malloc(tmpBufferSize);
+		memcpy(tmpBuffer, buffer + bufferOffset, tmpBufferSize);
+		saveDataOnPage(cpuStruct, pageNumber, firstByte, tmpBufferSize, tmpBuffer);
+		if (errorFlag == FLAG_OK) {
+			bufferOffset += tmpBufferSize;
+		}
+		free(tmpBuffer);
+	}
 }

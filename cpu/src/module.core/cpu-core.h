@@ -38,6 +38,8 @@ void unloadPCB(cpu_struct* cpuStruct);
 
 char* getNextInstruction(cpu_struct* cpuStruct);
 
-char* getDataFromMemory(cpu_struct* cpuStruct, t_puntero_instruccion offset, t_size length);
+char* getDataFromMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset, t_size length);
+
+void saveDataOnMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset, t_size length, char* buffer);
 
 #endif /* MODULE_CORE_CPU_CORE_H_ */
