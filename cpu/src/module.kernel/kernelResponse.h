@@ -19,6 +19,12 @@
 
 void reportEndInstruction(cpu_struct* cpuStruct);
 
+void reportEndProcess(cpu_struct* cpuStruct);
+
+void reportContextSwich(cpu_struct* cpuStruct);
+
+void sendPCB(cpu_struct* cpuStruct, int messageCode);
+
 void reportExcecutionError(cpu_struct* cpuStruct, int errorFlag);
 
 #endif /* MODULE_KERNEL_KERNELRESPONSE_H_ */

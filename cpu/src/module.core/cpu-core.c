@@ -11,35 +11,40 @@ PCB* pcb;
 int pageSize;
 int errorFlag;
 
-AnSISOP_funciones ansisop_funtions = {
-		.AnSISOP_definirVariable		= ansisop_definirVariable,
-		.AnSISOP_obtenerPosicionVariable= ansisop_obtenerPosicionVariable,
-		.AnSISOP_dereferenciar			= ansisop_dereferenciar,
-		.AnSISOP_asignar				= ansisop_asignar,
+AnSISOP_funciones ansisop_funtions = { .AnSISOP_definirVariable =
+		ansisop_definirVariable, .AnSISOP_obtenerPosicionVariable =
+		ansisop_obtenerPosicionVariable, .AnSISOP_dereferenciar =
+		ansisop_dereferenciar, .AnSISOP_asignar = ansisop_asignar,
 		.AnSISOP_obtenerValorCompartida = ansisop_obtenerValorCompartida,
 		.AnSISOP_asignarValorCompartida = ansisop_asignarValorCompartida,
-		.AnSISOP_irAlLabel				= ansisop_irAlLabel,
-		.AnSISOP_llamarSinRetorno		= ansisop_llamarSinRetorno,
-		.AnSISOP_llamarConRetorno		= ansisop_llamarConRetorno,
-		.AnSISOP_finalizar				= ansisop_finalizar,
-		.AnSISOP_retornar				= ansisop_retornar,
-};
+		.AnSISOP_irAlLabel = ansisop_irAlLabel, .AnSISOP_llamarSinRetorno =
+				ansisop_llamarSinRetorno, .AnSISOP_llamarConRetorno =
+				ansisop_llamarConRetorno,
+		.AnSISOP_finalizar = ansisop_finalizar, .AnSISOP_retornar =
+				ansisop_retornar, };
 
-AnSISOP_kernel ansisop_kernelFunctions = {
-		.AnSISOP_wait = ansisopKernel_wait,
-		.AnSISOP_signal = ansisopKernel_signal,
-		.AnSISOP_reservar = ansisopKernel_reservar,
-		.AnSISOP_liberar = ansisopKernel_liberar,
-		.AnSISOP_abrir = ansisopKernel_abrir,
-		.AnSISOP_borrar = ansisopKernel_borrar,
-		.AnSISOP_cerrar = ansisopKernel_cerrar,
-		.AnSISOP_moverCursor = ansisopKernel_moverCursor,
-		.AnSISOP_escribir = ansisopKernel_escribir,
-		.AnSISOP_leer = ansisopKernel_leer,
-};
+AnSISOP_kernel ansisop_kernelFunctions = { .AnSISOP_wait = ansisopKernel_wait,
+		.AnSISOP_signal = ansisopKernel_signal, .AnSISOP_reservar =
+				ansisopKernel_reservar,
+		.AnSISOP_liberar = ansisopKernel_liberar, .AnSISOP_abrir =
+				ansisopKernel_abrir, .AnSISOP_borrar = ansisopKernel_borrar,
+		.AnSISOP_cerrar = ansisopKernel_cerrar, .AnSISOP_moverCursor =
+				ansisopKernel_moverCursor, .AnSISOP_escribir =
+				ansisopKernel_escribir, .AnSISOP_leer = ansisopKernel_leer, };
 
 PCB* getPCB() {
 	return pcb;
+}
+
+void loadPCB(PCB* newPCB) {
+	pcb = newPCB;
+	logTrace("Contexto de proceso cargado PID:%d...", pcb->pid);
+}
+
+void unloadPCB() {
+	destroy_PBC(pcb);
+	pcb = NULL;
+	logTrace("Se descargo el pcb");
 }
 
 void setErrorFlag(int error) {
@@ -54,9 +59,8 @@ void setPageSize(int value) {
 	pageSize = value;
 }
 
-void loadPCB(PCB* newPCB) {
-	pcb = newPCB;
-	logTrace("Contexto de proceso cargado PID:%d...", pcb->pid);
+bool isFinishedProcess() {
+	return pcb->programCounter > pcb->metadata->instrucciones_size;
 }
 
 void ansisopExecuteInstruccion(cpu_struct* cpuStruct) {
@@ -66,27 +70,20 @@ void ansisopExecuteInstruccion(cpu_struct* cpuStruct) {
 		pcb->programCounter++;
 		logTrace("Ansisop instruction - START");
 		logTrace("Ejecutando '%s'", instruccion);
-		analizadorLinea(instruccion, &ansisop_funtions, &ansisop_kernelFunctions);
+		analizadorLinea(instruccion, &ansisop_funtions,
+				&ansisop_kernelFunctions);
 		logTrace("Ansisop instruction - START");
 		free(instruccion);
 	}
-	if (errorFlag == FLAG_OK){
-		reportEndInstruction(cpuStruct);
+	if (errorFlag == FLAG_OK) {
+		if (isFinishedProcess()) {
+			reportEndProcess(cpuStruct);
+		}else{
+			reportEndInstruction(cpuStruct);
+		}
 	} else {
 		reportExcecutionError(cpuStruct, errorFlag);
 	}
-}
-
-void unloadPCB(cpu_struct* cpuStruct) {
-	char* buffer = serialize_PCB(pcb);
-	uint32_t size = sizeOf_PCB(pcb);
-	Package* package = createAndSendPackage(cpuStruct->socketClientKernel,
-	COD_CONTEXT_SWITCH_RESPONSE, size, buffer);
-	logTrace("Se envio en PCB del pid: %d actualizado al kernel fd:%d",
-			pcb->pid, cpuStruct->socketClientKernel);
-	destroyPackage(package);
-	destroy_PBC(pcb);
-	logTrace("Se descargo el pcb");
 }
 
 char* getNextInstruction(cpu_struct* cpuStruct) {
