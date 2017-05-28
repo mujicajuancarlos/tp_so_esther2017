@@ -13,6 +13,18 @@ int errorFlag;
 AnSISOP_funciones ansisop_funtions;
 AnSISOP_kernel ansisop_kernelFunctions;
 
+PCB* getPCB(){
+	return pcb;
+}
+
+void setErrorFlag(int error){
+	errorFlag = error;
+}
+
+int getErrorFlag(){
+	return errorFlag;
+}
+
 void setPageSize(int value){
 	pageSize = value;
 }

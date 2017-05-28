@@ -14,7 +14,7 @@ void loadMemoryPageSize(cpu_struct* cpuStruct) {
 	Package* package;
 	logInfo("Solicitando a la memoria el tamaño de pagina");
 	package = createAndSendPackage(cpuStruct->socketClientMemoria,
-			COD_PAGE_SIZE_REQUEST, 0,
+	COD_PAGE_SIZE_REQUEST, 0,
 	NULL);
 	if (package == NULL) {
 		logError("No se pudo solicitar el tamaño de pagina");
@@ -33,8 +33,54 @@ void loadMemoryPageSize(cpu_struct* cpuStruct) {
 	}
 }
 
-char* getDataFromPage(cpu_struct* cpuStruct, int pageNumber, int offset, int size){
-	char* buffer = "devulvo los bytes del buffer";
-	//Package* package = createAndSendPackage(cpuStruct->socketClientMemoria, COD_GET_PAGE_BYTES_REQUEST, )
+char* getDataFromPage(cpu_struct* cpuStruct, int pageNumber, int offset,
+		int size) {
+	Package* package;
+	size_t bufferSize = sizeof(char) * size;
+	char* buffer = malloc(bufferSize);
+	t_PageBytes* data = create_t_PageBytes(getPCB()->pid, pageNumber, offset,
+			size, buffer);
+	char* serializedData = serialize_t_PageBytes(data);
+	size_t serializedSize = sizeof_t_PageBytes(data);
+	logTrace("Solicitando datos para pid: %d pag: %d offset: %d size: %d",
+			getPCB()->pid, pageNumber, offset, size);
+	package = createAndSendPackage(cpuStruct->socketClientMemoria,
+	COD_GET_PAGE_BYTES_REQUEST, serializedSize, serializedData);
+	free(serializedData);
+	destroy_t_PageBytes(data);
+	if (package != NULL) {
+		destroyPackage(package);
+		package = createAndReceivePackage(cpuStruct->socketClientMemoria);
+		if (package != NULL) {
+			switch (package->msgCode) {
+			case COD_GET_PAGE_BYTES_RESPONSE:
+				data = deserialize_t_PageBytes(package->stream);
+				memcpy(buffer,data->buffer,bufferSize);
+				destroy_t_PageBytes(data);
+				break;
+			case ERROR_SEGMENTATION_FAULT:
+				logError(
+						"La memoria informo que la solicitud produjo SegmentationFault");
+				setErrorFlag(FLAG_SEGMENTATION_FAULT);
+				break;
+			default:
+				logError("La memoria respondio con un codigo no esperado");
+				setErrorFlag(FLAG_UNKNOWN_ERROR);
+				break;
+			}
+			destroyPackage(package);
+		} else {
+			logError("No se pudo recibir la solicitud a la memoria");
+			setErrorFlag(FLAG_DISCONNECTED_MEMORY);
+		}
+
+	} else {
+		logError("No se pudo enviar la solicitud a la memoria");
+		setErrorFlag(FLAG_DISCONNECTED_MEMORY);
+	}
+	if(getErrorFlag()!=FLAG_OK){
+		free(buffer);
+		buffer = NULL;
+	}
 	return buffer;
 }

@@ -19,6 +19,14 @@
 #define FLAG_OK 0
 #define FLAG_STACKOVERFLOW -1
 #define FLAG_SEGMENTATION_FAULT -2
+#define FLAG_DISCONNECTED_MEMORY -3
+#define FLAG_UNKNOWN_ERROR -4
+
+PCB* getPCB();
+
+void setErrorFlag(int error);
+
+int getErrorFlag();
 
 void setPageSize(int value);
 
