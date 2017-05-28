@@ -12,6 +12,8 @@
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-kernel-cpu.h>
+#include "../module.ansisop/primitiveFunctions.h"
+#include "../module.ansisop/primitiveKernelFunctions.h"
 #include "../module.memory/memoryRequest.h"
 #include "../module.kernel/kernelResponse.h"
 #include "../cpuStruct.h"

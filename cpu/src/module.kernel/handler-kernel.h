@@ -16,6 +16,7 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-kernel-cpu.h>
 #include <dc-commons/protocol-errors.h>
+#include "kernelRequest.h"
 #include "../cpuStruct.h"
 
 void handleKernel(cpu_struct *args);

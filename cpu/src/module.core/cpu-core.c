@@ -10,8 +10,33 @@
 PCB* pcb;
 int pageSize;
 int errorFlag;
-AnSISOP_funciones ansisop_funtions;
-AnSISOP_kernel ansisop_kernelFunctions;
+
+AnSISOP_funciones ansisop_funtions = {
+		.AnSISOP_definirVariable		= ansisop_definirVariable,
+		.AnSISOP_obtenerPosicionVariable= ansisop_obtenerPosicionVariable,
+		.AnSISOP_dereferenciar			= ansisop_dereferenciar,
+		.AnSISOP_asignar				= ansisop_asignar,
+		.AnSISOP_obtenerValorCompartida = ansisop_obtenerValorCompartida,
+		.AnSISOP_asignarValorCompartida = ansisop_asignarValorCompartida,
+		.AnSISOP_irAlLabel				= ansisop_irAlLabel,
+		.AnSISOP_llamarSinRetorno		= ansisop_llamarSinRetorno,
+		.AnSISOP_llamarConRetorno		= ansisop_llamarConRetorno,
+		.AnSISOP_finalizar				= ansisop_finalizar,
+		.AnSISOP_retornar				= ansisop_retornar,
+};
+
+AnSISOP_kernel ansisop_kernelFunctions = {
+		.AnSISOP_wait = ansisopKernel_wait,
+		.AnSISOP_signal = ansisopKernel_signal,
+		.AnSISOP_reservar = ansisopKernel_reservar,
+		.AnSISOP_liberar = ansisopKernel_liberar,
+		.AnSISOP_abrir = ansisopKernel_abrir,
+		.AnSISOP_borrar = ansisopKernel_borrar,
+		.AnSISOP_cerrar = ansisopKernel_cerrar,
+		.AnSISOP_moverCursor = ansisopKernel_moverCursor,
+		.AnSISOP_escribir = ansisopKernel_escribir,
+		.AnSISOP_leer = ansisopKernel_leer,
+};
 
 PCB* getPCB() {
 	return pcb;
@@ -41,8 +66,7 @@ void ansisopExecuteInstruccion(cpu_struct* cpuStruct) {
 		pcb->programCounter++;
 		logTrace("Ansisop instruction - START");
 		logTrace("Ejecutando '%s'", instruccion);
-		analizadorLinea(instruccion, &ansisop_funtions,
-				&ansisop_kernelFunctions);
+		analizadorLinea(instruccion, &ansisop_funtions, &ansisop_kernelFunctions);
 		logTrace("Ansisop instruction - START");
 		free(instruccion);
 	}

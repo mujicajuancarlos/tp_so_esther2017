@@ -13,6 +13,7 @@
 #include <dc-commons/protocol-memory-identification.h>
 #include <dc-commons/protocol-memory-cpu.h>
 #include <dc-commons/logger.h>
+#include "module.memory/memoryRequest.h"
 #include "cpuStruct.h"
 
 void createMemoryClientSocket(cpu_struct* cpuStruct);
