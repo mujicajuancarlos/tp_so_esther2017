@@ -29,6 +29,10 @@ int getErrorFlag();
 
 void setPageSize(int value);
 
+bool isFinishedProcess();
+
+void validateStackOverflow(size_t requiredSize);
+
 void finalize_CPU_process();
 
 void ansisopExecuteInstruccion(cpu_struct* cpuStruct);

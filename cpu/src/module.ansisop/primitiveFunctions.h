@@ -9,6 +9,8 @@
 #define MODULE_ANSISOP_PRIMITIVEFUNCTIONS_H_
 
 #include <parser/parser.h>
+#include <dc-commons/protocol-kernel-cpu.h>
+#include "../module.core/cpu-core.h"
 
 /*
  * DEFINIR VARIABLE

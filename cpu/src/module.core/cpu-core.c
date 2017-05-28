@@ -72,6 +72,13 @@ bool isFinishedProcess() {
 	return pcb->programCounter > pcb->metadata->instrucciones_size;
 }
 
+void validateStackOverflow(size_t requiredSize){
+	int maxStackOffset = pcb->stackSize * pageSize;
+	if(pcb->stackOffset + requiredSize >= maxStackOffset){
+		errorFlag = FLAG_STACKOVERFLOW;
+	}
+}
+
 /**
  * me pueden invocar en dos momentos
  * 	- cuando tengo un pcb -> tengo que realizar acciones para no perder los datos del pcb
