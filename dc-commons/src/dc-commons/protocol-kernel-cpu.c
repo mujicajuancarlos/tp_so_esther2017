@@ -18,7 +18,6 @@ PCB* create_new_PCB(uint32_t pid, uint32_t stackFirstPage,
 	newPBC->programCounter = 0;
 	newPBC->stackFirstPage = stackFirstPage;
 	newPBC->stackOffset = 0;
-	newPBC->executedQuantums = 0;
 	newPBC->metadata = metadata;
 	newPBC->stack = NULL;
 	newPBC->stackSize = 0;
