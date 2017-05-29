@@ -19,17 +19,29 @@ PCB* create_new_PCB(uint32_t pid, uint32_t stackFirstPage,
 	newPBC->stackFirstPage = stackFirstPage;
 	newPBC->stackOffset = 0;
 	newPBC->metadata = metadata;
-	newPBC->stack = NULL;
 	newPBC->stackSize = 0;
+	newPBC->stackIndex = NULL;
 	newPBC->exit_code = 0;
 	return newPBC;
 }
-void destroy_PBC(PCB* pbc) {
-	metadata_destruir(pbc->metadata);
-	destroy_stackIndex(pbc->stack, pbc->stackSize);
-	free(pbc);
+void destroy_PBC(PCB* pcb) {
+	if (pcb->metadata != NULL) {
+		metadata_destruir(pcb->metadata);
+		pcb->metadata = NULL;
+	}
+	if (pcb->stackIndex != NULL) {
+		destroy_stackArray(pcb->stackIndex, pcb->stackSize);
+		pcb->stackIndex = NULL;
+	}
+	free(pcb);
 }
-
+uint32_t sizeOf_PCB(PCB* pcb) {
+	uint32_t size = 0;
+	size = sizeof(uint32_t) * 6; //corresponde a los 6 atributos de tipo uint32_t, si se agrega o se elimina algino hay que modificar esto
+	size += sizeOf_metadata_program(pcb->metadata);
+	size += sizeof_stackArray(pcb->stackIndex, pcb->stackSize);
+	return size;
+}
 char* serialize_PCB(PCB* pcb) {
 
 	char *stream = malloc(sizeOf_PCB(pcb));
@@ -51,28 +63,24 @@ char* serialize_PCB(PCB* pcb) {
 	serialize_and_copy_value(stream, streamMetadata,
 			sizeof(char) * size_metadata_program, &offset);
 	free(streamMetadata);
+	//serializo la metadata
 
 	serialize_and_copy_value(stream, &(pcb->stackSize), sizeof(uint32_t),
 			&offset);
 
 	//serializar stack
-	//TODO descomentar y validar
-	uint32_t size_stack = getLong_stack(pcb->stack, pcb->stackSize);
+	uint32_t size_stack = sizeof_stackArray(pcb->stackIndex, pcb->stackSize);
 	serialize_and_copy_value(stream, &(size_stack), sizeof(uint32_t), &offset);
 
-	char* streamStack = serialize_stack(&(pcb->stack), pcb->stackSize);
+	char* streamStack = serialize_stackArray(pcb->stackIndex, pcb->stackSize);
 	serialize_and_copy_value(stream, streamStack, sizeof(char) * size_stack,
 			&offset);
 	free(streamStack);
+	//serializar stack
+	serialize_and_copy_value(stream, &(pcb->exit_code), sizeof(uint32_t),
+			&offset);
 
 	return stream;
-}
-uint32_t sizeOf_PCB(PCB* pcb) {
-	uint32_t size = 0;
-	size = sizeof(uint32_t) * 6; //corresponde a los 6 atributos de tipo uint32_t, si se agrega o se elimina algino hay que modificar esto
-	size += sizeof(uint32_t);
-	size += sizeOf_metadata_program(pcb->metadata);
-	return size;
 }
 PCB* deserialize_PCB(char* stream) {
 
@@ -101,209 +109,219 @@ PCB* deserialize_PCB(char* stream) {
 			&offset);
 
 	//deserializacion de stack
-	//TODO descomentar y validar
 	uint32_t size_stack;
 	deserialize_and_copy_value(&size_stack, stream, sizeof(uint32_t), &offset);
 
 	char* stream_stack = malloc(sizeof(char) * size_stack);
 	deserialize_and_copy_value(stream_stack, stream, size_stack, &offset);
-	pcb->stack = deserialize_stack(stream_stack, pcb->stackSize);
+	pcb->stackIndex = deserialize_stackArray(stream_stack, pcb->stackSize);
 	free(stream_stack);
 
+	deserialize_and_copy_value(&(pcb->exit_code), stream, sizeof(uint32_t),
+			&offset);
 	return pcb;
 }
+
 /******************************************************************************************************************
+ EXCUSIVO METADATA PROGRAM
  ******************************************************************************************************************
  */
+uint32_t sizeOf_metadata_program(t_metadata_program* metadata) {
+	uint32_t total_size = 0;
+	total_size += sizeof(metadata->instruccion_inicio);	//inst_inicio
+	total_size += sizeof(metadata->instrucciones_size);	//size int32
+	total_size += sizeof(t_intructions) * metadata->instrucciones_size;	//size indice de codigo
+	total_size += sizeof(metadata->etiquetas_size);	//size etiquetas
+	total_size += sizeof(char) * metadata->etiquetas_size;//string de etiquetas serializado
+	total_size += sizeof(int) * 2;	//cant funciones y etiquetas
+	return total_size;
+}
+
+char* serialize_metadata_program(t_metadata_program* metadata) {
+	uint32_t total_size = sizeOf_metadata_program(metadata);
+	char* serialized = malloc(total_size);
+	uint32_t offset = 0;
+	int i;
+
+	serialize_and_copy_value(serialized, &(metadata->instruccion_inicio),
+			sizeof(metadata->instruccion_inicio), &offset);
+	serialize_and_copy_value(serialized, &(metadata->instrucciones_size),
+			sizeof(metadata->instrucciones_size), &offset);
+
+	for (i = 0; i < metadata->instrucciones_size; i++) {
+		serialize_and_copy_value(serialized,
+				&(metadata->instrucciones_serializado[i].start),
+				sizeof(metadata->instrucciones_serializado[i].start), &offset);
+		serialize_and_copy_value(serialized,
+				&(metadata->instrucciones_serializado[i].offset),
+				sizeof(metadata->instrucciones_serializado[i].offset), &offset);
+	}
+
+	serialize_and_copy_value(serialized, &(metadata->etiquetas_size),
+			sizeof(metadata->etiquetas_size), &offset);
+	serialize_and_copy_value(serialized, metadata->etiquetas,
+			sizeof(char) * metadata->etiquetas_size, &offset);
+	serialize_and_copy_value(serialized, &(metadata->cantidad_de_funciones),
+			sizeof(metadata->cantidad_de_funciones), &offset);
+	serialize_and_copy_value(serialized, &(metadata->cantidad_de_etiquetas),
+			sizeof(metadata->cantidad_de_etiquetas), &offset);
+
+	return serialized;
+}
+
+t_metadata_program* deserialize_metadata_program(char* serialized) {
+	t_metadata_program* metadata = malloc(sizeof(t_metadata_program));
+	uint32_t offset = 0;
+	int i;
+
+	deserialize_and_copy_value(&(metadata->instruccion_inicio), serialized,
+			sizeof(metadata->instruccion_inicio), &offset);
+	deserialize_and_copy_value(&(metadata->instrucciones_size), serialized,
+			sizeof(metadata->instrucciones_size), &offset);
+
+	metadata->instrucciones_serializado = malloc(
+			sizeof(t_intructions) * metadata->instrucciones_size);
+	for (i = 0; i < metadata->instrucciones_size; i++) {
+		deserialize_and_copy_value(
+				&(metadata->instrucciones_serializado[i].start), serialized,
+				sizeof(metadata->instrucciones_serializado[i].start), &offset);
+		deserialize_and_copy_value(
+				&(metadata->instrucciones_serializado[i].offset), serialized,
+				sizeof(metadata->instrucciones_serializado[i].offset), &offset);
+	}
+
+	deserialize_and_copy_value(&(metadata->etiquetas_size), serialized,
+			sizeof(metadata->etiquetas_size), &offset);
+	metadata->etiquetas = malloc(sizeof(char) * metadata->etiquetas_size);
+	deserialize_and_copy_value(metadata->etiquetas, serialized,
+			sizeof(char) * metadata->etiquetas_size, &offset);
+	deserialize_and_copy_value(&(metadata->cantidad_de_funciones), serialized,
+			sizeof(metadata->cantidad_de_funciones), &offset);
+	deserialize_and_copy_value(&(metadata->cantidad_de_etiquetas), serialized,
+			sizeof(metadata->cantidad_de_etiquetas), &offset);
+
+	return metadata;
+}
 
 /******************************************************************************************************************
  EXCUSIVO STACK
  ******************************************************************************************************************
  */
-
-t_stack_program* create_new_stack() {
-	t_stack_program* stack = malloc(sizeof(stack));
-	//todo completar
-	return stack;
-}
-void destroy_stackIndex(t_stack_program* contexto, uint32_t context_len) {
-	int i;
-	for (i = 0; i < context_len; i++) {
-		if (contexto[i].variables != NULL && contexto[i].var_len > 0) {
-			free(contexto[i].variables);
-		}
-		if (contexto[i].argumentos != NULL && contexto[i].arg_len > 0) {
-			free(contexto[i].argumentos);
-		}
-	}
-	free(contexto);
-}
-char* serialize_stack(t_stack_program** contextos, uint32_t contextos_length) {
-
-	t_stack_program* aux_contextos = *contextos;
-	uint32_t total_size = getLong_stack(aux_contextos, contextos_length);
-	char *stream = malloc(sizeof(char) * total_size);
-
-	uint32_t offset = 0;
-
-	int i;
-	for (i = 0; i < contextos_length; i++) {
-		char* serialized_contexto = serializar_contexto(&aux_contextos[i]);	//TODO: ver como pasarle el puntero como parametro
-		uint32_t size_contexto = getLong_contexto(&aux_contextos[i]);
-		serialize_and_copy_value(stream, &(size_contexto), sizeof(uint32_t),
-				&offset);	//size contexto
-		serialize_and_copy_value(stream, serialized_contexto,
-				sizeof(char) * size_contexto, &offset);	//contexto
-		free(serialized_contexto);
-	}
-	return stream;
-
-}
-
-t_stack_program* deserialize_stack(char* stream, uint32_t contextos_length) {
-	//t_stack_program* stack = malloc(sizeof(stack));
-	uint32_t offset = 0;
-
-	//t_stack_program* contextos = NULL;
-	t_stack_program* contextos = malloc(
-			sizeof(t_stack_program) * contextos_length);
-	int i;
-	for (i = 0; i < contextos_length; i++) {
-		uint32_t size_contexto;
-		deserialize_and_copy_value(&(size_contexto), stream, sizeof(uint32_t),
-				&offset);
-		char* serialized_contexto = malloc(sizeof(char) * size_contexto);
-		//contextos = realloc(contextos,sizeof(contexto)*(i+1));
-		deserialize_and_copy_value(serialized_contexto, stream, size_contexto,
-				&offset);
-		t_stack_program* aux = deserializar_contexto(serialized_contexto);
-		contextos[i] = *(aux);
-		free(aux);
-		free(serialized_contexto);
-	}
-	return contextos;
-}
-
-//SizeOf_Stack()
-uint32_t getLong_stack(t_stack_program* contextos, uint32_t contextos_length) {
+uint32_t sizeof_stackArray(t_stack_index* stackArray, uint32_t stackSize) {
 	uint32_t total = 0;
 	int i;
-	for (i = 0; i < contextos_length; i++) {
-		total += sizeof(uint32_t);
-		total += getLong_contexto(&(contextos[i]));
+	for (i = 0; i < stackSize; i++) {
+		total += sizeof(uint32_t); //esto es para la serializacion, guarda el tamaño de stackIndex
+		total += sizeof_stackIndex(&(stackArray[i]));
 	}
 	return total;
 }
 
-/******************************************************************************************************************
- EXCUSIVO CONTEXTO
- ******************************************************************************************************************
- */
-void crearNuevoContexto(PCB* pcb) {
-	pcb->stack = realloc(pcb->stack,
-			sizeof(t_stack_program) * (pcb->stackSize + 1));
-	pcb->stack[pcb->stackSize].arg_len = 0;
-	pcb->stack[pcb->stackSize].argumentos = NULL;
-	pcb->stack[pcb->stackSize].var_len = 0;
-	pcb->stack[pcb->stackSize].variables = NULL;
-	pcb->stackSize++;
+uint32_t sizeof_stackIndex(t_stack_index* stackIndex) {
+	uint32_t longitud = 0;
+	longitud += sizeof(uint32_t);
+	longitud += sizeof(t_variable) * stackIndex->arg_len;
+	longitud += sizeof(uint32_t);
+	longitud += sizeof(t_variable) * stackIndex->var_len;
+	longitud += sizeof(t_puntero_instruccion);
+	longitud += sizeof(dir_memoria);
+	return longitud;
 }
 
-void destruirContextoActual(PCB* pcb, int size_pagina) {
-	pcb->stackSize--;
-	t_stack_program* contextoActual = &(pcb->stack[pcb->stackSize]);
-	//pongo el program counter en la direccion de retorno de la funcion
-	pcb->programCounter = contextoActual->retPos;
-	//libero variables y argumentos
-	if (contextoActual->variables != NULL) {
-		free(contextoActual->variables);
-	}
-	if (contextoActual->argumentos != NULL) {
-		free(contextoActual->argumentos);
-	}
-	//reestablezco el valor del stack offset para que se pueda volver a usar el espacio para crear variables
-	pcb->stackOffset -= (contextoActual->var_len * sizeof(uint32_t));
-	pcb->stackOffset -= (contextoActual->arg_len * sizeof(uint32_t));
-	//libero el ultimo contexto
-	pcb->stack = realloc(pcb->stack,
-			sizeof(t_stack_program) * (pcb->stackSize));
-}
-
-char* serializar_contexto(t_stack_program* contexto) {
-	uint32_t total_size = getLong_contexto(contexto);
-	char *stream = malloc(sizeof(char) * total_size);
-
+char* serialize_stackArray(t_stack_index* stackArray, uint32_t stackSize) {
+	uint32_t total_size = sizeof_stackArray(stackArray, stackSize);
+	char* stream = malloc(sizeof(char) * total_size);
 	uint32_t offset = 0;
-
-	//cantidad de argumentos
-	serialize_and_copy_value(stream, &(contexto->arg_len), sizeof(uint32_t),
-			&offset);
-
-	//serializar array de argumentos
-	char* serialized_dictionary = serializar_array_variables(
-			&(contexto->argumentos), contexto->arg_len);
-	serialize_and_copy_value(stream, serialized_dictionary,
-			sizeof(t_variable) * contexto->arg_len, &offset);
-	free(serialized_dictionary);
-
-	//cantidad de variables
-	serialize_and_copy_value(stream, &(contexto->var_len), sizeof(uint32_t),
-			&offset);
-
-	//serializar array de variables
-	serialized_dictionary = serializar_array_variables(&(contexto->variables),
-			contexto->var_len);
-	serialize_and_copy_value(stream, serialized_dictionary,
-			sizeof(t_variable) * contexto->var_len, &offset);
-	free(serialized_dictionary);
-
-	//posicion de retorno
-	serialize_and_copy_value(stream, &(contexto->retPos),
-			sizeof(t_puntero_instruccion), &offset);
-
-	//direccion de variable de retorno
-	serialize_and_copy_value(stream, &(contexto->retVar.pagina),
-			sizeof(uint32_t), &offset);
-	serialize_and_copy_value(stream, &(contexto->retVar.offset),
-			sizeof(uint32_t), &offset);
-	serialize_and_copy_value(stream, &(contexto->retVar.size), sizeof(uint32_t),
-			&offset);
-
+	int i;
+	for (i = 0; i < stackSize; i++) {
+		uint32_t stackIndexSize = sizeof_stackIndex(&stackArray[i]);
+		char* stackIndexBuffer = serialize_stackIndex(&stackArray[i]);
+		//TODO: ver como pasarle el puntero como parametro -> &stackArray[i] |||| stackArray + i
+		serialize_and_copy_value(stream, &(stackIndexSize), sizeof(uint32_t),
+				&offset);
+		serialize_and_copy_value(stream, stackIndexBuffer,
+				sizeof(char) * stackIndexSize, &offset);
+		free(stackIndexBuffer);
+	}
 	return stream;
 }
 
-t_stack_program* deserializar_contexto(char* stream) {
-	t_stack_program* context = malloc(sizeof(t_stack_program));
+char* serialize_stackIndex(t_stack_index* stackIndex) {
+	uint32_t total_size = sizeof_stackIndex(stackIndex);
+	char *stream = malloc(sizeof(char) * total_size);
+	char* tmpBuffer;
 	uint32_t offset = 0;
 
-	//cantidad de argumentos
+	serialize_and_copy_value(stream, &(stackIndex->arg_len), sizeof(uint32_t),
+			&offset);
+	tmpBuffer = serializeVariablesArray(stackIndex->args,
+			stackIndex->arg_len);
+	serialize_and_copy_value(stream, tmpBuffer,
+			sizeof(t_variable) * stackIndex->arg_len, &offset);
+	free(tmpBuffer);
+
+	serialize_and_copy_value(stream, &(stackIndex->var_len), sizeof(uint32_t),
+			&offset);
+	tmpBuffer = serializeVariablesArray(stackIndex->vars,
+			stackIndex->var_len);
+	serialize_and_copy_value(stream, tmpBuffer,
+			sizeof(t_variable) * stackIndex->var_len, &offset);
+	free(tmpBuffer);
+
+	serialize_and_copy_value(stream, &(stackIndex->retPos),
+			sizeof(t_puntero_instruccion), &offset);
+	serialize_and_copy_value(stream, &(stackIndex->retVar.pagina),
+			sizeof(uint32_t), &offset);
+	serialize_and_copy_value(stream, &(stackIndex->retVar.offset),
+			sizeof(uint32_t), &offset);
+	serialize_and_copy_value(stream, &(stackIndex->retVar.size),
+			sizeof(uint32_t), &offset);
+
+	return stream;
+}
+t_stack_index* deserialize_stackArray(char* buffer, uint32_t stackSize) {
+	uint32_t offset = 0;
+	int i;
+	t_stack_index* stackArray = malloc(sizeof(t_stack_index) * stackSize);
+	for (i = 0; i < stackSize; i++) {
+		uint32_t stackIndexSize;
+		deserialize_and_copy_value(&(stackIndexSize), buffer, sizeof(uint32_t),
+				&offset);
+		char* stackIndexBuffer = malloc(sizeof(char) * stackIndexSize);
+		deserialize_and_copy_value(stackIndexBuffer, buffer, stackIndexSize,
+				&offset);
+		t_stack_index* stackIndex = deserialize_stackIndex(stackIndexBuffer);
+		stackArray[i] = *(stackIndex);  //TODO: verificar
+		free(stackIndex);  //verificar
+		free(stackIndexBuffer);
+	}
+	return stackArray;
+}
+
+t_stack_index* deserialize_stackIndex(char* stream) {
+	t_stack_index* context = malloc(sizeof(t_stack_index));
+	uint32_t offset = 0;
+	char* tmpBuffer;
+
 	deserialize_and_copy_value(&(context->arg_len), stream, sizeof(uint32_t),
 			&offset);
 
-	char* serialized_dictionary = malloc(
-			(sizeof(t_variable)) * context->arg_len);
-	deserialize_and_copy_value(serialized_dictionary, stream,
+	tmpBuffer = malloc((sizeof(t_variable)) * context->arg_len);
+	deserialize_and_copy_value(tmpBuffer, stream,
 			(sizeof(t_variable)) * context->arg_len, &offset);
+	context->args = deserializeVariablessssArray(tmpBuffer, context->arg_len);
+	free(tmpBuffer);
 
-	context->argumentos = deserializar_array_variables(serialized_dictionary,
-			context->arg_len);
-	free(serialized_dictionary);
-
-	//cantidad de variables
 	deserialize_and_copy_value(&(context->var_len), stream, sizeof(uint32_t),
 			&offset);
-
-	serialized_dictionary = malloc((sizeof(t_variable)) * context->var_len);
-	deserialize_and_copy_value(serialized_dictionary, stream,
+	tmpBuffer = malloc((sizeof(t_variable)) * context->var_len);
+	deserialize_and_copy_value(tmpBuffer, stream,
 			(sizeof(t_variable)) * context->var_len, &offset);
-
-	context->variables = deserializar_array_variables(serialized_dictionary,
-			context->var_len);
-	free(serialized_dictionary);
+	context->vars = deserializeVariablessssArray(tmpBuffer, context->var_len);
+	free(tmpBuffer);
 
 	deserialize_and_copy_value(&(context->retPos), stream,
 			sizeof(t_puntero_instruccion), &offset);
-
 	deserialize_and_copy_value(&(context->retVar.pagina), stream,
 			sizeof(uint32_t), &offset);
 	deserialize_and_copy_value(&(context->retVar.offset), stream,
@@ -314,44 +332,47 @@ t_stack_program* deserializar_contexto(char* stream) {
 	return context;
 }
 
-uint32_t getLong_contexto(t_stack_program* contexto) {
-	uint32_t longitud = 0;
-	longitud += sizeof(uint32_t);
-	longitud += sizeof(t_variable) * contexto->arg_len;
-	longitud += sizeof(uint32_t);
-	longitud += sizeof(t_variable) * contexto->var_len;
-	longitud += sizeof(t_puntero_instruccion);
-	longitud += sizeof(dir_memoria);
-	return longitud;
+void destroy_stackArray(t_stack_index* stackArray, uint32_t stackSize) {
+	int i;
+	for (i = 0; i < stackSize; i++) {
+		destroy_stackIndex(stackArray[i]);
+	}
+	free(stackArray);
 }
+
+void destroy_stackIndex(t_stack_index stackIndex) {
+	if (stackIndex.vars != NULL && stackIndex.var_len > 0) {
+		free(stackIndex.vars);
+	}
+	if (stackIndex.args != NULL && stackIndex.arg_len > 0) {
+		free(stackIndex.args);
+	}
+}
+
 /******************************************************************************************************************
  EXCUSIVO VARIABLE
  ******************************************************************************************************************
  */
 
-char* serializar_array_variables(t_variable** variables, uint32_t len) {
+char* serializeVariablesArray(t_variable* variables, uint32_t len) {
 	char *stream = malloc(sizeof(t_variable) * len);
-	t_variable* aux_variables = *variables;
-
 	uint32_t offset = 0;
-
 	int i;
 	for (i = 0; i < len; i++) {
-		serialize_and_copy_value(stream, &(aux_variables[i].nombre),
+		serialize_and_copy_value(stream, &(variables[i].nombre),
 				sizeof(char), &offset);
-		serialize_and_copy_value(stream, &(aux_variables[i].direccion.pagina),
+		serialize_and_copy_value(stream, &(variables[i].direccion.pagina),
 				sizeof(uint32_t), &offset);
-		serialize_and_copy_value(stream, &(aux_variables[i].direccion.offset),
+		serialize_and_copy_value(stream, &(variables[i].direccion.offset),
 				sizeof(uint32_t), &offset);
-		serialize_and_copy_value(stream, &(aux_variables[i].direccion.size),
+		serialize_and_copy_value(stream, &(variables[i].direccion.size),
 				sizeof(uint32_t), &offset);
 	}
 	return stream;
 }
 
-t_variable* deserializar_array_variables(char* stream, uint32_t len) {
+t_variable* deserializeVariablessssArray(char* stream, uint32_t len) {
 	uint32_t offset = 0;
-
 	t_variable* variables = NULL;
 	int i;
 	for (i = 0; i < len; i++) {
@@ -367,6 +388,38 @@ t_variable* deserializar_array_variables(char* stream, uint32_t len) {
 	}
 	return variables;
 }
+
 /******************************************************************************************************************
+ EXCUSIVO CONTEXTO
+ Es un array de t_stack_index
  ******************************************************************************************************************
  */
+void createNewContext(PCB* pcb) {
+	pcb->stackIndex = realloc(pcb->stackIndex,
+			sizeof(t_stack_index) * (pcb->stackSize + 1));
+	pcb->stackIndex[pcb->stackSize].arg_len = 0;
+	pcb->stackIndex[pcb->stackSize].args = NULL;
+	pcb->stackIndex[pcb->stackSize].var_len = 0;
+	pcb->stackIndex[pcb->stackSize].vars = NULL;
+	pcb->stackSize++;
+}
+
+void destroyCurrentContext(PCB* pcb) {
+	pcb->stackSize--;
+	t_stack_index* contextoActual = getCurrentContext(pcb);
+	pcb->programCounter = contextoActual->retPos;
+	if (contextoActual->vars != NULL) {
+		free(contextoActual->vars);
+	}
+	if (contextoActual->args != NULL) {
+		free(contextoActual->args);
+	}
+	pcb->stackOffset -= (contextoActual->var_len * sizeof(uint32_t));
+	pcb->stackOffset -= (contextoActual->arg_len * sizeof(uint32_t));
+	pcb->stackIndex = realloc(pcb->stackIndex,
+			sizeof(t_stack_index) * (pcb->stackSize));
+}
+
+t_stack_index* getCurrentContext(PCB* pcb) {
+	return &(pcb->stackIndex[pcb->stackSize]);
+}

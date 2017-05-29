@@ -69,34 +69,4 @@ int deserialize_int(char* stream);
  */
 char* deserialize_string(char* stream, size_t length);
 
-/**
- * @NAME: sizeOf_metadata_program
- * @DESC: devuelvo el tamaño de toda la estructura
- * @PARAMS:
- * 		t_metadata_program* metadata
- * @RETURN:
- * 		uint32_t
- */
-uint32_t sizeOf_metadata_program(t_metadata_program* metadata);
-
-/**
- * @NAME: serialize_metadata_program
- * @DESC: devuelvo un stream que representa la metadata
- * @PARAMS:
- * 		t_metadata_program* metadata
- * @RETURN:
- * 		char* stream
- */
-char* serialize_metadata_program(t_metadata_program* metadata);
-
-/**
- * @NAME: deserialize_metadata_program
- * @DESC: devuelvo una estructura a partir del stream
- * @PARAMS:
- * 		char* stream
- * @RETURN:
- * 		t_metadata_program* metadata
- */
-t_metadata_program* deserialize_metadata_program(char* stream);
-
 #endif /* SRC_DC_COMMONS_SERIALIZATION_H_ */
