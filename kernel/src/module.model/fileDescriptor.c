@@ -7,6 +7,7 @@
 #include "fileDescriptor.h"
 
 t_list* tablaGlobalFD;
+//t_list* tablaProcesosFD;
 int nextFD = FIRST_FD;
 
 pthread_mutex_t fileDescriptor_mutex;
@@ -114,3 +115,32 @@ void decrementarOpen(t_fileDescriptor* fd) {
 	fileDescriptor_mutex_unlock();
 }
 
+void imprimirEstructura(t_fileDescriptor* fd){
+	printf("Estructura FD:\n File Descriptor: %d\n,Archivo: %s\n,Open: %d\n",fd->fd,fd->path,fd->open);
+
+}
+
+void imprimirListaDeFD(t_list* lista){
+	fileDescriptor_mutex_lock();
+	t_list* aux = lista;
+	while(aux!=NULL){
+		imprimirEstructura(aux->head->data);
+		aux =aux->head->next; //Duda sobre esto. Hay un problema de tipos que no comprendi (salta un warning)
+	}
+	fileDescriptor_mutex_unlock();
+}
+
+t_processFileDescriptor* createNew_t_processFileDescriptor(char permiso, t_fileDescriptor fd){
+
+	t_processFileDescriptor* newPFD = malloc(sizeof(t_processFileDescriptor));
+	newPFD->flags[0] = permiso;
+	newPFD->fileDescriptor = fd; //Aca dudo si se hace asi o hay que pasar cada campo del t_fileDescriptor
+	return newPFD;
+
+}
+
+void destroy_t_processFileDescriptor(t_processFileDescriptor* pfd) {
+
+	destroy_t_filedescriptor(&(pfd->fileDescriptor));
+	free(pfd);
+}

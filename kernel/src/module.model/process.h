@@ -16,7 +16,7 @@
 #include <dc-commons/package.h>
 #include "../kernelStruct.h"
 #include "../commons/collections/list.h"
-
+#include "fileDescriptor.h"
 
 #define FIRST_PID 1000
 
@@ -26,6 +26,7 @@ typedef struct Process {
     int quantum;
     PCB* pcb;
     kernel_struct* kernelStruct;
+    t_processFileDescriptor pfd; //agregar a la estructura Process
 } Process;
 
 Process* createProcess(int socket,kernel_struct* kernelStruct);

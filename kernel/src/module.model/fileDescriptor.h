@@ -24,6 +24,12 @@ typedef struct {
 	uint32_t open; //cantidad de procesos que lo tienen abierto
 }t_fileDescriptor;
 
+typedef struct {
+	char flags[2];
+	t_fileDescriptor fileDescriptor;
+
+}t_processFileDescriptor;
+
 void initializeFileSystemModule();
 void destroyFileSystemModule();
 
