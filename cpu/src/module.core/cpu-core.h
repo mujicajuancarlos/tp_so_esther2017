@@ -23,6 +23,8 @@ PCB* getPCB();
 void loadPCB(PCB* newPCB);
 void unloadPCB();
 
+void setStackPageSize(int size);
+
 void setErrorFlag(int error);
 
 int getErrorFlag();

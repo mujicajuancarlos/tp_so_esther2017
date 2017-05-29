@@ -27,9 +27,12 @@ void handleKernel(cpu_struct *cpuStruct) {
 	}
 }
 
-void handleKernelRequest(cpu_struct *cpuStruct, Package *package) {
+void handleKernelRequest(cpu_struct* cpuStruct, Package* package) {
 
 	switch (package->msgCode) {
+	case COD_SET_STACK_PAGE_SIZE: //para actualizar el tamaño de stack
+		updateStackPageSize(cpuStruct, package);
+		break;
 	case COD_EXEC_NEW_PCB: //se envia a ejecutar un nuevo pcb
 		executeNewPcb(cpuStruct, package);
 		break;

@@ -69,6 +69,7 @@ void removeCPU(CPU* cpu) {
 		CPU* anCpu = element;
 		return anCpu->fileDescriptor == cpu->fileDescriptor;
 	}
+	sem_wait(&freeCPU_sem);
 	pthread_mutex_lock(&cpuListMutex);
 	list_remove_and_destroy_by_condition(cpuList, condicion,
 			(void*) destroyCPU);

@@ -13,6 +13,8 @@
 #include "../cpuStruct.h"
 #include "../module.core/cpu-core.h"
 
+void updateStackPageSize(cpu_struct* cpuStruct, Package* package);
+
 void executeNewPcb(cpu_struct *cpuStruct, Package *package);
 
 void continueExecution(cpu_struct *cpuStruct, Package *package);

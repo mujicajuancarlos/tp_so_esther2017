@@ -14,7 +14,7 @@
 #include "serialization.h"
 
 //prefijo = CPU ; between 200 - 299
-
+#define COD_SET_STACK_PAGE_SIZE 200
 #define COD_EXEC_NEW_PCB 201 //para ejecutar un nuevo pcb
 #define COD_CONTINUE_EXECUTION 202 //para continuar la ejecucion
 #define COD_CONTEXT_SWITCH_REQUEST 203 //para solicitar a la cpu que me devuelva el pcb actualizado

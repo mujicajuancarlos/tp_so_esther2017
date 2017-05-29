@@ -9,6 +9,7 @@
 
 PCB* pcb;
 int pageSize;
+int stackPageSize = 0;
 int errorFlag;
 pthread_mutex_t executionMutex;
 
@@ -56,6 +57,10 @@ void unloadPCB() {
 	logTrace("Se descargo el pcb");
 }
 
+void setStackPageSize(int size){
+	stackPageSize = size;
+}
+
 void setErrorFlag(int error) {
 	errorFlag = error;
 }
@@ -73,7 +78,7 @@ bool isFinishedProcess() {
 }
 
 void validateStackOverflow(size_t requiredSize){
-	int maxStackOffset = pcb->stackSize * pageSize;
+	int maxStackOffset = stackPageSize * pageSize;
 	if(pcb->stackOffset + requiredSize >= maxStackOffset){
 		errorFlag = FLAG_STACKOVERFLOW;
 	}

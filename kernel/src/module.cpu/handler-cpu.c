@@ -37,6 +37,13 @@ void handleNewCPU(CPU* newCpu) {
 	Package* package;
 	addCPU(newCpu);
 	bool running = true;
+	char* tmpBuffer = serialize_int(newCpu->kernelStruct->config->stack_size);
+	package = createAndSendPackage(newCpu->fileDescriptor,
+			COD_SET_STACK_PAGE_SIZE, sizeof(uint32_t), tmpBuffer);
+	if (package == NULL)
+		running = false;
+	free(tmpBuffer);
+	destroyPackage(package);
 	while (running) {
 
 		package = createAndReceivePackage(newCpu->fileDescriptor);
@@ -49,34 +56,34 @@ void handleNewCPU(CPU* newCpu) {
 		destroyPackage(package);
 	}
 
-	removeCPU(newCpu);//no hace falta decrementar siempre y cuando salga de error
+	removeCPU(newCpu); //no hace falta decrementar siempre y cuando salga de error
 	close(newCpu->fileDescriptor);
 	pthread_exit(EXIT_SUCCESS);
 }
 
 void handleCPURequest(CPU* cpu, Package* package) {
-/*	switch (package->msgCode) {
-	case COD_CPU_END_EXECUTION:
-		// rutina de proceso finalizado -> actualizar pcb
-		markFreeCPU(cpu);
-		break;
-	case COD_CPU_END_QUANTUM:
-		// rutina para guardar el pcb
-		//rutina  para mover el proceso ready
-		markFreeCPU(cpu);
-		break;
-	case COD_CPU_MEMORY_SYSTEM_CALL:
-		//rutina de proceso bloqueado -> actualizar pcb
-		markFreeCPU(cpu);
-		break;
-	case COD_CPU_FS_SYSTEM_CALL:
-		//rutina de proceso bloqueado -> actualizar pcb
-		markFreeCPU(cpu);
-		break;
-	default:
-		logError("La cpu %d envio un mensaje desconocido", cpu->fileDescriptor);
-		markFreeCPU(cpu);
-		//todo verificar que hacemos en este caso
-		break;
-	}*/
+	/*	switch (package->msgCode) {
+	 case COD_CPU_END_EXECUTION:
+	 // rutina de proceso finalizado -> actualizar pcb
+	 markFreeCPU(cpu);
+	 break;
+	 case COD_CPU_END_QUANTUM:
+	 // rutina para guardar el pcb
+	 //rutina  para mover el proceso ready
+	 markFreeCPU(cpu);
+	 break;
+	 case COD_CPU_MEMORY_SYSTEM_CALL:
+	 //rutina de proceso bloqueado -> actualizar pcb
+	 markFreeCPU(cpu);
+	 break;
+	 case COD_CPU_FS_SYSTEM_CALL:
+	 //rutina de proceso bloqueado -> actualizar pcb
+	 markFreeCPU(cpu);
+	 break;
+	 default:
+	 logError("La cpu %d envio un mensaje desconocido", cpu->fileDescriptor);
+	 markFreeCPU(cpu);
+	 //todo verificar que hacemos en este caso
+	 break;
+	 }*/
 }
