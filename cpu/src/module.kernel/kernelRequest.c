@@ -18,13 +18,13 @@ void executeNewPcb(cpu_struct* cpuStruct, Package* package){
 	loadPCB(pcb);
 	logTrace("El PCB para pid: %d fue cargado", pcb->pid);
 	ansisopExecuteInstruccion(cpuStruct);
-	logTrace("Rafaga ejecutada para el pid: %d", pcb->pid);
+	logTrace("Se ejecuto la instruccion ansisop del pid: %d", pcb->pid);
 }
 
 void continueExecution(cpu_struct* cpuStruct, Package* package){
 	logTrace("Continuando la ejecucion de la siguiente instruccion ansisop");
 	ansisopExecuteInstruccion(cpuStruct);
-
+	logTrace("Se ejecuto la instruccion ansisop del pid: %d", pcb->pid);
 }
 
 void contextSwitch(cpu_struct* cpuStruct, Package* package){

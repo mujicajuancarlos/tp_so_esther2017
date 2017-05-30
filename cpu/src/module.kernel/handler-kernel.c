@@ -39,7 +39,7 @@ void handleKernelRequest(cpu_struct* cpuStruct, Package* package) {
 	case COD_CONTINUE_EXECUTION: //paso un quantum y se decidio continuar ejecytando el mismo pcb
 		continueExecution(cpuStruct, package);
 		break;
-	case COD_CONTEXT_SWITCH_REQUEST: //se solicito desalojar el pcb
+	case COD_CONTEXT_SWITCH_REQUEST: //se solicito desalojar el pcb -> el kernel espera el pcb actualizado
 		contextSwitch(cpuStruct, package);
 		break;
 	default:
