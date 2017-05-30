@@ -47,6 +47,8 @@ void destroy_t_filedescriptor(t_fileDescriptor* fd);
 
 int getNextFD();
 
+void imprimirListaDeFD(t_list* lista);
+
 void agregarFD_Alista(t_fileDescriptor* fd);
 void removerFD_Lista(t_fileDescriptor* fd);
 

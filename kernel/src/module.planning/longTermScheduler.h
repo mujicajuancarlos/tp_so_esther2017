@@ -13,6 +13,8 @@
 #include <dc-commons/logger.h>
 #include "../kernelStruct.h"
 
+#define MAX_MULTIPROGRAMMING_LVL 1000
+
 void initializeMultiprogrammingLevel(kernel_struct* kernel_struct);
 
 void destroyMultiprogrammingLevel();

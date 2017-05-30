@@ -16,5 +16,6 @@
 #define OPT_ALL "-all"
 #define OPT_STATE "-s"
 #define OPT_PID "-p"
+#define COD_CONSOLE_SET_NEW_MULTIPROGRAMMING_LEVEL "setmlvl"
 
 #endif /* PROTOCOL_KERNEL_USER_H_ */

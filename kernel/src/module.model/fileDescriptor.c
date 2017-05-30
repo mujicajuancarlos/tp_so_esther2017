@@ -120,15 +120,20 @@ void imprimirEstructura(t_fileDescriptor* fd){
 
 }
 
+/*
 void imprimirListaDeFD(t_list* lista){
 	fileDescriptor_mutex_lock();
 	t_list* aux = lista;
+	t_link_element* aux2;
 	while(aux!=NULL){
 		imprimirEstructura(aux->head->data);
-		aux =aux->head->next; //Duda sobre esto. Hay un problema de tipos que no comprendi (salta un warning)
+		aux2 =aux->head; //TODO: Duda sobre esto. Hay un problema de tipos que no comprendi (salta un warning)
+		aux = aux2->next;
 	}
 	fileDescriptor_mutex_unlock();
 }
+*/
+
 
 t_processFileDescriptor* createNew_t_processFileDescriptor(char permiso, t_fileDescriptor fd){
 
