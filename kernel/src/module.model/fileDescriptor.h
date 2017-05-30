@@ -55,4 +55,10 @@ void removerFD_Lista(t_fileDescriptor* fd);
 void incrementarOpen(t_fileDescriptor* fd);
 void decrementarOpen(t_fileDescriptor* fd);
 
+void imprimirEstructura(t_fileDescriptor* fd);
+void imprimirListaDeFD(t_list* lista);
+
+t_processFileDescriptor* createNew_t_processFileDescriptor(char permiso, t_fileDescriptor fd);
+void destroy_t_processFileDescriptor(t_processFileDescriptor* pfd);
+
 #endif /* MODULE_MODEL_FILEDESCRIPTOR_H_ */
