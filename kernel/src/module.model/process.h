@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <parser/metadata_program.h>
+#include <commons/string.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/protocol-kernel-cpu.h>
 #include <dc-commons/package.h>
@@ -41,6 +42,10 @@ int getNextPID();
 
 void createPcbForNewProcess(Process* process, Package* package);
 
-char*  getProcessState(Process*);
+void printHeaderProcess();
+
+void printProcess(Process* proceso, char* state);
+
+void printProcessFull(Process* proceso);
 
 #endif /* PROCESS_H_ */

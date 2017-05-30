@@ -7,7 +7,7 @@
 
 #include "handler-user.h"
 
-void handleUserRequest(kernel_struct* kernelStruct){
+void handleUserRequest(kernel_struct* kernelStruct) {
 
 	bool exit = false;
 	bool shouldCompareCommand;
@@ -59,52 +59,101 @@ void handleUserRequest(kernel_struct* kernelStruct){
 void handleCommand_info_program(kernel_struct* kernelStruct, char** commands) {
 	if (commands[1] != NULL) {
 		if (equal_user_command(commands[1], OPT_ALL)) {
-			handleCommand_info_all_program(kernelStruct, commands);
+			handleCommand_info_all_process(kernelStruct, commands);
+		}
+		if (equal_user_command(commands[1], OPT_STATE)) {
+			handleCommand_info_by_state_process(kernelStruct, commands);
 		}
 		if (equal_user_command(commands[1], OPT_PID)) {
-			handleCommand_info_by_pid_program(kernelStruct, commands);
+			handleCommand_info_by_pid_process(kernelStruct, commands);
 		}
 	} else
 		printInvalidArguments("", commands[0]);
 }
 
-void handleCommand_info_all_program(kernel_struct* kernelStruct, char** commands) {
+void handleCommand_info_all_process(kernel_struct* kernelStruct,
+		char** commands) {
 	if (commands[2] == NULL) {
-//		void printElement(void* element) {
-//			Process* anProgram = (Process*) element;
-//			printProgram(anProgram);
-//		}
-//		lockPrinter();
-//		printHeaderProgram();
-//		pthread_mutex_lock(&(kernelStruct->));
-//		list_iterate(kernelStruct->listaProgramas, printElement);
-//		pthread_mutex_unlock(&(kernelStruct->programsListMutex));
-//		unlockPrinter();
+		t_planningStates* states = getStates();
+		char* state;
+		printHeaderProcess();
+		void printElement(void* element) {
+			Process* proces = element;
+			printProcess(proces, state);
+		}
+		state = "new";
+		list_iterate(states->new, printElement);
+		state = "ready";
+		list_iterate(states->ready->elements, printElement);
+		state = "execute";
+		list_iterate(states->execute, printElement);
+		state = "block";
+		list_iterate(states->block->elements, printElement);
+		state = "exit";
+		list_iterate(states->exit->elements, printElement);
 	} else
 		printInvalidArguments(commands[2], commands[0]);
 }
 
-void handleCommand_info_by_pid_program(kernel_struct* kernelStruct,
+void handleCommand_info_by_state_process(kernel_struct* kernelStruct,
 		char** commands) {
-	if (commands[2] != NULL && commands[3] == NULL) {
-//		int pid = atoi(commands[2]);
-//		bool condicion(void* element) {
-//			Program* anProgram = (Program*) element;
-//			return pid_isEqual(anProgram, pid);
-//		}
-//		pthread_mutex_lock(&(kernelStruct->programsListMutex));
-//		Program* program = list_find(kernelStruct->listaProgramas, condicion);
-//		pthread_mutex_unlock(&(kernelStruct->programsListMutex));
-//		if (program != NULL) {
-//			lockPrinter();
-//			printHeaderProgram();
-//			printProgram(program);
-//			unlockPrinter();
-//		} else {
-//			printPidNotFound(pid);
-//		}
+	if (commands[2] != NULL) {
+		if (commands[3] == NULL) {
+			char* state = commands[2];
+			bool valid = false;
+			t_planningStates* states = getStates();
+			printHeaderProcess();
+			void printElement(void* element) {
+				Process* proces = element;
+				printProcess(proces, state);
+			}
+			if (string_equals_ignore_case(state, "new")){
+				list_iterate(states->new, printElement);
+				valid = true;
+			}
+			if (string_equals_ignore_case(state, "ready")){
+				list_iterate(states->ready->elements, printElement);
+				valid = true;
+			}
+			if (string_equals_ignore_case(state, "execute")){
+				list_iterate(states->execute, printElement);
+				valid = true;
+			}
+			if (string_equals_ignore_case(state, "block")){
+				list_iterate(states->block->elements, printElement);
+				valid = true;
+			}
+			if (string_equals_ignore_case(state, "exit")){
+				list_iterate(states->exit->elements, printElement);
+				valid = true;
+			}
+			if(!valid){
+				printInvalidArguments(state, commands[0]);
+			}
+		} else
+			printInvalidArguments(commands[3], commands[0]);
 	} else
-		printInvalidArguments("", commands[0]);
+		printInvalidArguments(commands[2], commands[0]);
+}
+
+void handleCommand_info_by_pid_process(kernel_struct* kernelStruct,
+		char** commands) {
+	if (commands[2] != NULL) {
+		if (commands[3] == NULL) {
+			int pid = atoi(commands[2]);
+			Process* process = getProcessByPID(pid);
+			if(process != NULL){
+				printProcessFull(process);
+			}else{
+				if(pid == 0)
+					printInvalidArguments(commands[2], commands[0]);
+				else
+					printPidNotFound(pid);
+			}
+		} else
+			printInvalidArguments(commands[3], commands[0]);
+	} else
+		printInvalidArguments(commands[2], commands[0]);
 }
 
 void handleCommand_end_program(kernel_struct* kernelStruct, char** commands) {
@@ -119,8 +168,7 @@ void handleCommand_end_program(kernel_struct* kernelStruct, char** commands) {
 		printInvalidArguments("", commands[0]);
 }
 
-void handleCommand_end_all_program(kernel_struct* kernelStruct,
-		char** commands) {
+void handleCommand_end_all_program(kernel_struct* kernelStruct, char** commands) {
 //	if (commands[2] == NULL) {
 //		void actionByElement(void* element) {
 //			Program* anProgram = (Program*) element;
@@ -165,11 +213,9 @@ void printCommandsHelp() {
 	COD_CONSOLE_INFO_PROGRAM, OPT_ALL, "",
 			"Muestra informacion de todos los procesos");
 	printf(patter,
-			COD_CONSOLE_INFO_PROGRAM, OPT_STATE, "«state»",
+	COD_CONSOLE_INFO_PROGRAM, OPT_STATE, "«state»",
 			"Muestra informacion de los procesos correspondientes a «state»");
-	printf(patter,
-				"", "", "",
-				"Estados: NEW, READY, EXEC, BLOCK, EXIT.");
+	printf(patter, "", "", "", "Estados: NEW, READY, EXEC, BLOCK, EXIT.");
 	printf(patter,
 	COD_CONSOLE_INFO_PROGRAM, OPT_PID, "«pid»",
 			"Muestra informacion del programa con «pid»");

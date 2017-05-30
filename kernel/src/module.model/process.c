@@ -21,7 +21,7 @@ Process* createProcess(int socket, kernel_struct* kernelStruct) {
 
 void destroyProcess(Process* process) {
 	if (process != NULL) {
-		if(process->pcb != NULL)
+		if (process->pcb != NULL)
 			destroy_PBC(process->pcb);
 		free(process);
 	}
@@ -46,10 +46,12 @@ int getNextPID() {
 void createPcbForNewProcess(Process* process, Package* sourceCodePackage) {
 
 	logInfo("Generando la metadata para el proceso %d", process->pid);
-	t_metadata_program* metadata = metadata_desde_literal(sourceCodePackage->stream);
+	t_metadata_program* metadata = metadata_desde_literal(
+			sourceCodePackage->stream);
 
 	//el va despues del codigo, por lo tanto con esta cuenta puedo saber cual es la primer pagina del stack
-	uint32_t stackFirstPage = sourceCodePackage->size / process->kernelStruct->pageSize;
+	uint32_t stackFirstPage = sourceCodePackage->size
+			/ process->kernelStruct->pageSize;
 
 	logInfo("Generando el pcb para el proceso %d", process->pid);
 	PCB* pcb = create_new_PCB(process->pid, stackFirstPage, metadata);
@@ -58,18 +60,24 @@ void createPcbForNewProcess(Process* process, Package* sourceCodePackage) {
 	process->pcb = pcb;
 }
 
-
-void printProcess(Process* proceso){
-	//imprimo pid
-		printf("%d", proceso->pid);
-
-	//imprimo estado
-		char* state = getProcessState(proceso);
-		printf("%s", state);
-
-	//imprimo exit code
-		printf("%d", proceso->pcb->exit_code);
+void printHeaderProcess() {
+	printf("\n%5s\t%20s\t%20s\n%s\n", "PID", "STATE", "EXIT CODE",
+			"===============================================================");
 }
 
+void printProcess(Process* proceso, char* state) {
+	char* exitCode = (proceso->pcb==NULL)? "" : string_itoa(proceso->pcb->exit_code);
+	printf("%5d\t%20s\t%20s\n", proceso->pid, state, exitCode);
+}
 
+void printProcessFull(Process* proceso){
+	printf("\nInformación del proceso %d\n", proceso->pid);
+	printf("\tCantidad rafagas ejecutadas %d\n", 567);//TODO: completar rafagas ejecutadas
+	printf("\tCantidad de operaciones privilegiadas %d\n", 142);//TODO: completar
+	printf("\tTabla de archivos abiertos %d\n", 423);//TODO: completar
+	printf("\tCantidad de paginas heap utilizadas %d\n", 423);//TODO: completar
+	printf("\tOtra cantidad %d\n", 432);//TODO: completar
+	printf("\tOtra cantidad %d\n", 234);//TODO: completar
+	printf("\tCantidad de syscall ejecutadas %d\n", 432);//TODO: completar
+}
 

@@ -41,14 +41,8 @@ int main(int argc, char *argv[]) {
 	pthread_create(&hiloPlanificador, NULL, (void*) handlePlanning,
 			&kernelStruct);
 
-
-
 	logInfo("Inicia el lector de comandos para el usuario");
 	handleUserRequest(&kernelStruct);
-
-	printf("holitas");
-
-
 
 	destroyKernelStructs(&kernelStruct, config);
 

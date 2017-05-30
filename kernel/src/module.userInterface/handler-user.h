@@ -12,19 +12,23 @@
 #include <pthread.h>
 #include <dc-commons/stdout-printer.h>
 #include <dc-commons/utils.h>
+#include "../module.planning/processLifeCycle.h"
+#include "../module.model/processFinder.h"
 #include "../kernelStruct.h"
-#include "protocol-kernel-user.h"
 #include "../module.model/process.h"
+#include "protocol-kernel-user.h"
 
 
 void handleUserRequest(kernel_struct* kernelStruct);
 
 void handleCommand_info_program(kernel_struct* kernelStruct, char** commands);
 
-void handleCommand_info_all_program(kernel_struct* kernelStruct,
+void handleCommand_info_all_process(kernel_struct* kernelStruct,
 		char** commands);
 
-void handleCommand_info_by_pid_program(kernel_struct* kernelStruct,
+void handleCommand_info_by_state_process(kernel_struct* kernelStruct, char** commands);
+
+void handleCommand_info_by_pid_process(kernel_struct* kernelStruct,
 		char** commands);
 
 void handleCommand_end_program(kernel_struct* kernelStruct, char** commands);

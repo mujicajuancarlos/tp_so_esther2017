@@ -12,15 +12,7 @@
 #include "process.h"
 #include "../module.planning/processLifeCycle.h"
 
-
-
-
-
-
 Process* getProcessByPID(int);
 char*  getProcessState(Process*);
-
-
-
 
 #endif /* MODULE_MODEL_PROCESSFINDER_H_ */
