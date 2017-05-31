@@ -20,7 +20,7 @@ void destroyMultiprogrammingLevel() {
 
 void updateMultiprogrammingLevel(kernel_struct* kernel_struct, int newLevel) {
 	int currentLevel = kernel_struct->config->grado_multiprog;
-	if (newLevel > 0) {
+	if ((newLevel >= 0) && (newLevel <= MAX_MULTIPROGRAMMING_LVL)) {
 		logInfo("Actualizando el grado de multiprogramación a %d", newLevel);
 		if (newLevel > currentLevel)
 			incrementMultiprogrammingLevel(newLevel - currentLevel);
