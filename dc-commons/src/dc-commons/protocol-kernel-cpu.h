@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <parser/metadata_program.h>
+#include "logger.h"
 #include "serialization.h"
 
 //prefijo = CPU ; between 200 - 299
@@ -48,7 +49,7 @@ typedef struct dir_memoria {
 
 typedef struct {
 	dir_memoria direccion;
-	char* nombre;
+	char nombre;
 } t_variable;
 
 typedef struct {
@@ -102,6 +103,5 @@ t_variable* deserializeVariablessssArray(char* stream, uint32_t len);
 //  EXCUSIVO CONTEXTO
 void createNewContext(PCB* pcb);//ok
 void destroyCurrentContext(PCB* pcb);//ok
-t_stack_index* getCurrentContext(PCB* pcb);//ok
 
 #endif /* SRC_DC_COMMONS_PROTOCOL_KERNEL_CPU_H_ */

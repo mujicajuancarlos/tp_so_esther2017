@@ -350,7 +350,7 @@ void destroy_stackIndex(t_stack_index stackIndex) {
 }
 
 /******************************************************************************************************************
- EXCUSIVO VARIABLE
+ EXCUSIVO VARIABLES - ARGUMENTOS
  ******************************************************************************************************************
  */
 
@@ -402,11 +402,12 @@ void createNewContext(PCB* pcb) {
 	pcb->stackIndex[pcb->stackSize].var_len = 0;
 	pcb->stackIndex[pcb->stackSize].vars = NULL;
 	pcb->stackSize++;
+	logInfo("Se creó el contexto principal (mail) del stack para el pid: %d", pcb->pid);
 }
 
 void destroyCurrentContext(PCB* pcb) {
 	pcb->stackSize--;
-	t_stack_index* contextoActual = getCurrentContext(pcb);
+	t_stack_index* contextoActual = &(pcb->stackIndex[pcb->stackSize]);
 	pcb->programCounter = contextoActual->retPos;
 	if (contextoActual->vars != NULL) {
 		free(contextoActual->vars);
@@ -418,8 +419,4 @@ void destroyCurrentContext(PCB* pcb) {
 	pcb->stackOffset -= (contextoActual->arg_len * sizeof(uint32_t));
 	pcb->stackIndex = realloc(pcb->stackIndex,
 			sizeof(t_stack_index) * (pcb->stackSize));
-}
-
-t_stack_index* getCurrentContext(PCB* pcb) {
-	return &(pcb->stackIndex[pcb->stackSize]);
 }
