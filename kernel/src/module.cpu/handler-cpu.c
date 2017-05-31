@@ -39,7 +39,7 @@ void handleNewCPU(CPU* newCpu) {
 	bool running = true;
 	char* tmpBuffer = serialize_int(newCpu->kernelStruct->config->stack_size);
 	package = createAndSendPackage(newCpu->fileDescriptor,
-			COD_SET_STACK_PAGE_SIZE, sizeof(uint32_t), tmpBuffer);
+	COD_SET_STACK_PAGE_SIZE, sizeof(uint32_t), tmpBuffer);
 	if (package == NULL)
 		running = false;
 	free(tmpBuffer);
@@ -62,28 +62,74 @@ void handleNewCPU(CPU* newCpu) {
 }
 
 void handleCPURequest(CPU* cpu, Package* package) {
-	/*	switch (package->msgCode) {
-	 case COD_CPU_END_EXECUTION:
-	 // rutina de proceso finalizado -> actualizar pcb
-	 markFreeCPU(cpu);
-	 break;
-	 case COD_CPU_END_QUANTUM:
-	 // rutina para guardar el pcb
-	 //rutina  para mover el proceso ready
-	 markFreeCPU(cpu);
-	 break;
-	 case COD_CPU_MEMORY_SYSTEM_CALL:
-	 //rutina de proceso bloqueado -> actualizar pcb
-	 markFreeCPU(cpu);
-	 break;
-	 case COD_CPU_FS_SYSTEM_CALL:
-	 //rutina de proceso bloqueado -> actualizar pcb
-	 markFreeCPU(cpu);
-	 break;
-	 default:
-	 logError("La cpu %d envio un mensaje desconocido", cpu->fileDescriptor);
-	 markFreeCPU(cpu);
-	 //todo verificar que hacemos en este caso
-	 break;
-	 }*/
+	switch (package->msgCode) {
+	case COD_END_INSTRUCCION:
+		/*
+		 * finalizo una instruccion
+		 * evaluar el tipo de planificador configurado
+		 * quantum no superado -> continuar ejecucion
+		 */
+		break;
+	case COD_PROGRAM_FINISHED:
+		/*
+		 * programa finalizado
+		 * setear exit code
+		 * liberar recursos
+		 * enviar a exit y liberar cpu
+		 */
+		markFreeCPU(cpu);
+		break;
+	case COD_SIGNAL_DISCONNECTED:
+		/*
+		 * la cpu se va desconectar -> guardar pcb
+		 * enviar proceso a ready
+		 * liberar cpu
+		 */
+		markFreeCPU(cpu);
+		break;
+	case COD_GET_SHARED_VAR:
+	case COD_SET_SHARED_VAR:
+		/*
+		 * realizar accion y devolver control a la cpu
+		 */
+		break;
+	case COD_MALLOC_MEMORY:
+	case COD_FREE_MEMORY:
+		/*
+		 * realizar accion solicitada y devolver el control a la cpu
+		 */
+		break;
+	case COD_OPEN_FD:
+	case COD_DELETE_FD:
+	case COD_CLOSE_FD:
+	case COD_SEED_FD:
+	case COD_WRITE_FD:
+	case COD_READ_FD:
+		/*
+		 * todo: ver en detalle mas adelante
+		 * no lo tengo definido:
+		 * opcion a:
+		 * hacero con dos mensajes: solicitud fs + solicitud de bloqueo
+		 * opcion b:
+		 * una unica solicitud -> fs y bloquear
+		 *
+		 * bloquear: liberar cpu y enviar proceso a bloqueado
+		 *
+		 */
+		break;
+	case COD_SEM_WAIT:
+	case COD_SEM_SIGNAL:
+		/*
+		 * parecido a fs
+		 */
+		markFreeCPU(cpu);
+		break;
+	default:
+		logError("La cpu %d envio un mensaje desconocido", cpu->fileDescriptor);
+		/*
+		 * liberar cpu y enviar proceso a ready
+		 */
+		markFreeCPU(cpu);
+		break;
+	}
 }
