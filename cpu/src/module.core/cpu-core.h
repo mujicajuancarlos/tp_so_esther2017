@@ -35,6 +35,10 @@ bool isFinishedProcess();
 
 void validateStackOverflow(size_t requiredSize);
 
+t_stack_index* getCurrentContext();
+
+t_puntero logicalAddressToPointer(dir_memoria* dir);
+
 void finalize_CPU_process();
 
 void ansisopExecuteInstruccion(cpu_struct* cpuStruct);
@@ -44,5 +48,9 @@ char* getNextInstruction(cpu_struct* cpuStruct);
 char* getDataFromMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset, t_size length);
 
 void saveDataOnMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset, t_size length, char* buffer);
+
+t_variable* createVariableForCurrentPCB(t_nombre_variable name);
+
+t_variable* createArgumentForCurrentPCB(t_nombre_variable name);
 
 #endif /* MODULE_CORE_CPU_CORE_H_ */
