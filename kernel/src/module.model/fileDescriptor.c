@@ -6,9 +6,12 @@
  */
 #include "fileDescriptor.h"
 
+//TODO:ojear td el .c
+
 t_list* tablaGlobalFD;
-t_list* tablaProcesosFD; //TODO: agregar a estructura process?
+t_list* tablaProcesosFD;//TODO: agregar a estructura process?
 int nextFD = FIRST_FD;
+
 
 pthread_mutex_t fileDescriptor_mutex;
 pthread_mutex_t tablaGlobalFD_mutex;
@@ -33,7 +36,8 @@ void destroyFileSystemModule() {
 	pthread_mutex_destroy(&tablaProcesosFD_mutex);
 	list_destroy_and_destroy_elements(tablaGlobalFD,
 			(void*) destroy_t_filedescriptor);
-	list_destroy_and_destroy_elements(tablaProcesosFD,(void*) destroy_t_processFileDescriptor);
+	list_destroy_and_destroy_elements(tablaProcesosFD,
+			(void*) destroy_t_processFileDescriptor);
 }
 
 void tablaGlobalFD_mutex_lock() {
@@ -129,7 +133,8 @@ void decrementarOpen(t_fileDescriptor* fd) {
 }
 
 void imprimirEstructura(t_fileDescriptor* fd){
-	printf("Estructura FD:\n File Descriptor: %d\n,Archivo: %s\n,Open: %d\n",fd->fd,fd->path,fd->open);
+	printf("Estructura FD:\n File Descriptor: %d\n,Archivo: %s\n,Open: %d\n",
+			fd->fd,fd->path,fd->open);
 
 }
 
@@ -145,12 +150,14 @@ void imprimirListaDeFD(t_list* lista){
 }
 
 
-
-t_processFileDescriptor* createNew_t_processFileDescriptor(char permiso, t_fileDescriptor fd){
+t_processFileDescriptor* createNew_t_processFileDescriptor(char* permiso, t_fileDescriptor fd){
 
 	t_processFileDescriptor* newPFD = malloc(sizeof(t_processFileDescriptor));
-	newPFD->flags[0] = permiso;
+
+	habilitarPermisos(newPFD,permiso);
+
 	newPFD->fileDescriptor = fd; //TODO:Aca dudo si se hace asi o hay que pasar cada campo del t_fileDescriptor
+
 	return newPFD;
 
 }
@@ -177,8 +184,33 @@ void removerPFD_Lista(t_processFileDescriptor* pfd){
 	tablaProcesosFD_mutex_unlock();
 }
 
+void habilitarPermisos(t_processFileDescriptor* newPFD, char* permiso){
 
-
+int retorno;
+	retorno = strcmp(permiso,READ);
+	if(retorno==0){
+		newPFD->flag.read = true;
+		newPFD->flag.write = false;
+	}
+	else {
+		retorno = strcmp(permiso,WRITE);
+		if(retorno==0){
+			newPFD->flag.read = false;
+			newPFD->flag.write = true;
+		}
+		else{
+			retorno = strcmp(permiso,RW);
+			if(retorno==0){
+				newPFD->flag.read = true;
+				newPFD->flag.write = true;
+			}
+		else {
+			newPFD->flag.read = false;
+			newPFD->flag.write = false;
+		}
+	}
+}
+}
 
 
 

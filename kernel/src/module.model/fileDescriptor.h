@@ -17,6 +17,9 @@
 #include <commons/collections/list.h>
 
 #define FIRST_FD 3
+#define READ "r"
+#define WRITE "w"
+#define RW "rw"
 
 typedef struct {
 	uint32_t fd; //numero de FileDescriptor
@@ -25,10 +28,17 @@ typedef struct {
 }t_fileDescriptor;
 
 typedef struct {
-	char flags[2];
+	bool read;
+	bool write;
+}flags;
+
+typedef struct {
+	flags flag;
 	t_fileDescriptor fileDescriptor;
 
 }t_processFileDescriptor;
+
+
 
 void initializeFileSystemModule();
 void destroyFileSystemModule();
@@ -61,10 +71,12 @@ void decrementarOpen(t_fileDescriptor* fd);
 void imprimirEstructura(t_fileDescriptor* fd);
 void imprimirListaDeFD(t_list* lista);
 
-t_processFileDescriptor* createNew_t_processFileDescriptor(char permiso, t_fileDescriptor fd);
+t_processFileDescriptor* createNew_t_processFileDescriptor(char* permiso, t_fileDescriptor fd);
 void destroy_t_processFileDescriptor(t_processFileDescriptor* pfd);
 
 void agregarPFD_Alista (t_processFileDescriptor* pfd);
 void removerPFD_Lista(t_processFileDescriptor* pfd);
+
+void habilitarPermisos(t_processFileDescriptor* newPFD, char* permiso);
 
 #endif /* MODULE_MODEL_FILEDESCRIPTOR_H_ */
