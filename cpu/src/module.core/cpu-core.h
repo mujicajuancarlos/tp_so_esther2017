@@ -53,4 +53,8 @@ t_variable* createVariableForCurrentPCB(t_nombre_variable name);
 
 t_variable* createArgumentForCurrentPCB(t_nombre_variable name);
 
+t_variable* getArgument(t_nombre_variable name);
+
+t_variable* getVariable(t_nombre_variable name);
+
 #endif /* MODULE_CORE_CPU_CORE_H_ */

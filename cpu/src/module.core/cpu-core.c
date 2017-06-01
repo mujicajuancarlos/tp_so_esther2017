@@ -247,3 +247,23 @@ t_variable* createArgumentForCurrentPCB(t_nombre_variable name) {
 	pcb->stackOffset += sizeof(uint32_t);
 	return &(currentContext->args[currentContext->arg_len - 1]);
 }
+
+t_variable* getArgument(t_nombre_variable name) {
+	t_stack_index* currentContext = getCurrentContext();
+	int i;
+	for (i = 0; i < currentContext->arg_len; i++) {
+		if (currentContext->args[i].nombre == name)
+			return &(currentContext->args[i]);
+	}
+	return NULL;
+}
+
+t_variable* getVariable(t_nombre_variable name) {
+	t_stack_index* currentContext = getCurrentContext();
+	int i;
+	for (i = 0; i < currentContext->var_len; i++) {
+		if (currentContext->vars[i].nombre == name)
+			return &(currentContext->vars[i]);
+	}
+	return NULL;
+}
