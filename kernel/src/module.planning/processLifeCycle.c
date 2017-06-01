@@ -7,6 +7,11 @@
 
 #include "processLifeCycle.h"
 
+#include <commons/collections/list.h>
+#include <dc-commons/package.h>
+#include <stdbool.h>
+#include <stdio.h>
+
 pthread_mutex_t executeListMutex;
 pthread_mutex_t exitListMutex;
 pthread_mutex_t newListMutex;
@@ -14,6 +19,7 @@ pthread_mutex_t readyListMutex;
 pthread_mutex_t blockListMutex;
 
 t_planningStates* states;
+t_log* logger;
 
 void moveFromNewToReady(Process* process) {
 	removeFromNEW(process);
@@ -169,35 +175,30 @@ exit - loguear el error porque no seria una inconsitencia enviar a finalizar un 
 
 void endProcessGeneric(Process* process) {
 	char* state = getProcessState(process);
-	//enum planningStates estado;
 	bool shouldCompareState=true;
 
-	/* switch(estado) {
-		    case new ;
-		    case ready;
-		    case execute;
-		    case block;
-		    case ex;
-		    	    */
-	if (shouldCompareState && equal_user_command(state,"new")){
-		shouldCompareState = false;
-		Package* package ;
-		package = createAndSendPackage(process->fileDescriptor,
-		COD_FORCE_QUIT_PROGRAM, 0 ,NULL );
-		destroyPackage(package);
-		sendToEXIT(process);
-
-				}
-
-	if (shouldCompareState && equal_user_command(state,"ready")) {
+		if (shouldCompareState && string_equals_ignore_case(state,"new")){
 			shouldCompareState = false;
-
-			processInReady_wait();
+			Package* package ;
+			package = createAndSendPackage(process->fileDescriptor,
+			COD_FORCE_QUIT_PROGRAM, 0 ,NULL );
+			destroyPackage(package);
 			sendToEXIT(process);
-	close(process->fileDescriptor);
+		}
+
+	if (shouldCompareState && string_equals_ignore_case(state,"ready")) {
+			shouldCompareState = false;
+ 			processInReady_wait();
+ 			Package* package ;
+ 			package = createAndSendPackage(process->fileDescriptor,
+ 			COD_FORCE_QUIT_PROGRAM, 0 ,NULL );
+ 			destroyPackage(package);
+			sendToEXIT(process);
+			close(process->fileDescriptor);
 			destroyProcess(process);
 			//liberar memoria
 			//liberar filesystem
+
 			/*mostrar mensaje :
 			->si viene desde consola -> finalizo con exito
 			->si cerro por la consola kernel -> el programa finalizado por el administrador del sistema
@@ -205,24 +206,37 @@ void endProcessGeneric(Process* process) {
 			*/
 
 					}
-	if (shouldCompareState && equal_user_command(state,"execute")) {
+	if (shouldCompareState && string_equals_ignore_case(state,"execute")) {
 
-		//signal sem de multiprogramacion
 			shouldCompareState = false;
+			_incrementMultiprogrammingLevel();
+			Package* package ;
+			package = createAndSendPackage(process->fileDescriptor,
+			COD_FORCE_QUIT_PROGRAM, 0 ,NULL );
+			destroyPackage(package);
 			sendToEXIT(process);
 			close(process->fileDescriptor);
 			destroyProcess(process);
+			//liberar memoria
+			//liberar filesystem
 
 					}
-	if (shouldCompareState && equal_user_command(state,"block")) {
+	if (shouldCompareState && string_equals_ignore_case(state,"block")) {
 			shouldCompareState = false;
+			Package* package ;
+			package = createAndSendPackage(process->fileDescriptor,
+			COD_FORCE_QUIT_PROGRAM, 0 ,NULL );
+			destroyPackage(package);
 			sendToEXIT(process);
 			close(process->fileDescriptor);
 			destroyProcess(process);
-					}
-	if (shouldCompareState && equal_user_command(state,"execute")) {
+			//liberar memoria
+			//liberar filesystem
+		}
+	if (shouldCompareState && string_equals_ignore_case(state,"exit")) {
 			shouldCompareState = false;
-			printf("Error, no puedo enviar un proceso a finalizar el cual ya finalizo");
+			log_error(logger,"Error, no puedo enviar un proceso a finalizar el cual ya finalizo");
+			//printf("Error, no puedo enviar un proceso a finalizar el cual ya finalizo");
 					}
 
 

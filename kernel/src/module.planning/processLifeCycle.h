@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <commons/string.h>
 #include <commons/collections/queue.h>
 #include "../module.planning/shortTermScheduler.h"
 #include "../module.model/processFinder.h"
@@ -21,6 +22,7 @@
 #include <../dc-commons/socket-message.h>
 #include "../module.model/process.h"
 #include "shortTermScheduler.h"
+#include "longTermScheduler.h"
 
 
 
@@ -33,13 +35,15 @@ typedef struct {
 } t_planningStates;
 
 
+
 enum planningStates {
-  new,
-  ready,
-  execute,
-  block,
-  ex
+  new=1,
+  ready=2,
+  execute=3,
+  block=4,
+  ex=5
 } enum_planning;  // Must end with a semicolon like a struct
+
 
 
 void moveFromNewToReady(Process* process);
