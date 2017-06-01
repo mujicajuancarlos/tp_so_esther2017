@@ -39,6 +39,9 @@ void tablaGlobalFD_mutex_unlock();
 void fileDescriptor_mutex_lock();
 void fileDescriptor_mutex_unlock();
 
+void tablaProcesosFD_mutex_lock();
+void tablaProcesosFD_mutex_unlock();
+
 void nextFD_mutex_lock();
 void nextFD_mutex_unlock();
 
@@ -60,5 +63,8 @@ void imprimirListaDeFD(t_list* lista);
 
 t_processFileDescriptor* createNew_t_processFileDescriptor(char permiso, t_fileDescriptor fd);
 void destroy_t_processFileDescriptor(t_processFileDescriptor* pfd);
+
+void agregarPFD_Alista (t_processFileDescriptor* pfd);
+void removerPFD_Lista(t_processFileDescriptor* pfd);
 
 #endif /* MODULE_MODEL_FILEDESCRIPTOR_H_ */
