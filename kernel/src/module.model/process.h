@@ -28,6 +28,7 @@ typedef struct Process {
     PCB* pcb;
     kernel_struct* kernelStruct;
     t_processFileDescriptor pfd; //agregar a la estructura Process
+    int exit_code;
 } Process;
 
 Process* createProcess(int socket,kernel_struct* kernelStruct);

@@ -52,6 +52,12 @@ void handleUserRequest(kernel_struct* kernelStruct) {
 				shouldCompareCommand = false;
 				handleCommand_end_program(kernelStruct, commands);
 			}
+
+			if (shouldCompareCommand && equal_user_command(commands[0],
+			COD_CONSOLE_PLANING)) {
+				shouldCompareCommand = false;
+				handleCommand_lock_unlock(kernelStruct, commands);
+			}
 		}
 
 		if (shouldCompareCommand) {
@@ -197,6 +203,28 @@ void handleCommand_end_program(kernel_struct* kernelStruct, char** commands) {
 		printInvalidArguments("", commands[0]);
 }
 
+void handleCommand_lock_unlock(kernel_struct* kernelStruct, char** commands) {
+	if (commands[1] != NULL) {
+		if (commands[2] == NULL) {
+			char* planning = commands[1];
+			//bool validar = false;
+
+			if (string_equals_ignore_case(planning, "Bloqueado")) {
+				shortTermScheduler_lock();
+				//	validar = true;
+			} else if (string_equals_ignore_case(planning, "Desbloqueado")) {
+				shortTermScheduler_unlock();
+				//	validar = true;
+			} else
+				printInvalidArguments(commands[1], commands[0]);
+
+		} else
+			printInvalidArguments(commands[2], commands[0]);
+
+	} else
+		printInvalidArguments("", commands[0]);
+}
+
 void handleCommand_end_all_program(kernel_struct* kernelStruct, char** commands) {
 //	if (commands[2] == NULL) {
 //		void actionByElement(void* element) {
@@ -257,8 +285,11 @@ void printCommandsHelp() {
 			"Detiene la ejecución del programa con «pid»");
 
 	printf(patter,
-	COD_CONSOLE_SET_NEW_MULTIPROGRAMMING_LEVEL,"","«new level»",
+	COD_CONSOLE_SET_NEW_MULTIPROGRAMMING_LEVEL, "", "«new level»",
 			"Actualiza el nivel de multiprogramacion a «new level»");
+
+	printf(patter,
+	COD_CONSOLE_PLANING, "", "", "Bloquea o Desbloquea el planificador");
 
 	printf(patter, COD_CONSOLE_CLEAR, "", "", "Limpia la pantalla");
 
@@ -266,3 +297,4 @@ void printCommandsHelp() {
 
 	unlockPrinter();
 }
+
