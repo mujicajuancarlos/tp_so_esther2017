@@ -177,15 +177,7 @@ void endProcessGeneric(Process* process) {
 	char* state = getProcessState(process);
 	bool shouldCompareState=true;
 
-	/* switch(estado) {
-		    case new ;
-		    case ready;
-		    case execute;
-		    case block;
-		    case ex;
-		    	    */
-
-	if (shouldCompareState && equal_user_command(state,string_itoa(new))){
+		if (shouldCompareState && string_equals_ignore_case(state,"new")){
 			shouldCompareState = false;
 			Package* package ;
 			package = createAndSendPackage(process->fileDescriptor,
@@ -194,7 +186,7 @@ void endProcessGeneric(Process* process) {
 			sendToEXIT(process);
 		}
 
-	if (shouldCompareState && equal_user_command(state,string_itoa(ready))) {
+	if (shouldCompareState && string_equals_ignore_case(state,"ready")) {
 			shouldCompareState = false;
  			processInReady_wait();
  			Package* package ;
@@ -206,6 +198,7 @@ void endProcessGeneric(Process* process) {
 			destroyProcess(process);
 			//liberar memoria
 			//liberar filesystem
+
 			/*mostrar mensaje :
 			->si viene desde consola -> finalizo con exito
 			->si cerro por la consola kernel -> el programa finalizado por el administrador del sistema
@@ -213,7 +206,7 @@ void endProcessGeneric(Process* process) {
 			*/
 
 					}
-	if (shouldCompareState && equal_user_command(state,string_itoa(execute))) {
+	if (shouldCompareState && string_equals_ignore_case(state,"execute")) {
 
 			shouldCompareState = false;
 			_incrementMultiprogrammingLevel();
@@ -228,7 +221,7 @@ void endProcessGeneric(Process* process) {
 			//liberar filesystem
 
 					}
-	if (shouldCompareState && equal_user_command(state,string_itoa(block))) {
+	if (shouldCompareState && string_equals_ignore_case(state,"block")) {
 			shouldCompareState = false;
 			Package* package ;
 			package = createAndSendPackage(process->fileDescriptor,
@@ -240,7 +233,7 @@ void endProcessGeneric(Process* process) {
 			//liberar memoria
 			//liberar filesystem
 		}
-	if (shouldCompareState && equal_user_command(state,string_itoa(ex))) {
+	if (shouldCompareState && string_equals_ignore_case(state,"exit")) {
 			shouldCompareState = false;
 			log_error(logger,"Error, no puedo enviar un proceso a finalizar el cual ya finalizo");
 			//printf("Error, no puedo enviar un proceso a finalizar el cual ya finalizo");
