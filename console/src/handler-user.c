@@ -207,9 +207,6 @@ void printCommandsHelp() {
 	COD_CONSOLE_STOP_PROGRAM, OPT_PID, "«pid»",
 			"Detiene la ejecución del programa con «pid»");
 
-	printf(patter, COD_CONSOLE_ENABLE, "", "", "Bloquea planificador");
-
-	printf(patter, COD_CONSOLE_DISABLE, "", "", "Desbloquea planificador");
 
 	printf(patter, COD_CONSOLE_CLEAR, "", "", "Limpia la pantalla");
 

@@ -11,10 +11,18 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <unistd.h>
 #include <commons/collections/queue.h>
+#include "../module.planning/shortTermScheduler.h"
+#include "../module.model/processFinder.h"
 #include <dc-commons/logger.h>
+#include <dc-commons/utils.h>
+#include <../dc-commons/protocol-kernel-console.h>
+#include <../dc-commons/socket-message.h>
 #include "../module.model/process.h"
 #include "shortTermScheduler.h"
+
+
 
 typedef struct {
 	t_list* new;
@@ -24,15 +32,15 @@ typedef struct {
 	t_queue* exit;
 } t_planningStates;
 
-/*
-enum enum_planningStates {
+
+enum planningStates {
   new,
   ready,
   execute,
   block,
-  ex,
-};  // Must end with a semicolon like a struct
-*/
+  ex
+} enum_planning;  // Must end with a semicolon like a struct
+
 
 void moveFromNewToReady(Process* process);
 void moveFromExcecToReady(Process* process);

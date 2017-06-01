@@ -157,3 +157,76 @@ void destroyProcessLifeCycle() {
 	pthread_mutex_destroy(&readyListMutex);
 	pthread_mutex_destroy(&blockListMutex);
 }
+
+/*  dependiendo el estado se puede realizar diferentes acciones
+new - como no ingreso en el sistema solo hay q moverlo de new a exit
+ready - ya tiene asignado recursos por lo tanto hay que eliminarlos y luego moverlo
+block - lo mismo que ready
+exec - lo mismo que ready (tener en cuenta que si esta ejecutando
+		hay que esperar que la cpu termine de ejecutar la instruccion)
+exit - loguear el error porque no seria una inconsitencia enviar a finalizar un proceso que ya finalizo    */
+
+
+void endProcessGeneric(Process* process) {
+	char* state = getProcessState(process);
+	//enum planningStates estado;
+	bool shouldCompareState=true;
+
+	/* switch(estado) {
+		    case new ;
+		    case ready;
+		    case execute;
+		    case block;
+		    case ex;
+		    	    */
+	if (shouldCompareState && equal_user_command(state,"new")){
+		shouldCompareState = false;
+		Package* package ;
+		package = createAndSendPackage(process->fileDescriptor,
+		COD_FORCE_QUIT_PROGRAM, 0 ,NULL );
+		destroyPackage(package);
+		sendToEXIT(process);
+
+				}
+
+	if (shouldCompareState && equal_user_command(state,"ready")) {
+			shouldCompareState = false;
+
+			processInReady_wait();
+			sendToEXIT(process);
+	close(process->fileDescriptor);
+			destroyProcess(process);
+			//liberar memoria
+			//liberar filesystem
+			/*mostrar mensaje :
+			->si viene desde consola -> finalizo con exito
+			->si cerro por la consola kernel -> el programa finalizado por el administrador del sistema
+			->si cerro por error -> se podria informar el tipo de error
+			*/
+
+					}
+	if (shouldCompareState && equal_user_command(state,"execute")) {
+
+		//signal sem de multiprogramacion
+			shouldCompareState = false;
+			sendToEXIT(process);
+			close(process->fileDescriptor);
+			destroyProcess(process);
+
+					}
+	if (shouldCompareState && equal_user_command(state,"block")) {
+			shouldCompareState = false;
+			sendToEXIT(process);
+			close(process->fileDescriptor);
+			destroyProcess(process);
+					}
+	if (shouldCompareState && equal_user_command(state,"execute")) {
+			shouldCompareState = false;
+			printf("Error, no puedo enviar un proceso a finalizar el cual ya finalizo");
+					}
+
+
+	  }
+
+
+
