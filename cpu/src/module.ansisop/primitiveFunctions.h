@@ -13,6 +13,8 @@
 #include <dc-commons/protocol-kernel-cpu.h>
 #include "../module.core/cpu-core.h"
 
+#define NULL_POINTER -1;
+
 /*
  * DEFINIR VARIABLE
  *

@@ -10,7 +10,8 @@
 t_puntero ansisop_definirVariable(t_nombre_variable identificador_variable) {
 	logTrace("Ejecutando ansisop_definirVariable(%c)", identificador_variable);
 	t_variable* newArgOrVar;
-	t_puntero pointer = -1;
+	t_puntero pointer = NULL_POINTER
+	;
 	validateStackOverflow(sizeof(t_puntero));
 	if (getErrorFlag() == FLAG_OK) {
 		if (isdigit(identificador_variable)) {
@@ -23,7 +24,7 @@ t_puntero ansisop_definirVariable(t_nombre_variable identificador_variable) {
 			pointer = logicalAddressToPointer(&(newArgOrVar->direccion));
 		}
 		logTrace(
-				"Se ejecutó ansisop_definirVariable(%c) se creó la variable en: pag:%d, off:%d, size:%d, ptr:%d",
+				"Se ejecutó ansisop_definirVariable(%c) se creó la variable/argumento en: pag:%d, off:%d, size:%d, ptr:%d",
 				identificador_variable, newArgOrVar->direccion.pagina,
 				newArgOrVar->direccion.offset, newArgOrVar->direccion.size,
 				pointer);
@@ -33,7 +34,31 @@ t_puntero ansisop_definirVariable(t_nombre_variable identificador_variable) {
 
 t_puntero ansisop_obtenerPosicionVariable(
 		t_nombre_variable identificador_variable) {
-	return 0;
+	logTrace("Ejecutando ansisop_obtenerPosicionVariable(%c)",
+			identificador_variable);
+	t_variable* newArgOrVar;
+	t_puntero pointer = NULL_POINTER
+	;
+	if (getErrorFlag() == FLAG_OK) {
+		if (isdigit(identificador_variable)) {
+			newArgOrVar = getArgument(identificador_variable);
+		} else {
+			newArgOrVar = getVariable(identificador_variable);
+		}
+		if (newArgOrVar == NULL) {
+			setErrorFlag(FLAG_SINTAX_ERROR);
+			logError(
+					"No se pudo encontrar la variable/argumento (%c) en el stack, verificar que no se trate de un error sintactico ansisop");
+		} else {
+			pointer = logicalAddressToPointer(&(newArgOrVar->direccion));
+			logTrace(
+					"Se ejecutó ansisop_obtenerPosicionVariable(%c) se encontro la variable/argumento en: pag:%d, off:%d, size:%d, ptr:%d",
+					identificador_variable, newArgOrVar->direccion.pagina,
+					newArgOrVar->direccion.offset, newArgOrVar->direccion.size,
+					pointer);
+		}
+	}
+	return pointer;
 }
 
 t_valor_variable ansisop_dereferenciar(t_puntero direccion_variable) {
