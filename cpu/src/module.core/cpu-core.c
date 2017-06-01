@@ -34,11 +34,11 @@ AnSISOP_kernel ansisop_kernelFunctions = { .AnSISOP_wait = ansisopKernel_wait,
 				ansisopKernel_moverCursor, .AnSISOP_escribir =
 				ansisopKernel_escribir, .AnSISOP_leer = ansisopKernel_leer, };
 
-void initExecutionMutex(){
-	pthread_mutex_init(&executionMutex,NULL);
+void initExecutionMutex() {
+	pthread_mutex_init(&executionMutex, NULL);
 }
 
-void destroyExecutionMutex(){
+void destroyExecutionMutex() {
 	pthread_mutex_destroy(&executionMutex);
 }
 
@@ -57,7 +57,7 @@ void unloadPCB() {
 	logTrace("Se descargo el pcb");
 }
 
-void setStackPageSize(int size){
+void setStackPageSize(int size) {
 	stackPageSize = size;
 }
 
@@ -77,16 +77,16 @@ bool isFinishedProcess() {
 	return pcb->programCounter > pcb->metadata->instrucciones_size;
 }
 
-void validateStackOverflow(size_t requiredSize){
+void validateStackOverflow(size_t requiredSize) {
 	int maxStackOffset = stackPageSize * pageSize;
-	if(pcb->stackOffset + requiredSize >= maxStackOffset){
+	if (pcb->stackOffset + requiredSize >= maxStackOffset) {
 		logError("StackOverflow para el pid: %d", pcb->pid);
 		errorFlag = FLAG_STACKOVERFLOW;
 	}
 }
 
 t_stack_index* getCurrentContext() {
-	return (pcb->stackIndex!=NULL)? &(pcb->stackIndex[pcb->stackSize]) : NULL;
+	return (pcb->stackIndex != NULL) ? &(pcb->stackIndex[pcb->stackSize]) : NULL;
 }
 
 t_puntero logicalAddressToPointer(dir_memoria* dir) {
@@ -101,10 +101,10 @@ t_puntero logicalAddressToPointer(dir_memoria* dir) {
  * 	- cuando tengo un pcb -> tengo que realizar acciones para no perder los datos del pcb
  * 	- cuando no tengo pcb -> finalizo feliz
  */
-void finalize_CPU_process(){
+void finalize_CPU_process() {
 	pthread_mutex_lock(&executionMutex);
-		logInfo("Finalizando el proceso porque se recibio la señal SIGUSR1");
-		exit (0);
+	logInfo("Finalizando el proceso porque se recibio la señal SIGUSR1");
+	exit(0);
 	pthread_mutex_unlock(&executionMutex);
 }
 
@@ -124,7 +124,7 @@ void ansisopExecuteInstruccion(cpu_struct* cpuStruct) {
 	if (errorFlag == FLAG_OK) {
 		if (isFinishedProcess()) {
 			reportEndProcess(cpuStruct);
-		}else{
+		} else {
 			reportEndInstruction(cpuStruct);
 		}
 	} else {
@@ -217,18 +217,17 @@ t_variable* createVariableForCurrentPCB(t_nombre_variable name) {
 	currentContext->vars = realloc(currentContext->vars,
 			sizeof(t_variable) * (currentContext->var_len + 1));
 	currentContext->vars[currentContext->var_len].nombre = name;
-	currentContext->vars[currentContext->var_len].direccion.pagina = pcb->stackFirstPage;
-	currentContext->vars[currentContext->var_len].direccion.offset = pcb->stackOffset;
-	//todo reemplazar el while por una logica mas copada
-	while (currentContext->vars[currentContext->var_len].direccion.offset
-			+ sizeof(uint32_t) > pageSize) {
-		currentContext->vars[currentContext->var_len].direccion.pagina++;
-		currentContext->vars[currentContext->var_len].direccion.offset -= pageSize;
-	}
-	currentContext->vars[currentContext->var_len].direccion.size = sizeof(uint32_t);
+	//TODO verificar la correcta asignacion
+	currentContext->vars[currentContext->var_len].direccion.pagina =
+			pcb->stackFirstPage + (pcb->stackOffset / pageSize);
+	//TODO verificar la correcta asignacion
+	currentContext->vars[currentContext->var_len].direccion.offset =
+			pcb->stackOffset % pageSize;
+	currentContext->vars[currentContext->var_len].direccion.size =
+			sizeof(uint32_t);
 	currentContext->var_len++;
 	pcb->stackOffset += sizeof(uint32_t);
-	return &(currentContext->vars[currentContext->var_len -1]);
+	return &(currentContext->vars[currentContext->var_len - 1]);
 }
 
 t_variable* createArgumentForCurrentPCB(t_nombre_variable name) {
@@ -236,18 +235,15 @@ t_variable* createArgumentForCurrentPCB(t_nombre_variable name) {
 	currentContext->args = realloc(currentContext->args,
 			sizeof(t_variable) * (currentContext->arg_len + 1));
 	currentContext->args[currentContext->arg_len].nombre = name;
+	//TODO verificar la correcta asignacion
 	currentContext->args[currentContext->arg_len].direccion.pagina =
-			pcb->stackFirstPage;
+			pcb->stackFirstPage + (pcb->stackOffset / pageSize);
+	//TODO verificar la correcta asignacion
 	currentContext->args[currentContext->arg_len].direccion.offset =
-			pcb->stackOffset;
-	//todo reemplazar el while por una logica mas copada
-	while (currentContext->args[currentContext->arg_len].direccion.offset
-			+ sizeof(uint32_t) > pageSize) {
-		currentContext->args[currentContext->arg_len].direccion.pagina++;
-		currentContext->args[currentContext->arg_len].direccion.offset -= pageSize;
-	}
-	currentContext->args[currentContext->arg_len].direccion.size = sizeof(uint32_t);
+			pcb->stackOffset % pageSize;
+	currentContext->args[currentContext->arg_len].direccion.size =
+			sizeof(uint32_t);
 	currentContext->arg_len++;
 	pcb->stackOffset += sizeof(uint32_t);
-	return &(currentContext->vars[currentContext->arg_len -1]);
+	return &(currentContext->args[currentContext->arg_len - 1]);
 }
