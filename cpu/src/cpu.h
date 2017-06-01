@@ -30,4 +30,6 @@ void createSockets(cpu_struct* cpuStruct);
 
 void configSignalHandlers();
 
+cpu_struct* getCPUStruct();
+
 #endif /* CPU_H_ */

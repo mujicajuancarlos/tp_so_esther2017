@@ -96,6 +96,16 @@ t_puntero logicalAddressToPointer(dir_memoria* dir) {
 	return pointer;
 }
 
+dir_memoria* pointerToLogicalAddress(t_puntero pointer) {
+	dir_memoria* address = malloc(sizeof(dir_memoria));
+	int pageNumber = pointer / pageSize;
+	int offset = pointer % pageSize;
+	address->pagina = pcb->stackFirstPage + pageNumber;
+	address->offset = offset;
+	address->size = sizeof(uint32_t);
+	return address;
+}
+
 /**
  * me pueden invocar en dos momentos
  * 	- cuando tengo un pcb -> tengo que realizar acciones para no perder los datos del pcb

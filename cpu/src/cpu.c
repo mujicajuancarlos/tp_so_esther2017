@@ -50,3 +50,7 @@ void configSignalHandlers() {
 	if (signal(SIGUSR1, signal_handler) == SIG_ERR)
 		printf("\nNo se pudo configurar el manejador para de señales\n");
 }
+
+cpu_struct* getCPUStruct(){
+	return &cpuStruct;
+}
