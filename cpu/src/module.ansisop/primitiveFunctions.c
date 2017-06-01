@@ -10,8 +10,7 @@
 t_puntero ansisop_definirVariable(t_nombre_variable identificador_variable) {
 	logTrace("Ejecutando ansisop_definirVariable(%c)", identificador_variable);
 	t_variable* newArgOrVar;
-	t_puntero pointer = NULL_POINTER
-	;
+	t_puntero pointer = NULL_POINTER;
 	validateStackOverflow(sizeof(t_puntero));
 	if (getErrorFlag() == FLAG_OK) {
 		if (isdigit(identificador_variable)) {
@@ -37,8 +36,7 @@ t_puntero ansisop_obtenerPosicionVariable(
 	logTrace("Ejecutando ansisop_obtenerPosicionVariable(%c)",
 			identificador_variable);
 	t_variable* newArgOrVar;
-	t_puntero pointer = NULL_POINTER
-	;
+	t_puntero pointer = NULL_POINTER;
 	if (getErrorFlag() == FLAG_OK) {
 		if (isdigit(identificador_variable)) {
 			newArgOrVar = getArgument(identificador_variable);
@@ -61,8 +59,25 @@ t_puntero ansisop_obtenerPosicionVariable(
 	return pointer;
 }
 
-t_valor_variable ansisop_dereferenciar(t_puntero direccion_variable) {
-	return 0;
+t_valor_variable ansisop_dereferenciar(t_puntero pointer) {
+	logTrace("Ejecutando ansisop_dereferenciar(%d)", pointer);
+	t_valor_variable value = NULL_VALUE;
+	if (getErrorFlag() == FLAG_OK) {
+		dir_memoria* address = pointerToLogicalAddress(pointer);
+		char* buffer = getDataFromMemory(getCPUStruct(), address->pagina,
+				address->offset, address->size);
+		if (getErrorFlag() == FLAG_OK) {
+			value = deserialize_int(buffer);
+			free(buffer);
+			logTrace("Se derefencio el puntero %d el valor optenido de la memoria es: %d", pointer, value);
+		} else {
+			logError(
+					"Fallo la solicitud de datos a la memoria de pag:%d, off:%d, size:%d, ptr:%d",
+					address->pagina, address->offset, address->size, pointer);
+		}
+		free(address);
+	}
+	return value;
 }
 
 void ansisop_asignar(t_puntero direccion_variable, t_valor_variable valor) {

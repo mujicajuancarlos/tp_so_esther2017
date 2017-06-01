@@ -11,9 +11,12 @@
 #include <ctype.h>
 #include <parser/parser.h>
 #include <dc-commons/protocol-kernel-cpu.h>
+#include <dc-commons/serialization.h>
+#include "../cpu.h"
 #include "../module.core/cpu-core.h"
 
-#define NULL_POINTER -1;
+#define NULL_POINTER -1
+#define NULL_VALUE -2
 
 /*
  * DEFINIR VARIABLE
