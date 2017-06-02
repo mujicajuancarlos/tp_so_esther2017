@@ -420,3 +420,44 @@ void destroyCurrentContext(PCB* pcb) {
 	pcb->stackIndex = realloc(pcb->stackIndex,
 			sizeof(t_stack_index) * (pcb->stackSize));
 }
+
+/******************************************************************************************************************
+//EXCLUSIVO SET SHARED VALUE
+ Es un array de t_stack_index
+ ******************************************************************************************************************
+ */
+set_shared_var* createSetSharedVar(char* name, int value){
+	set_shared_var* object = malloc(sizeof(set_shared_var));
+	object->name = malloc(strlen(name));
+	object->sizeName = strlen(name);
+	object->newValue = value;
+	return object;
+}
+void destroySetSharedVar(set_shared_var* object){
+	if(object->name != NULL)
+		free(object->name);
+	free(object);
+}
+size_t sizeOf_SetSharedVar(set_shared_var* object){
+	size_t size = 0;
+	size += sizeof(uint32_t) * 2;
+	size += sizeof(char) * object->sizeName;
+	return size;
+}
+char* serialize_SetSharedVar(set_shared_var* object){
+	char* buffer = malloc(sizeOf_SetSharedVar(object));
+	uint32_t offset = 0;
+	serialize_and_copy_value(buffer, &(object->sizeName), sizeof(uint32_t), &offset);
+	serialize_and_copy_value(buffer, object->name, sizeof(char) * object->sizeName, &offset);
+	serialize_and_copy_value(buffer, &(object->newValue), sizeof(uint32_t), &offset);
+	return buffer;
+}
+set_shared_var* deserialize_SetSharedVar(char* buffer){
+	set_shared_var* object = malloc(sizeof(set_shared_var));
+	uint32_t offset = 0;
+	deserialize_and_copy_value(&(object->sizeName), buffer, sizeof(uint32_t), &offset);
+	object->name = malloc(sizeof(char)*object->sizeName);
+	deserialize_and_copy_value(object->name, buffer, sizeof(char)*object->sizeName, &offset);
+	deserialize_and_copy_value(&(object->newValue), buffer, sizeof(uint32_t), &offset);
+	return object;
+}

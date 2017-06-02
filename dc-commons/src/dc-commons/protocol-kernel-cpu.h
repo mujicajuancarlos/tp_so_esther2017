@@ -42,7 +42,13 @@
 #define COD_SEM_WAIT 219
 #define COD_SEM_SIGNAL 220
 
-typedef struct dir_memoria {
+typedef struct {
+	uint32_t sizeName;
+	char* name ;
+	uint32_t newValue;
+} set_shared_var;
+
+typedef struct {
 	uint32_t pagina;
 	uint32_t offset;
 	uint32_t size;
@@ -72,7 +78,6 @@ typedef struct {
 	t_stack_index* stackIndex;		//context
 	uint32_t exit_code; //Agrego Exit Code a PCB (No hace falta serializar, usa solo Kernel)
 } PCB;
-
 
 //EXCLUSIVO PBC
 PCB* create_new_PCB(uint32_t pid, uint32_t stackFirstPage, t_metadata_program* metadata);//ok
@@ -104,5 +109,12 @@ t_variable* deserializeVariablessssArray(char* stream, uint32_t len);
 //  EXCUSIVO CONTEXTO
 void createNewContext(PCB* pcb);//ok
 void destroyCurrentContext(PCB* pcb);//ok
+
+//EXCLUSIVO SET SHARED VALUE
+set_shared_var* createSetSharedVar(char* name, int value);
+void destroySetSharedVar(set_shared_var* object);
+uint32_t sizeOf_SetSharedVar(set_shared_var* object);
+char* serialize_SetSharedVar(set_shared_var* object);
+set_shared_var* deserialize_SetSharedVar(char* stream);
 
 #endif /* SRC_DC_COMMONS_PROTOCOL_KERNEL_CPU_H_ */
