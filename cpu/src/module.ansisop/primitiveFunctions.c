@@ -69,10 +69,12 @@ t_valor_variable ansisop_dereferenciar(t_puntero pointer) {
 		if (getErrorFlag() == FLAG_OK) {
 			value = deserialize_int(buffer);
 			free(buffer);
-			logTrace("Se derefencio el puntero %d el valor optenido de la memoria es: %d", pointer, value);
+			logTrace(
+					"Se derefencio el puntero %d el valor optenido de la memoria es: %d",
+					pointer, value);
 		} else {
 			logError(
-					"Fallo la solicitud de datos a la memoria de pag:%d, off:%d, size:%d, ptr:%d",
+					"Fallo la solicitud a la memoria de pag:%d, off:%d, size:%d, ptr:%d",
 					address->pagina, address->offset, address->size, pointer);
 		}
 		free(address);
@@ -80,8 +82,25 @@ t_valor_variable ansisop_dereferenciar(t_puntero pointer) {
 	return value;
 }
 
-void ansisop_asignar(t_puntero direccion_variable, t_valor_variable valor) {
-
+void ansisop_asignar(t_puntero pointer, t_valor_variable value) {
+	logTrace("Ejecutando ansisop_dereferenciar(%d,%d)", pointer, value);
+	if (getErrorFlag() == FLAG_OK) {
+		dir_memoria* address = pointerToLogicalAddress(pointer);
+		char* buffer = serialize_int(value);
+		saveDataOnMemory(getCPUStruct(), address->pagina, address->offset,
+				address->size, buffer);
+		if (getErrorFlag() == FLAG_OK) {
+			logTrace(
+					"Se envio el valor %d a la direccion pag:%d, off:%d, size:%d",
+					value, address->pagina, address->offset, address->size);
+		} else {
+			logError(
+					"Fallo la solicitud a la memoria de pag:%d, off:%d, size:%d, ptr:%d",
+					address->pagina, address->offset, address->size, pointer);
+		}
+		free(buffer);
+		free(address);
+	}
 }
 
 t_valor_variable ansisop_obtenerValorCompartida(t_nombre_compartida variable) {
