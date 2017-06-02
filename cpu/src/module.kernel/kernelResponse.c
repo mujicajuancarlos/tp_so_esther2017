@@ -38,6 +38,9 @@ void sendPCB(cpu_struct* cpuStruct, int messageCode) {
 void reportExcecutionError(cpu_struct* cpuStruct, int errorFlag) {
 	Package* package;
 	switch (errorFlag) {
+	case FLAG_END_PROGRAM:
+		reportEndProcess(cpuStruct);
+		break;
 	case FLAG_STACKOVERFLOW:
 	case FLAG_SEGMENTATION_FAULT:
 	case FLAG_DISCONNECTED_MEMORY:

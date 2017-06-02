@@ -105,17 +105,21 @@ void ansisop_asignar(t_puntero pointer, t_valor_variable value) {
 
 t_valor_variable ansisop_obtenerValorCompartida(t_nombre_compartida name) {
 	logTrace("Ejecutando ansisop_obtenerValorCompartida(%s)", name);
-	if (name[strlen(name) - 1] == '\n') {
-		name[strlen(name) - 1] = '\0';
-	}
-	t_valor_variable value = getSharedVarriableValue(getCPUStruct(), name);
+	t_valor_variable value = NULL_VALUE;
 	if (getErrorFlag() == FLAG_OK) {
-		logTrace(
-				"Socilitud al kernel realizada, variable compartida: %s value:%d",
-				name, value);
-	} else {
-		logError("Fallo la solicitud al kernel para la variable compartida: %s",
-				name);
+		if (name[strlen(name) - 1] == '\n') {
+			name[strlen(name) - 1] = '\0';
+		}
+		value = getSharedVarriableValue(getCPUStruct(), name);
+		if (getErrorFlag() == FLAG_OK) {
+			logTrace(
+					"Socilitud al kernel realizada, variable compartida: %s value:%d",
+					name, value);
+		} else {
+			logError(
+					"Fallo la solicitud al kernel para la variable compartida: %s",
+					name);
+		}
 	}
 	return value;
 }
@@ -123,60 +127,90 @@ t_valor_variable ansisop_obtenerValorCompartida(t_nombre_compartida name) {
 t_valor_variable ansisop_asignarValorCompartida(t_nombre_compartida name,
 		t_valor_variable value) {
 	logTrace("Ejecutando ansisop_asignarValorCompartida(%s,%d)", name, value);
-	if (name[strlen(name) - 1] == '\n') {
-		name[strlen(name) - 1] = '\0';
-	}
-	t_valor_variable assignedValue = setSharedVarriableValue(getCPUStruct(),
-			name, value);
+	t_valor_variable assignedValue = NULL_VALUE;
 	if (getErrorFlag() == FLAG_OK) {
-		logTrace(
-				"Socilitud al kernel realizada, variable compartida: %s value:%d",
-				name, value);
-	} else {
-		logError("Fallo la solicitud al kernel para la variable compartida: %s",
-				name);
+		if (name[strlen(name) - 1] == '\n') {
+			name[strlen(name) - 1] = '\0';
+		}
+		assignedValue = setSharedVarriableValue(getCPUStruct(), name, value);
+		if (getErrorFlag() == FLAG_OK) {
+			logTrace(
+					"Socilitud al kernel realizada, variable compartida: %s value:%d",
+					name, value);
+		} else {
+			logError(
+					"Fallo la solicitud al kernel para la variable compartida: %s",
+					name);
+		}
 	}
 	return assignedValue;
 }
 
 void ansisop_irAlLabel(t_nombre_etiqueta name) {
 	logTrace("Ejecutando ansisop_irAlLabel(%d,%d)", name);
-	t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(name);
-	getPCB()->programCounter = newProgramCounter;
-	logTrace("Se definio el program counter con el valor: %d",
-			newProgramCounter);
+	if (getErrorFlag() == FLAG_OK) {
+		t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(
+				name);
+		getPCB()->programCounter = newProgramCounter;
+		logTrace("Se definio el program counter con el valor: %d",
+				newProgramCounter);
+	}
 }
 
 void ansisop_llamarSinRetorno(t_nombre_etiqueta label) {
 	logTrace("Ejecutando ansisop_llamarSinRetorno(%s)", label);
-	logWarning("PREGUNTAR QUE HACE ESTA PRIMITIVA"); //TODO: pendiente
+	if (getErrorFlag() == FLAG_OK) {
+		logWarning("PREGUNTAR QUE HACE ESTA PRIMITIVA"); //TODO: pendiente
+	}
 }
 
 void ansisop_llamarConRetorno(t_nombre_etiqueta label, t_puntero pointer) {
 	logTrace("Ejecutando ansisop_llamarConRetorno(%s, %d)", label, pointer);
-	t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(label);
-	PCB* tmpPcb = getPCB();
-	createNewContext(tmpPcb);
-	logTrace("Se genero un nuevo contexto en el stack");
-	t_stack_index* stackIndex = getCurrentContext();
-	stackIndex->retPos = tmpPcb->programCounter;
-	logTrace("Se definio el puntero de retorno en: %d", tmpPcb->programCounter);
-	tmpPcb->programCounter = newProgramCounter;
-	logTrace("Se definio el program counter en: %d", tmpPcb->programCounter);
-	dir_memoria* address = pointerToLogicalAddress(pointer);
-	stackIndex->retVar.pagina = address->pagina;
-	stackIndex->retVar.offset = address->offset;
-	stackIndex->retVar.size = address->size;
-	logTrace(
-			"Se definio la direccion del valor de retorno en: pag:%d, offset:%d, size:%d",
-			address->pagina, address->offset, address->size);
-	free(address);
+	if (getErrorFlag() == FLAG_OK) {
+		t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(
+				label);
+		PCB* tmpPcb = getPCB();
+		createNewContext(tmpPcb);
+		logTrace("Se genero un nuevo contexto en el stack");
+		t_stack_index* stackIndex = getCurrentContext();
+		stackIndex->retPos = tmpPcb->programCounter;
+		logTrace("Se definio el puntero de retorno en: %d",
+				tmpPcb->programCounter);
+		tmpPcb->programCounter = newProgramCounter;
+		logTrace("Se definio el program counter en: %d",
+				tmpPcb->programCounter);
+		dir_memoria* address = pointerToLogicalAddress(pointer);
+		stackIndex->retVar.pagina = address->pagina;
+		stackIndex->retVar.offset = address->offset;
+		stackIndex->retVar.size = address->size;
+		logTrace(
+				"Se definio la direccion del valor de retorno en: pag:%d, offset:%d, size:%d",
+				address->pagina, address->offset, address->size);
+		free(address);
+	}
+	logTrace("Fin de ansisop_llamarConRetorno(%s, %d)", label, pointer);
 }
 
-void ansisop_finalizar(void) {
-
+void ansisop_finalizar() {
+	logTrace("Ejecutando ansisop_finalizar()");
+	if (getErrorFlag() == FLAG_OK) {
+		setErrorFlag(FLAG_END_PROGRAM);
+	}
 }
 
-void ansisop_retornar(t_valor_variable retorno) {
+void ansisop_retornar(t_valor_variable value) {
+	logTrace("Ejecutando ansisop_retornar(%d)", value);
+	if (getErrorFlag() == FLAG_OK) {
+		t_stack_index* stackIndex = getCurrentContext();
+		dir_memoria* address = &(stackIndex->retVar);
+		char* buffer = serialize_int(value);
+		saveDataOnMemory(getCPUStruct(), address->pagina, address->offset,
+				address->size, buffer);
+		free(buffer);
+		logTrace(
+				"Se guardó el valor: %d en la direccion pag:%d, offset:%d, size:%d",
+				value, address->pagina, address->offset, address->size);
 
+		destroyCurrentContext(getPCB());
+	}
 }
