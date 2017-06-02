@@ -277,3 +277,22 @@ t_variable* getVariable(t_nombre_variable name) {
 	}
 	return NULL;
 }
+
+t_puntero_instruccion getProgramCounterByLabel(t_nombre_etiqueta label) {
+	char* labels = pcb->metadata->etiquetas;
+	size_t size = pcb->metadata->etiquetas_size;
+	int offset = 0;
+	t_puntero_instruccion newProgramCounter = NULL_VALUE;
+	if (label[strlen(label) - 1] == '\n') {
+		label[strlen(label) - 1] = '\0';
+	}
+	while (offset < size && strcmp(labels + offset, label) != 0) {
+		offset += strlen(labels + offset) + 1 + sizeof(t_puntero_instruccion);
+	}
+	if (offset < size) {
+		memcpy(&newProgramCounter,
+				labels + offset + strlen(labels + offset) + 1,
+				sizeof(t_puntero_instruccion));
+	}
+	return newProgramCounter;
+}

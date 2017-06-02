@@ -141,6 +141,9 @@ t_valor_variable ansisop_asignarValorCompartida(t_nombre_compartida name,
 
 void ansisop_irAlLabel(t_nombre_etiqueta name) {
 	logTrace("Ejecutando ansisop_irAlLabel(%d,%d)", name);
+	t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(name);
+	getPCB()->programCounter = newProgramCounter;
+	logTrace("Se definio el program counter con el valor: %d", newProgramCounter);
 }
 
 void ansisop_llamarSinRetorno(t_nombre_etiqueta etiqueta) {
