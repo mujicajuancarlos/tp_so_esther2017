@@ -26,20 +26,21 @@
 #define COD_SIGNAL_DISCONNECTED 207 //le llego una señal de desconeccion a la cpu -> dejara de dar servicio
 //no bloqueantes
 #define COD_GET_SHARED_VAR 208
-#define COD_SET_SHARED_VAR 209
+#define COD_GET_SHARED_VAR_RESPONSE 209
+#define COD_SET_SHARED_VAR 210
 // MEMORY
-#define COD_MALLOC_MEMORY 210
-#define COD_FREE_MEMORY 211
+#define COD_MALLOC_MEMORY 211
+#define COD_FREE_MEMORY 212
 //bloqueantes FS
-#define COD_OPEN_FD 212
-#define COD_DELETE_FD 213
-#define COD_CLOSE_FD 214
-#define COD_SEED_FD 215
-#define COD_WRITE_FD 216
-#define COD_READ_FD 217
+#define COD_OPEN_FD 213
+#define COD_DELETE_FD 214
+#define COD_CLOSE_FD 215
+#define COD_SEED_FD 216
+#define COD_WRITE_FD 217
+#define COD_READ_FD 218
 //bloquantes semaforos
-#define COD_SEM_WAIT 218
-#define COD_SEM_SIGNAL 219
+#define COD_SEM_WAIT 219
+#define COD_SEM_SIGNAL 220
 
 typedef struct dir_memoria {
 	uint32_t pagina;
