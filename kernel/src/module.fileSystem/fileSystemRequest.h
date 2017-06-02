@@ -17,6 +17,6 @@
 #include "../kernelStruct.h"
 #include "../module.model/fileDescriptor.h"
 
-void validarArchivo(kernel_struct* kernelStruct);
+bool validateFile(kernel_struct* kernelStruct, t_fileDescriptor* fileDescriptor);
 
 #endif /* MODULE_FILESYSTEM_FILESYSTEMREQUEST_H_ */
