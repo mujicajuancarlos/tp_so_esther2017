@@ -13,16 +13,16 @@ int nextFD = FIRST_FD;
 pthread_mutex_t fileDescriptor_mutex;
 pthread_mutex_t tablaGlobalFD_mutex;
 pthread_mutex_t nextFD_mutex;
-//pthread_mutex_t tablaProcesosFD_mutex;  //TODO: MOVER A PROCESS (Farid)
+
 
 void initializeFileSystemModule() {
 	logInfo("Inicializando el modulo FS");
 	pthread_mutex_init(&tablaGlobalFD_mutex, NULL);
 	pthread_mutex_init(&fileDescriptor_mutex, NULL);
 	pthread_mutex_init(&nextFD_mutex, NULL);
-	//pthread_mutex_init(&tablaProcesosFD_mutex, NULL); //TODO: MOVER A PROCESS (Farid)
+
 	fileDescriptorGlobalList = list_create();
-//	tablaProcesosFD = list_create(); //TODO: MOVER A PROCESS (Farid)
+
 }
 
 void destroyFileSystemModule() {
@@ -30,11 +30,9 @@ void destroyFileSystemModule() {
 	pthread_mutex_destroy(&tablaGlobalFD_mutex);
 	pthread_mutex_destroy(&fileDescriptor_mutex);
 	pthread_mutex_destroy(&nextFD_mutex);
-//	pthread_mutex_destroy(&tablaProcesosFD_mutex); //TODO: MOVER A PROCESS (Farid)
 	list_destroy_and_destroy_elements(fileDescriptorGlobalList,
 			(void*) destroy_t_filedescriptor);
-//	list_destroy_and_destroy_elements(tablaProcesosFD, //TODO: MOVER A PROCESS (Farid)
-	//		(void*) destroy_t_processFileDescriptor); //TODO: MOVER A PROCESS (Farid)
+
 }
 
 void tablaGlobalFD_mutex_lock() {
@@ -45,15 +43,7 @@ void tablaGlobalFD_mutex_unlock() {
 	pthread_mutex_unlock(&tablaGlobalFD_mutex);
 }
 
-/*
-void tablaProcesosFD_mutex_lock() {
-	pthread_mutex_lock(&tablaProcesosFD_mutex);	//TODO: MOVER A PROCESS (Farid)
-}
 
-void tablaProcesosFD_mutex_unlock() {
-	pthread_mutex_unlock(&tablaProcesosFD_mutex);	//TODO: MOVER A PROCESS (Farid)
-}
-*/
 
 void fileDescriptor_mutex_lock() {
 	pthread_mutex_lock(&fileDescriptor_mutex);
@@ -146,13 +136,13 @@ void imprimirListaDeFD(t_list* lista) {
 	}
 	fileDescriptor_mutex_unlock();
 }
-
+/*
 t_processFileDescriptor* createNew_t_processFileDescriptor(char* permiso,
 		t_fileDescriptor* fd) {
 
 	t_processFileDescriptor* newPFD = malloc(sizeof(t_processFileDescriptor));
 
-	newPFD->fileDescriptor = fd; //
+	newPFD->fileDescriptor = fd;
 	newPFD->flag = habilitarPermisos(permiso);
 
 	return newPFD;
@@ -164,26 +154,6 @@ void destroy_t_processFileDescriptor(t_processFileDescriptor* pfd) {
 	free(pfd);
 }
 
-/*
-void agregarPFD_Alista(t_processFileDescriptor* pfd) {		//TODO: MOVER A PROCESS (Farid)
-	tablaProcesosFD_mutex_lock();
-	list_add(fileDescriptorGlobalList, pfd);
-	tablaProcesosFD_mutex_unlock();
-}
-*/
-
-/*
-void removerPFD_Lista(t_processFileDescriptor* pfd) {			//TODO: MOVER A PROCESS (Farid)
-	bool condicion(void* element) {
-		t_processFileDescriptor* pfd_aux = element;
-		return pfd_aux == pfd;
-	}
-	tablaProcesosFD_mutex_lock();
-	list_remove_and_destroy_by_condition(tablaProcesosFD, condicion,
-			(void*) destroy_t_processFileDescriptor);
-	tablaProcesosFD_mutex_unlock();
-}
-*/
 
 flags habilitarPermisos(char* permiso) {
 	flags flag;
@@ -215,4 +185,4 @@ flags habilitarPermisos(char* permiso) {
 	return flag;
 }
 
-
+*/

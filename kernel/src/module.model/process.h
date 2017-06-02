@@ -31,6 +31,8 @@ typedef struct Process {
     int exit_code;
 } Process;
 
+t_list* tablaProcesosFD;
+
 Process* createProcess(int socket,kernel_struct* kernelStruct);
 
 void destroyProcess(Process* process);
@@ -48,5 +50,16 @@ void printHeaderProcess();
 void printProcess(Process* proceso, char* state);
 
 void printProcessFull(Process* proceso);
+
+void agregarPFD_Alista(t_processFileDescriptor* pfd);
+
+void removerPFD_Lista(t_processFileDescriptor* pfd);
+
+flags habilitarPermisos(char* permiso);
+
+void destroy_t_processFileDescriptor(t_processFileDescriptor* pfd);
+
+t_processFileDescriptor* createNew_t_processFileDescriptor(char* permiso,
+		t_fileDescriptor* fd);
 
 #endif /* PROCESS_H_ */

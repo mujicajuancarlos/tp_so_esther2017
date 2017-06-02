@@ -9,6 +9,7 @@
 
 int currentPid = FIRST_PID;
 pthread_mutex_t currentPidMutex;
+pthread_mutex_t tablaProcesosFD_mutex;
 
 Process* createProcess(int socket, kernel_struct* kernelStruct) {
 	Process* newProcess = malloc(sizeof(Process));
@@ -16,6 +17,7 @@ Process* createProcess(int socket, kernel_struct* kernelStruct) {
 	newProcess->pid = 0;
 	newProcess->kernelStruct = kernelStruct;
 	newProcess->pcb = NULL;
+	tablaProcesosFD = list_create();
 	return newProcess;
 }
 
@@ -24,6 +26,8 @@ void destroyProcess(Process* process) {
 		if (process->pcb != NULL)
 			destroy_PBC(process->pcb);
 		free(process);
+		list_destroy_and_destroy_elements(tablaProcesosFD, //TODO: MOVER A PROCESS (Farid)
+			(void*) destroy_t_processFileDescriptor);
 	}
 }
 
@@ -34,6 +38,7 @@ void initializeCurrentPidMutex() {
 void destroyCurrentPidMutex() {
 	pthread_mutex_destroy(&currentPidMutex);
 }
+
 
 int getNextPID() {
 	int next;
@@ -79,5 +84,72 @@ void printProcessFull(Process* proceso){
 	printf("\tOtra cantidad %d\n", 432);//TODO: completar
 	printf("\tOtra cantidad %d\n", 234);//TODO: completar
 	printf("\tCantidad de syscall ejecutadas %d\n", 432);//TODO: completar
+}
+
+t_processFileDescriptor* createNew_t_processFileDescriptor(char* permiso,
+		t_fileDescriptor* fd) {
+
+	t_processFileDescriptor* newPFD = malloc(sizeof(t_processFileDescriptor));
+
+	newPFD->fileDescriptor = fd;
+	newPFD->flag = habilitarPermisos(permiso);
+
+	return newPFD;
+
+}
+
+void destroy_t_processFileDescriptor(t_processFileDescriptor* pfd) {
+	destroy_t_filedescriptor(pfd->fileDescriptor);
+	free(pfd);
+}
+
+
+flags habilitarPermisos(char* permiso) {
+	flags flag;
+	int retorno=-1;
+	retorno = strcmp(permiso, READ);
+	if (retorno == 0) {
+		flag.read = true;
+		flag.write = false;
+		//logInfo("Los permisos para el FileDescriptor han sido seteados a Read Only");
+	} else {
+		retorno = strcmp(permiso, WRITE);
+		if (retorno == 0) {
+			flag.read = false;
+			flag.write = true;
+			//logInfo("Los permisos para el FileDescriptor %s han sido seteados a Write Only", auxPFD->fileDescriptor->fd);
+		} else {
+			retorno = strcmp(permiso, RW);
+			if (retorno == 0) {
+				flag.read = true;
+				flag.write = true;
+				//logInfo("Los permisos para el FileDescriptor %s han sido seteados a Read & Write", auxPFD->fileDescriptor->fd);
+			} else {
+				flag.read = false;
+				flag.write = false;
+				//logInfo("No se han podido setear los permisos correspondientes para el FileDescriptor %s", auxPFD->fileDescriptor->fd);
+			}
+		}
+	}
+	return flag;
+}
+
+
+
+void agregarPFD_Alista(t_processFileDescriptor* pfd) {		//TODO: MOVER A PROCESS (Farid)
+
+	list_add(fileDescriptorGlobalList, pfd);
+
+}
+
+void removerPFD_Lista(t_processFileDescriptor* pfd) {			//TODO: MOVER A PROCESS (Farid)
+	bool condicion(void* element) {
+		t_processFileDescriptor* pfd_aux = element;
+		return pfd_aux == pfd;
+	}
+
+	list_remove_and_destroy_by_condition(tablaProcesosFD, condicion,
+			(void*) destroy_t_processFileDescriptor);
+
 }
 
