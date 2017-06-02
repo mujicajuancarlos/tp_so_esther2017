@@ -40,13 +40,16 @@ void handleKernelRequest(memory_struct* memory_struct, Package* package) {
 		startNewProcess(package, memory_struct);
 		break;
 	case COD_SAVE_PAGE_BYTES_REQUEST: //para guardar bytes en una pagina
-		//todo realizar la funcion
+		saveData (package, memory_struct);
+		break;
+	case COD_GET_PAGE_BYTES_REQUEST: // para leer bytes de una pagina
+		readData (package, memory_struct);
 		break;
 	case COD_ADD_PROCESS_PAGES_REQUEST: //para agregar paginas adicionales a un proceso existente
-		//todo realizar la funcion
+		addNewPages (package, memory_struct);
 		break;
 	case COD_END_PROCESS_REQUEST: //para liberar paginas de un proceso que finalizo
-		//todo realizar la funcion
+		//todo: la funcion endProcess está hecha, pero habría que asegurar que esté la parte de serialización para obtener el pid
 		break;
 	default:
 		logError("El kernel solicito una accion desconocida FD: %d Cod: %d",
