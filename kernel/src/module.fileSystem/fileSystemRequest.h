@@ -15,8 +15,8 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/serialization.h>
 #include <dc-commons/logger.h>
-#include <fileDescriptor.h>
+#include "../module.model/fileDescriptor.h"
 
-void validarArchivo(kernel_struct* kernelStruct);
+bool validateFile(kernel_struct* kernelStruct, t_fileDescriptor* fileDescriptor);
 
 #endif /* MODULE_FILESYSTEM_FILESYSTEMREQUEST_H_ */
