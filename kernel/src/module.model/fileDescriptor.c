@@ -44,7 +44,6 @@ void tablaGlobalFD_mutex_unlock() {
 }
 
 
-
 void fileDescriptor_mutex_lock() {
 	pthread_mutex_lock(&fileDescriptor_mutex);
 }

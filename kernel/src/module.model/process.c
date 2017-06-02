@@ -9,7 +9,7 @@
 
 int currentPid = FIRST_PID;
 pthread_mutex_t currentPidMutex;
-pthread_mutex_t tablaProcesosFD_mutex;
+
 
 Process* createProcess(int socket, kernel_struct* kernelStruct) {
 	Process* newProcess = malloc(sizeof(Process));
@@ -26,7 +26,7 @@ void destroyProcess(Process* process) {
 		if (process->pcb != NULL)
 			destroy_PBC(process->pcb);
 		free(process);
-		list_destroy_and_destroy_elements(tablaProcesosFD, //TODO: MOVER A PROCESS (Farid)
+		list_destroy_and_destroy_elements(tablaProcesosFD,
 			(void*) destroy_t_processFileDescriptor);
 	}
 }
@@ -136,13 +136,12 @@ flags habilitarPermisos(char* permiso) {
 
 
 
-void agregarPFD_Alista(t_processFileDescriptor* pfd) {		//TODO: MOVER A PROCESS (Farid)
-
-	list_add(fileDescriptorGlobalList, pfd);
+void agregarPFD_Alista(t_processFileDescriptor* pfd) {
+	list_add(tablaProcesosFD, pfd);
 
 }
 
-void removerPFD_Lista(t_processFileDescriptor* pfd) {			//TODO: MOVER A PROCESS (Farid)
+void removerPFD_Lista(t_processFileDescriptor* pfd) {
 	bool condicion(void* element) {
 		t_processFileDescriptor* pfd_aux = element;
 		return pfd_aux == pfd;
@@ -152,4 +151,5 @@ void removerPFD_Lista(t_processFileDescriptor* pfd) {			//TODO: MOVER A PROCESS 
 			(void*) destroy_t_processFileDescriptor);
 
 }
+
 
