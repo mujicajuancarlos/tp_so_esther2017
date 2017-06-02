@@ -105,21 +105,38 @@ void ansisop_asignar(t_puntero pointer, t_valor_variable value) {
 
 t_valor_variable ansisop_obtenerValorCompartida(t_nombre_compartida name) {
 	logTrace("Ejecutando ansisop_obtenerValorCompartida(%s)", name);
+	if (name[strlen(name) - 1] == '\n') {
+		name[strlen(name) - 1] = '\0';
+	}
 	t_valor_variable value = getSharedVarriableValue(getCPUStruct(), name);
 	if (getErrorFlag() == FLAG_OK) {
-		logTrace("Socilitud al kernel realizada, variable compartida: %s value:%d", name, value);
+		logTrace(
+				"Socilitud al kernel realizada, variable compartida: %s value:%d",
+				name, value);
 	} else {
-		logError(
-				"Fallo la solicitud al kernel para la variable compartida: %s", name);
+		logError("Fallo la solicitud al kernel para la variable compartida: %s",
+				name);
 	}
 	return value;
 }
 
-t_valor_variable ansisop_asignarValorCompartida(t_nombre_compartida variable,
-		t_valor_variable valor) {
-	logTrace("Ejecutando ansisop_asignarValorCompartida(%s,%d)", variable,
-			valor);
-	return 0;
+t_valor_variable ansisop_asignarValorCompartida(t_nombre_compartida name,
+		t_valor_variable value) {
+	logTrace("Ejecutando ansisop_asignarValorCompartida(%s,%d)", name, value);
+	if (name[strlen(name) - 1] == '\n') {
+		name[strlen(name) - 1] = '\0';
+	}
+	t_valor_variable assignedValue = setSharedVarriableValue(getCPUStruct(),
+			name, value);
+	if (getErrorFlag() == FLAG_OK) {
+		logTrace(
+				"Socilitud al kernel realizada, variable compartida: %s value:%d",
+				name, value);
+	} else {
+		logError("Fallo la solicitud al kernel para la variable compartida: %s",
+				name);
+	}
+	return assignedValue;
 }
 
 void ansisop_irAlLabel(t_nombre_etiqueta name) {
