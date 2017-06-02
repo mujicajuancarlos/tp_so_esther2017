@@ -188,7 +188,8 @@ void endProcessGeneric(Process* process) {
 
 	if (shouldCompareState && string_equals_ignore_case(state,"ready")) {
 			shouldCompareState = false;
- 			processInReady_wait();
+			_incrementMultiprogrammingLevel();
+			processInReady_wait();
  			Package* package ;
  			package = createAndSendPackage(process->fileDescriptor,
  			COD_FORCE_QUIT_PROGRAM, 0 ,NULL );
@@ -223,6 +224,7 @@ void endProcessGeneric(Process* process) {
 					}
 	if (shouldCompareState && string_equals_ignore_case(state,"block")) {
 			shouldCompareState = false;
+			_incrementMultiprogrammingLevel();
 			Package* package ;
 			package = createAndSendPackage(process->fileDescriptor,
 			COD_FORCE_QUIT_PROGRAM, 0 ,NULL );
