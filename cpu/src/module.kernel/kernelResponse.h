@@ -29,4 +29,6 @@ void reportExcecutionError(cpu_struct* cpuStruct, int errorFlag);
 
 int getSharedVarriableValue(cpu_struct* cpuStruct, char* name);
 
+int setSharedVarriableValue(cpu_struct* cpuStruct, char* name, int value);
+
 #endif /* MODULE_KERNEL_KERNELRESPONSE_H_ */

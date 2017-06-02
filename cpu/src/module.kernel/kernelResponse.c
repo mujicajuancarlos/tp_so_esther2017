@@ -99,3 +99,39 @@ int getSharedVarriableValue(cpu_struct* cpuStruct, char* name) {
 	}
 	return NULL_VALUE;
 }
+
+int setSharedVarriableValue(cpu_struct* cpuStruct, char* name, int value) {
+	Package* package;
+	set_shared_var* object = createSetSharedVar(name, value);
+	char* buffer = serialize_SetSharedVar(object);
+	package = createAndSendPackage(cpuStruct->socketClientKernel,
+	COD_SET_SHARED_VAR, sizeOf_SetSharedVar(object), buffer);
+	destroySetSharedVar(object);
+	free(buffer);
+	if (package != NULL) {
+		destroyPackage(package);
+		package = createAndReceivePackage(cpuStruct->socketClientKernel);
+		if (package != NULL) {
+			int value;
+			switch (package->msgCode) {
+			case COD_SET_SHARED_VAR_RESPONSE:
+				value = deserialize_int(package->stream);
+				destroyPackage(package);
+				return value;
+				break;
+			default:
+				logError(
+						"Kernel respondio con un codigo de mensaje desconocido");
+				setErrorFlag(FLAG_UNKNOWN_MESSAGE_CODE);
+				break;
+			}
+		} else {
+			logError("No se pudo recibir los datos del kernel");
+			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+		}
+	} else {
+		logError("No se pudo enviar la solicitud al kernel");
+		setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+	}
+	return NULL_VALUE;
+}
