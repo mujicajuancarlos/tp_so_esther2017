@@ -143,16 +143,34 @@ void ansisop_irAlLabel(t_nombre_etiqueta name) {
 	logTrace("Ejecutando ansisop_irAlLabel(%d,%d)", name);
 	t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(name);
 	getPCB()->programCounter = newProgramCounter;
-	logTrace("Se definio el program counter con el valor: %d", newProgramCounter);
+	logTrace("Se definio el program counter con el valor: %d",
+			newProgramCounter);
 }
 
-void ansisop_llamarSinRetorno(t_nombre_etiqueta etiqueta) {
-
+void ansisop_llamarSinRetorno(t_nombre_etiqueta label) {
+	logTrace("Ejecutando ansisop_llamarSinRetorno(%s)", label);
+	logWarning("PREGUNTAR QUE HACE ESTA PRIMITIVA"); //TODO: pendiente
 }
 
-void ansisop_llamarConRetorno(t_nombre_etiqueta etiqueta,
-		t_puntero donde_retornar) {
-
+void ansisop_llamarConRetorno(t_nombre_etiqueta label, t_puntero pointer) {
+	logTrace("Ejecutando ansisop_llamarConRetorno(%s, %d)", label, pointer);
+	t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(label);
+	PCB* tmpPcb = getPCB();
+	createNewContext(tmpPcb);
+	logTrace("Se genero un nuevo contexto en el stack");
+	t_stack_index* stackIndex = getCurrentContext();
+	stackIndex->retPos = tmpPcb->programCounter;
+	logTrace("Se definio el puntero de retorno en: %d", tmpPcb->programCounter);
+	tmpPcb->programCounter = newProgramCounter;
+	logTrace("Se definio el program counter en: %d", tmpPcb->programCounter);
+	dir_memoria* address = pointerToLogicalAddress(pointer);
+	stackIndex->retVar.pagina = address->pagina;
+	stackIndex->retVar.offset = address->offset;
+	stackIndex->retVar.size = address->size;
+	logTrace(
+			"Se definio la direccion del valor de retorno en: pag:%d, offset:%d, size:%d",
+			address->pagina, address->offset, address->size);
+	free(address);
 }
 
 void ansisop_finalizar(void) {
