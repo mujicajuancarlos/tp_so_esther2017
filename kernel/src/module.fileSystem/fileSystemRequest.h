@@ -10,12 +10,12 @@
 
 #include <stdbool.h>
 #include <dc-commons/protocol-fileSystem-kernel.h>
-#include "../kernelStruct.h"
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
 #include <dc-commons/serialization.h>
 #include <dc-commons/logger.h>
-#include <fileDescriptor.h>
+#include "../kernelStruct.h"
+#include "../module.model/fileDescriptor.h"
 
 void validarArchivo(kernel_struct* kernelStruct);
 
