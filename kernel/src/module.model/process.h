@@ -27,7 +27,7 @@ typedef struct Process {
     int quantum;
     PCB* pcb;
     kernel_struct* kernelStruct;
-    t_processFileDescriptor pfd; //agregar a la estructura Process
+    t_list* fileDescriptorList;
     int exit_code;
 } Process;
 
