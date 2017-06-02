@@ -83,7 +83,7 @@ t_valor_variable ansisop_dereferenciar(t_puntero pointer) {
 }
 
 void ansisop_asignar(t_puntero pointer, t_valor_variable value) {
-	logTrace("Ejecutando ansisop_dereferenciar(%d,%d)", pointer, value);
+	logTrace("Ejecutando ansisop_asignar(%d,%d)", pointer, value);
 	if (getErrorFlag() == FLAG_OK) {
 		dir_memoria* address = pointerToLogicalAddress(pointer);
 		char* buffer = serialize_int(value);
@@ -103,17 +103,27 @@ void ansisop_asignar(t_puntero pointer, t_valor_variable value) {
 	}
 }
 
-t_valor_variable ansisop_obtenerValorCompartida(t_nombre_compartida variable) {
-	return 0;
+t_valor_variable ansisop_obtenerValorCompartida(t_nombre_compartida name) {
+	logTrace("Ejecutando ansisop_obtenerValorCompartida(%s)", name);
+	t_valor_variable value = getSharedVarriableValue(getCPUStruct(), name);
+	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Socilitud al kernel realizada, variable compartida: %s value:%d", name, value);
+	} else {
+		logError(
+				"Fallo la solicitud al kernel para la variable compartida: %s", name);
+	}
+	return value;
 }
 
 t_valor_variable ansisop_asignarValorCompartida(t_nombre_compartida variable,
 		t_valor_variable valor) {
+	logTrace("Ejecutando ansisop_asignarValorCompartida(%s,%d)", variable,
+			valor);
 	return 0;
 }
 
-void ansisop_irAlLabel(t_nombre_etiqueta t_nombre_etiqueta) {
-
+void ansisop_irAlLabel(t_nombre_etiqueta name) {
+	logTrace("Ejecutando ansisop_irAlLabel(%d,%d)", name);
 }
 
 void ansisop_llamarSinRetorno(t_nombre_etiqueta etiqueta) {
