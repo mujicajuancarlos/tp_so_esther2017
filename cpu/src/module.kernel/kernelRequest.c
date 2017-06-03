@@ -32,6 +32,6 @@ void continueExecution(cpu_struct* cpuStruct, Package* package) {
 }
 
 void contextSwitch(cpu_struct* cpuStruct, Package* package) {
-	logTrace("Descargando el actual pcb");
-	unloadPCB(cpuStruct);
+	logTrace("Descargando y enviando el actual pcb hacia el kernel");
+	reportContextSwich(cpuStruct);
 }

@@ -7,17 +7,32 @@
 
 #include "kernelResponse.h"
 
+//SURGE AL FINALIZAR LA EJECUCION DE UNA INSTRUCCION
 void reportEndInstruction(cpu_struct* cpuStruct) {
 	logInfo("Informando al kernel que la instruccion se ejecutó correctamente");
-	sendPCB(cpuStruct, COD_END_INSTRUCCION);
+	Package* package = createAndSendPackage(cpuStruct->socketClientKernel,
+			COD_END_INSTRUCCION, 0, NULL);
+	destroyPackage(package);
+	//NO SE DESCARGA EL PCB PORQUE PUEDE VENIR UNA SOLICITUD PARA QUE SIGA EJECUTANDO EL MISMO PROCESO
+	//TAMPOCO HACE FALTA ENVIARLO AL KERNEL (MENOS OVERHEAD -> EL KERNEL PARA CAMBIAR DE CONTEXTO DEBERIA INVOCAR CON CONTEXTsWITCH)
 }
 
+//SURGE CUANDO LA CPU SE VA DESCONECTAR
+void reportCpuDisconected(cpu_struct* cpuStruct) {
+	logInfo("Informando al kernel que la instruccion se ejecutó correctamente, y que la cpu dejara de dar servicio");
+	sendPCB(cpuStruct, COD_SIGNAL_DISCONNECTED);
+	unloadPCB(cpuStruct);
+}
+
+//SURGE CUANDO SE EJECUTA LA INSTRUCCION ANSISOP DE FIN DE PROGRAMA
+//O CUANDO LLEGO AL MAXIMO PROGRAM COUNTER CONFIGURADO EN LA METADATA
 void reportEndProcess(cpu_struct* cpuStruct) {
 	logInfo("Informando al kernel que el programa finalizo con éxito");
 	sendPCB(cpuStruct, COD_PROGRAM_FINISHED);
 	unloadPCB(cpuStruct);
 }
 
+//SURGE CUANDO EL KERNEL SOLICITA EL CONTEXT SWITCH
 void reportContextSwich(cpu_struct* cpuStruct) {
 	logInfo("Informando al kernel en nuevo pcb producto del contex swich");
 	sendPCB(cpuStruct, COD_CONTEXT_SWITCH_RESPONSE);

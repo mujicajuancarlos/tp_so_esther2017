@@ -35,7 +35,7 @@ void handleCPUs(kernel_struct *kernelStruct) {
 void handleNewCPU(CPU* newCpu) {
 
 	Package* package;
-	addCPU(newCpu);
+	addCPU(newCpu);//AGREGO E INCREMENTO EL SEMAFORO DE CPUS LIBRES
 	bool running = true;
 	char* tmpBuffer = serialize_int(newCpu->kernelStruct->config->stack_size);
 	package = createAndSendPackage(newCpu->fileDescriptor,
@@ -45,7 +45,6 @@ void handleNewCPU(CPU* newCpu) {
 	free(tmpBuffer);
 	destroyPackage(package);
 	while (running) {
-
 		package = createAndReceivePackage(newCpu->fileDescriptor);
 		if (package != NULL) {
 			handleCPURequest(newCpu, package);
@@ -55,8 +54,7 @@ void handleNewCPU(CPU* newCpu) {
 		}
 		destroyPackage(package);
 	}
-
-	removeCPU(newCpu); //no hace falta decrementar siempre y cuando salga de error
+	removeCPU(newCpu); //REMUEVO Y DECREMENTO EL SEMAFORO DE CPUS LIBRES
 	close(newCpu->fileDescriptor);
 	pthread_exit(EXIT_SUCCESS);
 }

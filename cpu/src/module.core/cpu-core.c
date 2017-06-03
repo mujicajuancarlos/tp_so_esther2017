@@ -113,8 +113,13 @@ dir_memoria* pointerToLogicalAddress(t_puntero pointer) {
  */
 void finalize_CPU_process() {
 	pthread_mutex_lock(&executionMutex);
-	logInfo("Finalizando el proceso porque se recibio la señal SIGUSR1");
-	exit(0);
+	if (pcb == NULL) {
+		logInfo("Finalizando el proceso CPU")
+		exit(0);
+	}
+	logInfo(
+			"Seteo el flag para finalizar la CPU porque se recibio la señal SIGUSR1");
+	errorFlag = FLAG_END_CPU;
 	pthread_mutex_unlock(&executionMutex);
 }
 
@@ -131,16 +136,25 @@ void ansisopExecuteInstruccion(cpu_struct* cpuStruct) {
 		logTrace("Ansisop instruction - START");
 		free(instruccion);
 	}
-	if (errorFlag == FLAG_OK) {
+	pthread_mutex_unlock(&executionMutex);
+	switch (errorFlag) {
+	case FLAG_OK: //caso feliz reporto que finalizo ejecucion de la instruccion
 		if (isFinishedProcess()) {
 			reportEndProcess(cpuStruct);
 		} else {
 			reportEndInstruction(cpuStruct);
 		}
-	} else {
+		break;
+	case FLAG_END_CPU: //si la cpu se va desconectar necesito mandar un mensaje especial al kernel
+		reportCpuDisconected(cpuStruct);
+		logInfo("Fin de proceso CPU");
+		exit(0); //FIN
+		break;
+	default:
+		//SI ES OTRO TIPO DE ERROR USO LA FUNCION GENERICA
 		reportExcecutionError(cpuStruct, errorFlag);
+		break;
 	}
-	pthread_mutex_unlock(&executionMutex);
 }
 
 char* getNextInstruction(cpu_struct* cpuStruct) {
