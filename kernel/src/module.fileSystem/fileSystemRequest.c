@@ -35,7 +35,29 @@ bool validateFile(kernel_struct* kernelStruct, t_fileDescriptor* fileDescriptor)
 	return false;
 
 }
+/*
+void openFile(kernel_struct* kernelStruct,char* path,char* openMode){
+	t_fileDescriptor* file = createNew_t_fileDescriptor(path);
+
+	if(validateFile(kernelStruct,file)){
+		Package* package = createAndSendPackage(
+					kernelStruct->socketClientFileSystem, COD_CREAR_ARCHIVO,
+					sizeof(t_fileDescriptor), &file);//TODO: Funcion para serializar el t_fileDescriptor
+		if (package != NULL) {
+			agregarFD_Alista(file);
+			logInfo("El Archivo de fileDescriptor %d ha sido abierto correctamente y se encuentra en la ruta %s",file->fd, file->path);
+			//TODO: Agregar a tabla de proceso.
+		}else
+			logInfo("No se pudo enviar los datos al FileSystem");
+
+	}
 
 
+}
 
 
+void createFile(kernel_struct* kernelStruct,char* path,char* openMode){
+
+
+}
+*/
