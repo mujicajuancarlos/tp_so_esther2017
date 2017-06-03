@@ -16,3 +16,10 @@ void consoleResponseRepulseMessage(Process* newProcess) {
 	close(newProcess->fileDescriptor);
 	destroyProcess(newProcess);
 }
+
+void runProgramIsOK_response(Process* process){
+	char* buffer = serialize_int(process->pid);
+	Package* package = createAndSendPackage(process->fileDescriptor,COD_KC_RUN_PROGRAM_RESPONSE,sizeof(uint32_t),buffer);
+	free(buffer);
+	destroyPackage(package);
+}

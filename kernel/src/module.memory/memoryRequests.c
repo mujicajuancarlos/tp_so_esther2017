@@ -78,6 +78,7 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 		case COD_NEW_PROCESS_RESPONSE_OK:
 			logInfo("La memoria reservo las paginas para el proceso pid %d",
 					process->pid);
+			runProgramIsOK_response(process);
 			break;
 		case ERROR_MEMORY_FULL:
 			//Función de mensaje de rechazo porque no se pudo reservar pag en memoria
