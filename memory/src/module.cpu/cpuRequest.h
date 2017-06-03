@@ -15,8 +15,8 @@
 #include <dc-commons/protocol-memory-cpu.h>
 #include "../memoryStruct.h"
 
-void saveData (Package* package, memory_struct* memoryStruct);
+void cpuSaveData (Package* package, memory_struct* memoryStruct);
 
-void readData (Package* package, memory_struct* memoryStruct);
+void cpuReadData (Package* package, memory_struct* memoryStruct);
 
 #endif /* MODULE_CPU_CPUREQUEST_H_ */

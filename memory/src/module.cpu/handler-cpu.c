@@ -7,7 +7,12 @@
 
 #include "handler-cpu.h"
 
-void handleCpu(MemoryClient* newClient) {
+void handleCpu(memory_struct* memoryStruct, MemoryClient* newClient) {
+
+	/**
+	 * TODO pedir confirmación de que cuando llego al handleCPU de la cpu
+	 * traemos el memory_struct
+	 */
 
 	CPU* cpu = createCPU(newClient);
 	addCPU(cpu);
@@ -17,7 +22,7 @@ void handleCpu(MemoryClient* newClient) {
 
 		package = createAndReceivePackage(cpu->fileDescriptor);
 		if (package != NULL) {
-			handleCpuRequest(cpu, package);
+			handleCpuRequest(memoryStruct, cpu, package);
 		} else {
 			running = false;
 			logError("CPU cerro la conexion para FD: %d", cpu->fileDescriptor);
@@ -29,17 +34,22 @@ void handleCpu(MemoryClient* newClient) {
 	close(cpu->fileDescriptor);
 }
 
-void handleCpuRequest(CPU* cpu, Package* package) {
+void handleCpuRequest(memory_struct* memoryStruct, CPU* cpu, Package* package) {
 	/**
 	 * TODO completar con las funcionalidades que solicita la CPU
 	 */
 
+	/**
+	 * TODO pedir confirmación de que cuando llego al handleRequest de la cpu
+	 * traemos el memory_struct
+	 */
+
 	switch (package->msgCode) {
 	case COD_SAVE_PAGE_BYTES_REQUEST: //para guardar bytes en una pagina
-		saveData (package, memory_struct);
+		cpuSaveData (package, memoryStruct);
 		break;
 	case COD_GET_PAGE_BYTES_REQUEST: // para leer bytes de una pagina
-		readData (package, memory_struct);
+		cpuReadData (package, memoryStruct);
 		break;
 	default:
 		logError("El kernel solicito una accion desconocida FD: %d Cod: %d",

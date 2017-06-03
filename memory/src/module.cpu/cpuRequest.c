@@ -7,7 +7,7 @@
 
 #include "cpuRequest.h"
 
-void saveData(Package* package, memory_struct* memoryStruct) {
+void cpuSaveData(Package* package, memory_struct* memoryStruct) {
 	t_PageBytes* pageBytes = deserialize_t_PageBytes(package->stream);
 	Package* outPackage;
 	int status = processWrite(memoryStruct, pageBytes);
@@ -23,7 +23,7 @@ void saveData(Package* package, memory_struct* memoryStruct) {
 	destroy_t_PageBytes(pageBytes);
 }
 
-void readData(Package* package, memory_struct* memoryStruct) {
+void cpuReadData(Package* package, memory_struct* memoryStruct) {
 	t_PageBytes* pageBytes = deserialize_t_PageBytes(package->stream);
 	Package* outPackage;
 

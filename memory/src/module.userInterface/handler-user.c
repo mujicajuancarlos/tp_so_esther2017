@@ -72,6 +72,7 @@ void handleCommand_dump(memory_struct* memoryStruct, char** commands) {
 
 void handleCommand_dump_cache(memory_struct* memoryStruct, char** commands) {
 	if (commands[2] == NULL) {
+		printf ("\ndump de cache\n");
 /*
  * TODO dump completo de la cache
  */
@@ -81,27 +82,30 @@ void handleCommand_dump_cache(memory_struct* memoryStruct, char** commands) {
 
 void handleCommand_dump_structure(memory_struct* memoryStruct,
 		char** commands) {
-	if (commands[2] != NULL && commands[3] == NULL) {
+	if (commands[2] == NULL) {
+		printf ("\ estado de tabla de paginas y listado de procesos activos\n");
 /*
  * TODO estado de tabla de paginas y listado de procesos activos
  */
 	} else
-		printInvalidArguments("", commands[0]);
+		printInvalidArguments(commands[2], commands[0]);
 }
 
 void handleCommand_dump_content(memory_struct* kernelStruct, char** commands) {
-	if (commands[2] != NULL && commands[3] == NULL) {
+	if (commands[2] == NULL) {
+		printf ("\ datos almacenados en memoria de todos los proc o de alguno en particular\n");
 /*
  * TODO datos almacenados en la memoria de todos los procesos o de alguno en particular
  */
 	} else
-		printInvalidArguments("", commands[0]);
+		printInvalidArguments(commands[2], commands[0]);
 }
 
 void handleCommand_set_sleep (memory_struct* memoryStruct, char** commands) {
 
 	if (commands[1] != NULL) {
 		if (equal_user_command(commands[1], OPT_MILISECONDS)) {
+			printf ("\n el sleep se ha modificado \n");
 			handleCommand_set_sleep_to_value(memoryStruct, commands);
 		}
 	} else
