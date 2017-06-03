@@ -114,7 +114,7 @@ dir_memoria* pointerToLogicalAddress(t_puntero pointer) {
 void finalize_CPU_process() {
 	pthread_mutex_lock(&executionMutex);
 	if (pcb == NULL) {
-		logInfo("Finalizando el proceso CPU")
+		logInfo("Finalizando el proceso CPU");
 		exit(0);
 	}
 	logInfo(
