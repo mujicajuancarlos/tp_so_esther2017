@@ -15,9 +15,9 @@
 #include "../memoryClient.h"
 #include "cpu.h"
 
-void handleCpu(MemoryClient* newClient);
+void handleCpu(memory_struct* memoryStruct, MemoryClient* newClient);
 
-void handleCpuRequest(CPU* cpu, Package* package);
+void handleCpuRequest(memory_struct* memoryStruct, CPU* cpu, Package* package);
 
 void addCPU(CPU* cpu);
 

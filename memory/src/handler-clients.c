@@ -72,7 +72,7 @@ void handleNewClient(MemoryClient* newClient) {
 
 		break;
 	case COD_HANDSHAKE_CPU:
-		handleCpu(newClient);
+		handleCpu(newClient->memoryStruct, newClient);
 		break;
 	default:
 		logError("El cliente con FD %d no pudo ser identificado, respondio %d",
