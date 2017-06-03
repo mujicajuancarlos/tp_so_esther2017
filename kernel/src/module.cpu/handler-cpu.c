@@ -35,7 +35,7 @@ void handleCPUs(kernel_struct *kernelStruct) {
 void handleNewCPU(CPU* newCpu) {
 
 	Package* package;
-	addCPU(newCpu);//AGREGO E INCREMENTO EL SEMAFORO DE CPUS LIBRES
+	addCPU(newCpu); //AGREGO E INCREMENTO EL SEMAFORO DE CPUS LIBRES
 	bool running = true;
 	char* tmpBuffer = serialize_int(newCpu->kernelStruct->config->stack_size);
 	package = createAndSendPackage(newCpu->fileDescriptor,
@@ -60,13 +60,23 @@ void handleNewCPU(CPU* newCpu) {
 }
 
 void handleCPURequest(CPU* cpu, Package* package) {
+	int algorithm;
 	switch (package->msgCode) {
 	case COD_END_INSTRUCCION:
-		/*
-		 * finalizo una instruccion
-		 * evaluar el tipo de planificador configurado
-		 * quantum no superado -> continuar ejecucion
-		 */
+		algorithm = getAlgorithmIndex(cpu->kernelStruct->config->algoritmo);
+		switch (algorithm) {
+		case ROUND_ROBIN:
+
+			break;
+		case FIFO:
+
+			break;
+		default:
+			logError(
+					"El algoritmo de planificacion ingresado en el archivo de configuracion no es valido");
+			exit(-1);
+			break;
+		}
 		break;
 	case COD_PROGRAM_FINISHED:
 		/*
