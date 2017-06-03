@@ -45,11 +45,14 @@ void handleCpuRequest(memory_struct* memoryStruct, CPU* cpu, Package* package) {
 	 */
 
 	switch (package->msgCode) {
+	case COD_PAGE_SIZE_REQUEST: //para guardar bytes en una pagina
+		sendPageSizeToCPU(cpu, memoryStruct);
+		break;
 	case COD_SAVE_PAGE_BYTES_REQUEST: //para guardar bytes en una pagina
-		cpuSaveData (package, memoryStruct);
+		cpuSaveData(cpu, package, memoryStruct);
 		break;
 	case COD_GET_PAGE_BYTES_REQUEST: // para leer bytes de una pagina
-		cpuReadData (package, memoryStruct);
+		cpuReadData(cpu, package, memoryStruct);
 		break;
 	default:
 		logError("El kernel solicito una accion desconocida FD: %d Cod: %d",

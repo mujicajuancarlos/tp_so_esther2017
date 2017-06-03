@@ -34,7 +34,7 @@ void handleKernelRequest(memory_struct* memory_struct, Package* package) {
 
 	switch (package->msgCode) {
 	case COD_PAGE_SIZE_REQUEST: //para pedir el tamaño de pagina
-		sendPageSize(memory_struct);
+		sendPageSizeToKernel(memory_struct);
 		break;
 	case COD_NEW_PROCESS_REQUEST: //para solicitar la reserva de n paginas para un proceso nuevo
 		startNewProcess(package, memory_struct);

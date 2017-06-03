@@ -19,7 +19,7 @@ void startNewProcess(Package* package, memory_struct* memoryStruct);
 
 void addNewPages (Package* package, memory_struct* memoryStruct);
 
-void sendPageSize(memory_struct* memoryStruct);
+void sendPageSizeToKernel(memory_struct* memoryStruct);
 
 void saveData (Package* package, memory_struct* memoryStruct);
 

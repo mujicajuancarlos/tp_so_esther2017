@@ -46,7 +46,7 @@ void addNewPages(Package* package, memory_struct* memoryStruct) {
 	destroyPackage(outPackage);
 }
 
-void sendPageSize(memory_struct* memoryStruct) {
+void sendPageSizeToKernel(memory_struct* memoryStruct) {
 	char* stream = serialize_int(memoryStruct->config->marco_size);
 	Package* package;
 	package = createAndSendPackage(memoryStruct->socketClientKernel,

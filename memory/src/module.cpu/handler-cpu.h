@@ -13,6 +13,7 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-memory-cpu.h>
 #include "../memoryClient.h"
+#include "cpuResponse.h"
 #include "cpu.h"
 
 void handleCpu(memory_struct* memoryStruct, MemoryClient* newClient);
