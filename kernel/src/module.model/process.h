@@ -45,6 +45,8 @@ int getNextPID();
 
 void createPcbForNewProcess(Process* process, Package* package);
 
+void replacePCB(Process* process, PCB* newPCB);
+
 void printHeaderProcess();
 
 void printProcess(Process* proceso, char* state);

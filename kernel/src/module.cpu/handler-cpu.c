@@ -35,7 +35,7 @@ void handleCPUs(kernel_struct *kernelStruct) {
 void handleNewCPU(CPU* newCpu) {
 
 	Package* package;
-	addCPU(newCpu);//AGREGO E INCREMENTO EL SEMAFORO DE CPUS LIBRES
+	addCPU(newCpu); //AGREGO E INCREMENTO EL SEMAFORO DE CPUS LIBRES
 	bool running = true;
 	char* tmpBuffer = serialize_int(newCpu->kernelStruct->config->stack_size);
 	package = createAndSendPackage(newCpu->fileDescriptor,
@@ -55,47 +55,48 @@ void handleNewCPU(CPU* newCpu) {
 		destroyPackage(package);
 	}
 	removeCPU(newCpu); //REMUEVO Y DECREMENTO EL SEMAFORO DE CPUS LIBRES
-	close(newCpu->fileDescriptor);
 	pthread_exit(EXIT_SUCCESS);
 }
 
 void handleCPURequest(CPU* cpu, Package* package) {
+	int algorithm;
 	switch (package->msgCode) {
 	case COD_END_INSTRUCCION:
-		/*
-		 * finalizo una instruccion
-		 * evaluar el tipo de planificador configurado
-		 * quantum no superado -> continuar ejecucion
-		 */
+		algorithm = getAlgorithmIndex(cpu->kernelStruct->config->algoritmo);
+		switch (algorithm) {
+		case ROUND_ROBIN:
+			cpu->process->quantum--;
+			if (cpu->process->quantum > 0) {
+				continueCurrentExcecution(cpu);
+			} else {
+				contextSwitch(cpu);
+			}
+			break;
+		case FIFO:
+			continueCurrentExcecution(cpu);
+			break;
+		default:
+			logError(
+					"El algoritmo de planificacion ingresado en el archivo de configuracion no es valido");
+			exit(-1);
+			break;
+		}
 		break;
 	case COD_PROGRAM_FINISHED:
-		/*
-		 * programa finalizado
-		 * setear exit code
-		 * liberar recursos
-		 * enviar a exit y liberar cpu
-		 */
-		markFreeCPU(cpu);
+		programFinished(cpu, package);
 		break;
 	case COD_SIGNAL_DISCONNECTED:
-		/*
-		 * la cpu se va desconectar -> guardar pcb
-		 * enviar proceso a ready
-		 * liberar cpu
-		 */
-		markFreeCPU(cpu);
+		cpuDisconnected(cpu, package);
 		break;
 	case COD_GET_SHARED_VAR:
 	case COD_SET_SHARED_VAR:
-		/*
-		 * realizar accion y devolver control a la cpu
-		 */
+		logError("PENDIENTE");
+		//TODO: pendiente
 		break;
 	case COD_MALLOC_MEMORY:
 	case COD_FREE_MEMORY:
-		/*
-		 * realizar accion solicitada y devolver el control a la cpu
-		 */
+		logError("PENDIENTE");
+				//TODO: pendiente
 		break;
 	case COD_OPEN_FD:
 	case COD_DELETE_FD:
@@ -114,20 +115,23 @@ void handleCPURequest(CPU* cpu, Package* package) {
 		 * bloquear: liberar cpu y enviar proceso a bloqueado
 		 *
 		 */
+		logError("PENDIENTE");
+				//TODO: pendiente
 		break;
 	case COD_SEM_WAIT:
 	case COD_SEM_SIGNAL:
 		/*
 		 * parecido a fs
 		 */
-		markFreeCPU(cpu);
+		logError("PENDIENTE");
+				//TODO: pendiente
 		break;
 	default:
 		logError("La cpu %d envio un mensaje desconocido", cpu->fileDescriptor);
 		/*
 		 * liberar cpu y enviar proceso a ready
 		 */
-		markFreeCPU(cpu);
+		removeCPU(cpu);
 		break;
 	}
 }

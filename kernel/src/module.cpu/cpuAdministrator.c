@@ -30,7 +30,7 @@ void destroyCpuAdministrator() {
  */
 void markFreeCPU(CPU* cpu) {
 	pthread_mutex_lock(&cpuListMutex);
-	cpu->pid = -1;
+	cpu->process = NULL;
 	cpu->libre = true;
 	sem_post(&freeCPU_sem);
 	pthread_mutex_unlock(&cpuListMutex);
@@ -64,14 +64,24 @@ void addCPU(CPU* cpu) {
 	pthread_mutex_unlock(&cpuListMutex);
 }
 
+/*
+ * realizo el wait solo si la cpu se encontraba en la lista
+ */
 void removeCPU(CPU* cpu) {
+	CPU* finded;
 	bool condicion(void* element) {
 		CPU* anCpu = element;
 		return anCpu->fileDescriptor == cpu->fileDescriptor;
 	}
-	sem_wait(&freeCPU_sem);
+	close(cpu->fileDescriptor);
+	if(cpu->libre == true){
+		sem_wait(&freeCPU_sem);
+	}
 	pthread_mutex_lock(&cpuListMutex);
-	list_remove_and_destroy_by_condition(cpuList, condicion,
-			(void*) destroyCPU);
+	finded = list_find(cpuList,condicion);
+	if(finded!=NULL){
+		list_remove_and_destroy_by_condition(cpuList, condicion,
+					(void*) destroyCPU);
+	}
 	pthread_mutex_unlock(&cpuListMutex);
 }

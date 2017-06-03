@@ -19,6 +19,8 @@
 
 void reportEndInstruction(cpu_struct* cpuStruct);
 
+void reportCpuDisconected(cpu_struct* cpuStruct);
+
 void reportEndProcess(cpu_struct* cpuStruct);
 
 void reportContextSwich(cpu_struct* cpuStruct);

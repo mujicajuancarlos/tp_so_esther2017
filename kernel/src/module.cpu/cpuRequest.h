@@ -12,11 +12,21 @@
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-kernel-cpu.h>
+#include <dc-commons/protocol-process-exitCodes.h>
 #include "../module.model/cpu.h"
 #include "../module.model/process.h"
 #include "../module.planning/processLifeCycle.h"
+#include "cpuAdministrator.h"
 
 
 void startProcessExecution(Process* selectedProcess, CPU* selectedCPU);
+
+void continueCurrentExcecution(CPU* cpu);
+
+void contextSwitch(CPU* cpu);
+
+void programFinished(CPU* cpu, Package* package);
+
+void cpuDisconnected(CPU* cpu, Package* package);
 
 #endif /* MODULE_CPU_CPUREQUEST_H_ */

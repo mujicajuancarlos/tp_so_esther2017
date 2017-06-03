@@ -39,7 +39,6 @@ void destroyCurrentPidMutex() {
 	pthread_mutex_destroy(&currentPidMutex);
 }
 
-
 int getNextPID() {
 	int next;
 	pthread_mutex_lock(&currentPidMutex);
@@ -63,6 +62,12 @@ void createPcbForNewProcess(Process* process, Package* sourceCodePackage) {
 
 	logInfo("Pcb asociado al proceso de pid %d", process->pid);
 	process->pcb = pcb;
+}
+
+void replacePCB(Process* process, PCB* newPCB){
+	PCB* oldPcb = process->pcb;
+	destroy_PBC(oldPcb);
+	process->pcb = newPCB;
 }
 
 void printHeaderProcess() {

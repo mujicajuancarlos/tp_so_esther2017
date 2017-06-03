@@ -12,12 +12,13 @@ CPU* createCPU(int socket, kernel_struct* kernelStruct) {
 	CPU* cpu = malloc(sizeof(CPU));
 	cpu->fileDescriptor = socket;
 	cpu->libre = true;
-	cpu->pid = 0;
+	cpu->process = NULL;
 	cpu->kernelStruct = kernelStruct;
 	return cpu;
 }
 
 void destroyCPU(CPU* cpu) {
+	cpu->process = NULL;
 	if (cpu != NULL) {
 		free(cpu);
 	}
