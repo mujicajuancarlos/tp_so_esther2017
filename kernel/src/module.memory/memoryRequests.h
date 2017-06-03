@@ -9,6 +9,8 @@
 #define MODULE_MEMORY_MEMORYREQUESTS_H_
 
 #include <stddef.h>
+#include <stdio.h>
+#include <math.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
@@ -21,6 +23,7 @@
 #include "../kernelStruct.h"
 #include "../module.console/consoleResponse.h"
 
+double pagesNumberAux;
 
 void loadMemoryPageSize(kernel_struct* kernel_struct);
 

@@ -39,7 +39,11 @@ void loadMemoryPageSize(kernel_struct* kernel_struct) {
 void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 	int pagesNumber;
 	Package* tmpPackage;
+	//pagesNumber = 5;
 	pagesNumber = sourceCodePackage->size / process->kernelStruct->pageSize; //como ambos estan bytes me da la cantidad de paginas
+	if (((sourceCodePackage->size) % (process->kernelStruct->pageSize)) > 0)  {
+		pagesNumber++;
+	}
 	//agrego la cantidad de paginas para el stack
 	pagesNumber += process->kernelStruct->config->stack_size;
 
