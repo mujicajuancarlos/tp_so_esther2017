@@ -82,7 +82,7 @@ int sendMessage(int socket, char *buffer, int sizeOfMessage, int flags) {
 	char *aux_buffer = buffer;
 
 	if ((socket == -1) || (buffer == NULL) || (sizeOfMessage < 1)) {
-		error_show(
+		logError(
 				"Error de parametros. No se puede enviar porque FD->%d message->%s Tamaño->%d\n",
 				socket, buffer, sizeOfMessage);
 		return SEND_OR_RECEIVE_FAILURE;
@@ -93,11 +93,13 @@ int sendMessage(int socket, char *buffer, int sizeOfMessage, int flags) {
 		bytes_written = send(socket, aux_buffer,
 				sizeOfMessage - total_bytes_written, flags);
 
-		if (bytes_written == 0)
+		if (bytes_written == 0) {
 			logWarning("La funcion 'recv(...)' retorno 0, FD: %d\n", socket);
+			return SEND_OR_RECEIVE_FAILURE;
+		}
 
 		if (bytes_written == -1) {
-			error_show(
+			logWarning(
 					"La funcion 'send(...)' retorno -1, FD: %d, bytes enviados antes del error: %d\n",
 					socket, total_bytes_written);
 			return SEND_OR_RECEIVE_FAILURE;
@@ -108,7 +110,7 @@ int sendMessage(int socket, char *buffer, int sizeOfMessage, int flags) {
 	}
 
 	if (total_bytes_written != sizeOfMessage) {
-		error_show(
+		logError(
 				"Se envio una cantidad de bytes distinta a lo esperado FD->%d, enviado->%d esperado->%d\n",
 				socket, total_bytes_written, sizeOfMessage);
 		return SEND_OR_RECEIVE_FAILURE;
@@ -124,7 +126,7 @@ int receiveMessage(int socket, char *buffer, int sizeOfMessage, int flags) {
 	char *aux_buffer = buffer;
 
 	if ((socket == -1) || (buffer == NULL) || (sizeOfMessage < 1)) {
-		error_show(
+		logError(
 				"Error de parametros. No se puede recibir mensajes porque FD->%d mensaje->%s Tamaño->%d\n",
 				socket, buffer, sizeOfMessage);
 		return SEND_OR_RECEIVE_FAILURE;
@@ -135,17 +137,20 @@ int receiveMessage(int socket, char *buffer, int sizeOfMessage, int flags) {
 		bytes_received = recv(socket, aux_buffer,
 				sizeOfMessage - total_bytes_received, flags);
 
-		if (bytes_received == 0)
-			logWarning("La funcion 'recv(...)' retorno 0, FD: %d\n", socket);
-
 		switch (errno) { //errno indica el tipo de error
 		case EINTR: //tipo EINTR si hubo interrupcion en el sistema
 		case EAGAIN: //tipo EAGAIN si el socket no esta disponible
 			usleep(100); //demora de 100 microsegundos y vuelo a intentar leer
 			break;
 		default:
+			if (bytes_received == 0) {
+				logWarning(
+						"La funcion 'recv(...)' retorno 0, FD: %d, bytes recibidos antes del error: %d\n",
+						socket, total_bytes_received);
+				return SEND_OR_RECEIVE_FAILURE;
+			}
 			if (bytes_received == -1) {
-				error_show(
+				logWarning(
 						"La funcion 'recv(...)' retorno -1, FD: %d, bytes recibidos antes del error: %d\n",
 						socket, total_bytes_received);
 				return SEND_OR_RECEIVE_FAILURE;
@@ -157,7 +162,7 @@ int receiveMessage(int socket, char *buffer, int sizeOfMessage, int flags) {
 	}
 
 	if (total_bytes_received != sizeOfMessage) {
-		error_show(
+		logWarning(
 				"Se recibio una cantidad de bytes distinta a lo esperado FD->%d, recibido->%d esperado->%d\n",
 				socket, total_bytes_received, sizeOfMessage);
 		return SEND_OR_RECEIVE_FAILURE;
