@@ -20,6 +20,13 @@ typedef struct memory_page {
 	bool isFree;
 } memory_page;
 
+typedef struct cache_entry {
+	int pid;
+	int procPage;
+	int globPage;
+} cache_entry;
+
+
 typedef struct memory_struct {
 	int socketServer;
 	int socketClientKernel;
@@ -32,6 +39,9 @@ typedef struct memory_struct {
 	void* memory;
 	t_list* referenceTable;
 	int memorySleep;
+	t_list* cacheEntries;
+	int maxEntries;
+	int maxPPP;
 } memory_struct;
 
 #endif /* MEMORYSTRUCT_H_ */

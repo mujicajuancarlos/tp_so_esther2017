@@ -102,17 +102,18 @@ void handleCommand_dump_structure(memory_struct* memoryStruct, char** commands) 
 }
 
 void handleCommand_dump_content(memory_struct* memoryStruct, char** commands) {
-	if (commands[1] != NULL) {
+	if (commands[2] != NULL) {
 		if (equal_user_command(commands[2], OPT_ALL)) {
 			handleCommand_dump_content_all(memoryStruct, commands);
-		} else if (commands[2] != NULL) {
+		}
+		if (equal_user_command(commands[2], OPT_DESIRED_PID)) {
 			handleCommand_dump_content_pid(memoryStruct, commands);
 		}
 		/*
 		 * TODO datos almacenados en la memoria de todos los procesos o de alguno en particular
 		 */
 	} else
-		printInvalidArguments(commands[2], commands[0]);
+		printInvalidArguments("", commands[0]);
 }
 
 void handleCommand_dump_content_all(memory_struct* memoryStruct,
@@ -120,23 +121,24 @@ void handleCommand_dump_content_all(memory_struct* memoryStruct,
 	if (commands[3] == NULL) {
 		printf("\n dump de contenido completo \n");
 	} else
-		printInvalidArguments(commands[2], commands[0]);
+		printInvalidArguments(commands[3], commands[0]);
 }
 
 void handleCommand_dump_content_pid(memory_struct* memoryStruct,
 		char** commands) {
-	if (commands[3] == NULL) {
-		int pid = atoi(commands[2]);
+	if (commands[3] != NULL && commands[4] == NULL) {
+		int pid = atoi(commands[3]);
 		printf("\n dump de contenido completo de proceso %i \n", pid);
 	} else
-		printInvalidArguments(commands[2], commands[0]);
+		printInvalidArguments(commands[3], commands[0]);
 }
 
 void handleCommand_set_sleep(memory_struct* memoryStruct, char** commands) {
 
 	if (commands[1] != NULL && commands[2] == NULL) {
 		int sleep = atoi(commands[1]);
-		printf("\n sleep fue modificado a %i \n", sleep);
+		memoryStruct->memorySleep = sleep;
+		printf("\nEl valor de retardo fue modificado a %i\n", sleep);
 	} else
 		printInvalidArguments("", commands[0]);
 
@@ -166,7 +168,7 @@ void handleCommand_size(memory_struct* memoryStruct, char** commands) {
 		if (equal_user_command(commands[1], OPT_MEMORY)) {
 			handleCommand_size_memory(memoryStruct, commands);
 		}
-		if (equal_user_command(commands[1], OPT_PID)) {
+		if (equal_user_command(commands[1], OPT_DESIRED_PID)) {
 			handleCommand_size_pid(memoryStruct, commands);
 		}
 	} else
@@ -200,13 +202,16 @@ void printCommandsHelp() {
 			"Muestra tabla de páginas y listado de procesos activos");
 
 	printf(patter, COD_CONSOLE_DUMP, OPT_CONTENT,
-			"Muestra datos almacenados en memoria de todos los procesos «-all» o de un proceso en particular «pid»");
+			"Muestra datos almacenados en memoria de todos los procesos «-all» o de un proceso en particular «-pid»");
 
 	printf(patter, COD_CONSOLE_FLUSH, OPT_CACHE,
 			"Limpia completamente el contenido de la cache");
 
-	printf(patter, COD_CONSOLE_SIZE, OPT_MEMORY,
-			"Tamanio de la memoria en frames. Cantidad de frames ocupados y libres");
+	printf(patter, COD_CONSOLE_FLUSH, OPT_CACHE,
+			"Limpia completamente el contenido de la cache");
+
+	printf(patter, COD_CONSOLE_SLEEP, "",
+			"Setea nuevo valor para retardo en milisegundos (valor entero).");
 
 	printf(patter, COD_CONSOLE_SIZE, OPT_DESIRED_PID,
 			"Tamaño total de un proceso");
