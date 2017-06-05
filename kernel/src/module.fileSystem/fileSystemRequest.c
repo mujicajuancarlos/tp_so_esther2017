@@ -75,6 +75,34 @@ void openFile(kernel_struct* kernelStruct,char* path,char* openMode, Process* pr
 
 }
 
+
+void closeFile(uint32_t fileDescriptorID, Process* process){ //Recibo el ID del archivo a cerrar, y el proceso que lo contiene.
+
+	if(isOpen(fileDescriptorID)){
+				decrementarOpen(fileDescriptorID);
+				removerPFD_Alista(process,fileDescriptorID);
+				logInfo("Se ha cerrado el archivo abierto de FD ID %d perteneciente al proceso %d", fileDescriptorID, process->pid);
+		}
+	else
+		logInfo("No se ha encontrado archivo alguno abierto de FD ID %d", fileDescriptorID);
+
+}
+
+
+
+
+bool isOpen(uint32_t fileDescriptorID){
+
+	bool condicion(void* element){
+			t_fileDescriptor* unFD = element;
+			return strcmp(unFD->fd == fileDescriptorID);
+		}
+
+		return list_any_satisfy(fileDescriptorGlobalList, condicion);
+}
+
+
+
 /*
 void createFile(kernel_struct* kernelStruct,char* path,char* openMode){
 
