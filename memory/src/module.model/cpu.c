@@ -7,7 +7,6 @@
 
 #include "cpu.h"
 
-
 CPU* createCPU(MemoryClient* newClient) {
 	CPU* cpu = malloc(sizeof(CPU));
 	cpu->fileDescriptor = newClient->fileDescriptor;

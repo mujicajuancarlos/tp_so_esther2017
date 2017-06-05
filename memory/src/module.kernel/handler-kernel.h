@@ -12,11 +12,12 @@
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-memory-kernel.h>
+#include "../module.model/kernel.h"
 #include "kernelRequest.h"
-#include "../memoryClient.h"
+#include "kernelResponse.h"
 
-void handleKernel(memory_struct* memoryStruct);
+void handleKernel(kernel* kernel);
 
-void handleKernelRequest(memory_struct* newProcess, Package* package);
+void handleKernelRequest(kernel* kernel, Package* package);
 
 #endif /* MODULE_KERNEL_HANDLER_KERNEL_H_ */

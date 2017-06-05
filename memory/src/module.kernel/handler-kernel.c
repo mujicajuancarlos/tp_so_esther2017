@@ -7,53 +7,51 @@
 
 #include "handler-kernel.h"
 
-void handleKernel(memory_struct* memoryStruct) {
-
+void handleKernel(kernel* kernel) {
 	Package* package;
 	bool running = true;
 	while (running) {
-
-		package = createAndReceivePackage(memoryStruct->socketClientKernel);
+		package = createAndReceivePackage(kernel->fileDescriptor);
 		if (package != NULL) {
-			handleKernelRequest(memoryStruct, package);
+			handleKernelRequest(kernel, package);
 		} else {
 			running = false;
 			logError("Kernel cerro la conexion para FD: %d",
-					memoryStruct->socketClientKernel);
+					kernel->fileDescriptor);
 		}
 		destroyPackage(package);
 	}
-
-	close(memoryStruct->socketClientKernel);
+	kernel->memoryStruct->socketClientKernel = -1;
+	close(kernel->fileDescriptor);
 }
 
-void handleKernelRequest(memory_struct* memory_struct, Package* package) {
+void handleKernelRequest(kernel* kernel, Package* package) {
 	/**
 	 * TODO completar con las funcionalidades que solicita el kernel
 	 */
 
 	switch (package->msgCode) {
 	case COD_PAGE_SIZE_REQUEST: //para pedir el tamaño de pagina
-		sendPageSizeToKernel(memory_struct);
+		sendPageSizeToKernel(kernel);
 		break;
 	case COD_NEW_PROCESS_REQUEST: //para solicitar la reserva de n paginas para un proceso nuevo
-		startNewProcess(package, memory_struct);
+		startNewProcess(package, kernel);
 		break;
 	case COD_SAVE_PAGE_BYTES_REQUEST: //para guardar bytes en una pagina
-		saveData (package, memory_struct);
+		saveData(package, kernel);
 		break;
 	case COD_GET_PAGE_BYTES_REQUEST: // para leer bytes de una pagina
-		readData (package, memory_struct);
+		readData(package, kernel);
 		break;
 	case COD_ADD_PROCESS_PAGES_REQUEST: //para agregar paginas adicionales a un proceso existente
-		addNewPages (package, memory_struct);
+		addNewPages(package, kernel);
 		break;
 	case COD_END_PROCESS_REQUEST: //para liberar paginas de un proceso que finalizo
 		//todo: la funcion endProcess está hecha, pero habría que asegurar que esté la parte de serialización para obtener el pid
 		break;
 	default:
 		logError("El kernel solicito una accion desconocida FD: %d Cod: %d",
-				memory_struct->socketClientKernel, package->msgCode);
+				kernel->fileDescriptor, package->msgCode);
 		break;
 	}
 }

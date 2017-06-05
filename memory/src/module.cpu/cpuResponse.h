@@ -13,9 +13,9 @@
 #include <dc-commons/protocol-memory-cpu.h>
 #include <dc-commons/serialization.h>
 #include "../memoryStruct.h"
-#include "cpu.h"
+#include "../module.model/cpu.h"
 
 
-void sendPageSizeToCPU(CPU* cpu, memory_struct* memoryStruct);
+void sendPageSizeToCPU(CPU* cpu);
 
 #endif /* MODULE_CPU_CPURESPONSE_H_ */

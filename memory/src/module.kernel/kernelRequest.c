@@ -10,51 +10,40 @@
  * esta funcion es invocada cuando se solicita generar espacio para un nuevo programa
  */
 
-void startNewProcess(Package* package, memory_struct* memoryStruct) {
+void startNewProcess(Package* package, kernel* kernel) {
 
 	t_AddPagesToProcess* requestInfo = (t_AddPagesToProcess*) package->stream;
 
 	Package* outPackage;
-	int status = assignNewPages(memoryStruct, requestInfo->pid,
+	int status = assignNewPages(kernel->memoryStruct, requestInfo->pid,
 			requestInfo->size);
 
 	if (status == 0)
-		outPackage = createAndSendPackage(memoryStruct->socketClientKernel,
+		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				COD_NEW_PROCESS_RESPONSE_OK, 0, NULL);
 	else
-		outPackage = createAndSendPackage(memoryStruct->socketClientKernel,
+		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				ERROR_MEMORY_FULL, 0, NULL);
 
 	destroyPackage(outPackage);
 }
 
-void addNewPages(Package* package, memory_struct* memoryStruct) {
+void addNewPages(Package* package, kernel* kernel) {
 
 	t_AddPagesToProcess* requestInfo = (t_AddPagesToProcess*) package->stream;
 
 	Package* outPackage;
-	int status = assignNewPages(memoryStruct, requestInfo->pid,
+	int status = assignNewPages(kernel->memoryStruct, requestInfo->pid,
 			requestInfo->size);
 
 	if (status == 0)
-		outPackage = createAndSendPackage(memoryStruct->socketClientKernel,
+		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				COD_ADD_PROCESS_PAGES_RESPONSE, 0, NULL);
 	else
-		outPackage = createAndSendPackage(memoryStruct->socketClientKernel,
+		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				ERROR_MEMORY_FULL, 0, NULL);
 
 	destroyPackage(outPackage);
-}
-
-void sendPageSizeToKernel(memory_struct* memoryStruct) {
-	char* stream = serialize_int(memoryStruct->config->marco_size);
-	Package* package;
-	package = createAndSendPackage(memoryStruct->socketClientKernel,
-			COD_PAGE_SIZE_RESPONSE, sizeof(int), stream);
-	if (package == NULL)
-		logError("Fallo el envio del tamaño de frame hacia el kernel");
-	free(stream);
-	destroyPackage(package);
 }
 
 void startNewProcessTest(int processId, int pages, memory_struct* memoryStruct) {
@@ -71,40 +60,40 @@ void startNewProcessTest(int processId, int pages, memory_struct* memoryStruct) 
 	destroyPackage(outPackage);
 }
 
-void saveData(Package* package, memory_struct* memoryStruct) {
+void saveData(Package* package, kernel* kernel) {
 	t_PageBytes* pageBytes = deserialize_t_PageBytes(package->stream);
 	Package* outPackage;
-	int status = processWrite(memoryStruct, pageBytes);
+	int status = processWrite(kernel->memoryStruct, pageBytes);
 
 	if (status == 0)
-		outPackage = createAndSendPackage(memoryStruct->socketClientKernel,
+		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				COD_SAVE_PAGE_BYTES_RESPONSE, 0, NULL);
 	else
-		outPackage = createAndSendPackage(memoryStruct->socketClientKernel,
+		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				ERROR_SEGMENTATION_FAULT, 0, NULL);
 
 	destroyPackage(outPackage);
 	destroy_t_PageBytes(pageBytes);
 }
 
-void readData(Package* package, memory_struct* memoryStruct) {
+void readData(Package* package, kernel* kernel) {
 	t_PageBytes* pageBytes = deserialize_t_PageBytes(package->stream);
 	Package* outPackage;
 
-	int status = processRead(memoryStruct, pageBytes);
+	int status = processRead(kernel->memoryStruct, pageBytes);
 
 	if (status == 0)
-		outPackage = createAndSendPackage(memoryStruct->socketClientKernel,
+		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				COD_GET_PAGE_BYTES_RESPONSE, pageBytes->size,
 				pageBytes->buffer);
 	else
-		outPackage = createAndSendPackage(memoryStruct->socketClientKernel,
+		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				ERROR_SEGMENTATION_FAULT, 0, NULL);
 
 	destroy_t_PageBytes(pageBytes);
 	destroyPackage(outPackage);
 }
 
-void endProcess(memory_struct* memoryStruct, int pid) {
-	freeProcess(memoryStruct, pid);
+void endProcess(kernel* kernel, int pid) {
+	freeProcess(kernel->memoryStruct, pid);
 }

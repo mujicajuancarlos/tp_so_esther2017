@@ -7,22 +7,14 @@
 
 #include "handler-cpu.h"
 
-void handleCpu(memory_struct* memoryStruct, MemoryClient* newClient) {
-
-	/**
-	 * TODO pedir confirmación de que cuando llego al handleCPU de la cpu
-	 * traemos el memory_struct
-	 */
-
-	CPU* cpu = createCPU(newClient);
+void handleCpu(CPU* cpu) {
 	addCPU(cpu);
 	Package* package;
 	bool running = true;
 	while (running) {
-
 		package = createAndReceivePackage(cpu->fileDescriptor);
 		if (package != NULL) {
-			handleCpuRequest(memoryStruct, cpu, package);
+			handleCpuRequest(cpu, package);
 		} else {
 			running = false;
 			logError("CPU cerro la conexion para FD: %d", cpu->fileDescriptor);
@@ -34,25 +26,16 @@ void handleCpu(memory_struct* memoryStruct, MemoryClient* newClient) {
 	close(cpu->fileDescriptor);
 }
 
-void handleCpuRequest(memory_struct* memoryStruct, CPU* cpu, Package* package) {
-	/**
-	 * TODO completar con las funcionalidades que solicita la CPU
-	 */
-
-	/**
-	 * TODO pedir confirmación de que cuando llego al handleRequest de la cpu
-	 * traemos el memory_struct
-	 */
-
+void handleCpuRequest(CPU* cpu, Package* package) {
 	switch (package->msgCode) {
 	case COD_PAGE_SIZE_REQUEST: //para guardar bytes en una pagina
-		sendPageSizeToCPU(cpu, memoryStruct);
+		sendPageSizeToCPU(cpu);
 		break;
 	case COD_SAVE_PAGE_BYTES_REQUEST: //para guardar bytes en una pagina
-		cpuSaveData(cpu, package, memoryStruct);
+		cpuSaveData(cpu, package);
 		break;
 	case COD_GET_PAGE_BYTES_REQUEST: // para leer bytes de una pagina
-		cpuReadData(cpu, package, memoryStruct);
+		cpuReadData(cpu, package);
 		break;
 	default:
 		logError("El kernel solicito una accion desconocida FD: %d Cod: %d",

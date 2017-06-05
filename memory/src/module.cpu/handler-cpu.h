@@ -12,13 +12,13 @@
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-memory-cpu.h>
-#include "../memoryClient.h"
 #include "cpuResponse.h"
-#include "cpu.h"
+#include "cpuRequest.h"
+#include "../module.model/cpu.h"
 
-void handleCpu(memory_struct* memoryStruct, MemoryClient* newClient);
+void handleCpu(CPU* cpu);
 
-void handleCpuRequest(memory_struct* memoryStruct, CPU* cpu, Package* package);
+void handleCpuRequest(CPU* cpu, Package* package);
 
 void addCPU(CPU* cpu);
 

@@ -13,11 +13,11 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/serialization.h>
 #include <dc-commons/protocol-memory-cpu.h>
-#include "../memoryStruct.h"
-#include "cpu.h"
+#include "../module.model/cpu.h"
+#include "../module.core/pageAdministrator.h"
 
-void cpuSaveData(CPU* cpu, Package* package, memory_struct* memoryStruct);
+void cpuSaveData(CPU* cpu, Package* package);
 
-void cpuReadData(CPU* cpu, Package* package, memory_struct* memoryStruct);
+void cpuReadData(CPU* cpu, Package* package);
 
 #endif /* MODULE_CPU_CPUREQUEST_H_ */

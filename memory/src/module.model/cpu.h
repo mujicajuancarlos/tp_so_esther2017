@@ -9,7 +9,7 @@
 #define CPU_H_
 
 #include "../memoryStruct.h"
-#include "../memoryClient.h"
+#include "memoryClient.h"
 
 //estructura para representar una CPU conectada a la memoria
 typedef struct CPU {

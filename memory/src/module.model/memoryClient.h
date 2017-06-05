@@ -8,7 +8,9 @@
 #ifndef MEMORYCLIENT_H_
 #define MEMORYCLIENT_H_
 
-#include "memoryStruct.h"
+#include <stddef.h>
+#include <stdlib.h>
+#include "../memoryStruct.h"
 
 //estructura para representar una un nuevo cliente conectado a la memoria
 typedef struct MemoryClient {

@@ -50,7 +50,8 @@ void handleClients(memory_struct* memoryStruct) {
 void handleNewClient(MemoryClient* newClient) {
 
 	Package* package = createAndReceivePackage(newClient->fileDescriptor);
-
+	kernel* kernel;
+	CPU* cpu;
 	switch (package->msgCode) {
 	case COD_HANDSHAKE_KERNEL:
 		pthread_mutex_lock(&(newClient->memoryStruct->socketClientKernelMutex));
@@ -61,18 +62,19 @@ void handleNewClient(MemoryClient* newClient) {
 		pthread_mutex_unlock(
 				&(newClient->memoryStruct->socketClientKernelMutex));
 		if (newClient->memoryStruct->socketClientKernel
-				== newClient->fileDescriptor)
-			handleKernel(newClient->memoryStruct);
-		else {
+				== newClient->fileDescriptor) {
+			kernel = createKernel(newClient);
+			handleKernel(kernel);
+		} else {
 			logInfo(
 					"No se puede atender al cliente %d porque ya existe un kernel en el sistema",
 					newClient->fileDescriptor);
 			close(newClient->fileDescriptor);
 		}
-
 		break;
 	case COD_HANDSHAKE_CPU:
-		handleCpu(newClient->memoryStruct, newClient);
+		cpu = createCPU(newClient);
+		handleCpu(cpu);
 		break;
 	default:
 		logError("El cliente con FD %d no pudo ser identificado, respondio %d",

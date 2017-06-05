@@ -11,7 +11,7 @@
 #include <commons/collections/list.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/protocol-memory-kernel.h>
-#include "memoryStruct.h"
+#include "../memoryStruct.h"
 
 int assignNewPages (memory_struct* memoryStruct, int processId, int pages);
 

@@ -8,6 +8,7 @@
 #ifndef MODULE_CPU_CPUADMINISTRATOR_H_
 #define MODULE_CPU_CPUADMINISTRATOR_H_
 
+#include <unistd.h>
 #include <semaphore.h>
 #include <stdbool.h>
 #include <pthread.h>

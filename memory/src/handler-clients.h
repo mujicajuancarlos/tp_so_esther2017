@@ -17,9 +17,10 @@
 #include <dc-commons/protocol-memory-cpu.h>
 #include <dc-commons/protocol-memory-kernel.h>
 #include "module.cpu/handler-cpu.h"
-#include "module.cpu/cpu.h"
 #include "memoryStruct.h"
-#include "memoryClient.h"
+#include "module.model/cpu.h"
+#include "module.model/kernel.h"
+#include "module.model/memoryClient.h"
 #include "module.kernel/handler-kernel.h"
 
 

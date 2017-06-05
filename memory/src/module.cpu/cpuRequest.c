@@ -7,10 +7,10 @@
 
 #include "cpuRequest.h"
 
-void cpuSaveData(CPU* cpu, Package* package, memory_struct* memoryStruct) {
+void cpuSaveData(CPU* cpu, Package* package) {
 	t_PageBytes* pageBytes = deserialize_t_PageBytes(package->stream);
 	Package* outPackage;
-	int status = processWrite(memoryStruct, pageBytes);
+	int status = processWrite(cpu->memoryStruct, pageBytes);
 
 	if (status == 0)
 		outPackage = createAndSendPackage(cpu->fileDescriptor,
@@ -23,11 +23,11 @@ void cpuSaveData(CPU* cpu, Package* package, memory_struct* memoryStruct) {
 	destroy_t_PageBytes(pageBytes);
 }
 
-void cpuReadData(CPU* cpu, Package* package, memory_struct* memoryStruct) {
+void cpuReadData(CPU* cpu, Package* package) {
 	t_PageBytes* pageBytes = deserialize_t_PageBytes(package->stream);
 	Package* outPackage;
 
-	int status = processRead(memoryStruct, pageBytes);
+	int status = processRead(cpu->memoryStruct, pageBytes);
 
 	if (status == 0)
 		outPackage = createAndSendPackage(cpu->fileDescriptor,

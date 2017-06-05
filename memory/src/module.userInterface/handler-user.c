@@ -7,7 +7,7 @@
 
 #include "handler-user.h"
 
-void handleUserRequest(memory_struct* memoryStruct){
+void handleUserRequest(memory_struct* memoryStruct) {
 
 	bool exit = false;
 	bool shouldCompareCommand;
@@ -41,17 +41,20 @@ void handleUserRequest(memory_struct* memoryStruct){
 				handleCommand_dump(memoryStruct, commands);
 			}
 
-			if (shouldCompareCommand && equal_user_command(commands[0], COD_CONSOLE_SLEEP)) {
+			if (shouldCompareCommand
+					&& equal_user_command(commands[0], COD_CONSOLE_SLEEP)) {
 				shouldCompareCommand = false;
-				handleCommand_set_sleep (memoryStruct, commands);
+				handleCommand_set_sleep(memoryStruct, commands);
 			}
-			if (shouldCompareCommand && equal_user_command(commands[0], COD_CONSOLE_FLUSH)) {
+			if (shouldCompareCommand
+					&& equal_user_command(commands[0], COD_CONSOLE_FLUSH)) {
 				shouldCompareCommand = false;
-				handleCommand_flush (memoryStruct, commands);
+				handleCommand_flush(memoryStruct, commands);
 			}
-			if (shouldCompareCommand && equal_user_command(commands[0], COD_CONSOLE_SIZE)) {
+			if (shouldCompareCommand
+					&& equal_user_command(commands[0], COD_CONSOLE_SIZE)) {
 				shouldCompareCommand = false;
-				handleCommand_size (memoryStruct, commands);
+				handleCommand_size(memoryStruct, commands);
 			}
 		}
 
@@ -72,7 +75,7 @@ void handleCommand_dump(memory_struct* memoryStruct, char** commands) {
 			handleCommand_dump_structure(memoryStruct, commands);
 		}
 		if (equal_user_command(commands[1], OPT_CONTENT)) {
-					handleCommand_dump_content(memoryStruct, commands);
+			handleCommand_dump_content(memoryStruct, commands);
 		}
 	} else
 		printInvalidArguments("", commands[0]);
@@ -80,21 +83,20 @@ void handleCommand_dump(memory_struct* memoryStruct, char** commands) {
 
 void handleCommand_dump_cache(memory_struct* memoryStruct, char** commands) {
 	if (commands[2] == NULL) {
-		printf ("\ndump de cache\n");
-/*
- * TODO dump completo de la cache
- */
+		printf("\ndump de cache\n");
+		/*
+		 * TODO dump completo de la cache
+		 */
 	} else
 		printInvalidArguments(commands[2], commands[0]);
 }
 
-void handleCommand_dump_structure(memory_struct* memoryStruct,
-		char** commands) {
+void handleCommand_dump_structure(memory_struct* memoryStruct, char** commands) {
 	if (commands[2] == NULL) {
-		printf ("\ estado de tabla de paginas y listado de procesos activos\n");
-/*
- * TODO estado de tabla de paginas y listado de procesos activos
- */
+		printf("\nestado de tabla de paginas y listado de procesos activos\n");
+		/*
+		 * TODO estado de tabla de paginas y listado de procesos activos
+		 */
 	} else
 		printInvalidArguments(commands[2], commands[0]);
 }
@@ -102,82 +104,83 @@ void handleCommand_dump_structure(memory_struct* memoryStruct,
 void handleCommand_dump_content(memory_struct* memoryStruct, char** commands) {
 	if (commands[1] != NULL) {
 		if (equal_user_command(commands[2], OPT_ALL)) {
-			handleCommand_dump_content_all (memoryStruct, commands);
-		}
-		else if (commands[2] != NULL) {
+			handleCommand_dump_content_all(memoryStruct, commands);
+		} else if (commands[2] != NULL) {
 			handleCommand_dump_content_pid(memoryStruct, commands);
 		}
-/*
- * TODO datos almacenados en la memoria de todos los procesos o de alguno en particular
- */
+		/*
+		 * TODO datos almacenados en la memoria de todos los procesos o de alguno en particular
+		 */
 	} else
 		printInvalidArguments(commands[2], commands[0]);
 }
 
-void handleCommand_dump_content_all (memory_struct* memoryStruct, char** commands) {
+void handleCommand_dump_content_all(memory_struct* memoryStruct,
+		char** commands) {
 	if (commands[3] == NULL) {
-		printf ("\n dump de contenido completo \n");
+		printf("\n dump de contenido completo \n");
 	} else
 		printInvalidArguments(commands[2], commands[0]);
 }
 
-void handleCommand_dump_content_pid (memory_struct* memoryStruct, char** commands) {
+void handleCommand_dump_content_pid(memory_struct* memoryStruct,
+		char** commands) {
 	if (commands[3] == NULL) {
-		int pid = atoi (commands[2]);
-		printf ("\n dump de contenido completo de proceso %i \n", pid);
+		int pid = atoi(commands[2]);
+		printf("\n dump de contenido completo de proceso %i \n", pid);
 	} else
 		printInvalidArguments(commands[2], commands[0]);
 }
 
-void handleCommand_set_sleep (memory_struct* memoryStruct, char** commands) {
+void handleCommand_set_sleep(memory_struct* memoryStruct, char** commands) {
 
 	if (commands[1] != NULL && commands[2] == NULL) {
-		int sleep = atoi (commands[1]);
-		printf ("\n sleep fue modificado a %i \n", sleep);
+		int sleep = atoi(commands[1]);
+		printf("\n sleep fue modificado a %i \n", sleep);
 	} else
 		printInvalidArguments("", commands[0]);
 
 }
 
-void handleCommand_flush (memory_struct* memoryStruct, char** commands) {
+void handleCommand_flush(memory_struct* memoryStruct, char** commands) {
 	if (commands[1] != NULL) {
 		if (equal_user_command(commands[1], OPT_CACHE)) {
 			handleCommand_flush_cache(memoryStruct, commands);
 		}
 	} else
-			printInvalidArguments("", commands[0]);
+		printInvalidArguments("", commands[0]);
 }
 
-void handleCommand_flush_cache (memory_struct* memoryStruct, char** commands) {
+void handleCommand_flush_cache(memory_struct* memoryStruct, char** commands) {
 	if (commands[2] == NULL) {
-		printf ("\n se hace flush de cache\n");
-	/*
-	 * TODO flush completo de la cache
-	 */
+		printf("\n se hace flush de cache\n");
+		/*
+		 * TODO flush completo de la cache
+		 */
 	} else
 		printInvalidArguments(commands[2], commands[0]);
 }
 
-void handleCommand_size (memory_struct* memoryStruct, char** commands) {
+void handleCommand_size(memory_struct* memoryStruct, char** commands) {
 	if (commands[1] != NULL) {
 		if (equal_user_command(commands[1], OPT_MEMORY)) {
-			handleCommand_size_memory (memoryStruct, commands);
+			handleCommand_size_memory(memoryStruct, commands);
 		}
 		if (equal_user_command(commands[1], OPT_PID)) {
-			handleCommand_size_pid (memoryStruct, commands);
+			handleCommand_size_pid(memoryStruct, commands);
 		}
 	} else
-			printInvalidArguments("", commands[0]);
+		printInvalidArguments("", commands[0]);
 }
 
-void handleCommand_size_memory (memory_struct* memoryStruct, char** commands) {
-	printf ("\nEl tamaño de la memoria es de X \n");
+void handleCommand_size_memory(memory_struct* memoryStruct, char** commands) {
+	printf("\nEl tamaño de la memoria es de X \n");
 }
 
-void handleCommand_size_pid (memory_struct* memoryStruct, char** commands) {
+void handleCommand_size_pid(memory_struct* memoryStruct, char** commands) {
 	if (commands[2] != NULL && commands[3] == NULL) {
-		int pid = atoi (commands[2]);
-		printf ("\n El tamaño del proceso %i es de X\n", pid);
+		int pid = atoi(commands[2]);
+		printf("\n El tamaño del proceso %i es de X\n", pid);
 	} else
 		printInvalidArguments("", commands[0]);
 }
@@ -208,11 +211,9 @@ void printCommandsHelp() {
 	printf(patter, COD_CONSOLE_SIZE, OPT_DESIRED_PID,
 			"Tamaño total de un proceso");
 
-	printf(patter, COD_CONSOLE_CLEAR, "", "",
-			"Limpia la pantalla");
+	printf(patter, COD_CONSOLE_CLEAR, "", "", "Limpia la pantalla");
 
-	printf(patter, COD_CONSOLE_EXIT, "", "",
-			"Finaliza el proceso");
+	printf(patter, COD_CONSOLE_EXIT, "", "", "Finaliza el proceso");
 
 	unlockPrinter();
 }

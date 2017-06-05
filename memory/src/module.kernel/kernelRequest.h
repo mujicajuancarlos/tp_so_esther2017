@@ -13,18 +13,18 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/serialization.h>
 #include <dc-commons/protocol-memory-kernel.h>
+#include "../module.core/pageAdministrator.h"
+#include "../module.model/kernel.h"
 #include "../memoryStruct.h"
 
-void startNewProcess(Package* package, memory_struct* memoryStruct);
+void startNewProcess(Package* package, kernel* kernel);
 
-void addNewPages (Package* package, memory_struct* memoryStruct);
+void addNewPages (Package* package, kernel* kernel);
 
-void sendPageSizeToKernel(memory_struct* memoryStruct);
+void saveData (Package* package, kernel* kernel);
 
-void saveData (Package* package, memory_struct* memoryStruct);
+void readData (Package* package, kernel* kernel);
 
-void readData (Package* package, memory_struct* memoryStruct);
-
-void endProcess (memory_struct* memoryStruct, int pid);
+void endProcess (kernel* kernel, int pid);
 
 #endif /* MODULE_KERNEL_KERNELREQUEST_H_ */
