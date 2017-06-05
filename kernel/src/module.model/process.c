@@ -17,7 +17,7 @@ Process* createProcess(int socket, kernel_struct* kernelStruct) {
 	newProcess->pid = 0;
 	newProcess->kernelStruct = kernelStruct;
 	newProcess->pcb = NULL;
-	tablaProcesosFD = list_create();
+	//tablaProcesosFD = list_create();
 	return newProcess;
 }
 
@@ -26,7 +26,7 @@ void destroyProcess(Process* process) {
 		if (process->pcb != NULL)
 			destroy_PBC(process->pcb);
 		free(process);
-		list_destroy_and_destroy_elements(tablaProcesosFD,
+		list_destroy_and_destroy_elements(process->fileDescriptorList,
 			(void*) destroy_t_processFileDescriptor);
 	}
 }
@@ -141,18 +141,18 @@ flags habilitarPermisos(char* permiso) {
 
 
 
-void agregarPFD_Alista(t_processFileDescriptor* pfd) {
-	list_add(tablaProcesosFD, pfd);
+void agregarPFD_Alista(Process* process,t_processFileDescriptor* pfd) {
+	list_add(process->fileDescriptorList, pfd);
 
 }
 
-void removerPFD_Lista(t_processFileDescriptor* pfd) {
+void removerPFD_Lista(t_processFileDescriptor* pfd, Process* process) {
 	bool condicion(void* element) {
 		t_processFileDescriptor* pfd_aux = element;
 		return pfd_aux == pfd;
 	}
 
-	list_remove_and_destroy_by_condition(tablaProcesosFD, condicion,
+	list_remove_and_destroy_by_condition(process->fileDescriptorList, condicion,
 			(void*) destroy_t_processFileDescriptor);
 
 }
