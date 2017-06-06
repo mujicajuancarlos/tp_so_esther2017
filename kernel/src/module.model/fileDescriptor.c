@@ -7,7 +7,6 @@
 #include "fileDescriptor.h"
 
 
-//t_list* tablaProcesosFD; //TODO: Listo: Agrego tablaProcesosFD a struct process (con nombre fileDescriptorList)
 int nextFD = FIRST_FD;
 
 pthread_mutex_t fileDescriptor_mutex;

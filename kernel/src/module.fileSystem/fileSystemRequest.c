@@ -35,8 +35,24 @@ bool validateFile(kernel_struct* kernelStruct, t_fileDescriptor* fileDescriptor)
 	return false;
 
 }
-/*
-void openFile(kernel_struct* kernelStruct,char* path,char* openMode){
+
+void openFile(kernel_struct* kernelStruct,char* path,char* openMode, Process* process){
+
+	bool condicion(void* element){
+		t_fileDescriptor* unFD = element;
+		return strcmp(unFD->path, path);
+	}
+
+	bool resultado = list_any_satisfy(fileDescriptorGlobalList, condicion);
+
+	if(resultado == true){
+			t_fileDescriptor* fd = list_find(fileDescriptorGlobalList, condicion);
+			incrementarOpen(fd);
+			t_processFileDescriptor* pfd = createNew_t_processFileDescriptor(openMode,fd);
+			agregarPFD_Alista(process,pfd);
+	}
+	else {
+
 	t_fileDescriptor* file = createNew_t_fileDescriptor(path);
 
 	if(validateFile(kernelStruct,file)){
@@ -46,16 +62,20 @@ void openFile(kernel_struct* kernelStruct,char* path,char* openMode){
 		if (package != NULL) {
 			agregarFD_Alista(file);
 			logInfo("El Archivo de fileDescriptor %d ha sido abierto correctamente y se encuentra en la ruta %s",file->fd, file->path);
-			//TODO: Agregar a tabla de proceso.
+
+			t_processFileDescriptor* pfd = createNew_t_processFileDescriptor(openMode,file);
+
+			agregarPFD_Alista(process,pfd);
 		}else
 			logInfo("No se pudo enviar los datos al FileSystem");
 
+	}
 	}
 
 
 }
 
-
+/*
 void createFile(kernel_struct* kernelStruct,char* path,char* openMode){
 
 
