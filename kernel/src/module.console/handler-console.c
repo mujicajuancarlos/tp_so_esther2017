@@ -65,5 +65,8 @@ void handleConsoleRequestForProcess(Process* process, Package* package) {
 	case COD_KC_END_PROGRAM:
 		logInfo("Terminar ejecucion");
 		break;
+	case COD_FORCE_QUIT_PROGRAM:
+		endProcessGeneric(process);
+		break;
 	}
 }
