@@ -28,7 +28,19 @@ void ansisopKernel_wait(t_nombre_semaforo identificador_semaforo) {
 }
 
 void ansisopKernel_signal(t_nombre_semaforo identificador_semaforo) {
-
+	logTrace("Ejecutando ansisopKernel_signal(%c)", identificador_semaforo);
+	if (getErrorFlag() == FLAG_OK) {
+		Package* package = createAndSendPackage(kernelSocket(), COD_SEM_SIGNAL, 1,
+				identificador_semaforo);
+		if (package != NULL) {
+			logInfo("Se solicito al kernel ejecutar signal en el semaforo %c",
+					identificador_semaforo);
+			destroyPackage(package);
+		}else{
+			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+		}
+	}
+	logTrace("Ejecutado ansisopKernel_signal(%c)", identificador_semaforo);
 }
 
 t_puntero ansisopKernel_reservar(t_valor_variable espacio) {
