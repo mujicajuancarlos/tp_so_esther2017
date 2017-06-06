@@ -57,7 +57,8 @@ void agregarPFD_Alista(Process* process,t_processFileDescriptor* pfd);
 
 void removerPFD_Lista(t_processFileDescriptor* pfd,Process* process);
 
-flags habilitarPermisos(char* permiso);
+
+flags* habilitarPermisos(char* permiso);
 
 void destroy_t_processFileDescriptor(t_processFileDescriptor* pfd);
 

@@ -33,7 +33,7 @@ typedef struct {
 }flags;
 
 typedef struct {
-	flags flag;
+	flags* flag;
 	t_fileDescriptor* fileDescriptor;
 
 }t_processFileDescriptor;
@@ -68,6 +68,10 @@ void decrementarOpen(t_fileDescriptor* fd);
 
 void imprimirEstructura(t_fileDescriptor* fd);
 void imprimirListaDeFD(t_list* lista);
+
+char* serialize_FileDescriptor(t_fileDescriptor* fd);
+size_t sizeOf_FileDescriptor(t_fileDescriptor* fd);
+t_fileDescriptor* deserialize_FileDescriptor(char* buffer);
 /*
 t_processFileDescriptor* createNew_t_processFileDescriptor(char* permiso, t_fileDescriptor* fd);
 

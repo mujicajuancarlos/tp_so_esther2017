@@ -134,53 +134,56 @@ void imprimirListaDeFD(t_list* lista) {
 	}
 	fileDescriptor_mutex_unlock();
 }
-/*
-t_processFileDescriptor* createNew_t_processFileDescriptor(char* permiso,
-		t_fileDescriptor* fd) {
 
-	t_processFileDescriptor* newPFD = malloc(sizeof(t_processFileDescriptor));
+size_t sizeOf_FileDescriptor(t_fileDescriptor* fd) {
+	size_t size = 0;
+	size += sizeof(uint32_t) * 2;
+	size += sizeof(char) * fd->fd;
+	return size;
+}
+char* serialize_FileDescriptor(t_fileDescriptor* fd) {
+	char* buffer = malloc(sizeOf_FileDescriptor(fd));
 
-	newPFD->fileDescriptor = fd;
-	newPFD->flag = habilitarPermisos(permiso);
+	uint32_t offset = 0;
 
-	return newPFD;
+	serialize_and_copy_value(buffer, &(fd->fd), sizeof(uint32_t),
+			&offset);
 
+	serialize_and_copy_value(buffer, fd->path,
+			sizeof(char) * fd->fd, &offset);
+
+	serialize_and_copy_value(buffer, &(fd->open), sizeof(uint32_t),
+			&offset);
+
+	return buffer;
+}
+t_fileDescriptor* deserialize_FileDescriptor(char* buffer) {
+
+	t_fileDescriptor* fd = malloc(sizeof(t_fileDescriptor));
+
+	uint32_t offset = 0;
+
+	deserialize_and_copy_value(&(fd->fd), buffer, sizeof(uint32_t),
+			&offset);
+
+	fd->path = malloc(sizeof(char) * fd->fd);
+
+	deserialize_and_copy_value(fd->path, buffer,
+			sizeof(char) * fd->fd, &offset);
+
+	deserialize_and_copy_value(&(fd->open), buffer, sizeof(uint32_t),
+			&offset);
+	return fd;
 }
 
-void destroy_t_processFileDescriptor(t_processFileDescriptor* pfd) {
-	destroy_t_filedescriptor(pfd->fileDescriptor);
-	free(pfd);
-}
 
 
-flags habilitarPermisos(char* permiso) {
-	flags flag;
-	int retorno=-1;
-	retorno = strcmp(permiso, READ);
-	if (retorno == 0) {
-		flag.read = true;
-		flag.write = false;
-		//logInfo("Los permisos para el FileDescriptor han sido seteados a Read Only");
-	} else {
-		retorno = strcmp(permiso, WRITE);
-		if (retorno == 0) {
-			flag.read = false;
-			flag.write = true;
-			//logInfo("Los permisos para el FileDescriptor %s han sido seteados a Write Only", auxPFD->fileDescriptor->fd);
-		} else {
-			retorno = strcmp(permiso, RW);
-			if (retorno == 0) {
-				flag.read = true;
-				flag.write = true;
-				//logInfo("Los permisos para el FileDescriptor %s han sido seteados a Read & Write", auxPFD->fileDescriptor->fd);
-			} else {
-				flag.read = false;
-				flag.write = false;
-				//logInfo("No se han podido setear los permisos correspondientes para el FileDescriptor %s", auxPFD->fileDescriptor->fd);
-			}
-		}
-	}
-	return flag;
-}
 
-*/
+
+
+
+
+
+
+
+
