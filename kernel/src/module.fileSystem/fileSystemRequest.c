@@ -80,35 +80,36 @@ void openFile(kernel_struct* kernelStruct, char* path, char* openMode,
 
 }
 
-void closeFile(uint32_t fileDescriptorID, Process* process) { //Recibo el ID del archivo a cerrar, y el proceso que lo contiene.
+void closeFile(char* path, Process* process) { //Recibo el path del archivo a cerrar, y el proceso que lo contiene.
 
-	if (isOpen(fileDescriptorID)) {
+	if (isOpen(path)) {
 
-		Package* package = createAndSendPackage(
-				process->kernelStruct->socketClientFileSystem, COD_BORRAR_ARCHIVO,
-				sizeof(t_fileDescriptor), process->fileDescriptorList);
+		bool condicion(void* element) {
+				t_processFileDescriptor* unPFD = element;
+				return (unPFD->fileDescriptor->path == path);
+			}
 
-		if (package != NULL) {
-			decrementarOpen(fileDescriptorID);
-			removerPFD_Alista(process, fileDescriptorID);
-			logInfo("Se ha cerrado el archivo abierto de FD ID %d perteneciente al proceso %d",
-					fileDescriptorID, process->pid);
+			t_processFileDescriptor* pfd = list_find(process->fileDescriptorList,condicion);
 
-		}else
-			logInfo("El archivo de FD ID %d no es un archivo abierto del proceso %d",
-								fileDescriptorID, process->pid);
+		decrementarOpen(pfd->fileDescriptor);
 
-	} else
-		logInfo("No se ha encontrado archivo alguno abierto de FD ID %d",
-				fileDescriptorID);
+		removerPFD_Lista(pfd,process);
+
+			logInfo("Se ha cerrado el archivo abierto %s perteneciente al proceso %d",
+					path, process->pid);
+
+	}else
+			logInfo("El archivo %s no es un archivo abierto del proceso %d",
+								path, process->pid);
+
 
 }
 
-bool isOpen(uint32_t fileDescriptorID) {
+bool isOpen(char* path) {
 
 	bool condicion(void* element) {
 		t_fileDescriptor* unFD = element;
-		return (unFD->fd == fileDescriptorID);
+		return (unFD->path == path);
 	}
 
 	return list_any_satisfy(fileDescriptorGlobalList, condicion);
