@@ -158,10 +158,24 @@ void ansisop_irAlLabel(t_nombre_etiqueta name) {
 }
 
 void ansisop_llamarSinRetorno(t_nombre_etiqueta label) {
-	logTrace("Ejecutando ansisop_llamarSinRetorno(%s)", label);
+	logTrace("Ejecutando ansisop_llamarSinRetorno(%s,)", label);
 	if (getErrorFlag() == FLAG_OK) {
-		logWarning("PREGUNTAR QUE HACE ESTA PRIMITIVA"); //TODO: pendiente
+		t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(label);
+		PCB* tmpPcb = getPCB();
+		createNewContext(tmpPcb);
+		logTrace("Se genero un nuevo contexto en el stack");
+		t_stack_index* stackIndex = getCurrentContext();
+		stackIndex->retPos = tmpPcb->programCounter;
+		logTrace("Se definio el puntero de retorno en: %d",
+				tmpPcb->programCounter);
+		tmpPcb->programCounter = newProgramCounter;
+		logTrace("Se definio el program counter en: %d",
+				tmpPcb->programCounter);
+		stackIndex->retVar.pagina = 0;
+		stackIndex->retVar.offset = 0;
+		stackIndex->retVar.size = 0;
 	}
+	logTrace("Fin de ansisop_llamarSinRetorno(%s)", label);
 }
 
 void ansisop_llamarConRetorno(t_nombre_etiqueta label, t_puntero pointer) {
