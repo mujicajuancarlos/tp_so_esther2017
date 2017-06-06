@@ -38,7 +38,9 @@ void destroy_PBC(PCB* pcb) {
 uint32_t sizeOf_PCB(PCB* pcb) {
 	uint32_t size = 0;
 	size = sizeof(uint32_t) * 6; //corresponde a los 6 atributos de tipo uint32_t, si se agrega o se elimina algino hay que modificar esto
+	size += sizeof(uint32_t); //corresponde al tamaño de metadata
 	size += sizeOf_metadata_program(pcb->metadata);
+	size += sizeof(uint32_t); //corresponde al tamaño del stack
 	size += sizeof_stackArray(pcb->stackIndex, pcb->stackSize);
 	return size;
 }
@@ -99,11 +101,15 @@ PCB* deserialize_PCB(char* stream) {
 	uint32_t size_metadata_program;
 	deserialize_and_copy_value(&size_metadata_program, stream, sizeof(uint32_t),
 			&offset);
-	char* stream_metadata = malloc(sizeof(char) * size_metadata_program);
-	deserialize_and_copy_value(stream_metadata, stream, size_metadata_program,
-			&offset);
-	pcb->metadata = deserialize_metadata_program(stream_metadata);
-	free(stream_metadata);
+	if (size_metadata_program > 0) {
+		char* stream_metadata = malloc(sizeof(char) * size_metadata_program);
+		deserialize_and_copy_value(stream_metadata, stream,
+				size_metadata_program, &offset);
+		pcb->metadata = deserialize_metadata_program(stream_metadata);
+		free(stream_metadata);
+	} else {
+		pcb->metadata = NULL;
+	}
 
 	deserialize_and_copy_value(&(pcb->stackSize), stream, sizeof(uint32_t),
 			&offset);
@@ -111,11 +117,14 @@ PCB* deserialize_PCB(char* stream) {
 	//deserializacion de stack
 	uint32_t size_stack;
 	deserialize_and_copy_value(&size_stack, stream, sizeof(uint32_t), &offset);
-
-	char* stream_stack = malloc(sizeof(char) * size_stack);
-	deserialize_and_copy_value(stream_stack, stream, size_stack, &offset);
-	pcb->stackIndex = deserialize_stackArray(stream_stack, pcb->stackSize);
-	free(stream_stack);
+	if (size_stack > 0) {
+		char* stream_stack = malloc(sizeof(char) * size_stack);
+		deserialize_and_copy_value(stream_stack, stream, size_stack, &offset);
+		pcb->stackIndex = deserialize_stackArray(stream_stack, pcb->stackSize);
+		free(stream_stack);
+	} else {
+		pcb->stackIndex = NULL;
+	}
 
 	deserialize_and_copy_value(&(pcb->exit_code), stream, sizeof(uint32_t),
 			&offset);
@@ -254,16 +263,14 @@ char* serialize_stackIndex(t_stack_index* stackIndex) {
 
 	serialize_and_copy_value(stream, &(stackIndex->arg_len), sizeof(uint32_t),
 			&offset);
-	tmpBuffer = serializeVariablesArray(stackIndex->args,
-			stackIndex->arg_len);
+	tmpBuffer = serializeVariablesArray(stackIndex->args, stackIndex->arg_len);
 	serialize_and_copy_value(stream, tmpBuffer,
 			sizeof(t_variable) * stackIndex->arg_len, &offset);
 	free(tmpBuffer);
 
 	serialize_and_copy_value(stream, &(stackIndex->var_len), sizeof(uint32_t),
 			&offset);
-	tmpBuffer = serializeVariablesArray(stackIndex->vars,
-			stackIndex->var_len);
+	tmpBuffer = serializeVariablesArray(stackIndex->vars, stackIndex->var_len);
 	serialize_and_copy_value(stream, tmpBuffer,
 			sizeof(t_variable) * stackIndex->var_len, &offset);
 	free(tmpBuffer);
@@ -306,19 +313,30 @@ t_stack_index* deserialize_stackIndex(char* stream) {
 	deserialize_and_copy_value(&(context->arg_len), stream, sizeof(uint32_t),
 			&offset);
 
-	tmpBuffer = malloc((sizeof(t_variable)) * context->arg_len);
-	deserialize_and_copy_value(tmpBuffer, stream,
-			(sizeof(t_variable)) * context->arg_len, &offset);
-	context->args = deserializeVariablessssArray(tmpBuffer, context->arg_len);
-	free(tmpBuffer);
+	if (context->arg_len > 0) {
+		tmpBuffer = malloc((sizeof(t_variable)) * context->arg_len);
+		deserialize_and_copy_value(tmpBuffer, stream,
+				(sizeof(t_variable)) * context->arg_len, &offset);
+		context->args = deserializeVariablessssArray(tmpBuffer,
+				context->arg_len);
+		free(tmpBuffer);
+	} else {
+		context->args = NULL;
+	}
 
 	deserialize_and_copy_value(&(context->var_len), stream, sizeof(uint32_t),
 			&offset);
-	tmpBuffer = malloc((sizeof(t_variable)) * context->var_len);
-	deserialize_and_copy_value(tmpBuffer, stream,
-			(sizeof(t_variable)) * context->var_len, &offset);
-	context->vars = deserializeVariablessssArray(tmpBuffer, context->var_len);
-	free(tmpBuffer);
+
+	if (context->var_len > 0) {
+		tmpBuffer = malloc((sizeof(t_variable)) * context->var_len);
+		deserialize_and_copy_value(tmpBuffer, stream,
+				(sizeof(t_variable)) * context->var_len, &offset);
+		context->vars = deserializeVariablessssArray(tmpBuffer,
+				context->var_len);
+		free(tmpBuffer);
+	} else {
+		context->vars = NULL;
+	}
 
 	deserialize_and_copy_value(&(context->retPos), stream,
 			sizeof(t_puntero_instruccion), &offset);
@@ -359,8 +377,8 @@ char* serializeVariablesArray(t_variable* variables, uint32_t len) {
 	uint32_t offset = 0;
 	int i;
 	for (i = 0; i < len; i++) {
-		serialize_and_copy_value(stream, &(variables[i].nombre),
-				sizeof(char), &offset);
+		serialize_and_copy_value(stream, &(variables[i].nombre), sizeof(char),
+				&offset);
 		serialize_and_copy_value(stream, &(variables[i].direccion.pagina),
 				sizeof(uint32_t), &offset);
 		serialize_and_copy_value(stream, &(variables[i].direccion.offset),
@@ -402,7 +420,8 @@ void createNewContext(PCB* pcb) {
 	pcb->stackIndex[pcb->stackSize].var_len = 0;
 	pcb->stackIndex[pcb->stackSize].vars = NULL;
 	pcb->stackSize++;
-	logInfo("Se creó el contexto principal (mail) del stack para el pid: %d", pcb->pid);
+	logInfo("Se creó el contexto principal (mail) del stack para el pid: %d",
+			pcb->pid);
 }
 
 void destroyCurrentContext(PCB* pcb) {
@@ -422,42 +441,48 @@ void destroyCurrentContext(PCB* pcb) {
 }
 
 /******************************************************************************************************************
-//EXCLUSIVO SET SHARED VALUE
+ //EXCLUSIVO SET SHARED VALUE
  Es un array de t_stack_index
  ******************************************************************************************************************
  */
-set_shared_var* createSetSharedVar(char* name, int value){
+set_shared_var* createSetSharedVar(char* name, int value) {
 	set_shared_var* object = malloc(sizeof(set_shared_var));
 	object->name = malloc(strlen(name));
 	object->sizeName = strlen(name);
 	object->newValue = value;
 	return object;
 }
-void destroySetSharedVar(set_shared_var* object){
-	if(object->name != NULL)
+void destroySetSharedVar(set_shared_var* object) {
+	if (object->name != NULL)
 		free(object->name);
 	free(object);
 }
-size_t sizeOf_SetSharedVar(set_shared_var* object){
+size_t sizeOf_SetSharedVar(set_shared_var* object) {
 	size_t size = 0;
 	size += sizeof(uint32_t) * 2;
 	size += sizeof(char) * object->sizeName;
 	return size;
 }
-char* serialize_SetSharedVar(set_shared_var* object){
+char* serialize_SetSharedVar(set_shared_var* object) {
 	char* buffer = malloc(sizeOf_SetSharedVar(object));
 	uint32_t offset = 0;
-	serialize_and_copy_value(buffer, &(object->sizeName), sizeof(uint32_t), &offset);
-	serialize_and_copy_value(buffer, object->name, sizeof(char) * object->sizeName, &offset);
-	serialize_and_copy_value(buffer, &(object->newValue), sizeof(uint32_t), &offset);
+	serialize_and_copy_value(buffer, &(object->sizeName), sizeof(uint32_t),
+			&offset);
+	serialize_and_copy_value(buffer, object->name,
+			sizeof(char) * object->sizeName, &offset);
+	serialize_and_copy_value(buffer, &(object->newValue), sizeof(uint32_t),
+			&offset);
 	return buffer;
 }
-set_shared_var* deserialize_SetSharedVar(char* buffer){
+set_shared_var* deserialize_SetSharedVar(char* buffer) {
 	set_shared_var* object = malloc(sizeof(set_shared_var));
 	uint32_t offset = 0;
-	deserialize_and_copy_value(&(object->sizeName), buffer, sizeof(uint32_t), &offset);
-	object->name = malloc(sizeof(char)*object->sizeName);
-	deserialize_and_copy_value(object->name, buffer, sizeof(char)*object->sizeName, &offset);
-	deserialize_and_copy_value(&(object->newValue), buffer, sizeof(uint32_t), &offset);
+	deserialize_and_copy_value(&(object->sizeName), buffer, sizeof(uint32_t),
+			&offset);
+	object->name = malloc(sizeof(char) * object->sizeName);
+	deserialize_and_copy_value(object->name, buffer,
+			sizeof(char) * object->sizeName, &offset);
+	deserialize_and_copy_value(&(object->newValue), buffer, sizeof(uint32_t),
+			&offset);
 	return object;
 }
