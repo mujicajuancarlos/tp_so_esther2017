@@ -9,7 +9,12 @@
 #define MODULE_ANSISOP_PRIMITIVEKERNELFUNCTIONS_H_
 
 #include <parser/parser.h>
+#include <dc-commons/protocol-kernel-cpu.h>
+#include <dc-commons/serialization.h>
+#include "../cpu.h"
+#include "../module.core/cpu-core.h"
 
+int kernelSocket();
 /*
  * WAIT
  *
