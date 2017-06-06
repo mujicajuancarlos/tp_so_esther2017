@@ -8,11 +8,14 @@
 #include "primitiveKernelFunctions.h"
 
 int kernelSocket() {
-	return getCPUStruct().socketClientKernel;
+	return getCPUStruct()->socketClientKernel;
 }
 
 void ansisopKernel_wait(t_nombre_semaforo identificador_semaforo) {
 	logTrace("Ejecutando ansisopKernel_wait(%c)", identificador_semaforo);
+	if (identificador_semaforo[strlen(identificador_semaforo) - 1] == '\n') {
+		identificador_semaforo[strlen(identificador_semaforo) - 1] = '\0';
+	}
 	if (getErrorFlag() == FLAG_OK) {
 		Package* package = createAndSendPackage(kernelSocket(), COD_SEM_WAIT, 1,
 				identificador_semaforo);
@@ -20,7 +23,7 @@ void ansisopKernel_wait(t_nombre_semaforo identificador_semaforo) {
 			logInfo("Se solicito al kernel ejecutar wait en el semaforo %c",
 					identificador_semaforo);
 			destroyPackage(package);
-		}else{
+		} else {
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 		}
 	}
@@ -29,14 +32,17 @@ void ansisopKernel_wait(t_nombre_semaforo identificador_semaforo) {
 
 void ansisopKernel_signal(t_nombre_semaforo identificador_semaforo) {
 	logTrace("Ejecutando ansisopKernel_signal(%c)", identificador_semaforo);
+	if (identificador_semaforo[strlen(identificador_semaforo) - 1] == '\n') {
+		identificador_semaforo[strlen(identificador_semaforo) - 1] = '\0';
+	}
 	if (getErrorFlag() == FLAG_OK) {
-		Package* package = createAndSendPackage(kernelSocket(), COD_SEM_SIGNAL, 1,
-				identificador_semaforo);
+		Package* package = createAndSendPackage(kernelSocket(), COD_SEM_SIGNAL,
+				strlen(identificador_semaforo), identificador_semaforo);
 		if (package != NULL) {
 			logInfo("Se solicito al kernel ejecutar signal en el semaforo %c",
 					identificador_semaforo);
 			destroyPackage(package);
-		}else{
+		} else {
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 		}
 	}

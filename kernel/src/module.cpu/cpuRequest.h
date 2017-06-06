@@ -8,6 +8,7 @@
 #ifndef MODULE_CPU_CPUREQUEST_H_
 #define MODULE_CPU_CPUREQUEST_H_
 
+#include <parser/parser.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
@@ -24,6 +25,8 @@ void startProcessExecution(Process* selectedProcess, CPU* selectedCPU);
 void continueCurrentExcecution(CPU* cpu);
 
 void contextSwitch(CPU* cpu);
+
+void contextSwitchForBlocked(CPU* cpu, t_nombre_semaforo semId);
 
 void programFinished(CPU* cpu, Package* package);
 

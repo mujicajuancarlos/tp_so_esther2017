@@ -78,6 +78,38 @@ void contextSwitch(CPU* cpu) {
 	}
 }
 
+void contextSwitchForBlocked(CPU* cpu, t_nombre_semaforo semId) {
+	logInfo(
+			"Voy a realizar un context switch solicito a la cpu el pcb actualizado de pid: %d en cpu: %d",
+			cpu->process->pid, cpu->fileDescriptor);
+	Package* package = createAndSendPackage(cpu->fileDescriptor,
+	COD_CONTEXT_SWITCH_REQUEST, 0, NULL);
+	if (package != NULL) {
+		destroyPackage(package);
+		package = createAndReceivePackage(cpu->fileDescriptor);
+		if (package != NULL && package->msgCode == COD_CONTEXT_SWITCH_RESPONSE) {
+			PCB* newPcb = deserialize_PCB(package->stream);
+			replacePCB(cpu->process, newPcb);
+			removeFromEXEC(cpu->process);
+			sendToBLOCK(cpu->process);//TODO: REFACTORIZAR PARA TENER UNA COLA POR CADA SEMAFORO
+			markFreeCPU(cpu);
+			destroyPackage(package);
+		} else {
+			logError("La CPU no envio respondio el context switch");
+			removeFromEXEC(cpu->process);
+			sendToREADY(cpu->process);
+			logInfo("Finalizando la CPU que no acepta solicitudes");
+			removeCPU(cpu);
+		}
+	} else {
+		logError("La CPU no pudo recibir la solicitud de ejecutar el proceso.");
+		removeFromEXEC(cpu->process);
+		sendToREADY(cpu->process);
+		logInfo("Finalizando la CPU que no acepta solicitudes");
+		removeCPU(cpu);
+	}
+}
+
 void programFinished(CPU* cpu, Package* package) {
 	PCB* newPcb = deserialize_PCB(package->stream);
 	replacePCB(cpu->process, newPcb);

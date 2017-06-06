@@ -119,12 +119,10 @@ void handleCPURequest(CPU* cpu, Package* package) {
 				//TODO: pendiente
 		break;
 	case COD_SEM_WAIT:
+		executeWaitTo(cpu, package);
+		break;
 	case COD_SEM_SIGNAL:
-		/*
-		 * parecido a fs
-		 */
-		logError("PENDIENTE");
-				//TODO: pendiente
+		executeSignalTo(cpu, package);
 		break;
 	default:
 		logError("La cpu %d envio un mensaje desconocido", cpu->fileDescriptor);
