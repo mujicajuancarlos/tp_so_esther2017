@@ -70,6 +70,7 @@ t_planningStates* getStates();
 
 void initializeProcessLifeCycle();
 void destroyProcessLifeCycle();
+void endProcessGeneric(Process* process);
 
 
 
