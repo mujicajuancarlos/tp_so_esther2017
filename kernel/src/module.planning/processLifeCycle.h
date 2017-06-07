@@ -11,26 +11,28 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <stdbool.h>
+#include <stdio.h>
 #include <unistd.h>
 #include <commons/string.h>
 #include <commons/collections/queue.h>
-#include "../module.planning/shortTermScheduler.h"
-#include "../module.model/processFinder.h"
+#include <commons/collections/list.h>
+#include <commons/collections/dictionary.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/utils.h>
-#include <../dc-commons/protocol-kernel-console.h>
-#include <../dc-commons/socket-message.h>
+#include <dc-commons/protocol-process-exitCodes.h>
+#include "../module.planning/shortTermScheduler.h"
+#include "../module.model/processFinder.h"
 #include "../module.model/process.h"
+#include "../module.model/sharedSemaphore.h"
 #include "shortTermScheduler.h"
 #include "longTermScheduler.h"
-
-
 
 typedef struct {
 	t_list* new;
 	t_queue* ready;
 	t_list* execute;
-	t_queue* block;
+	t_list* block;
 	t_queue* exit;
 } t_planningStates;
 
@@ -50,6 +52,7 @@ void moveFromNewToReady(Process* process);
 void moveFromExcecToReady(Process* process);
 void moveFromExcecToExit(Process* process);
 void moveFromExcecToBlock(Process* process);
+void moveFromBlockToReady(Process* process);
 
 void sendToREADY(Process* process);
 Process* popToREADY();
@@ -58,7 +61,10 @@ void sendToEXEC(Process* process);
 void removeFromEXEC(Process* process);
 
 void sendToBLOCK(Process* process);
-Process* popToBLOCK();
+void removeFromBLOCK(Process* process);
+void initializeQueueBySemaphore(char** semKeys);
+void notifyUnlockedProcessFor(char* semKey);
+void notifyLockedProcessFor(char* semKey, Process* process);
 
 void sendToEXIT(Process* process);
 Process* popToEXIT();
@@ -71,8 +77,6 @@ t_planningStates* getStates();
 void initializeProcessLifeCycle();
 void destroyProcessLifeCycle();
 void endProcessGeneric(Process* process);
-
-
 
 
 #endif /* MODULE_PLANNING_PROCESSLIFECYCLE_H_ */
