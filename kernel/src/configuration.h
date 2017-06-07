@@ -14,6 +14,7 @@
 #include <commons/log.h>
 #include <commons/error.h>
 #include <dc-commons/config.h>
+#include "module.model/sharedSemaphore.h"
 
 //configuration file keys
 #define DEFAULT_CONFIG_PATH "../kernel.conf"
@@ -50,9 +51,6 @@ typedef struct Configuration {
 	int quantum_sleep;
 	char* algoritmo;
 	int grado_multiprog;
-	char** sem_ids;
-	int* sem_init;
-	char** shared_vars;
 	int stack_size;
 	char* log_level;
 	char* log_file;

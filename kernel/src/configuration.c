@@ -42,9 +42,14 @@ Configuration* config_with(char *config_file) {
 	config_set_int_valid_value(&config->quantum_sleep, temporalConfig, QUANTUM_SLEEP);
 	config_set_string_valid_value(&config->algoritmo, temporalConfig, ALGORITMO);
 	config_set_int_valid_value(&config->grado_multiprog, temporalConfig, GRADO_MULTIPROG);
-	//	config->sem_ids
-	//	config->sem_init
+
+	//configuro los semaforos
+	char** semKeys = config_get_array_value(temporalConfig,SEM_IDS);
+	char** semValues = config_get_array_value(temporalConfig,SEM_INIT);
+	initializeSemaphores(semKeys,semValues);
+
 	//	config->shared_vars
+
 	config_set_int_valid_value(&config->stack_size, temporalConfig, STACK_SIZE);
 
 	//configuracion de log
