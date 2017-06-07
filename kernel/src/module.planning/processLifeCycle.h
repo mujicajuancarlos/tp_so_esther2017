@@ -47,12 +47,19 @@ enum planningStates {
 } enum_planning;  // Must end with a semicolon like a struct
 
 
-
+//move to ready
 void moveFromNewToReady(Process* process);
 void moveFromExcecToReady(Process* process);
-void moveFromExcecToExit(Process* process);
-void moveFromExcecToBlock(Process* process);
 void moveFromBlockToReady(Process* process);
+//move to exit
+void moveFromExcecToExit(Process* process);
+void moveFromNewToExit(Process* process);
+void moveFromReadyToExit(Process* process);
+void moveFromExecToExit(Process* process);
+void moveFromBlockToExit(Process* process);
+void removeFromBlockQueues(Process* process);
+//move to block
+void moveFromExcecToBlock(Process* process);
 
 void sendToREADY(Process* process);
 Process* popToREADY();
@@ -70,6 +77,7 @@ void sendToEXIT(Process* process);
 Process* popToEXIT();
 
 void sendToNEW(Process* process);
+void removeFromREADY(Process* process);
 void removeFromNEW(Process* process);
 
 t_planningStates* getStates();

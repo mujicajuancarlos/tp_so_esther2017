@@ -30,9 +30,51 @@ void moveFromExcecToReady(Process* process) {
 
 void moveFromExcecToExit(Process* process) {
 	removeFromEXEC(process);
-	sendToEXEC(process);
+	sendToEXIT(process);
 	process->exit_code = SC_SUCCESS;
 	_incrementMultiprogrammingLevel();
+}
+
+void moveFromNewToExit(Process* process) {
+	removeFromNEW(process);
+	sendToEXIT(process);
+	process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
+}
+
+void moveFromReadyToExit(Process* process) {
+	removeFromREADY(process);
+	sendToEXIT(process);
+	process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
+	_incrementMultiprogrammingLevel();
+}
+
+void moveFromExecToExit(Process* process) {
+	removeFromEXEC(process);
+	sendToEXIT(process);
+	process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
+	_incrementMultiprogrammingLevel();
+}
+
+void moveFromBlockToExit(Process* process) {
+	removeFromBlockQueues(process);
+	removeFromBLOCK(process);
+	sendToEXIT(process);
+	process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
+	_incrementMultiprogrammingLevel();
+}
+
+void removeFromBlockQueues(Process* process) {
+	bool condition(void* element) {
+		Process* anyProcess = element;
+		return anyProcess->pid == process->pid;
+	}
+	void removeProcess(char* key, void* value) {
+		t_queue* queue = value;
+		list_remove_by_condition(queue->elements, condition);
+	}
+	pthread_mutex_lock(&blockQueuesMutex);
+	dictionary_iterator(blockQueues, removeProcess);
+	pthread_mutex_lock(&blockQueuesMutex);
 }
 
 void moveFromExcecToBlock(Process* process) {
@@ -40,7 +82,7 @@ void moveFromExcecToBlock(Process* process) {
 	sendToBLOCK(process);
 }
 
-void moveFromBlockToReady(Process* process){
+void moveFromBlockToReady(Process* process) {
 	removeFromBLOCK(process);
 	sendToREADY(process);
 }
@@ -51,6 +93,17 @@ void sendToREADY(Process* process) {
 	processInReady_signal();
 	pthread_mutex_unlock(&readyListMutex);
 	logTrace("El proceso %d ingresó a la lista de READY", process->pid);
+}
+
+void removeFromREADY(Process* process) {
+	bool condition(void* element) {
+		Process* anyProcess = element;
+		return anyProcess->pid == process->pid;
+	}
+	pthread_mutex_lock(&readyListMutex);
+	list_remove_by_condition(states->ready->elements, condition);
+	pthread_mutex_unlock(&readyListMutex);
+	logTrace("El proceso %d salio de la cola de READY", process->pid);
 }
 
 Process* popToREADY() {
@@ -116,13 +169,11 @@ void notifyUnlockedProcessFor(char* semKey) {
 	if (dictionary_has_key(blockQueues, semKey)) {
 		value = dictionary_get(blockQueues, semKey);
 		process = queue_pop(value);
-		if(process != NULL){
+		if (process != NULL) {
 			moveFromBlockToReady(process);
 		}
 	} else {
-		logError(
-				"No se encontro la cola de bloqueados para: %s",
-				semKey);
+		logError("No se encontro la cola de bloqueados para: %s", semKey);
 		exit(-1);
 	}
 	pthread_mutex_unlock(&blockQueuesMutex);
@@ -133,12 +184,10 @@ void notifyLockedProcessFor(char* semKey, Process* process) {
 	pthread_mutex_lock(&blockQueuesMutex);
 	if (dictionary_has_key(blockQueues, semKey)) {
 		value = dictionary_get(blockQueues, semKey);
-		queue_push(value,process);
+		queue_push(value, process);
 		moveFromExcecToBlock(process);
 	} else {
-		logError(
-				"No se encontro la cola de bloqueados para: %s",
-				semKey);
+		logError("No se encontro la cola de bloqueados para: %s", semKey);
 		exit(-1);
 	}
 	pthread_mutex_unlock(&blockQueuesMutex);
@@ -191,14 +240,14 @@ void initializeProcessLifeCycle() {
 	states->exit = queue_create();
 	states->new = list_create();
 	states->ready = queue_create();
-	states->block = queue_create();
+	states->block = list_create();
 
 	pthread_mutex_init(&executeListMutex, NULL);
 	pthread_mutex_init(&exitListMutex, NULL);
 	pthread_mutex_init(&newListMutex, NULL);
 	pthread_mutex_init(&readyListMutex, NULL);
 	pthread_mutex_init(&blockListMutex, NULL);
-	pthread_mutex_init(&blockQueuesMutex,NULL);
+	pthread_mutex_init(&blockQueuesMutex, NULL);
 }
 
 void destroyProcessLifeCycle() {
@@ -207,7 +256,7 @@ void destroyProcessLifeCycle() {
 	queue_destroy_and_destroy_elements(states->exit, (void*) destroyProcess);
 	list_destroy_and_destroy_elements(states->new, (void*) destroyProcess);
 	queue_destroy_and_destroy_elements(states->ready, (void*) destroyProcess);
-	queue_destroy_and_destroy_elements(states->block, (void*) destroyProcess);
+	list_destroy_and_destroy_elements(states->block, (void*) destroyProcess);
 
 	pthread_mutex_destroy(&executeListMutex);
 	pthread_mutex_destroy(&exitListMutex);
@@ -227,72 +276,72 @@ void destroyProcessLifeCycle() {
 
 void endProcessGeneric(Process* process) {
 	/*char* state = getProcessState(process);
-	bool shouldCompareState = true;
+	 bool shouldCompareState = true;
 
-	if (shouldCompareState && string_equals_ignore_case(state, "new")) {
-		shouldCompareState = false;
-		Package* package;
-		package = createAndSendPackage(process->fileDescriptor,
-				COD_FORCE_QUIT_PROGRAM, 0, NULL);
-		destroyPackage(package);
-		sendToEXIT(process);
-	}
+	 if (shouldCompareState && string_equals_ignore_case(state, "new")) {
+	 shouldCompareState = false;
+	 Package* package;
+	 package = createAndSendPackage(process->fileDescriptor,
+	 COD_FORCE_QUIT_PROGRAM, 0, NULL);
+	 destroyPackage(package);
+	 sendToEXIT(process);
+	 }
 
-	if (shouldCompareState && string_equals_ignore_case(state, "ready")) {
-		shouldCompareState = false;
-		_incrementMultiprogrammingLevel();
-		processInReady_wait();
-		Package* package;
-		package = createAndSendPackage(process->fileDescriptor,
-				COD_FORCE_QUIT_PROGRAM, 0, NULL);
-		destroyPackage(package);
-		sendToEXIT(process);
-		close(process->fileDescriptor);
-		destroyProcess(process);
-		//liberar memoria
-		//liberar filesystem
+	 if (shouldCompareState && string_equals_ignore_case(state, "ready")) {
+	 shouldCompareState = false;
+	 _incrementMultiprogrammingLevel();
+	 processInReady_wait();
+	 Package* package;
+	 package = createAndSendPackage(process->fileDescriptor,
+	 COD_FORCE_QUIT_PROGRAM, 0, NULL);
+	 destroyPackage(package);
+	 sendToEXIT(process);
+	 close(process->fileDescriptor);
+	 destroyProcess(process);
+	 //liberar memoria
+	 //liberar filesystem
 
-		mostrar mensaje :
-		 ->si viene desde consola -> finalizo con exito
-		 ->si cerro por la consola kernel -> el programa finalizado por el administrador del sistema
-		 ->si cerro por error -> se podria informar el tipo de error
+	 mostrar mensaje :
+	 ->si viene desde consola -> finalizo con exito
+	 ->si cerro por la consola kernel -> el programa finalizado por el administrador del sistema
+	 ->si cerro por error -> se podria informar el tipo de error
 
 
-	}
-	if (shouldCompareState && string_equals_ignore_case(state, "execute")) {
+	 }
+	 if (shouldCompareState && string_equals_ignore_case(state, "execute")) {
 
-		shouldCompareState = false;
-		_incrementMultiprogrammingLevel();
-		Package* package;
-		package = createAndSendPackage(process->fileDescriptor,
-				COD_FORCE_QUIT_PROGRAM, 0, NULL);
-		destroyPackage(package);
-		sendToEXIT(process);
-		close(process->fileDescriptor);
-		destroyProcess(process);
-		//liberar memoria
-		//liberar filesystem
+	 shouldCompareState = false;
+	 _incrementMultiprogrammingLevel();
+	 Package* package;
+	 package = createAndSendPackage(process->fileDescriptor,
+	 COD_FORCE_QUIT_PROGRAM, 0, NULL);
+	 destroyPackage(package);
+	 sendToEXIT(process);
+	 close(process->fileDescriptor);
+	 destroyProcess(process);
+	 //liberar memoria
+	 //liberar filesystem
 
-	}
-	if (shouldCompareState && string_equals_ignore_case(state, "block")) {
-		shouldCompareState = false;
-		_incrementMultiprogrammingLevel();
-		Package* package;
-		package = createAndSendPackage(process->fileDescriptor,
-				COD_FORCE_QUIT_PROGRAM, 0, NULL);
-		destroyPackage(package);
-		sendToEXIT(process);
-		close(process->fileDescriptor);
-		destroyProcess(process);
-		//liberar memoria
-		//liberar filesystem
-	}
-	if (shouldCompareState && string_equals_ignore_case(state, "exit")) {
-		shouldCompareState = false;
-		log_error(logger,
-				"Error, no puedo enviar un proceso a finalizar el cual ya finalizo");
-		//printf("Error, no puedo enviar un proceso a finalizar el cual ya finalizo");
-	}*/
+	 }
+	 if (shouldCompareState && string_equals_ignore_case(state, "block")) {
+	 shouldCompareState = false;
+	 _incrementMultiprogrammingLevel();
+	 Package* package;
+	 package = createAndSendPackage(process->fileDescriptor,
+	 COD_FORCE_QUIT_PROGRAM, 0, NULL);
+	 destroyPackage(package);
+	 sendToEXIT(process);
+	 close(process->fileDescriptor);
+	 destroyProcess(process);
+	 //liberar memoria
+	 //liberar filesystem
+	 }
+	 if (shouldCompareState && string_equals_ignore_case(state, "exit")) {
+	 shouldCompareState = false;
+	 log_error(logger,
+	 "Error, no puedo enviar un proceso a finalizar el cual ya finalizo");
+	 //printf("Error, no puedo enviar un proceso a finalizar el cual ya finalizo");
+	 }*/
 
 }
 
