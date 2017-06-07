@@ -25,4 +25,6 @@ void consoleResponseRepulseMessage(Process* newProcess);
 
 void runProgramIsOK_response(Process* process);
 
+void notifyEndProcess(Process* process);
+
 #endif /* MODULE_CONSOLE_CONSOLERESPONSE_H_ */

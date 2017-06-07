@@ -31,6 +31,16 @@ void destroyProcess(Process* process) {
 	}
 }
 
+void freeProcessResources(Process* process){
+	process->fileDescriptor = -1;
+	destroy_stackArray(process->pcb->stackIndex,process->pcb->stackSize);
+	metadata_destruir(process->pcb->metadata);
+	process->pcb->stackIndex = NULL;
+	process->pcb->metadata = NULL;
+	//todo: enviar solicitud a la memoria para que libere las paginas
+	//todo: enviar solicitud al file system para que libere los archivos
+}
+
 void initializeCurrentPidMutex() {
 	pthread_mutex_init(&currentPidMutex, NULL);
 }

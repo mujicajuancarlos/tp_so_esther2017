@@ -7,7 +7,6 @@
 #include "consoleResponse.h"
 
 void consoleResponseRepulseMessage(Process* newProcess) {
-
 	Package* package;
 	package = createAndSendPackage(newProcess->fileDescriptor,
 	COD_KC_CANT_RUN_PROGRAM_RESPONSE, 0, NULL);
@@ -17,9 +16,18 @@ void consoleResponseRepulseMessage(Process* newProcess) {
 	destroyProcess(newProcess);
 }
 
-void runProgramIsOK_response(Process* process){
+void runProgramIsOK_response(Process* process) {
 	char* buffer = serialize_int(process->pid);
-	Package* package = createAndSendPackage(process->fileDescriptor,COD_KC_RUN_PROGRAM_RESPONSE,sizeof(uint32_t),buffer);
+	Package* package = createAndSendPackage(process->fileDescriptor,
+			COD_KC_RUN_PROGRAM_RESPONSE, sizeof(uint32_t), buffer);
 	free(buffer);
 	destroyPackage(package);
+}
+
+void notifyEndProcess(Process* process) {
+	Package* package;
+	package = createAndSendPackage(process->fileDescriptor,
+	COD_FORCE_QUIT_PROGRAM, 0, NULL);
+	destroyPackage(package);
+	close(process->fileDescriptor);
 }

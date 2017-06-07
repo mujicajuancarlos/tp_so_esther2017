@@ -28,15 +28,15 @@ char* getProcessState(Process* proceso) {
 		return aProcess == proceso;
 	}
 	if (list_find(states->new, condicion) != NULL)
-		return "new";
+		return STATE_NEW;
 	if (list_find(states->ready->elements, condicion) != NULL)
-		return "ready";
+		return STATE_READY;
 	if (list_find(states->execute, condicion) != NULL)
-		return "execute";
+		return STATE_EXECUTE;
 	if (list_find(states->block, condicion) != NULL)
-		return "block";
+		return STATE_BLOCK;
 	if (list_find(states->exit->elements, condicion) != NULL)
-		return "exit";
+		return STATE_EXIT;
 
-	return "notFound";
+	return STATE_NOTFOUND;
 }

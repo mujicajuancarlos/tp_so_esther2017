@@ -21,6 +21,7 @@
 #include <dc-commons/logger.h>
 #include <dc-commons/utils.h>
 #include <dc-commons/protocol-process-exitCodes.h>
+#include "../module.console/consoleResponse.h"
 #include "../module.planning/shortTermScheduler.h"
 #include "../module.model/processFinder.h"
 #include "../module.model/process.h"
@@ -36,16 +37,18 @@ typedef struct {
 	t_queue* exit;
 } t_planningStates;
 
-
-
-enum planningStates {
-  new=1,
-  ready=2,
-  execute=3,
-  block=4,
-  ex=5
-} enum_planning;  // Must end with a semicolon like a struct
-
+#define STATE_NEW "new"
+#define STATE_READY "ready"
+#define STATE_EXECUTE "excecute"
+#define STATE_BLOCK "block"
+#define STATE_EXIT "exit"
+#define STATE_NOTFOUND "notFound"
+#define STATE_CODE_NEW 1
+#define STATE_CODE_READY 2
+#define STATE_CODE_EXECUTE 3
+#define STATE_CODE_BLOCK 4
+#define STATE_CODE_EXIT 5
+#define STATE_CODE_NOTFOUND 6
 
 //move to ready
 void moveFromNewToReady(Process* process);
@@ -84,7 +87,7 @@ t_planningStates* getStates();
 
 void initializeProcessLifeCycle();
 void destroyProcessLifeCycle();
-void endProcessGeneric(Process* process);
+void basicForceQuitProcess(Process* process);
 
 
 #endif /* MODULE_PLANNING_PROCESSLIFECYCLE_H_ */

@@ -37,6 +37,8 @@ Process* createProcess(int socket,kernel_struct* kernelStruct);
 
 void destroyProcess(Process* process);
 
+void freeProcessResources(Process* process);
+
 void initializeCurrentPidMutex();
 
 void destroyCurrentPidMutex();

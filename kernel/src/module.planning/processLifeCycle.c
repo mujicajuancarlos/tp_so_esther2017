@@ -42,6 +42,7 @@ void moveFromNewToExit(Process* process) {
 }
 
 void moveFromReadyToExit(Process* process) {
+	processInReady_wait();//importante para el planificador
 	removeFromREADY(process);
 	sendToEXIT(process);
 	process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
@@ -266,82 +267,38 @@ void destroyProcessLifeCycle() {
 	pthread_mutex_destroy(&blockQueuesMutex);
 }
 
-/*  dependiendo el estado se puede realizar diferentes acciones
- new - como no ingreso en el sistema solo hay q moverlo de new a exit
- ready - ya tiene asignado recursos por lo tanto hay que eliminarlos y luego moverlo
- block - lo mismo que ready
- exec - lo mismo que ready (tener en cuenta que si esta ejecutando
- hay que esperar que la cpu termine de ejecutar la instruccion)
- exit - loguear el error porque no seria una inconsitencia enviar a finalizar un proceso que ya finalizo    */
+int stateCodeFor(char* state){
+	if(string_equals_ignore_case(state,STATE_NEW)) return STATE_CODE_NEW;
+	if(string_equals_ignore_case(state,STATE_READY)) return STATE_CODE_READY;
+	if(string_equals_ignore_case(state,STATE_EXECUTE)) return STATE_CODE_EXECUTE;
+	if(string_equals_ignore_case(state,STATE_BLOCK)) return STATE_CODE_BLOCK;
+	if(string_equals_ignore_case(state,STATE_EXIT)) return STATE_CODE_EXIT;
+	return STATE_CODE_NOTFOUND;
+}
 
-void endProcessGeneric(Process* process) {
-	/*char* state = getProcessState(process);
-	 bool shouldCompareState = true;
-
-	 if (shouldCompareState && string_equals_ignore_case(state, "new")) {
-	 shouldCompareState = false;
-	 Package* package;
-	 package = createAndSendPackage(process->fileDescriptor,
-	 COD_FORCE_QUIT_PROGRAM, 0, NULL);
-	 destroyPackage(package);
-	 sendToEXIT(process);
-	 }
-
-	 if (shouldCompareState && string_equals_ignore_case(state, "ready")) {
-	 shouldCompareState = false;
-	 _incrementMultiprogrammingLevel();
-	 processInReady_wait();
-	 Package* package;
-	 package = createAndSendPackage(process->fileDescriptor,
-	 COD_FORCE_QUIT_PROGRAM, 0, NULL);
-	 destroyPackage(package);
-	 sendToEXIT(process);
-	 close(process->fileDescriptor);
-	 destroyProcess(process);
-	 //liberar memoria
-	 //liberar filesystem
-
-	 mostrar mensaje :
-	 ->si viene desde consola -> finalizo con exito
-	 ->si cerro por la consola kernel -> el programa finalizado por el administrador del sistema
-	 ->si cerro por error -> se podria informar el tipo de error
-
-
-	 }
-	 if (shouldCompareState && string_equals_ignore_case(state, "execute")) {
-
-	 shouldCompareState = false;
-	 _incrementMultiprogrammingLevel();
-	 Package* package;
-	 package = createAndSendPackage(process->fileDescriptor,
-	 COD_FORCE_QUIT_PROGRAM, 0, NULL);
-	 destroyPackage(package);
-	 sendToEXIT(process);
-	 close(process->fileDescriptor);
-	 destroyProcess(process);
-	 //liberar memoria
-	 //liberar filesystem
-
-	 }
-	 if (shouldCompareState && string_equals_ignore_case(state, "block")) {
-	 shouldCompareState = false;
-	 _incrementMultiprogrammingLevel();
-	 Package* package;
-	 package = createAndSendPackage(process->fileDescriptor,
-	 COD_FORCE_QUIT_PROGRAM, 0, NULL);
-	 destroyPackage(package);
-	 sendToEXIT(process);
-	 close(process->fileDescriptor);
-	 destroyProcess(process);
-	 //liberar memoria
-	 //liberar filesystem
-	 }
-	 if (shouldCompareState && string_equals_ignore_case(state, "exit")) {
-	 shouldCompareState = false;
-	 log_error(logger,
-	 "Error, no puedo enviar un proceso a finalizar el cual ya finalizo");
-	 //printf("Error, no puedo enviar un proceso a finalizar el cual ya finalizo");
-	 }*/
-
+void basicForceQuitProcess(Process* process) {
+	char* state = getProcessState(process);
+	int stateCode = stateCodeFor(state);
+	switch (stateCode) {
+	case STATE_CODE_NEW:
+		moveFromNewToExit(process);
+		break;
+	case STATE_CODE_READY:
+		moveFromReadyToExit(process);
+		break;
+	case STATE_CODE_EXECUTE:
+		//La funcionalidad que lo invoca deberia liberar la cpu
+		moveFromExcecToExit(process);
+		break;
+	case STATE_CODE_BLOCK:
+		moveFromBlockToExit(process);
+		break;
+	case STATE_CODE_EXIT:
+	default:
+		logError("El proceso pid: %d tiene el estado: %s y no puede ser finalizado",process->pid,state);
+		break;
+	}
+	notifyEndProcess(process);
+	freeProcessResources(process);
 }
 
