@@ -7,6 +7,15 @@
 
 #include "pageAdministrator.h"
 
+void removeProcessFromCache (memory_struct* memoryStruct, int processId) {
+	bool notThisProcess (void* element) {
+		cache_entry* entry = element;
+		return (entry->pid != processId);
+	}
+
+	memoryStruct->cacheEntries = list_filter (memoryStruct->cacheEntries, notThisProcess);
+}
+
 void addEntryToCache (memory_struct* memoryStruct, int processId, int processPage, int globPage) {
 	cache_entry* entry = malloc (sizeof (entry));
 	entry->globPage = globPage;
@@ -44,6 +53,8 @@ int getFromCache (memory_struct* memoryStruct, int processId, int processPage) {
 		if (entry->pid == processId && entry->procPage == processPage)
 			return entry->globPage;
 	}
+	printf ("CACHE MISS!");
+	usleep (memoryStruct->memorySleep);
 	return (-1);
 }
 
@@ -189,4 +200,5 @@ void freeProcess(memory_struct *memoryStruct, int processId) {
 			freePage((memory_page*) list_get(thisProcessPages, i));
 	}
 
+	removeProcessFromCache (memoryStruct, processId);
 }
