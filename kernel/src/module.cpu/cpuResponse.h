@@ -16,9 +16,10 @@
 #include <dc-commons/protocol-process-exitCodes.h>
 #include "../module.model/cpu.h"
 #include "../module.model/process.h"
+#include "../module.model/sharedSemaphore.h"
 #include "../module.planning/processLifeCycle.h"
-#include "../module.planning/sharedSemaphore.h"
 #include "cpuAdministrator.h"
+#include "cpuRequest.h"
 
 
 void executeWaitTo(CPU* cpu, Package* package);

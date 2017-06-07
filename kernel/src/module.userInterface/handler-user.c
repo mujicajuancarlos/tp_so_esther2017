@@ -123,7 +123,7 @@ void handleCommand_info_all_process(kernel_struct* kernelStruct,
 		state = "execute";
 		list_iterate(states->execute, printElement);
 		state = "block";
-		list_iterate(states->block->elements, printElement);
+		list_iterate(states->block, printElement);
 		state = "exit";
 		list_iterate(states->exit->elements, printElement);
 	} else
@@ -155,7 +155,7 @@ void handleCommand_info_by_state_process(kernel_struct* kernelStruct,
 				valid = true;
 			}
 			if (string_equals_ignore_case(state, "block")) {
-				list_iterate(states->block->elements, printElement);
+				list_iterate(states->block, printElement);
 				valid = true;
 			}
 			if (string_equals_ignore_case(state, "exit")) {

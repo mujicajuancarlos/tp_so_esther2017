@@ -14,7 +14,7 @@ void executeWaitTo(CPU* cpu, Package* package) {
 		contextSwitchForBlocked(cpu, semId);
 	} else {
 		logInfo(
-				"El proceso pid: %d no quedara bloqueado despues del wait en %s",
+				"El proceso pid: %d NO quedara bloqueado despues del wait en %s",
 				cpu->process->pid, semId);
 	}
 }

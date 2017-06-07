@@ -18,6 +18,7 @@
 #include "../module.model/cpu.h"
 #include "../module.planning/scheduler.h"
 #include "cpuAdministrator.h"
+#include "cpuResponse.h"
 
 void handleCPUs(kernel_struct *args);
 

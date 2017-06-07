@@ -13,7 +13,7 @@ Process* getProcessByPID(int pidParam) {
 		return encontrado;
 	if ((encontrado = list_find(states->execute, condicion)) != NULL)
 		return encontrado;
-	if ((encontrado = list_find(states->block->elements, condicion)) != NULL)
+	if ((encontrado = list_find(states->block, condicion)) != NULL)
 		return encontrado;
 	if ((encontrado = list_find(states->exit->elements, condicion)) != NULL)
 		return encontrado;
@@ -33,7 +33,7 @@ char* getProcessState(Process* proceso) {
 		return "ready";
 	if (list_find(states->execute, condicion) != NULL)
 		return "execute";
-	if (list_find(states->block->elements, condicion) != NULL)
+	if (list_find(states->block, condicion) != NULL)
 		return "block";
 	if (list_find(states->exit->elements, condicion) != NULL)
 		return "exit";

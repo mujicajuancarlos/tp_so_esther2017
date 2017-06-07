@@ -22,8 +22,7 @@ void startProcessExecution(Process* selectedProcess, CPU* selectedCPU) {
 	COD_EXEC_NEW_PCB, size, buffer);
 	if (package == NULL) {
 		logError("La CPU no pudo recibir la solicitud de ejecutar el proceso.");
-		removeFromEXEC(selectedProcess);
-		sendToREADY(selectedProcess);
+		moveFromExcecToReady(selectedProcess);
 		logInfo("Finalizando la CPU que no acepta solicitudes");
 		removeCPU(selectedCPU);
 	}
@@ -38,8 +37,7 @@ void continueCurrentExcecution(CPU* cpu) {
 	COD_CONTINUE_EXECUTION, 0, NULL);
 	if (package == NULL) {
 		logError("La CPU no pudo recibir la solicitud de ejecutar el proceso.");
-		removeFromEXEC(cpu->process);
-		sendToREADY(cpu->process);
+		moveFromExcecToReady(cpu->process);
 		logInfo("Finalizando la CPU que no acepta solicitudes");
 		removeCPU(cpu);
 	}
@@ -58,21 +56,18 @@ void contextSwitch(CPU* cpu) {
 		if (package != NULL && package->msgCode == COD_CONTEXT_SWITCH_RESPONSE) {
 			PCB* newPcb = deserialize_PCB(package->stream);
 			replacePCB(cpu->process, newPcb);
-			removeFromEXEC(cpu->process);
-			sendToREADY(cpu->process);
+			moveFromExcecToReady(cpu->process);
 			markFreeCPU(cpu);
 			destroyPackage(package);
 		} else {
 			logError("La CPU no envio respondio el context switch");
-			removeFromEXEC(cpu->process);
-			sendToREADY(cpu->process);
+			moveFromExcecToReady(cpu->process);
 			logInfo("Finalizando la CPU que no acepta solicitudes");
 			removeCPU(cpu);
 		}
 	} else {
 		logError("La CPU no pudo recibir la solicitud de ejecutar el proceso.");
-		removeFromEXEC(cpu->process);
-		sendToREADY(cpu->process);
+		moveFromExcecToReady(cpu->process);
 		logInfo("Finalizando la CPU que no acepta solicitudes");
 		removeCPU(cpu);
 	}
@@ -90,21 +85,18 @@ void contextSwitchForBlocked(CPU* cpu, t_nombre_semaforo semId) {
 		if (package != NULL && package->msgCode == COD_CONTEXT_SWITCH_RESPONSE) {
 			PCB* newPcb = deserialize_PCB(package->stream);
 			replacePCB(cpu->process, newPcb);
-			removeFromEXEC(cpu->process);
-			sendToBLOCK(cpu->process);//TODO: REFACTORIZAR PARA TENER UNA COLA POR CADA SEMAFORO
+			notifyLockedProcessFor(semId,cpu->process);
 			markFreeCPU(cpu);
 			destroyPackage(package);
 		} else {
 			logError("La CPU no envio respondio el context switch");
-			removeFromEXEC(cpu->process);
-			sendToREADY(cpu->process);
+			moveFromExcecToReady(cpu->process);
 			logInfo("Finalizando la CPU que no acepta solicitudes");
 			removeCPU(cpu);
 		}
 	} else {
 		logError("La CPU no pudo recibir la solicitud de ejecutar el proceso.");
-		removeFromEXEC(cpu->process);
-		sendToREADY(cpu->process);
+		moveFromExcecToReady(cpu->process);
 		logInfo("Finalizando la CPU que no acepta solicitudes");
 		removeCPU(cpu);
 	}
@@ -113,16 +105,13 @@ void contextSwitchForBlocked(CPU* cpu, t_nombre_semaforo semId) {
 void programFinished(CPU* cpu, Package* package) {
 	PCB* newPcb = deserialize_PCB(package->stream);
 	replacePCB(cpu->process, newPcb);
-	removeFromEXEC(cpu->process);
-	cpu->process->exit_code = SC_SUCCESS;
-	sendToEXIT(cpu->process);
+	moveFromExcecToExit(cpu->process);
 	markFreeCPU(cpu);
 }
 
 void cpuDisconnected(CPU* cpu, Package* package) {
 	PCB* newPcb = deserialize_PCB(package->stream);
 	replacePCB(cpu->process, newPcb);
-	removeFromEXEC(cpu->process);
-	sendToREADY(cpu->process);
+	moveFromExcecToReady(cpu->process);
 	removeCPU(cpu);
 }
