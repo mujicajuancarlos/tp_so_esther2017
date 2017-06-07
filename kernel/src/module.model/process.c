@@ -120,7 +120,7 @@ void destroy_t_processFileDescriptor(t_processFileDescriptor* pfd) {
 
 
 flags* habilitarPermisos(char* permiso) {
-	flags* flag;
+	flags* flag = malloc(sizeof(flags));
 	int retorno=-1;
 	retorno = strcmp(permiso, READ);
 	if (retorno == 0) {
@@ -166,6 +166,8 @@ void removerPFD_Lista(t_processFileDescriptor* pfd, Process* process) {
 			(void*) destroy_t_processFileDescriptor);
 
 }
+
+/*
 char* serialize_Flags(flags* flags){
 	char* buffer = malloc(sizeof(flags));
 	uint32_t offset = 0;
@@ -231,7 +233,7 @@ t_processFileDescriptor* deserialize_ProcessFileDescritpro(char* buffer) {
 
 	t_processFileDescriptor* pfd = malloc(sizeof(t_processFileDescriptor));
 
-	flags* f;
+	flags* f = malloc(sizeof(flags));
 	t_size ft = sizeof(flags);
 
 	deserialize_and_copy_value(&f,buffer, sizeof(flags),
@@ -243,7 +245,7 @@ t_processFileDescriptor* deserialize_ProcessFileDescritpro(char* buffer) {
 				&offset);
 		pfd->flag = deserialize_Flags(flagsBuffer);
 
-		t_processFileDescriptor* unPFD;
+		t_processFileDescriptor* unPFD = malloc(sizeof(t_processFileDescriptor));
 
 	deserialize_and_copy_value(unPFD,buffer,sizeof(t_processFileDescriptor),&offset);
 
@@ -259,5 +261,8 @@ t_processFileDescriptor* deserialize_ProcessFileDescritpro(char* buffer) {
 
 	free(pfdBuffer);
 
+	free(unPFD);
+
 	return pfd;
 }
+*/

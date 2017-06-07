@@ -135,12 +135,15 @@ void imprimirListaDeFD(t_list* lista) {
 	fileDescriptor_mutex_unlock();
 }
 
+//TODO: revisarlas
+
 size_t sizeOf_FileDescriptor(t_fileDescriptor* fd) {
 	size_t size = 0;
 	size += sizeof(uint32_t) * 2;
 	size += sizeof(char) * fd->fd;
 	return size;
 }
+
 char* serialize_FileDescriptor(t_fileDescriptor* fd) {
 	char* buffer = malloc(sizeOf_FileDescriptor(fd));
 
