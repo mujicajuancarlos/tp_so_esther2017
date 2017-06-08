@@ -28,10 +28,19 @@ void moveFromExcecToReady(Process* process) {
 	sendToREADY(process);
 }
 
-void moveFromExcecToExit(Process* process) {
+void moveFromExcecToExit_withError(Process* process, int statusCode) {
+	process->exit_code = statusCode;
+	basic_moveFromExcecToExit(process);
+}
+
+void moveFromExcecToExit_withoutError(Process* process) {
+	process->exit_code = SC_SUCCESS;
+	basic_moveFromExcecToExit(process);
+}
+
+void basic_moveFromExcecToExit(Process* process) {
 	removeFromEXEC(process);
 	sendToEXIT(process);
-	process->exit_code = SC_SUCCESS;
 	_incrementMultiprogrammingLevel();
 }
 
@@ -42,7 +51,7 @@ void moveFromNewToExit(Process* process) {
 }
 
 void moveFromReadyToExit(Process* process) {
-	processInReady_wait();//importante para el planificador
+	processInReady_wait(); //importante para el planificador
 	removeFromREADY(process);
 	sendToEXIT(process);
 	process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
@@ -267,12 +276,17 @@ void destroyProcessLifeCycle() {
 	pthread_mutex_destroy(&blockQueuesMutex);
 }
 
-int stateCodeFor(char* state){
-	if(string_equals_ignore_case(state,STATE_NEW)) return STATE_CODE_NEW;
-	if(string_equals_ignore_case(state,STATE_READY)) return STATE_CODE_READY;
-	if(string_equals_ignore_case(state,STATE_EXECUTE)) return STATE_CODE_EXECUTE;
-	if(string_equals_ignore_case(state,STATE_BLOCK)) return STATE_CODE_BLOCK;
-	if(string_equals_ignore_case(state,STATE_EXIT)) return STATE_CODE_EXIT;
+int stateCodeFor(char* state) {
+	if (string_equals_ignore_case(state, STATE_NEW))
+		return STATE_CODE_NEW;
+	if (string_equals_ignore_case(state, STATE_READY))
+		return STATE_CODE_READY;
+	if (string_equals_ignore_case(state, STATE_EXECUTE))
+		return STATE_CODE_EXECUTE;
+	if (string_equals_ignore_case(state, STATE_BLOCK))
+		return STATE_CODE_BLOCK;
+	if (string_equals_ignore_case(state, STATE_EXIT))
+		return STATE_CODE_EXIT;
 	return STATE_CODE_NOTFOUND;
 }
 
@@ -287,18 +301,23 @@ void basicForceQuitProcess(Process* process) {
 		moveFromReadyToExit(process);
 		break;
 	case STATE_CODE_EXECUTE:
-		//La funcionalidad que lo invoca deberia liberar la cpu
-		moveFromExcecToExit(process);
+		/*
+		 * si estoy ejecutando no puedo forzarlo,
+		 * solo lo dejo marcado para que finalize
+		 * cuando termine de ejecutar la instruccion
+		 * la notificacion y la liberacion de recursos no se realiza aca
+		 */
+		markForcedQuitProcess(process);
 		break;
 	case STATE_CODE_BLOCK:
 		moveFromBlockToExit(process);
 		break;
 	case STATE_CODE_EXIT:
 	default:
-		logError("El proceso pid: %d tiene el estado: %s y no puede ser finalizado",process->pid,state);
+		logError(
+				"El proceso pid: %d tiene el estado: %s y no puede ser finalizado",
+				process->pid, state);
 		break;
 	}
-	notifyEndProcess(process);
-	freeProcessResources(process);
 }
 

@@ -54,8 +54,11 @@ typedef struct {
 void moveFromNewToReady(Process* process);
 void moveFromExcecToReady(Process* process);
 void moveFromBlockToReady(Process* process);
+//move to exit from execute
+void moveFromExcecToExit_withError(Process* process, int statusCode);
+void moveFromExcecToExit_withoutError(Process* process);
+void basic_moveFromExcecToExit(Process* process);
 //move to exit
-void moveFromExcecToExit(Process* process);
 void moveFromNewToExit(Process* process);
 void moveFromReadyToExit(Process* process);
 void moveFromExecToExit(Process* process);
