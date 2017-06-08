@@ -59,44 +59,23 @@ void handleNewCPU(CPU* newCpu) {
 }
 
 void handleCPURequest(CPU* cpu, Package* package) {
-	int algorithm;
 	switch (package->msgCode) {
 	case COD_END_INSTRUCCION:
-		algorithm = getAlgorithmIndex(cpu->kernelStruct->config->algoritmo);
-		switch (algorithm) {
-		case ROUND_ROBIN:
-			cpu->process->quantum--;
-			if (cpu->process->quantum > 0) {
-				continueCurrentExcecution(cpu);
-			} else {
-				contextSwitch(cpu);
-			}
-			break;
-		case FIFO:
-			continueCurrentExcecution(cpu);
-			break;
-		default:
-			logError(
-					"El algoritmo de planificacion ingresado en el archivo de configuracion no es valido");
-			exit(-1);
-			break;
-		}
+		resolveRequest_endInstruction(cpu, package);
 		break;
 	case COD_PROGRAM_FINISHED:
-		programFinished(cpu, package);
+		resolveRequest_programFinished(cpu, package);
 		break;
 	case COD_SIGNAL_DISCONNECTED:
-		cpuDisconnected(cpu, package);
+		resolveRequest_cpuDisconnected(cpu, package);
 		break;
 	case COD_GET_SHARED_VAR:
 	case COD_SET_SHARED_VAR:
-		logError("PENDIENTE");
-		//TODO: pendiente
+		resolveRequest_sharedVarOperation(cpu, package);
 		break;
 	case COD_MALLOC_MEMORY:
 	case COD_FREE_MEMORY:
-		logError("PENDIENTE");
-				//TODO: pendiente
+		resolveRequest_dynamicMemoryOperation(cpu, package);
 		break;
 	case COD_OPEN_FD:
 	case COD_DELETE_FD:
@@ -104,31 +83,18 @@ void handleCPURequest(CPU* cpu, Package* package) {
 	case COD_SEED_FD:
 	case COD_WRITE_FD:
 	case COD_READ_FD:
-		/*
-		 * todo: ver en detalle mas adelante
-		 * no lo tengo definido:
-		 * opcion a:
-		 * hacero con dos mensajes: solicitud fs + solicitud de bloqueo
-		 * opcion b:
-		 * una unica solicitud -> fs y bloquear
-		 *
-		 * bloquear: liberar cpu y enviar proceso a bloqueado
-		 *
-		 */
-		logError("PENDIENTE");
-				//TODO: pendiente
+		resolveRequest_fileSystemOperation(cpu, package);
 		break;
 	case COD_SEM_WAIT:
-		executeWaitTo(cpu, package);
-		break;
 	case COD_SEM_SIGNAL:
-		executeSignalTo(cpu, package);
+		resolveRequest_updateSemaphore(cpu, package);
+		break;
+	case COD_EXECUTION_ERROR://soy para los errores producidos exclusivamente en cpu, los errores de syscal se resuelven sincronicamente
+		resolveRequest_executionError(cpu, package);
 		break;
 	default:
-		logError("La cpu %d envio un mensaje desconocido", cpu->fileDescriptor);
-		/*
-		 * liberar cpu y enviar proceso a ready
-		 */
+		logError("La cpu %d envio un mensaje desconocido, por cuestiones de seguridad la conexion sera desvinculada", cpu->fileDescriptor);
+		moveFromExcecToReady(cpu->process);
 		removeCPU(cpu);
 		break;
 	}

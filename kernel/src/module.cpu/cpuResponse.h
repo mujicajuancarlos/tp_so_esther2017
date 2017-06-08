@@ -8,6 +8,7 @@
 #ifndef MODULE_CPU_CPURESPONSE_H_
 #define MODULE_CPU_CPURESPONSE_H_
 
+#include <stdbool.h>
 #include <parser/parser.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/package.h>
@@ -15,15 +16,7 @@
 #include <dc-commons/protocol-kernel-cpu.h>
 #include <dc-commons/protocol-process-exitCodes.h>
 #include "../module.model/cpu.h"
-#include "../module.model/process.h"
-#include "../module.model/sharedSemaphore.h"
-#include "../module.planning/processLifeCycle.h"
-#include "cpuAdministrator.h"
-#include "cpuRequest.h"
 
-
-void executeWaitTo(CPU* cpu, Package* package);
-
-void executeSignalTo(CPU* cpu, Package* package);
+void notifyUpdateSemaphoreStatus(CPU* cpu,bool hasError, bool shouldLock);
 
 #endif /* MODULE_CPU_CPURESPONSE_H_ */

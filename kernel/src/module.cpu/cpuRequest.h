@@ -17,7 +17,9 @@
 #include "../module.model/cpu.h"
 #include "../module.model/process.h"
 #include "../module.planning/processLifeCycle.h"
+#include "../module.planning/scheduler.h"
 #include "cpuAdministrator.h"
+#include "cpuResponse.h"
 
 
 void startProcessExecution(Process* selectedProcess, CPU* selectedCPU);
@@ -28,8 +30,24 @@ void contextSwitch(CPU* cpu);
 
 void contextSwitchForBlocked(CPU* cpu, t_nombre_semaforo semId);
 
-void programFinished(CPU* cpu, Package* package);
+void executeWaitTo(CPU* cpu, Package* package);
 
-void cpuDisconnected(CPU* cpu, Package* package);
+void executeSignalTo(CPU* cpu, Package* package);
+
+void resolveRequest_endInstruction(CPU* cpu, Package* package);
+
+void resolveRequest_programFinished(CPU* cpu, Package* package);
+
+void resolveRequest_cpuDisconnected(CPU* cpu, Package* package);
+
+void resolveRequest_sharedVarOperation(CPU* cpu, Package* package);
+
+void resolveRequest_dynamicMemoryOperation(CPU* cpu, Package* package);
+
+void resolveRequest_fileSystemOperation(CPU* cpu, Package* package);
+
+void resolveRequest_updateSemaphore(CPU* cpu, Package* package);
+
+void resolveRequest_executionError(CPU* cpu, Package* package);
 
 #endif /* MODULE_CPU_CPUREQUEST_H_ */

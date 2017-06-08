@@ -7,44 +7,18 @@
 
 #include "cpuResponse.h"
 
-void executeWaitTo(CPU* cpu, Package* package) {
-	t_nombre_semaforo semId = package->stream;
-	bool* shouldLock = malloc(sizeof(bool));
-	if (executeBasicWait(semId, shouldLock) == UPDATE_SEM_SUCCESS) {
-		if (*shouldLock) {
-			logInfo(
-					"El proceso pid: %d quedara bloqueado despues del wait en %s",
-					cpu->process->pid, semId);
-			contextSwitchForBlocked(cpu, semId);
-		} else {
-			logInfo(
-					"El proceso pid: %d NO quedara bloqueado despues del wait en %s",
-					cpu->process->pid, semId);
-		}
-	} else {
-		logError("No se pudo ejecutar wait");
-		//TODO: notificar el error a cpu para ejecutar la rutina de error de ejecucion o finalizar automaticamente
+/*
+ * me encargo de notificar a la cpu el estado de ejecucion del la syscall semaforos
+ */
+void notifyUpdateSemaphoreStatus(CPU* cpu,bool hasError, bool shouldLock){
+	Package* package;
+	char* buffer;
+	if(!hasError){
+		buffer = serialize_bool(shouldLock);
+		package = createAndSendPackage(cpu->fileDescriptor,COD_SYSCALL_SUCCESS,sizeof(bool),buffer);
+		free(buffer);
+	}else{
+		package = createAndSendPackage(cpu->fileDescriptor,COD_SYSCALL_FAILURE,0,NULL);
 	}
-	free(shouldLock);
-}
-
-void executeSignalTo(CPU* cpu, Package* package) {
-	t_nombre_semaforo semId = package->stream;
-	bool* shouldUnock = malloc(sizeof(bool));
-	if (executeBasicSignal(semId, shouldUnock) == UPDATE_SEM_SUCCESS) {
-		if (*shouldUnock) {
-			logInfo(
-					"Se desbloqueara un proceso de la cola de bloqueados del semaforo: %s",
-					semId);
-			notifyUnlockedProcessFor(semId);
-		} else {
-			logInfo(
-					"No se desbloqueara ningun proceso de la cola de bloqueados del semaforo: %s",
-					semId);
-		}
-	} else {
-		logError("No se pudo ejecutar wait");
-		//TODO: notificar el error a cpu para ejecutar la rutina de error de ejecucion o finalizar automaticamente
-	}
-	free(shouldUnock);
+	destroyPackage(package);
 }

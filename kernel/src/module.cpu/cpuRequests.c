@@ -46,7 +46,7 @@ void continueCurrentExcecution(CPU* cpu) {
 
 void contextSwitch(CPU* cpu) {
 	logInfo(
-			"Voy a realizar un context switch solicito a la cpu el pcb actualizado de pid: %d en cpu: %d",
+			"Realizando un context switch solicito a la cpu el pcb actualizado de pid: %d en cpu: %d",
 			cpu->process->pid, cpu->fileDescriptor);
 	Package* package = createAndSendPackage(cpu->fileDescriptor,
 	COD_CONTEXT_SWITCH_REQUEST, 0, NULL);
@@ -58,13 +58,13 @@ void contextSwitch(CPU* cpu) {
 			replacePCB(cpu->process, newPcb);
 			moveFromExcecToReady(cpu->process);
 			markFreeCPU(cpu);
-			destroyPackage(package);
 		} else {
 			logError("La CPU no envio respondio el context switch");
 			moveFromExcecToReady(cpu->process);
 			logInfo("Finalizando la CPU que no acepta solicitudes");
 			removeCPU(cpu);
 		}
+		destroyPackage(package);
 	} else {
 		logError("La CPU no pudo recibir la solicitud de ejecutar el proceso.");
 		moveFromExcecToReady(cpu->process);
@@ -74,8 +74,35 @@ void contextSwitch(CPU* cpu) {
 }
 
 void contextSwitchForBlocked(CPU* cpu, t_nombre_semaforo semId) {
+	logInfo("Esperando el pcb actualizado para el proceso %d desde la cpu: %d",
+			cpu->process->pid, cpu->fileDescriptor);
+	Package* package = createAndReceivePackage(cpu->fileDescriptor);
+	if (package != NULL) {
+		if (package->msgCode == COD_CONTEXT_SWITCH_RESPONSE) {
+			PCB* newPcb = deserialize_PCB(package->stream);
+			replacePCB(cpu->process, newPcb);
+			notifyLockedProcessFor(semId, cpu->process);
+			markFreeCPU(cpu);
+		} else {
+			logError("La CPU no devolvio el pcb actualizado");
+			moveFromExcecToReady(cpu->process);
+			logInfo(
+					"Remuevo la cpu porque no esta respondiendo adecuadamente.");
+			removeCPU(cpu);
+		}
+		destroyPackage(package);
+	} else {
+		logError("La CPU no devolvio el pcb actualizado");
+		moveFromExcecToReady(cpu->process);
+		logInfo("Remuevo la cpu porque no esta respondiendo adecuadamente.");
+		removeCPU(cpu);
+	}
+
+}
+
+void contextSwitchForForceQuitProcess(CPU* cpu) {
 	logInfo(
-			"Voy a realizar un context switch solicito a la cpu el pcb actualizado de pid: %d en cpu: %d",
+			"Solicito a la cpu el pcb actualizado de pid: %d en cpu: %d",
 			cpu->process->pid, cpu->fileDescriptor);
 	Package* package = createAndSendPackage(cpu->fileDescriptor,
 	COD_CONTEXT_SWITCH_REQUEST, 0, NULL);
@@ -85,33 +112,128 @@ void contextSwitchForBlocked(CPU* cpu, t_nombre_semaforo semId) {
 		if (package != NULL && package->msgCode == COD_CONTEXT_SWITCH_RESPONSE) {
 			PCB* newPcb = deserialize_PCB(package->stream);
 			replacePCB(cpu->process, newPcb);
-			notifyLockedProcessFor(semId,cpu->process);
+			moveFromExcecToExit_withError(cpu->process, SC_ERROR_END_PROCESS_BY_REQUEST);
 			markFreeCPU(cpu);
-			destroyPackage(package);
 		} else {
-			logError("La CPU no envio respondio el context switch");
-			moveFromExcecToReady(cpu->process);
+			logError("La CPU no devolvio el pcb actualizado, de todas formas se finalizara el proceso");
+			moveFromExcecToExit_withError(cpu->process, SC_ERROR_END_PROCESS_BY_REQUEST);
 			logInfo("Finalizando la CPU que no acepta solicitudes");
 			removeCPU(cpu);
 		}
+		destroyPackage(package);
 	} else {
-		logError("La CPU no pudo recibir la solicitud de ejecutar el proceso.");
-		moveFromExcecToReady(cpu->process);
+		logError("La CPU no devolvio el pcb actualizado, de todas formas se finalizara el proceso");
+		moveFromExcecToExit_withError(cpu->process, SC_ERROR_END_PROCESS_BY_REQUEST);
 		logInfo("Finalizando la CPU que no acepta solicitudes");
 		removeCPU(cpu);
 	}
 }
 
-void programFinished(CPU* cpu, Package* package) {
+void executeWaitTo(CPU* cpu, Package* package) {
+	t_nombre_semaforo semId = package->stream;
+	bool shouldLock = false;
+	bool hasError = executeBasicWait(semId, &shouldLock) == UPDATE_SEM_SUCCESS;
+	notifyUpdateSemaphoreStatus(cpu, hasError, shouldLock);
+	if (!hasError) {
+		if (shouldLock) {
+			logInfo(
+					"El proceso pid: %d quedara bloqueado despues del wait en %s",
+					cpu->process->pid, semId);
+			contextSwitchForBlocked(cpu, semId); //recibo el pcb para actualizarlo y enviar el proceso a bloqueado
+		} else {
+			logInfo(
+					"El proceso pid: %d NO quedara bloqueado despues del wait en %s",
+					cpu->process->pid, semId);
+		}
+	}else {
+		moveFromExcecToExit_withError(cpu->process, SC_ERROR_WAIT_SEMAPHORE);
+		markFreeCPU(cpu);
+	}
+}
+
+void executeSignalTo(CPU* cpu, Package* package) {
+	t_nombre_semaforo semId = package->stream;
+	bool shouldUnlock = false;
+	bool hasError = executeBasicSignal(semId,
+			&shouldUnlock) == UPDATE_SEM_SUCCESS;
+	notifyUpdateSemaphoreStatus(cpu, hasError, false); //notifico el estado, siempre enviar false
+	if (!hasError) {
+		if (shouldUnlock) {
+			logInfo(
+					"Se desbloqueara un proceso de la cola de bloqueados del semaforo: %s",
+					semId);
+			notifyUnlockedProcessFor(semId);
+		} else {
+			logInfo(
+					"No se desbloqueara ningun proceso de la cola de bloqueados del semaforo: %s",
+					semId);
+		}
+	}else {
+		moveFromExcecToExit_withError(cpu->process, SC_ERROR_WAIT_SEMAPHORE);
+		markFreeCPU(cpu);
+	}
+}
+
+void resolveRequest_endInstruction(CPU* cpu, Package* package) {
+	if (!cpu->process->forceQuit) {
+		int algorithm = getAlgorithmIndex(cpu->kernelStruct->config->algoritmo);
+		switch (algorithm) {
+		case ROUND_ROBIN:
+			cpu->process->quantum--;
+			if (cpu->process->quantum > 0) {
+				continueCurrentExcecution(cpu);
+			} else {
+				contextSwitch(cpu);
+			}
+			break;
+		case FIFO:
+		default:
+			continueCurrentExcecution(cpu);
+			break;
+		}
+	} else {
+		contextSwitchForForceQuitProcess(cpu);
+	}
+}
+
+void resolveRequest_programFinished(CPU* cpu, Package* package) {
 	PCB* newPcb = deserialize_PCB(package->stream);
 	replacePCB(cpu->process, newPcb);
-	moveFromExcecToExit(cpu->process);
+	moveFromExcecToExit_withoutError(cpu->process);
 	markFreeCPU(cpu);
 }
 
-void cpuDisconnected(CPU* cpu, Package* package) {
+void resolveRequest_cpuDisconnected(CPU* cpu, Package* package) {
 	PCB* newPcb = deserialize_PCB(package->stream);
 	replacePCB(cpu->process, newPcb);
 	moveFromExcecToReady(cpu->process);
 	removeCPU(cpu);
+}
+
+void resolveRequest_sharedVarOperation(CPU* cpu, Package* package) {
+
+}
+
+void resolveRequest_dynamicMemoryOperation(CPU* cpu, Package* package) {
+
+}
+
+void resolveRequest_fileSystemOperation(CPU* cpu, Package* package) {
+
+}
+
+void resolveRequest_updateSemaphore(CPU* cpu, Package* package) {
+	switch (package->msgCode) {
+	case COD_SEM_WAIT:
+		executeWaitTo(cpu, package);
+		break;
+	case COD_SEM_SIGNAL:
+		executeSignalTo(cpu, package);
+		break;
+	}
+}
+
+void resolveRequest_executionError(CPU* cpu, Package* package) {
+	//todo enviar el proceso a exit con el exit code
+	//la cpu queda limpia
 }
