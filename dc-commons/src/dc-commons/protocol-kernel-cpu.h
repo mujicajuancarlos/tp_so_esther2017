@@ -42,6 +42,10 @@
 //bloquantes semaforos
 #define COD_SEM_WAIT 220
 #define COD_SEM_SIGNAL 221
+//errores de ejecucion
+#define COD_SYSCALL_SUCCESS 222
+#define COD_SYSCALL_FAILURE 223
+#define COD_EXECUTION_ERROR 224
 
 typedef struct {
 	uint32_t sizeName;
