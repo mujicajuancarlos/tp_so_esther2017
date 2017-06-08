@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <parser/metadata_program.h>
 #include <commons/string.h>
 #include <dc-commons/logger.h>
@@ -25,6 +26,7 @@ typedef struct Process {
     int fileDescriptor;	//file descriptor del socket de la consola
     int pid;	//PID del proceso que esta ejecutando actualmente
     int quantum;
+    bool forceQuit;//usado para la finalizacion forzada de procesos en ejecucion
     PCB* pcb;
     kernel_struct* kernelStruct;
     t_list* fileDescriptorList;
@@ -44,6 +46,8 @@ void initializeCurrentPidMutex();
 void destroyCurrentPidMutex();
 
 int getNextPID();
+
+void markForcedQuitProcess(Process* process);
 
 void createPcbForNewProcess(Process* process, Package* package);
 

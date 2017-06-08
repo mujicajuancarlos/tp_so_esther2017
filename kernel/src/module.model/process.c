@@ -17,6 +17,7 @@ Process* createProcess(int socket, kernel_struct* kernelStruct) {
 	newProcess->pid = 0;
 	newProcess->kernelStruct = kernelStruct;
 	newProcess->pcb = NULL;
+	newProcess->forceQuit = false;
 	//tablaProcesosFD = list_create();
 	return newProcess;
 }
@@ -55,6 +56,10 @@ int getNextPID() {
 	next = currentPid++;
 	pthread_mutex_unlock(&currentPidMutex);
 	return next;
+}
+
+void markForcedQuitProcess(Process* process){
+	process->forceQuit = true;
 }
 
 void createPcbForNewProcess(Process* process, Package* sourceCodePackage) {
