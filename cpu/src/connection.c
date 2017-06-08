@@ -58,7 +58,7 @@ void createKernelClientSocket(cpu_struct* cpuStruct) {
 	cpuStruct->socketClientKernel = crearSocketCliente(cpuStruct->config->ip_kernel,
 			cpuStruct->config->puerto_kernel);
 	if (cpuStruct->socketClientKernel == -1)
-		logError("No se pudo establecer la conexion con el file system");
+		logError("No se pudo establecer la conexion con el kernel");
 	else
 		logInfo("Conexion establecida a traves del FD %d", cpuStruct->socketClientKernel);
 }

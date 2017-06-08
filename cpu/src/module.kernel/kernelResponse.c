@@ -32,9 +32,9 @@ void reportEndProcess(cpu_struct* cpuStruct) {
 	unloadPCB(cpuStruct);
 }
 
-//SURGE CUANDO EL KERNEL SOLICITA EL CONTEXT SWITCH
+//SE INVOCA CUANDO EL KERNEL SOLICITA EL CONTEXT SWITCH O CUANDO EL PROCESO VA A BLOQUEARSE
 void reportContextSwich(cpu_struct* cpuStruct) {
-	logInfo("Informando al kernel en nuevo pcb producto del contex swich");
+	logInfo("Informando al kernel en nuevo pcb producto del context switch");
 	sendPCB(cpuStruct, COD_CONTEXT_SWITCH_RESPONSE);
 	unloadPCB(cpuStruct);
 }
