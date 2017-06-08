@@ -49,6 +49,8 @@ Configuration* config_with(char *config_file) {
 	initializeSemaphores(semKeys,semValues);
 
 	//	config->shared_vars
+	char** sharedVarKeys = config_get_array_value(temporalConfig,SHARED_VARS);
+	initializeSharedVars(sharedVarKeys);
 
 	config_set_int_valid_value(&config->stack_size, temporalConfig, STACK_SIZE);
 

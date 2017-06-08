@@ -15,6 +15,7 @@
 #include <commons/error.h>
 #include <dc-commons/config.h>
 #include "module.model/sharedSemaphore.h"
+#include "module.model/sharedVariables.h"
 
 //configuration file keys
 #define DEFAULT_CONFIG_PATH "../kernel.conf"

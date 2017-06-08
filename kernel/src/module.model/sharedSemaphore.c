@@ -10,7 +10,12 @@
 
 t_dictionary* semaphores;
 
+pthread_mutex_t semaphoresMutex;
+
 void initializeSemaphores(char** semKeys, char** semValues) {
+
+	pthread_mutex_init(&semaphoresMutex, NULL);
+
 	semaphores = dictionary_create();
 	int index = 0;
 	while (semKeys[index] != NULL) {
@@ -22,37 +27,43 @@ void initializeSemaphores(char** semKeys, char** semValues) {
 	initializeQueueBySemaphore(semKeys);
 }
 
-bool executeBasicWait(t_nombre_semaforo semKey) {
+int executeBasicWait(t_nombre_semaforo semKey, bool* shouldLock) {
 	int* value;
+	int status;
+	pthread_mutex_lock(&semaphoresMutex);
 	if (dictionary_has_key(semaphores, semKey)) {
 		value = dictionary_get(semaphores, semKey);
 		*value = *value - 1;
+		*shouldLock = *value < 0;
+		logInfo("El semaforo: %s ahora tiene el valor %d", semKey, value);
+		status = UPDATE_SEM_SUCCESS;
 	} else {
 		logError("Se intento ejecutar wait sobre el semaforo: %s que no existe",
 				semKey);
-		exit(-1);
+		shouldLock = NULL;
+		status = UPDATE_SEM_FAILURE;
 	}
-	logInfo("El semaforo: %s ahora tiene el valor %d", semKey, value);
-	if(*value < 0){
-		logTrace("Bloquando el proceso que invoco a wait de semaforo: %s",semKey);
-	}
-	return *value < 0;
+	pthread_mutex_unlock(&semaphoresMutex);
+	return status;
 }
 
-void executeBasicSignal(t_nombre_semaforo semKey) {
+int executeBasicSignal(t_nombre_semaforo semKey, bool* shouldUnlock) {
 	int* value;
+	int status;
+	pthread_mutex_lock(&semaphoresMutex);
 	if (dictionary_has_key(semaphores, semKey)) {
 		value = dictionary_get(semaphores, semKey);
 		*value = *value + 1;
+		*shouldUnlock = *value <= 0;
+		logInfo("El semaforo: %s ahora tiene el valor %d", semKey, value);
+		status = UPDATE_SEM_SUCCESS;
 	} else {
 		logError(
 				"Se intento ejecutar signal sobre el semaforo: %s que no existe",
 				semKey);
-		exit(-1);
+		shouldUnlock = NULL;
+		status = UPDATE_SEM_FAILURE;
 	}
-	logInfo("El semaforo: %s ahora tiene el valor %d", semKey, *value);
-	if(*value <= 0){
-		logTrace("Desbloqueando algun proceso bloqueado por el semaforo: %s",semKey);
-		notifyUnlockedProcessFor(semKey);
-	}
+	pthread_mutex_unlock(&semaphoresMutex);
+	return status;
 }

@@ -75,7 +75,7 @@ void removeFromBlockQueues(Process* process) {
 	}
 	pthread_mutex_lock(&blockQueuesMutex);
 	dictionary_iterator(blockQueues, removeProcess);
-	pthread_mutex_lock(&blockQueuesMutex);
+	pthread_mutex_unlock(&blockQueuesMutex);
 }
 
 void moveFromExcecToBlock(Process* process) {
