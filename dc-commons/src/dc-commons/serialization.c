@@ -39,6 +39,20 @@ int deserialize_int(char* stream) {
 	return value;
 }
 
+char* serialize_bool(bool value) {
+	size_t size = sizeof(bool);
+	char *stream = calloc(1, size);
+	memcpy(stream, &value, size);
+	return stream;
+}
+
+bool deserialize_bool(char* stream) {
+	size_t size = sizeof(bool);
+	bool value;
+	memcpy(&value, stream, size);
+	return value;
+}
+
 char* deserialize_string(char* stream, size_t length) {
 	return string_substring_until(stream, length);
 }

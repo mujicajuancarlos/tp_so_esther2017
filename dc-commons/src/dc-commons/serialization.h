@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
 #include <parser/metadata_program.h>
 #include <commons/string.h>
 
@@ -46,7 +47,7 @@ void deserialize_and_copy_value(void* value, char* buffer, size_t size_to_copy, 
  * @RETURN:
  * 		stream, NO OLVIDAR HACER FREE DEL STREAM
  */
-char *serialize_int(int value);
+char* serialize_int(int value);
 
 /**
  * @NAME: stream
@@ -57,6 +58,10 @@ char *serialize_int(int value);
  * 		int, NO HAGO FREE DEL STREAM, POR LO CUAL DEBES HACERLO VOS AFUERA DE ESTA FUNCION
  */
 int deserialize_int(char* stream);
+
+char* serialize_bool(bool value);
+
+bool deserialize_bool(char* stream);
 
 /**
  * @NAME: deserialize_string
