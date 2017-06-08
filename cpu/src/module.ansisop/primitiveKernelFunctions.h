@@ -13,6 +13,7 @@
 #include <dc-commons/serialization.h>
 #include "../cpu.h"
 #include "../module.core/cpu-core.h"
+#include "../module.kernel/kernelResponse.h"
 
 int kernelSocket();
 /*
