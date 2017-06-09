@@ -77,8 +77,7 @@ uint32_t openFile(kernel_struct* kernelStruct, char* path, char* openMode,
  * ----------------------------------------------------------------------------------------------------------------------------
  */
 	else {
-		bool validacion = validateFile(kernelStruct,path); //TODO: verificar
-
+		bool validacion = validateFile(kernelStruct,path);
 		if(validacion){
 
 		t_fileDescriptor* file = createNew_t_fileDescriptor(path);
@@ -142,11 +141,16 @@ bool isOpen(char* path) {
 }
 
 /*
-writeFile(uint32_t fd, int offset,char*buffer, t_size tamanio, kernel_struct* kernelStruct){
+writeFile(uint32_t fd, int offset,char*buffer, t_size tamanio, Process* process){
 	char* path = obtenerPath(fd);
 
-	//TODO: Esta funcion serializa, envia y devuelve el package
-	Package* package = solicitudAlFileSystem(kernelStruct->socketClientFileSystem,COD_GUARDAR_DATOS,path,offset,tamanio,buffer);
+	//TODO: Esta funcion envia y devuelve el package
+	//TODO: hay que serializar los datos y meterlos en el stream ¿Estructuras?
+
+	int socket = process->kernelStruct->socketClientFileSystem;
+
+	Package* package = solicitudAlFileSystem(socket,
+	COD_GUARDAR_DATOS,stream); //TODO: path,offset,tamanio,buffer
 
 	if(package == NULL){
 		logInfo("Error en solicitud a FileSystem");
@@ -154,18 +158,23 @@ writeFile(uint32_t fd, int offset,char*buffer, t_size tamanio, kernel_struct* ke
 	}
 	destroyPackage(package); //TODO: se podria poner aca solo
 
-	package = createAndReceivePackage(kernelStruct->socketClientFileSystem);
+	package = createAndReceivePackage(socket);
 
 	//TODO Evaluar si hubo error terminar, si no mandar a Ready
 
 }
 
-readFile(uint32_t fd, int offset, size_t tamanio, kernel_struct* kernelStruct){
+readFile(uint32_t fd, int offset, size_t tamanio, Process* process){
 
 	char* path = obtenerPath(fd);
 
-	Package* package = solicitudAlFileSystem(kernelStruct->socketClientFileSystem,COD_OBTENER_DATOS,
-			path,offset,tamanio);
+	//TODO: Esta funcion envia y devuelve el package
+	//TODO: hay que serializar los datos y meterlos en el stream ¿Estructuras?
+
+	 int socket = process->kernelStruct->socketClientFileSystem;
+
+	Package* package = solicitudAlFileSystem(socket,
+	COD_OBTENER_DATOS,stream); //TODO:(path, offset,tamanio)
 
 	if(package == NULL){
 			logInfo("Error en solicitud a FileSystem");
@@ -173,7 +182,7 @@ readFile(uint32_t fd, int offset, size_t tamanio, kernel_struct* kernelStruct){
 		}
 		destroyPackage(package); //TODO: se podria poner aca solo
 
-	package = createAndReceivePackage(kernelStruct->socketClientFileSystem);
+	package = createAndReceivePackage(socket);
 
 	//TODO:	si surgio error ejecutar la rutina de finalizacion de proceso con el codigo de error adecuado
 	//si no hay error enviar a ready (ver donde se almacena el dato obtenido del fs)
@@ -182,7 +191,26 @@ readFile(uint32_t fd, int offset, size_t tamanio, kernel_struct* kernelStruct){
 
 */
 
+Package* solicitudAlFileSystem(int socket,uint32_t msgCode, char* stream){
 
+
+	Package* package = createAndSendPackage(socket, msgCode,strlen(stream),stream);
+
+	if(package!=NULL){
+		logInfo("Paquete enviado correctamente");
+
+	}
+	else{
+			logInfo("Error al enviar paquete");
+	}
+
+	destroyPackage(package);
+
+	package = createAndReceivePackage(socket);
+
+	return package;
+
+}
 
 
 
