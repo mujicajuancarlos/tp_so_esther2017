@@ -26,9 +26,7 @@
 #define COD_SIGNAL_DISCONNECTED 207 //le llego una señal de desconeccion a la cpu -> dejara de dar servicio
 //no bloqueantes
 #define COD_GET_SHARED_VAR 208
-#define COD_GET_SHARED_VAR_RESPONSE 209
 #define COD_SET_SHARED_VAR 210
-#define COD_SET_SHARED_VAR_RESPONSE 211
 // MEMORY
 #define COD_MALLOC_MEMORY 212
 #define COD_FREE_MEMORY 213

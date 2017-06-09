@@ -101,8 +101,7 @@ void contextSwitchForBlocked(CPU* cpu, t_nombre_semaforo semId) {
 }
 
 void contextSwitchForForceQuitProcess(CPU* cpu) {
-	logInfo(
-			"Solicito a la cpu el pcb actualizado de pid: %d en cpu: %d",
+	logInfo("Solicito a la cpu el pcb actualizado de pid: %d en cpu: %d",
 			cpu->process->pid, cpu->fileDescriptor);
 	Package* package = createAndSendPackage(cpu->fileDescriptor,
 	COD_CONTEXT_SWITCH_REQUEST, 0, NULL);
@@ -112,18 +111,23 @@ void contextSwitchForForceQuitProcess(CPU* cpu) {
 		if (package != NULL && package->msgCode == COD_CONTEXT_SWITCH_RESPONSE) {
 			PCB* newPcb = deserialize_PCB(package->stream);
 			replacePCB(cpu->process, newPcb);
-			moveFromExcecToExit_withError(cpu->process, SC_ERROR_END_PROCESS_BY_REQUEST);
+			moveFromExcecToExit_withError(cpu->process,
+			SC_ERROR_END_PROCESS_BY_REQUEST);
 			markFreeCPU(cpu);
 		} else {
-			logError("La CPU no devolvio el pcb actualizado, de todas formas se finalizara el proceso");
-			moveFromExcecToExit_withError(cpu->process, SC_ERROR_END_PROCESS_BY_REQUEST);
+			logError(
+					"La CPU no devolvio el pcb actualizado, de todas formas se finalizara el proceso");
+			moveFromExcecToExit_withError(cpu->process,
+			SC_ERROR_END_PROCESS_BY_REQUEST);
 			logInfo("Finalizando la CPU que no acepta solicitudes");
 			removeCPU(cpu);
 		}
 		destroyPackage(package);
 	} else {
-		logError("La CPU no devolvio el pcb actualizado, de todas formas se finalizara el proceso");
-		moveFromExcecToExit_withError(cpu->process, SC_ERROR_END_PROCESS_BY_REQUEST);
+		logError(
+				"La CPU no devolvio el pcb actualizado, de todas formas se finalizara el proceso");
+		moveFromExcecToExit_withError(cpu->process,
+		SC_ERROR_END_PROCESS_BY_REQUEST);
 		logInfo("Finalizando la CPU que no acepta solicitudes");
 		removeCPU(cpu);
 	}
@@ -145,7 +149,7 @@ void executeWaitTo(CPU* cpu, Package* package) {
 					"El proceso pid: %d NO quedara bloqueado despues del wait en %s",
 					cpu->process->pid, semId);
 		}
-	}else {
+	} else {
 		moveFromExcecToExit_withError(cpu->process, SC_ERROR_WAIT_SEMAPHORE);
 		markFreeCPU(cpu);
 	}
@@ -168,10 +172,46 @@ void executeSignalTo(CPU* cpu, Package* package) {
 					"No se desbloqueara ningun proceso de la cola de bloqueados del semaforo: %s",
 					semId);
 		}
-	}else {
+	} else {
 		moveFromExcecToExit_withError(cpu->process, SC_ERROR_WAIT_SEMAPHORE);
 		markFreeCPU(cpu);
 	}
+}
+
+void executeSetSharedVar(CPU* cpu, Package* package) {
+	set_shared_var* data = deserialize_SetSharedVar(package->stream);
+	Package* tmpPackage;
+	if (setSharedVar(data->name, data->newValue) == UPDATE_VAR_SUCCESS) {
+		char* buffer = serialize_int(data->newValue);
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+						COD_SYSCALL_SUCCESS, sizeof(int), buffer);
+		free(buffer);
+	} else {
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+				COD_SYSCALL_FAILURE, 0, NULL);
+		moveFromExcecToExit_withError(cpu->process, SC_ERROR_SET_SHARED_VAR);
+		markFreeCPU(cpu);
+	}
+	destroySetSharedVar(data);
+	destroyPackage(tmpPackage);
+}
+
+void executeGetSharedVar(CPU* cpu, Package* package) {
+	char* key = package->stream;
+	int value;
+	Package* tmpPackage;
+	if (getSharedVar(key, &value) == UPDATE_VAR_SUCCESS) {
+		char* buffer = serialize_int(value);
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+				COD_SYSCALL_SUCCESS, sizeof(int), buffer);
+		free(buffer);
+	} else {
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+				COD_SYSCALL_FAILURE, 0, NULL);
+		moveFromExcecToExit_withError(cpu->process, SC_ERROR_GET_SHARED_VAR);
+		markFreeCPU(cpu);
+	}
+	destroyPackage(tmpPackage);
 }
 
 void resolveRequest_endInstruction(CPU* cpu, Package* package) {
@@ -211,7 +251,14 @@ void resolveRequest_cpuDisconnected(CPU* cpu, Package* package) {
 }
 
 void resolveRequest_sharedVarOperation(CPU* cpu, Package* package) {
-
+	switch (package->msgCode) {
+	case COD_SET_SHARED_VAR:
+		executeSetSharedVar(cpu, package);
+		break;
+	case COD_GET_SHARED_VAR:
+		executeGetSharedVar(cpu, package);
+		break;
+	}
 }
 
 void resolveRequest_dynamicMemoryOperation(CPU* cpu, Package* package) {

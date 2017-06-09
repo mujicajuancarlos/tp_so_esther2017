@@ -104,12 +104,12 @@ void ansisop_asignar(t_puntero pointer, t_valor_variable value) {
 }
 
 t_valor_variable ansisop_obtenerValorCompartida(t_nombre_compartida name) {
+	if (name[strlen(name) - 1] == '\n') {
+		name[strlen(name) - 1] = '\0';
+	}
 	logTrace("Ejecutando ansisop_obtenerValorCompartida(%s)", name);
 	t_valor_variable value = NULL_VALUE;
 	if (getErrorFlag() == FLAG_OK) {
-		if (name[strlen(name) - 1] == '\n') {
-			name[strlen(name) - 1] = '\0';
-		}
 		value = getSharedVarriableValue(getCPUStruct(), name);
 		if (getErrorFlag() == FLAG_OK) {
 			logTrace(
@@ -126,12 +126,12 @@ t_valor_variable ansisop_obtenerValorCompartida(t_nombre_compartida name) {
 
 t_valor_variable ansisop_asignarValorCompartida(t_nombre_compartida name,
 		t_valor_variable value) {
+	if (name[strlen(name) - 1] == '\n') {
+		name[strlen(name) - 1] = '\0';
+	}
 	logTrace("Ejecutando ansisop_asignarValorCompartida(%s,%d)", name, value);
 	t_valor_variable assignedValue = NULL_VALUE;
 	if (getErrorFlag() == FLAG_OK) {
-		if (name[strlen(name) - 1] == '\n') {
-			name[strlen(name) - 1] = '\0';
-		}
 		assignedValue = setSharedVarriableValue(getCPUStruct(), name, value);
 		if (getErrorFlag() == FLAG_OK) {
 			logTrace(
@@ -160,7 +160,8 @@ void ansisop_irAlLabel(t_nombre_etiqueta name) {
 void ansisop_llamarSinRetorno(t_nombre_etiqueta label) {
 	logTrace("Ejecutando ansisop_llamarSinRetorno(%s,)", label);
 	if (getErrorFlag() == FLAG_OK) {
-		t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(label);
+		t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(
+				label);
 		PCB* tmpPcb = getPCB();
 		createNewContext(tmpPcb);
 		logTrace("Se genero un nuevo contexto en el stack");

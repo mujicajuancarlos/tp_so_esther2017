@@ -11,7 +11,7 @@
 void reportEndInstruction(cpu_struct* cpuStruct) {
 	logInfo("Informando al kernel que la instruccion se ejecutó correctamente");
 	Package* package = createAndSendPackage(cpuStruct->socketClientKernel,
-			COD_END_INSTRUCCION, 0, NULL);
+	COD_END_INSTRUCCION, 0, NULL);
 	destroyPackage(package);
 	//NO SE DESCARGA EL PCB PORQUE PUEDE VENIR UNA SOLICITUD PARA QUE SIGA EJECUTANDO EL MISMO PROCESO
 	//TAMPOCO HACE FALTA ENVIARLO AL KERNEL (MENOS OVERHEAD -> EL KERNEL PARA CAMBIAR DE CONTEXTO DEBERIA INVOCAR CON CONTEXTsWITCH)
@@ -19,7 +19,8 @@ void reportEndInstruction(cpu_struct* cpuStruct) {
 
 //SURGE CUANDO LA CPU SE VA DESCONECTAR
 void reportCpuDisconected(cpu_struct* cpuStruct) {
-	logInfo("Informando al kernel que la instruccion se ejecutó correctamente, y que la cpu dejara de dar servicio");
+	logInfo(
+			"Informando al kernel que la instruccion se ejecutó correctamente, y que la cpu dejara de dar servicio");
 	sendPCB(cpuStruct, COD_SIGNAL_DISCONNECTED);
 	unloadPCB(cpuStruct);
 }
@@ -94,19 +95,17 @@ int getSharedVarriableValue(cpu_struct* cpuStruct, char* name) {
 		destroyPackage(package);
 		package = createAndReceivePackage(cpuStruct->socketClientKernel);
 		if (package != NULL) {
-			int value;
-			switch (package->msgCode) {
-			case COD_GET_SHARED_VAR_RESPONSE:
-				value = deserialize_int(package->stream);
-				destroyPackage(package);
-				return value;
-				break;
-			default:
-				logError(
-						"Kernel respondio con un codigo de mensaje desconocido");
-				setErrorFlag(FLAG_UNKNOWN_MESSAGE_CODE);
-				break;
+			if (package->msgCode == COD_SYSCALL_SUCCESS) {
+				int newValue;
+				newValue = deserialize_int(package->stream);
+				logTrace(
+						"Se obtuvo el valor de la variable: %s valor: %d",
+						name, newValue);
+				return newValue;
+			} else {
+				setErrorFlag(FLAG_SYSCALL_FAILURE);
 			}
+			destroyPackage(package);
 		} else {
 			logError("No se pudo recibir los datos del kernel");
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
@@ -130,19 +129,17 @@ int setSharedVarriableValue(cpu_struct* cpuStruct, char* name, int value) {
 		destroyPackage(package);
 		package = createAndReceivePackage(cpuStruct->socketClientKernel);
 		if (package != NULL) {
-			int value;
-			switch (package->msgCode) {
-			case COD_SET_SHARED_VAR_RESPONSE:
-				value = deserialize_int(package->stream);
-				destroyPackage(package);
-				return value;
-				break;
-			default:
-				logError(
-						"Kernel respondio con un codigo de mensaje desconocido");
-				setErrorFlag(FLAG_UNKNOWN_MESSAGE_CODE);
-				break;
+			if (package->msgCode == COD_SYSCALL_SUCCESS) {
+				int newValue;
+				newValue = deserialize_int(package->stream);
+				logTrace(
+						"Se actualizo el valor de la variable: %s con el valor: %d",
+						name, newValue);
+				return newValue;
+			} else {
+				setErrorFlag(FLAG_SYSCALL_FAILURE);
 			}
+			destroyPackage(package);
 		} else {
 			logError("No se pudo recibir los datos del kernel");
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);

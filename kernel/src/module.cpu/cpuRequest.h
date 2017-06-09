@@ -34,6 +34,10 @@ void executeWaitTo(CPU* cpu, Package* package);
 
 void executeSignalTo(CPU* cpu, Package* package);
 
+void executeSetSharedVar(CPU* cpu, Package* package);
+
+void executeGetSharedVar(CPU* cpu, Package* package);
+
 void resolveRequest_endInstruction(CPU* cpu, Package* package);
 
 void resolveRequest_programFinished(CPU* cpu, Package* package);
