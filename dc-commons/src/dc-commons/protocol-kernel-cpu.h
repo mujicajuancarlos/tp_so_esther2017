@@ -82,6 +82,23 @@ typedef struct {
 	uint32_t exit_code; //Agrego Exit Code a PCB (No hace falta serializar, usa solo Kernel)
 } PCB;
 
+//ESTRUCTURAS PARA SYSCALL DE FS
+typedef struct {
+	uint32_t sizePath;
+	char* path;
+	t_banderas flags;
+} t_new_FD_request;
+typedef struct {
+	uint32_t fd;
+	uint32_t offset;
+} t_seed_FD_request;
+typedef struct {
+	uint32_t fd;
+	uint32_t sizeBuffer;
+	char* buffer;
+} t_data_FD_request;
+
+
 //EXCLUSIVO PBC
 PCB* create_new_PCB(uint32_t pid, uint32_t stackFirstPage, t_metadata_program* metadata);//ok
 void destroy_PBC(PCB* pbc);//ok
@@ -119,5 +136,24 @@ void destroySetSharedVar(set_shared_var* object);
 uint32_t sizeOf_SetSharedVar(set_shared_var* object);
 char* serialize_SetSharedVar(set_shared_var* object);
 set_shared_var* deserialize_SetSharedVar(char* stream);
+
+ //EXCLUSIVO SYSCALL FILE SYSTEM
+t_new_FD_request* create_t_new_FD_request(char* path, t_banderas flags);
+void destroy_t_new_FD_request(t_new_FD_request* object);
+size_t sizeof_t_new_FD_request(t_new_FD_request* object);
+char* serialize_t_new_FD_request(t_new_FD_request* object);
+t_new_FD_request* deserialize_t_new_FD_request(char* buffer);
+//
+t_seed_FD_request* create_t_seed_FD_request(uint32_t fd, uint32_t offset);
+void destroy_t_seed_FD_request(t_seed_FD_request* object);
+size_t sizeof_t_seed_FD_request(t_seed_FD_request* object);
+char* serialize_t_seed_FD_request(t_seed_FD_request* object);
+t_seed_FD_request* deserialize_t_seed_FD_request(char* buffer);
+//
+t_data_FD_request* create_t_data_FD_request(uint32_t fd, uint32_t size, char* buffer);
+void destroy_t_data_FD_request(t_data_FD_request* object);
+size_t sizeof_t_data_FD_request(t_data_FD_request* object);
+char* serialize_t_data_FD_request(t_data_FD_request* object);
+t_data_FD_request* deserialize_t_data_FD_request(char* buffer);
 
 #endif /* SRC_DC_COMMONS_PROTOCOL_KERNEL_CPU_H_ */

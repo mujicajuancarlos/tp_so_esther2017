@@ -448,6 +448,7 @@ void destroyCurrentContext(PCB* pcb) {
 set_shared_var* createSetSharedVar(char* name, int value) {
 	set_shared_var* object = malloc(sizeof(set_shared_var));
 	object->name = malloc(strlen(name));
+	memcpy(object->name, name, strlen(name));
 	object->sizeName = strlen(name);
 	object->newValue = value;
 	return object;
@@ -484,5 +485,130 @@ set_shared_var* deserialize_SetSharedVar(char* buffer) {
 			sizeof(char) * object->sizeName, &offset);
 	deserialize_and_copy_value(&(object->newValue), buffer, sizeof(uint32_t),
 			&offset);
+	return object;
+}
+/******************************************************************************************************************
+ //EXCLUSIVO SYSCALL FILE SYSTEM
+ ******************************************************************************************************************
+ */
+
+t_new_FD_request* create_t_new_FD_request(char* path, t_banderas flags) {
+	t_new_FD_request* object = malloc(sizeof(t_new_FD_request));
+	object->sizePath = strlen(path);
+	object->path = malloc(sizeof(char) * object->sizePath);
+	memcpy(object->path, path, object->sizePath);
+	memcpy(&(object->flags), &flags, sizeof(t_banderas));
+	return object;
+}
+void destroy_t_new_FD_request(t_new_FD_request* object) {
+	if (object != NULL) {
+		if (object->path != NULL)
+			free(object->path);
+		free(object);
+	}
+}
+size_t sizeof_t_new_FD_request(t_new_FD_request* object) {
+	size_t size = 0;
+	size += sizeof(uint32_t);
+	size += sizeof(char) * object->sizePath;
+	size += sizeof(t_banderas);
+	return size;
+}
+char* serialize_t_new_FD_request(t_new_FD_request* object) {
+	char* buffer = malloc(sizeof_t_new_FD_request(object));
+	uint32_t offset = 0;
+	serialize_and_copy_value(buffer, &(object->sizePath), sizeof(uint32_t),
+			&offset);
+	serialize_and_copy_value(buffer, object->path,
+			sizeof(char) * object->sizePath, &offset);
+	serialize_and_copy_value(buffer, &(object->flags), sizeof(t_banderas),
+			&offset);
+	return buffer;
+}
+t_new_FD_request* deserialize_t_new_FD_request(char* buffer) {
+	t_new_FD_request* object = malloc(sizeof(t_new_FD_request));
+	uint32_t offset = 0;
+	deserialize_and_copy_value(&(object->sizePath), buffer, sizeof(uint32_t),
+			&offset);
+	object->path = malloc(sizeof(char) * object->sizePath);
+	deserialize_and_copy_value(object->path, buffer,
+			sizeof(char) * object->sizePath, &offset);
+	deserialize_and_copy_value(&(object->flags), buffer, sizeof(t_banderas),
+			&offset);
+	return object;
+}
+//
+t_seed_FD_request* create_t_seed_FD_request(uint32_t fd, uint32_t offset) {
+	t_seed_FD_request* object = malloc(sizeof(t_seed_FD_request));
+	object->fd = fd;
+	object->offset = offset;
+	return object;
+}
+void destroy_t_seed_FD_request(t_seed_FD_request* object) {
+	free(object);
+}
+size_t sizeof_t_seed_FD_request(t_seed_FD_request* object) {
+	return sizeof(t_seed_FD_request);
+}
+char* serialize_t_seed_FD_request(t_seed_FD_request* object) {
+	char* buffer = malloc(sizeof(t_seed_FD_request));
+	uint32_t offset = 0;
+	serialize_and_copy_value(buffer, &(object->fd), sizeof(uint32_t), &offset);
+	serialize_and_copy_value(buffer, &(object->offset), sizeof(uint32_t),
+			&offset);
+	return buffer;
+}
+t_seed_FD_request* deserialize_t_seed_FD_request(char* buffer) {
+	t_seed_FD_request* object = malloc(sizeof(t_seed_FD_request));
+	uint32_t offset = 0;
+	deserialize_and_copy_value(&(object->fd), buffer, sizeof(uint32_t),
+			&offset);
+	deserialize_and_copy_value(&(object->offset), buffer, sizeof(uint32_t),
+			&offset);
+	return object;
+}
+//
+t_data_FD_request* create_t_data_FD_request(uint32_t fd, uint32_t size, char* buffer) {
+	t_data_FD_request* object = malloc(sizeof(t_data_FD_request));
+	object->fd = fd;
+	object->sizeBuffer = size;
+	object->buffer = malloc(sizeof(char) * object->sizeBuffer);
+	memcpy(object->buffer, buffer, object->sizeBuffer);
+	return object;
+}
+void destroy_t_data_FD_request(t_data_FD_request* object) {
+	if (object != NULL) {
+		if (object->buffer != NULL)
+			free(object->buffer);
+		free(object);
+	}
+}
+size_t sizeof_t_data_FD_request(t_data_FD_request* object) {
+	size_t size = 0;
+	size += sizeof(uint32_t);
+	size += sizeof(uint32_t);
+	size += sizeof(char) * object->sizeBuffer;
+	return size;
+}
+char* serialize_t_data_FD_request(t_data_FD_request* object) {
+	char* buffer = malloc(sizeof_t_data_FD_request(object));
+	uint32_t offset = 0;
+	serialize_and_copy_value(buffer, &(object->fd), sizeof(uint32_t),
+			&offset);
+	serialize_and_copy_value(buffer, &(object->sizeBuffer), sizeof(uint32_t),
+				&offset);
+	serialize_and_copy_value(buffer, object->buffer, sizeof(char) * object->sizeBuffer, &offset);
+	return buffer;
+}
+t_data_FD_request* deserialize_t_data_FD_request(char* buffer) {
+	t_data_FD_request* object = malloc(sizeof(t_data_FD_request));
+	uint32_t offset = 0;
+	deserialize_and_copy_value(&(object->fd), buffer, sizeof(uint32_t),
+			&offset);
+	deserialize_and_copy_value(&(object->sizeBuffer), buffer, sizeof(uint32_t),
+				&offset);
+	object->buffer = malloc(sizeof(char) * object->sizeBuffer);
+	deserialize_and_copy_value(object->buffer, buffer,
+			sizeof(char) * object->sizeBuffer, &offset);
 	return object;
 }
