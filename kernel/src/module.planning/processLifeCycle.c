@@ -234,7 +234,7 @@ void removeFromNEW(Process* process) {
 	pthread_mutex_lock(&newListMutex);
 	list_remove_by_condition(states->new, condition);
 	pthread_mutex_unlock(&newListMutex);
-	logTrace("El proceso %d salio de la lista de EXECUTE", process->pid);
+	logTrace("El proceso %d salio de la lista de NEW", process->pid);
 }
 
 t_planningStates* getStates() {

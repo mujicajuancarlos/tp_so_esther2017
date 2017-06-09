@@ -29,20 +29,20 @@ void destroyshortTermScheduler() {
 
 void shortTermScheduler_lock() {
 	pthread_mutex_lock(&shortTermSchedulerMutex);
-	logInfo("Planificador de corto plazo bloqueado");
+	logInfo("El planificador de corto plazo fue bloqueado");
 }
 
 void shortTermScheduler_unlock() {
 	pthread_mutex_unlock(&shortTermSchedulerMutex);
-	logInfo("Planificador de corto plazo desbloqueado");
+	logInfo("El planificador de corto plazo fue desbloqueado");
 }
 
 void processInReady_wait() {
 	sem_wait(&processInReady_sem);
-	logInfo("Recurso de proceso ready reducido");
+	logInfo("Se decremento (wait) el recurso de 'Procesos en ready'");
 }
 
 void processInReady_signal() {
+	logInfo("Se incremento (signal) el recurso de 'Procesos en ready'");
 	sem_post(&processInReady_sem);
-	logInfo("Recurso de proceso ready incrementado");
 }
