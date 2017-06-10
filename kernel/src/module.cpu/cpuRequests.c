@@ -184,11 +184,11 @@ void executeSetSharedVar(CPU* cpu, Package* package) {
 	if (setSharedVar(data->name, data->newValue) == UPDATE_VAR_SUCCESS) {
 		char* buffer = serialize_int(data->newValue);
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
-						COD_SYSCALL_SUCCESS, sizeof(int), buffer);
+		COD_SYSCALL_SUCCESS, sizeof(int), buffer);
 		free(buffer);
 	} else {
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
-				COD_SYSCALL_FAILURE, 0, NULL);
+		COD_SYSCALL_FAILURE, 0, NULL);
 		moveFromExcecToExit_withError(cpu->process, SC_ERROR_SET_SHARED_VAR);
 		markFreeCPU(cpu);
 	}
@@ -203,11 +203,11 @@ void executeGetSharedVar(CPU* cpu, Package* package) {
 	if (getSharedVar(key, &value) == UPDATE_VAR_SUCCESS) {
 		char* buffer = serialize_int(value);
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
-				COD_SYSCALL_SUCCESS, sizeof(int), buffer);
+		COD_SYSCALL_SUCCESS, sizeof(int), buffer);
 		free(buffer);
 	} else {
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
-				COD_SYSCALL_FAILURE, 0, NULL);
+		COD_SYSCALL_FAILURE, 0, NULL);
 		moveFromExcecToExit_withError(cpu->process, SC_ERROR_GET_SHARED_VAR);
 		markFreeCPU(cpu);
 	}
@@ -280,7 +280,11 @@ void resolveRequest_updateSemaphore(CPU* cpu, Package* package) {
 	}
 }
 
+/*
+ * cuando la cpu lanza un error invoca al kernel esta funcion para que el proceso finalize y libere la cpu
+ */
 void resolveRequest_executionError(CPU* cpu, Package* package) {
-	//todo enviar el proceso a exit con el exit code
-	//la cpu queda limpia
+	uint32_t exitCode = deserialize_int(package->stream);
+	moveFromExcecToExit_withError(cpu->process, exitCode);
+	markFreeCPU(cpu);
 }
