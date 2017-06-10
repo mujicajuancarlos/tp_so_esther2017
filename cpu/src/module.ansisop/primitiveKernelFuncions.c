@@ -234,7 +234,7 @@ void ansisopKernel_escribir(t_descriptor_archivo fd, void* info,
 		t_valor_variable sizeInfo) {
 	logTrace("Ejecutando ansisopKernel_escribir(%d,>>data<<,%d)", fd, sizeInfo);
 	if (getErrorFlag() == FLAG_OK) {
-		t_seed_FD_request* data = create_t_data_FD_request(fd, sizeInfo, info);
+		t_data_FD_request* data = create_t_data_FD_request(fd, sizeInfo, (char*) info);
 		char* buffer = serialize_t_data_FD_request(data);
 		size_t size = sizeof_t_data_FD_request(data);
 		Package* package = createAndSendPackage(kernelSocket(), COD_WRITE_FD,
@@ -266,7 +266,36 @@ void ansisopKernel_escribir(t_descriptor_archivo fd, void* info,
 	logTrace("Ejecutado ansisopKernel_escribir(%d,>>data<<,%d)", fd, sizeInfo);
 }
 
-void ansisopKernel_leer(t_descriptor_archivo descriptor_archivo,
-		t_puntero informacion, t_valor_variable tamanio) {
-
+void ansisopKernel_leer(t_descriptor_archivo fd, t_puntero pos, t_valor_variable size) {
+	logTrace("Ejecutando ansisopKernel_leer(%d,%d,%d)", fd, pos, size);
+	if (getErrorFlag() == FLAG_OK) {
+		t_dataPointer_FD_request data;
+		data.fd = fd;
+		data.pointer = pos;
+		data.size = size;
+		Package* package = createAndSendPackage(kernelSocket(), COD_READ_FD,
+				sizeof(t_dataPointer_FD_request), (char*) &data);
+		if (package != NULL) {
+			logTrace("Se solicito al kernel leer del file descriptor %d",
+					fd);
+			destroyPackage(package);
+			package = createAndReceivePackage(kernelSocket());
+			if (package != NULL) {
+				if (package->msgCode == COD_SYSCALL_SUCCESS) {
+					logTrace("El kernel pudo leer el file descriptor %d", fd);
+				} else {
+					logTrace(
+							"El kernel rechazo la lectura del file descriptor %d",
+							fd);
+					setErrorFlag(FLAG_SYSCALL_FAILURE);
+				}
+				destroyPackage(package);
+			} else {
+				setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+			}
+		} else {
+			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+		}
+	}
+	logTrace("Ejecutado ansisopKernel_leer(%d,%d,%d)", fd, pos, size);
 }
