@@ -85,17 +85,19 @@ t_puntero ansisopKernel_reservar(t_valor_variable size) {
 	logTrace("Ejecutando ansisopKernel_reservar(%d)", size);
 	if (getErrorFlag() == FLAG_OK) {
 		char* buffer = serialize_int(size);
-		Package* package = createAndSendPackage(kernelSocket(), COD_MALLOC_MEMORY,
-				sizeof(uint32_t), buffer);
+		Package* package = createAndSendPackage(kernelSocket(),
+		COD_MALLOC_MEMORY, sizeof(uint32_t), buffer);
 		free(buffer);
 		if (package != NULL) {
-			logTrace("Se solicito al kernel reservar memoria dinamica del talaño %d", size);
+			logTrace(
+					"Se solicito al kernel reservar memoria dinamica del tamaño %d",
+					size);
 			destroyPackage(package);
 			package = createAndReceivePackage(kernelSocket());
 			if (package != NULL) {
 				if (package->msgCode == COD_SYSCALL_SUCCESS) {
 					pointer = deserialize_int(package->stream);
-					logTrace("El kernel indico que el puntero es: %d",pointer);
+					logTrace("El kernel indico que el puntero es: %d", pointer);
 				} else {
 					logTrace("El kernel indico que no pudo hacer malloc");
 					setErrorFlag(FLAG_SYSCALL_FAILURE);
@@ -108,13 +110,40 @@ t_puntero ansisopKernel_reservar(t_valor_variable size) {
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 		}
 	}
-	logTrace(
-			"Ejecutado ansisopKernel_reservar(%d)", size);
+	logTrace("Ejecutado ansisopKernel_reservar(%d)", size);
 	return pointer;
 }
 
-void ansisopKernel_liberar(t_puntero puntero) {
-
+void ansisopKernel_liberar(t_puntero pointer) {
+	logTrace("Ejecutando ansisopKernel_liberar(%d)", pointer);
+	if (getErrorFlag() == FLAG_OK) {
+		char* buffer = serialize_int(pointer);
+		Package* package = createAndSendPackage(kernelSocket(),
+		COD_FREE_MEMORY, sizeof(uint32_t), buffer);
+		free(buffer);
+		if (package != NULL) {
+			logTrace(
+					"Se solicito al kernel liberar memoria dinamica del puntero %d",
+					pointer);
+			destroyPackage(package);
+			package = createAndReceivePackage(kernelSocket());
+			if (package != NULL) {
+				if (package->msgCode == COD_SYSCALL_SUCCESS) {
+					logTrace("El kernel libero el puntero: %d", pointer);
+				} else {
+					logTrace("El kernel no pudo liberar el puntero %d",
+							pointer);
+					setErrorFlag(FLAG_SYSCALL_FAILURE);
+				}
+				destroyPackage(package);
+			} else {
+				setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+			}
+		} else {
+			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+		}
+	}
+	logTrace("Ejecutado ansisopKernel_liberar(%d)", pointer);
 }
 
 t_descriptor_archivo ansisopKernel_abrir(t_direccion_archivo path,
