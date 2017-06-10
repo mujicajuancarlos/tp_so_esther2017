@@ -89,6 +89,7 @@ void reportExcecutionError(cpu_struct* cpuStruct, int errorFlag) {
 
 int getSharedVarriableValue(cpu_struct* cpuStruct, char* name) {
 	Package* package;
+	int newValue = NULL_VALUE;
 	package = createAndSendPackage(cpuStruct->socketClientKernel,
 	COD_GET_SHARED_VAR, strlen(name), name);
 	if (package != NULL) {
@@ -96,12 +97,10 @@ int getSharedVarriableValue(cpu_struct* cpuStruct, char* name) {
 		package = createAndReceivePackage(cpuStruct->socketClientKernel);
 		if (package != NULL) {
 			if (package->msgCode == COD_SYSCALL_SUCCESS) {
-				int newValue;
 				newValue = deserialize_int(package->stream);
 				logTrace(
 						"Se obtuvo el valor de la variable: %s valor: %d",
 						name, newValue);
-				return newValue;
 			} else {
 				setErrorFlag(FLAG_SYSCALL_FAILURE);
 			}
@@ -114,11 +113,12 @@ int getSharedVarriableValue(cpu_struct* cpuStruct, char* name) {
 		logError("No se pudo enviar la solicitud al kernel");
 		setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 	}
-	return NULL_VALUE;
+	return newValue;
 }
 
 int setSharedVarriableValue(cpu_struct* cpuStruct, char* name, int value) {
 	Package* package;
+	int newValue = NULL_VALUE;
 	set_shared_var* object = createSetSharedVar(name, value);
 	char* buffer = serialize_SetSharedVar(object);
 	package = createAndSendPackage(cpuStruct->socketClientKernel,
@@ -130,7 +130,6 @@ int setSharedVarriableValue(cpu_struct* cpuStruct, char* name, int value) {
 		package = createAndReceivePackage(cpuStruct->socketClientKernel);
 		if (package != NULL) {
 			if (package->msgCode == COD_SYSCALL_SUCCESS) {
-				int newValue;
 				newValue = deserialize_int(package->stream);
 				logTrace(
 						"Se actualizo el valor de la variable: %s con el valor: %d",
@@ -148,5 +147,5 @@ int setSharedVarriableValue(cpu_struct* cpuStruct, char* name, int value) {
 		logError("No se pudo enviar la solicitud al kernel");
 		setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 	}
-	return NULL_VALUE;
+	return newValue;
 }
