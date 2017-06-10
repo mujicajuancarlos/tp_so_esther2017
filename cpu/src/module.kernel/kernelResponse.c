@@ -52,21 +52,23 @@ void sendPCB(cpu_struct* cpuStruct, int messageCode) {
 }
 
 void reportExcecutionError(cpu_struct* cpuStruct, int errorFlag) {
-	Package* package;
+	Package* package = NULL;
+	char* buffer;
+	size_t size = sizeof(uint32_t);
+	int socket = cpuStruct->socketClientKernel;
 	switch (errorFlag) {
 	case FLAG_STACKOVERFLOW:
 	case FLAG_SEGMENTATION_FAULT:
 	case FLAG_DISCONNECTED_MEMORY:
-		package = createAndSendPackage(cpuStruct->socketClientKernel,
-		SC_ERROR_MEMORY_EXCEPTION, 0, NULL);
-		exit(1);
-		break;
-	case FLAG_UNKNOWN_ERROR:
-		package = createAndSendPackage(cpuStruct->socketClientKernel,
-		SC_ERROR_UNKNOWN, 0, NULL);
+		buffer = serialize_int(SC_ERROR_MEMORY_EXCEPTION);
+		package = createAndSendPackage(socket, COD_EXECUTION_ERROR, size,
+				buffer);
+		free(buffer);
+		exit(1);	//finalizo porque es un error irecuperable
 		break;
 	case FLAG_DISCONNECTED_KERNEL:
-		logError("El kernel esta desconectado, no puedo continuar ejecuarnado");
+		logError(
+				"El kernel esta desconectado, no puedo continuar ejecuarnado por lo tanto finalizo tambien");
 		logTrace(
 				"Finalizando proceso cpu porque no se pudo conectar con el kernel");
 		exit(1);
@@ -77,9 +79,12 @@ void reportExcecutionError(cpu_struct* cpuStruct, int errorFlag) {
 		logTrace("Finalizando proceso cpu porque hay errores en el kernel");
 		exit(1);
 		break;
+	case FLAG_UNKNOWN_ERROR:
 	default:
-		package = createAndSendPackage(cpuStruct->socketClientKernel,
-		SC_ERROR_UNKNOWN, 0, NULL);
+		buffer = serialize_int(SC_ERROR_UNKNOWN);
+		package = createAndSendPackage(socket, COD_EXECUTION_ERROR, size,
+				buffer);
+		free(buffer);
 		break;
 	}
 	destroyPackage(package);
@@ -96,8 +101,7 @@ int getSharedVarriableValue(cpu_struct* cpuStruct, char* name) {
 		if (package != NULL) {
 			if (package->msgCode == COD_SYSCALL_SUCCESS) {
 				newValue = deserialize_int(package->stream);
-				logTrace(
-						"Se obtuvo el valor de la variable: %s valor: %d",
+				logTrace("Se obtuvo el valor de la variable: %s valor: %d",
 						name, newValue);
 			} else {
 				setErrorFlag(FLAG_SYSCALL_FAILURE);
