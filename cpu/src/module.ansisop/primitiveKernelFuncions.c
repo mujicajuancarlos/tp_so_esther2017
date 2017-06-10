@@ -28,9 +28,10 @@ void ansisopKernel_wait(t_nombre_semaforo identificador_semaforo) {
 				if (package->msgCode == COD_SYSCALL_SUCCESS) {
 					logTrace("Se ejecuto wait sobre el semaforo %s",
 							identificador_semaforo);
-					bool shouldLock = deserialize_bool(package->stream);//el package contiene un booleando que determina si el proceso va a bloquearse
+					bool shouldLock = deserialize_bool(package->stream); //el package contiene un booleando que determina si el proceso va a bloquearse
 					if (shouldLock) {
-						logTrace("El kernel indico que el proceso debe bloquearse, envio el pcb al kernel");
+						logTrace(
+								"El kernel indico que el proceso debe bloquearse, envio el pcb al kernel");
 						reportContextSwich(getCPUStruct());
 						setErrorFlag(FLAG_PROCESS_BLOCK);
 					}
@@ -93,9 +94,11 @@ t_descriptor_archivo ansisopKernel_abrir(t_direccion_archivo path,
 		path[strlen(path) - 1] = '\0';
 	}
 	uint32_t newFD = NULL_VALUE;
-	logTrace("Ejecutando ansisopKernel_abrir(%s,flags(leer:%d, escribir:%d, crear:%d))", path,flags.lectura,flags.escritura,flags.creacion);
+	logTrace(
+			"Ejecutando ansisopKernel_abrir(%s,flags(leer:%d, escribir:%d, crear:%d))",
+			path, flags.lectura, flags.escritura, flags.creacion);
 	if (getErrorFlag() == FLAG_OK) {
-		t_new_FD_request* data = create_t_new_FD_request(path,flags);
+		t_new_FD_request* data = create_t_new_FD_request(path, flags);
 		char* buffer = serialize_t_new_FD_request(data);
 		size_t size = sizeof_t_new_FD_request(data);
 		Package* package = createAndSendPackage(kernelSocket(), COD_OPEN_FD,
@@ -103,13 +106,14 @@ t_descriptor_archivo ansisopKernel_abrir(t_direccion_archivo path,
 		destroy_t_new_FD_request(data);
 		free(buffer);
 		if (package != NULL) {
-			logTrace("Se solicito al kernel abrir el archivo %s",path);
+			logTrace("Se solicito al kernel abrir el archivo %s", path);
 			destroyPackage(package);
 			package = createAndReceivePackage(kernelSocket());
 			if (package != NULL) {
 				if (package->msgCode == COD_SYSCALL_SUCCESS) {
 					newFD = deserialize_int(package->stream);
-					logTrace("El kernel asigno el fd: %d para el archivo %s",newFD, path);
+					logTrace("El kernel asigno el fd: %d para el archivo %s",
+							newFD, path);
 				} else {
 					setErrorFlag(FLAG_SYSCALL_FAILURE);
 				}
@@ -121,12 +125,41 @@ t_descriptor_archivo ansisopKernel_abrir(t_direccion_archivo path,
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 		}
 	}
-	logTrace("Ejecutado ansisopKernel_abrir(%s,flags(leer:%d, escribir:%d, crear:%d))", path,flags.lectura,flags.escritura,flags.creacion);
+	logTrace(
+			"Ejecutado ansisopKernel_abrir(%s,flags(leer:%d, escribir:%d, crear:%d))",
+			path, flags.lectura, flags.escritura, flags.creacion);
 	return newFD;
 }
 
-void ansisopKernel_borrar(t_descriptor_archivo direccion) {
-
+void ansisopKernel_borrar(t_descriptor_archivo fd) {
+	logTrace("Ejecutando ansisopKernel_borrar(%d)", fd);
+	if (getErrorFlag() == FLAG_OK) {
+		char* buffer = serialize_int(fd);
+		Package* package = createAndSendPackage(kernelSocket(), COD_DELETE_FD,
+				sizeof(uint32_t), buffer);
+		free(buffer);
+		if (package != NULL) {
+			logTrace("Se solicito al kernel borrar el file descriptor %d", fd);
+			destroyPackage(package);
+			package = createAndReceivePackage(kernelSocket());
+			if (package != NULL) {
+				if (package->msgCode == COD_SYSCALL_SUCCESS) {
+					logTrace("El kernel borro el file descriptor %d", fd);
+				} else {
+					logTrace(
+							"El kernel rechazo el borrado del file descriptor %d",
+							fd);
+					setErrorFlag(FLAG_SYSCALL_FAILURE);
+				}
+				destroyPackage(package);
+			} else {
+				setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+			}
+		} else {
+			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+		}
+	}
+	logTrace("Ejecutado ansisopKernel_borrar(%d)", fd);
 }
 
 void ansisopKernel_cerrar(t_descriptor_archivo descriptor_archivo) {
