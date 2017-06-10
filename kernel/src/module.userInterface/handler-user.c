@@ -226,36 +226,47 @@ void handleCommand_lock_unlock(kernel_struct* kernelStruct, char** commands) {
 }
 
 void handleCommand_end_all_program(kernel_struct* kernelStruct, char** commands) {
-//	if (commands[2] == NULL) {
-//		void actionByElement(void* element) {
-//			Program* anProgram = (Program*) element;
-//			sendEndProgramRequest(anProgram, kernelStruct);
-//		}
-//		pthread_mutex_lock(&(kernelStruct->programsListMutex));
-//		list_iterate(kernelStruct->listaProgramas, actionByElement);
-//		pthread_mutex_unlock(&(kernelStruct->programsListMutex));
-//	} else
-//		printInvalidArguments(commands[2], commands[0]);
-}
+	if (commands[2] == NULL) {
+
+		void moveExit(void* element) {
+			Process* proces = element;
+			basicForceQuitProcess(proces, getProcessState(proces));
+		}
+
+		list_iterate(getStates()->new, moveExit);
+		list_iterate(getStates()->ready->elements, moveExit);
+		list_iterate(getStates()->block, moveExit);
+		list_iterate(getStates()->execute, moveExit);
+		list_iterate(getStates()->exit->elements, moveExit);
+
+		/*pthread_mutex_lock(&(kernelStruct->stdoutMutex));
+		 state = list_map(state, basicForceQuitProcess(process,state));
+		 pthread_mutex_unlock(&(kernelStruct->stdoutMutex));*/
+	} else
+		printInvalidArguments(commands[2], commands[0]);
+} //recorro toda lista (new, ready..) y por cada lista ejecuto Funcion generica
 
 void handleCommand_end_by_pid_program(kernel_struct* kernelStruct,
 		char** commands) {
 	if (commands[2] != NULL && commands[3] == NULL) {
-//		int pid = atoi(commands[2]);
-//		bool condicion(void* element) {
-//			Program* anProgram = (Program*) element;
-//			return pid_isEqual(anProgram, pid);
-//		}
-//		pthread_mutex_lock(&(kernelStruct->programsListMutex));
-//		Program* program = list_find(kernelStruct->listaProgramas, condicion);
-//		pthread_mutex_unlock(&(kernelStruct->programsListMutex));
-//		if (program != NULL) {
-//			sendEndProgramRequest(program, kernelStruct);
-//		} else {
-//			printPidNotFound(pid);
-//		}
-	} else
+		int pid = atoi(commands[2]);
+
+		Process* process = getProcessByPID(pid);
+		char * state = getProcessState(process);
+
+		if (process != NULL) {
+			basicForceQuitProcess(process, state);
+		} else {
+			printPidNotFound(pid);
+		}
+		/*
+		 pthread_mutex_lock(&(kernelStruct->programsListMutex));
+		 Program* program = list_find(kernelStruct->listaProgramas, condicion);
+		 pthread_mutex_unlock(&(kernelStruct->programsListMutex));
+		 */
+	} else {
 		printInvalidArguments("", commands[0]);
+	}
 }
 
 void printCommandsHelp() {

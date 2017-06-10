@@ -12,6 +12,7 @@
 #include <pthread.h>
 #include <dc-commons/stdout-printer.h>
 #include <dc-commons/utils.h>
+#include <commons/collections/list.h>
 #include "../module.planning/processLifeCycle.h"
 #include "../module.planning/longTermScheduler.h"
 #include "../module.planning/shortTermScheduler.h"

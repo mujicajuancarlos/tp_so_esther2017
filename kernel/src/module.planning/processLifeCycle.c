@@ -290,8 +290,8 @@ int stateCodeFor(char* state) {
 	return STATE_CODE_NOTFOUND;
 }
 
-void basicForceQuitProcess(Process* process) {
-	char* state = getProcessState(process);
+void basicForceQuitProcess(Process* process, char* state) {
+//	char* state = getProcessState(process);
 	int stateCode = stateCodeFor(state);
 	switch (stateCode) {
 	case STATE_CODE_NEW:

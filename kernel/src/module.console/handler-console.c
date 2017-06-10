@@ -66,7 +66,7 @@ void handleConsoleRequestForProcess(Process* process, Package* package) {
 		logInfo("Terminar ejecucion");
 		break;
 	case COD_FORCE_QUIT_PROGRAM:
-		basicForceQuitProcess(process);
+		basicForceQuitProcess(process,getProcessState(process));
 		break;
 	}
 }

@@ -90,7 +90,7 @@ t_planningStates* getStates();
 
 void initializeProcessLifeCycle();
 void destroyProcessLifeCycle();
-void basicForceQuitProcess(Process* process);
+void basicForceQuitProcess(Process* process, char* state);
 
 
 #endif /* MODULE_PLANNING_PROCESSLIFECYCLE_H_ */
