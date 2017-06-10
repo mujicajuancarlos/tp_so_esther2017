@@ -193,10 +193,10 @@ void ansisopKernel_cerrar(t_descriptor_archivo fd) {
 	logTrace("Ejecutado ansisopKernel_cerrar(%d)", fd);
 }
 
-void ansisopKernel_moverCursor(t_descriptor_archivo fd,	t_valor_variable offset) {
-	logTrace("Ejecutando ansisopKernel_moverCursor(%d,%d)", fd,offset);
+void ansisopKernel_moverCursor(t_descriptor_archivo fd, t_valor_variable offset) {
+	logTrace("Ejecutando ansisopKernel_moverCursor(%d,%d)", fd, offset);
 	if (getErrorFlag() == FLAG_OK) {
-		t_seed_FD_request* data = create_t_seed_FD_request(fd,offset);
+		t_seed_FD_request* data = create_t_seed_FD_request(fd, offset);
 		char* buffer = serialize_t_seed_FD_request(data);
 		size_t size = sizeof_t_seed_FD_request(data);
 		Package* package = createAndSendPackage(kernelSocket(), COD_SEED_FD,
@@ -204,12 +204,15 @@ void ansisopKernel_moverCursor(t_descriptor_archivo fd,	t_valor_variable offset)
 		destroy_t_seed_FD_request(data);
 		free(buffer);
 		if (package != NULL) {
-			logTrace("Se solicito al kernel mover cursor a: %d del file descriptor %d", offset,fd);
+			logTrace(
+					"Se solicito al kernel mover cursor a: %d del file descriptor %d",
+					offset, fd);
 			destroyPackage(package);
 			package = createAndReceivePackage(kernelSocket());
 			if (package != NULL) {
 				if (package->msgCode == COD_SYSCALL_SUCCESS) {
-					logTrace("El kernel movio el cursor del file descriptor %d", fd);
+					logTrace("El kernel movio el cursor del file descriptor %d",
+							fd);
 				} else {
 					logTrace(
 							"El kernel rechazo el movimiento del cursor del file descriptor %d",
@@ -224,12 +227,43 @@ void ansisopKernel_moverCursor(t_descriptor_archivo fd,	t_valor_variable offset)
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 		}
 	}
-	logTrace("Ejecutado ansisopKernel_moverCursor(%d,%d)", fd,offset);
+	logTrace("Ejecutado ansisopKernel_moverCursor(%d,%d)", fd, offset);
 }
 
-void ansisopKernel_escribir(t_descriptor_archivo descriptor_archivo,
-		void* informacion, t_valor_variable tamanio) {
-
+void ansisopKernel_escribir(t_descriptor_archivo fd, void* info,
+		t_valor_variable sizeInfo) {
+	logTrace("Ejecutando ansisopKernel_escribir(%d,>>data<<,%d)", fd, sizeInfo);
+	if (getErrorFlag() == FLAG_OK) {
+		t_seed_FD_request* data = create_t_data_FD_request(fd, sizeInfo, info);
+		char* buffer = serialize_t_data_FD_request(data);
+		size_t size = sizeof_t_data_FD_request(data);
+		Package* package = createAndSendPackage(kernelSocket(), COD_WRITE_FD,
+				size, buffer);
+		destroy_t_data_FD_request(data);
+		free(buffer);
+		if (package != NULL) {
+			logTrace("Se solicito al kernel escribir en el file descriptor %d",
+					fd);
+			destroyPackage(package);
+			package = createAndReceivePackage(kernelSocket());
+			if (package != NULL) {
+				if (package->msgCode == COD_SYSCALL_SUCCESS) {
+					logTrace("El kernel escribio en el file descriptor %d", fd);
+				} else {
+					logTrace(
+							"El kernel rechazo la escritura en el file descriptor %d",
+							fd);
+					setErrorFlag(FLAG_SYSCALL_FAILURE);
+				}
+				destroyPackage(package);
+			} else {
+				setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+			}
+		} else {
+			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+		}
+	}
+	logTrace("Ejecutado ansisopKernel_escribir(%d,>>data<<,%d)", fd, sizeInfo);
 }
 
 void ansisopKernel_leer(t_descriptor_archivo descriptor_archivo,
