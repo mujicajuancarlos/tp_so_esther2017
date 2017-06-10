@@ -214,6 +214,43 @@ void executeGetSharedVar(CPU* cpu, Package* package) {
 	destroyPackage(tmpPackage);
 }
 
+void executeMallocMemoryTo(CPU* cpu, Package* package) {
+	t_puntero pointer;
+	char* buffer;
+	Package* tmpPackage = NULL;
+	int status;
+	int mallocSize = deserialize_int(package->stream);
+	switch (status = basicMalloc(mallocSize, &pointer)) {
+	case MALLOC_MEMORY_SUCCES:
+		buffer = serialize_int(pointer);
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_SUCCESS, sizeof(t_puntero), buffer);
+		break;
+	case SC_ERROR_MEMORY_EXCEPTION:
+	case SC_ERROR_MEMORY_ALLOC_EXCEEDED:
+	case SC_ERROR_ADD_PAGE_REFUSED:
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_FAILURE, 0, NULL);
+		moveFromExcecToExit_withError(cpu->process, status);
+		markFreeCPU(cpu);
+		break;
+	default:
+		logError(
+				"La funcion basicMalloc(size,&pointer) informo un codigo de error no soportado");
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_FAILURE, 0, NULL);
+		moveFromExcecToExit_withError(cpu->process, status);
+		markFreeCPU(cpu);
+		break;
+	}
+	free(buffer);
+	destroyPackage(tmpPackage);
+}
+
+void executeFreeMemoryTo(CPU* cpu, Package* package) {
+	//todo: pending
+}
+
 void resolveRequest_endInstruction(CPU* cpu, Package* package) {
 	if (!cpu->process->forceQuit) {
 		int algorithm = getAlgorithmIndex(cpu->kernelStruct->config->algoritmo);
@@ -262,7 +299,14 @@ void resolveRequest_sharedVarOperation(CPU* cpu, Package* package) {
 }
 
 void resolveRequest_dynamicMemoryOperation(CPU* cpu, Package* package) {
-
+	switch (package->msgCode) {
+	case COD_MALLOC_MEMORY:
+		executeMallocMemoryTo(cpu, package);
+		break;
+	case COD_FREE_MEMORY:
+		executeFreeMemoryTo(cpu, package);
+		break;
+	}
 }
 
 void resolveRequest_fileSystemOperation(CPU* cpu, Package* package) {
