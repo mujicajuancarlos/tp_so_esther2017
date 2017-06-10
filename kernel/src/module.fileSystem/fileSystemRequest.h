@@ -19,8 +19,11 @@
 #include "../module.model/process.h"
 
 bool validateFile(kernel_struct* kernelStruct, char* path);
-uint32_t openFile(kernel_struct* kernelStruct, char* path, char* openMode,
-		Process* process);
+int openFile(Process* process, char* path, char* openMode);
 bool isOpen(char* path);
-void closeFile(char* path, Process* process);
+int createFile(Process* process, char* path, char* openMode);
+int closeFile(Process* process, char* path);
+int deleteFile(Process* process, char* path);
+Package* solicitudAlFileSystem(int socket, uint32_t msgCode, char* stream);
+
 #endif /* MODULE_FILESYSTEM_FILESYSTEMREQUEST_H_ */

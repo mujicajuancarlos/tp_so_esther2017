@@ -110,7 +110,7 @@ void incrementarOpen(t_fileDescriptor* fd) {
 	fileDescriptor_mutex_unlock();
 }
 
-void decrementarOpen(t_fileDescriptor* fd) {
+void decrementarOpen(t_fileDescriptor* fd) {//TODO: Verificar funcion. Que pasa si es negativo por ejemplo? o si el numero de abiertos es 5, queda en 4 por que hace validacion con 0?
 	fileDescriptor_mutex_lock();
 	fd->open--;
 	if (fd->open == 0) {
