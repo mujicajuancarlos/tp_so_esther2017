@@ -162,8 +162,35 @@ void ansisopKernel_borrar(t_descriptor_archivo fd) {
 	logTrace("Ejecutado ansisopKernel_borrar(%d)", fd);
 }
 
-void ansisopKernel_cerrar(t_descriptor_archivo descriptor_archivo) {
-
+void ansisopKernel_cerrar(t_descriptor_archivo fd) {
+	logTrace("Ejecutando ansisopKernel_cerrar(%d)", fd);
+	if (getErrorFlag() == FLAG_OK) {
+		char* buffer = serialize_int(fd);
+		Package* package = createAndSendPackage(kernelSocket(), COD_CLOSE_FD,
+				sizeof(uint32_t), buffer);
+		free(buffer);
+		if (package != NULL) {
+			logTrace("Se solicito al kernel cerrar el file descriptor %d", fd);
+			destroyPackage(package);
+			package = createAndReceivePackage(kernelSocket());
+			if (package != NULL) {
+				if (package->msgCode == COD_SYSCALL_SUCCESS) {
+					logTrace("El kernel cerro el file descriptor %d", fd);
+				} else {
+					logTrace(
+							"El kernel rechazo el cierre del file descriptor %d",
+							fd);
+					setErrorFlag(FLAG_SYSCALL_FAILURE);
+				}
+				destroyPackage(package);
+			} else {
+				setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+			}
+		} else {
+			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+		}
+	}
+	logTrace("Ejecutado ansisopKernel_cerrar(%d)", fd);
 }
 
 void ansisopKernel_moverCursor(t_descriptor_archivo descriptor_archivo,
