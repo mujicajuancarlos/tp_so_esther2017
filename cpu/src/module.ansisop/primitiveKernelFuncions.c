@@ -87,9 +87,42 @@ void ansisopKernel_liberar(t_puntero puntero) {
 
 }
 
-t_descriptor_archivo ansisopKernel_abrir(t_direccion_archivo direccion,
+t_descriptor_archivo ansisopKernel_abrir(t_direccion_archivo path,
 		t_banderas flags) {
-	return 0;
+	if (path[strlen(path) - 1] == '\n') {
+		path[strlen(path) - 1] = '\0';
+	}
+	uint32_t newFD = NULL_VALUE;
+	logTrace("Ejecutando ansisopKernel_abrir(%s,flags(leer:%d, escribir:%d, crear:%d))", path,flags.lectura,flags.escritura,flags.creacion);
+	if (getErrorFlag() == FLAG_OK) {
+		t_new_FD_request* data = create_t_new_FD_request(path,flags);
+		char* buffer = serialize_t_new_FD_request(data);
+		size_t size = sizeof_t_new_FD_request(data);
+		Package* package = createAndSendPackage(kernelSocket(), COD_OPEN_FD,
+				size, buffer);
+		destroy_t_new_FD_request(data);
+		free(buffer);
+		if (package != NULL) {
+			logTrace("Se solicito al kernel abrir el archivo %s",path);
+			destroyPackage(package);
+			package = createAndReceivePackage(kernelSocket());
+			if (package != NULL) {
+				if (package->msgCode == COD_SYSCALL_SUCCESS) {
+					newFD = deserialize_int(package->stream);
+					logTrace("El kernel asigno el fd: %d para el archivo %s",newFD, path);
+				} else {
+					setErrorFlag(FLAG_SYSCALL_FAILURE);
+				}
+				destroyPackage(package);
+			} else {
+				setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+			}
+		} else {
+			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+		}
+	}
+	logTrace("Ejecutado ansisopKernel_abrir(%s,flags(leer:%d, escribir:%d, crear:%d))", path,flags.lectura,flags.escritura,flags.creacion);
+	return newFD;
 }
 
 void ansisopKernel_borrar(t_descriptor_archivo direccion) {

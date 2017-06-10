@@ -15,6 +15,9 @@
 #include "../module.core/cpu-core.h"
 #include "../module.kernel/kernelResponse.h"
 
+#define NULL_POINTER -1
+#define NULL_VALUE -2
+
 int kernelSocket();
 /*
  * WAIT
