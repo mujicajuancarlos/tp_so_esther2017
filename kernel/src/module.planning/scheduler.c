@@ -20,8 +20,8 @@ void destroyScheduler(){
 }
 
 int getAlgorithmIndex(char* name){
-	if(strcmp(name,"RR")) return ROUND_ROBIN;
-	if(strcmp(name,"FIFO")) return FIFO;
+	if(string_equals_ignore_case(name,"RR")) return ROUND_ROBIN;
+	if(string_equals_ignore_case(name,"FIFO")) return FIFO;
 	return -1;
 }
 
