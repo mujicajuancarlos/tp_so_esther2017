@@ -97,7 +97,11 @@ typedef struct {
 	uint32_t sizeBuffer;
 	char* buffer;
 } t_data_FD_request;
-
+typedef struct {
+	uint32_t fd;
+	uint32_t pointer;
+	uint32_t size;
+} t_dataPointer_FD_request;
 
 //EXCLUSIVO PBC
 PCB* create_new_PCB(uint32_t pid, uint32_t stackFirstPage, t_metadata_program* metadata);//ok
