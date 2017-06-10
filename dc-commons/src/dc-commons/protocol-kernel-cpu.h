@@ -24,25 +24,26 @@
 #define COD_END_INSTRUCCION 205 //fin de instruccion
 #define COD_PROGRAM_FINISHED 206 //el programa termino
 #define COD_SIGNAL_DISCONNECTED 207 //le llego una señal de desconeccion a la cpu -> dejara de dar servicio
-//no bloqueantes
+//syscall shared var no bloqueante
 #define COD_GET_SHARED_VAR 208
 #define COD_SET_SHARED_VAR 210
-// MEMORY
+//syscall memory no bloqueante
 #define COD_MALLOC_MEMORY 212
 #define COD_FREE_MEMORY 213
-//bloqueantes FS
+//syscall file system no bloqueante
 #define COD_OPEN_FD 214
 #define COD_DELETE_FD 215
 #define COD_CLOSE_FD 216
 #define COD_SEED_FD 217
 #define COD_WRITE_FD 218
 #define COD_READ_FD 219
-//bloquantes semaforos
+//syscall semaforos (bloqueante)
 #define COD_SEM_WAIT 220
 #define COD_SEM_SIGNAL 221
-//errores de ejecucion
+//syscall result
 #define COD_SYSCALL_SUCCESS 222
 #define COD_SYSCALL_FAILURE 223
+//error de ejecucion
 #define COD_EXECUTION_ERROR 224
 
 typedef struct {

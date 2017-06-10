@@ -43,8 +43,8 @@ void handleKernelRequest(cpu_struct* cpuStruct, Package* package) {
 		contextSwitch(cpuStruct, package);
 		break;
 	default:
-		logError("El kernel solicito una accion no permitida");
-		exit(ERROR_UNKNOWN_MESSAGE_CODE);
+		logError("El kernel solicito una accion no permitida, finalizara la cpu");
+		exit(1);
 		break;
 	}
 }

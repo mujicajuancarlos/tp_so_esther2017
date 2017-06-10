@@ -24,8 +24,8 @@
  */
 #define FLAG_SYSCALL_FAILURE 8
 /*
- * este fag indica que la cpu debe enviar el pcb al kernel
- * y destruir su contexto para recibir nuevos procesos
+ * este fag no necesita indicar al kernel
+ * solos destruir su contexto para recibir nuevos procesos
  */
 #define FLAG_PROCESS_BLOCK 9
 

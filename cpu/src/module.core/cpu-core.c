@@ -140,19 +140,27 @@ void ansisopExecuteInstruccion(cpu_struct* cpuStruct) {
 	switch (errorFlag) {
 	case FLAG_OK: //caso feliz reporto que finalizo ejecucion de la instruccion
 		if (isFinishedProcess()) {
-			reportEndProcess(cpuStruct);
+			reportEndProcess(cpuStruct);//todo: verificar si es necesario o con el flag FLAG_END_PROGRAM alcanza
 		} else {
 			reportEndInstruction(cpuStruct);
 		}
+		break;
+	case FLAG_END_PROGRAM:
+		reportEndProcess(cpuStruct);
 		break;
 	case FLAG_END_CPU: //si la cpu se va desconectar necesito mandar un mensaje especial al kernel
 		reportCpuDisconected(cpuStruct);
 		logInfo("Fin de proceso CPU");
 		exit(0); //FIN
 		break;
+	case FLAG_PROCESS_BLOCK:
+	case FLAG_SYSCALL_FAILURE:
+		unloadPCB();
+		break;
 	default:
 		//SI ES OTRO TIPO DE ERROR USO LA FUNCION GENERICA
 		reportExcecutionError(cpuStruct, errorFlag);
+		unloadPCB();
 		break;
 	}
 }
