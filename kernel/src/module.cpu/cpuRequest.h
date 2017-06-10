@@ -18,6 +18,7 @@
 #include "../module.model/process.h"
 #include "../module.planning/processLifeCycle.h"
 #include "../module.planning/scheduler.h"
+#include "../module.memory/dynamicMemoryCore.h"
 #include "cpuAdministrator.h"
 #include "cpuResponse.h"
 
@@ -25,18 +26,18 @@
 void startProcessExecution(Process* selectedProcess, CPU* selectedCPU);
 
 void continueCurrentExcecution(CPU* cpu);
-
 void contextSwitch(CPU* cpu);
-
 void contextSwitchForBlocked(CPU* cpu, t_nombre_semaforo semId);
 
 void executeWaitTo(CPU* cpu, Package* package);
-
 void executeSignalTo(CPU* cpu, Package* package);
 
 void executeSetSharedVar(CPU* cpu, Package* package);
-
 void executeGetSharedVar(CPU* cpu, Package* package);
+
+void executeMallocMemoryTo(CPU* cpu, Package* package);
+void executeFreeMemoryTo(CPU* cpu, Package* package);
+
 
 void resolveRequest_endInstruction(CPU* cpu, Package* package);
 
