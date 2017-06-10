@@ -218,37 +218,46 @@ void executeMallocMemoryTo(CPU* cpu, Package* package) {
 	t_puntero pointer;
 	char* buffer;
 	Package* tmpPackage = NULL;
-	int status;
 	int mallocSize = deserialize_int(package->stream);
-	switch (status = basicMalloc(mallocSize, &pointer)) {
+	int status = basicMallocMemory(mallocSize, &pointer);
+	switch (status) {
 	case MALLOC_MEMORY_SUCCES:
 		buffer = serialize_int(pointer);
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
 		COD_SYSCALL_SUCCESS, sizeof(t_puntero), buffer);
+		free(buffer);
 		break;
 	case SC_ERROR_MEMORY_EXCEPTION:
 	case SC_ERROR_MEMORY_ALLOC_EXCEEDED:
 	case SC_ERROR_ADD_PAGE_REFUSED:
-		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
-		COD_SYSCALL_FAILURE, 0, NULL);
-		moveFromExcecToExit_withError(cpu->process, status);
-		markFreeCPU(cpu);
-		break;
 	default:
-		logError(
-				"La funcion basicMalloc(size,&pointer) informo un codigo de error no soportado");
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
 		COD_SYSCALL_FAILURE, 0, NULL);
 		moveFromExcecToExit_withError(cpu->process, status);
 		markFreeCPU(cpu);
 		break;
 	}
-	free(buffer);
 	destroyPackage(tmpPackage);
 }
 
 void executeFreeMemoryTo(CPU* cpu, Package* package) {
-	//todo: pending
+	t_puntero pointer = deserialize_int(package->stream);
+	Package* tmpPackage = NULL;
+	int status = basicFreeMemory(pointer);
+	switch (status) {
+	case FREE_MEMORY_SUCCES:
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_SUCCESS, 0, NULL);
+		break;
+	case SC_ERROR_MEMORY_EXCEPTION:
+	default:
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_FAILURE, 0, NULL);
+		moveFromExcecToExit_withError(cpu->process, status);
+		markFreeCPU(cpu);
+		break;
+	}
+	destroyPackage(tmpPackage);
 }
 
 void resolveRequest_endInstruction(CPU* cpu, Package* package) {

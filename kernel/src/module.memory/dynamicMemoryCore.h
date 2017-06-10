@@ -14,6 +14,8 @@
 #define MALLOC_MEMORY_SUCCES 0
 #define FREE_MEMORY_SUCCES 0
 
-int basicMalloc(int mallocSize, t_puntero* pointer);
+int basicMallocMemory(int mallocSize, t_puntero* pointer);
+
+int basicFreeMemory(t_puntero pointer);
 
 #endif /* MODULE_MEMORY_DYNAMICMEMORYCORE_H_ */
