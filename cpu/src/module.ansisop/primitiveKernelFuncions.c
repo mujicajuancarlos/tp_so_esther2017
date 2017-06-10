@@ -80,8 +80,37 @@ void ansisopKernel_signal(t_nombre_semaforo identificador_semaforo) {
 	logTrace("Ejecutado ansisopKernel_signal(%s)", identificador_semaforo);
 }
 
-t_puntero ansisopKernel_reservar(t_valor_variable espacio) {
-	return 0;
+t_puntero ansisopKernel_reservar(t_valor_variable size) {
+	t_puntero pointer = NULL_VALUE;
+	logTrace("Ejecutando ansisopKernel_reservar(%d)", size);
+	if (getErrorFlag() == FLAG_OK) {
+		char* buffer = serialize_int(size);
+		Package* package = createAndSendPackage(kernelSocket(), COD_MALLOC_MEMORY,
+				sizeof(uint32_t), buffer);
+		free(buffer);
+		if (package != NULL) {
+			logTrace("Se solicito al kernel reservar memoria dinamica del talaño %d", size);
+			destroyPackage(package);
+			package = createAndReceivePackage(kernelSocket());
+			if (package != NULL) {
+				if (package->msgCode == COD_SYSCALL_SUCCESS) {
+					pointer = deserialize_int(package->stream);
+					logTrace("El kernel indico que el puntero es: %d",pointer);
+				} else {
+					logTrace("El kernel indico que no pudo hacer malloc");
+					setErrorFlag(FLAG_SYSCALL_FAILURE);
+				}
+				destroyPackage(package);
+			} else {
+				setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+			}
+		} else {
+			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
+		}
+	}
+	logTrace(
+			"Ejecutado ansisopKernel_reservar(%d)", size);
+	return pointer;
 }
 
 void ansisopKernel_liberar(t_puntero puntero) {
@@ -234,7 +263,8 @@ void ansisopKernel_escribir(t_descriptor_archivo fd, void* info,
 		t_valor_variable sizeInfo) {
 	logTrace("Ejecutando ansisopKernel_escribir(%d,>>data<<,%d)", fd, sizeInfo);
 	if (getErrorFlag() == FLAG_OK) {
-		t_data_FD_request* data = create_t_data_FD_request(fd, sizeInfo, (char*) info);
+		t_data_FD_request* data = create_t_data_FD_request(fd, sizeInfo,
+				(char*) info);
 		char* buffer = serialize_t_data_FD_request(data);
 		size_t size = sizeof_t_data_FD_request(data);
 		Package* package = createAndSendPackage(kernelSocket(), COD_WRITE_FD,
@@ -266,7 +296,8 @@ void ansisopKernel_escribir(t_descriptor_archivo fd, void* info,
 	logTrace("Ejecutado ansisopKernel_escribir(%d,>>data<<,%d)", fd, sizeInfo);
 }
 
-void ansisopKernel_leer(t_descriptor_archivo fd, t_puntero pos, t_valor_variable size) {
+void ansisopKernel_leer(t_descriptor_archivo fd, t_puntero pos,
+		t_valor_variable size) {
 	logTrace("Ejecutando ansisopKernel_leer(%d,%d,%d)", fd, pos, size);
 	if (getErrorFlag() == FLAG_OK) {
 		t_dataPointer_FD_request data;
@@ -276,8 +307,7 @@ void ansisopKernel_leer(t_descriptor_archivo fd, t_puntero pos, t_valor_variable
 		Package* package = createAndSendPackage(kernelSocket(), COD_READ_FD,
 				sizeof(t_dataPointer_FD_request), (char*) &data);
 		if (package != NULL) {
-			logTrace("Se solicito al kernel leer del file descriptor %d",
-					fd);
+			logTrace("Se solicito al kernel leer del file descriptor %d", fd);
 			destroyPackage(package);
 			package = createAndReceivePackage(kernelSocket());
 			if (package != NULL) {
