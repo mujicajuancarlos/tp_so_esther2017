@@ -28,6 +28,7 @@
 #include "../module.model/sharedSemaphore.h"
 #include "shortTermScheduler.h"
 #include "longTermScheduler.h"
+#include "stateConverter.h"
 
 typedef struct {
 	t_list* new;
@@ -36,19 +37,6 @@ typedef struct {
 	t_list* block;
 	t_queue* exit;
 } t_planningStates;
-
-#define STATE_NEW "new"
-#define STATE_READY "ready"
-#define STATE_EXECUTE "excecute"
-#define STATE_BLOCK "block"
-#define STATE_EXIT "exit"
-#define STATE_NOTFOUND "notFound"
-#define STATE_CODE_NEW 1
-#define STATE_CODE_READY 2
-#define STATE_CODE_EXECUTE 3
-#define STATE_CODE_BLOCK 4
-#define STATE_CODE_EXIT 5
-#define STATE_CODE_NOTFOUND 6
 
 //move to ready
 void moveFromNewToReady(Process* process);
@@ -90,7 +78,8 @@ t_planningStates* getStates();
 
 void initializeProcessLifeCycle();
 void destroyProcessLifeCycle();
-void basicForceQuitProcess(Process* process, char* state);
+
+void basicForceQuitProcess(Process* process, int stateCode);
 
 
 #endif /* MODULE_PLANNING_PROCESSLIFECYCLE_H_ */

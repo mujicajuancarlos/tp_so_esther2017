@@ -276,23 +276,7 @@ void destroyProcessLifeCycle() {
 	pthread_mutex_destroy(&blockQueuesMutex);
 }
 
-int stateCodeFor(char* state) {
-	if (string_equals_ignore_case(state, STATE_NEW))
-		return STATE_CODE_NEW;
-	if (string_equals_ignore_case(state, STATE_READY))
-		return STATE_CODE_READY;
-	if (string_equals_ignore_case(state, STATE_EXECUTE))
-		return STATE_CODE_EXECUTE;
-	if (string_equals_ignore_case(state, STATE_BLOCK))
-		return STATE_CODE_BLOCK;
-	if (string_equals_ignore_case(state, STATE_EXIT))
-		return STATE_CODE_EXIT;
-	return STATE_CODE_NOTFOUND;
-}
-
-void basicForceQuitProcess(Process* process, char* state) {
-//	char* state = getProcessState(process);
-	int stateCode = stateCodeFor(state);
+void basicForceQuitProcess(Process* process, int stateCode) {
 	switch (stateCode) {
 	case STATE_CODE_NEW:
 		moveFromNewToExit(process);
@@ -316,7 +300,7 @@ void basicForceQuitProcess(Process* process, char* state) {
 	default:
 		logError(
 				"El proceso pid: %d tiene el estado: %s y no puede ser finalizado",
-				process->pid, state);
+				process->pid, stateIndexToString(stateCode));
 		break;
 	}
 }

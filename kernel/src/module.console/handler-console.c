@@ -62,11 +62,8 @@ void handleConsoleRequestForProcess(Process* process, Package* package) {
 	case COD_KC_RUN_PROGRAM_REQUEST:
 		startNewProcess(process, package);
 		break;
-	case COD_KC_END_PROGRAM:
-		logInfo("Terminar ejecucion");
-		break;
-	case COD_FORCE_QUIT_PROGRAM:
-		basicForceQuitProcess(process,getProcessState(process));
+	case COD_KC_STOP_PROGRAM_REQUEST:
+		basicForceQuitProcess(process,getProcessStateIndex(process));
 		break;
 	}
 }

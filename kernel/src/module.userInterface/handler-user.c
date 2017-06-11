@@ -110,22 +110,19 @@ void handleCommand_info_all_process(kernel_struct* kernelStruct,
 		char** commands) {
 	if (commands[2] == NULL) {
 		t_planningStates* states = getStates();
-		char* state;
 		printHeaderProcess();
-		void printElement(void* element) {
-			Process* proces = element;
-			printProcess(proces, state);
+		void wapperPrintAllProcess(int stateIndex, t_list* processList) {
+			void printElement(void* element) {
+				Process* proces = element;
+				printProcess(proces, stateIndex);
+			}
+			list_iterate(processList, printElement);
 		}
-		state = "new";
-		list_iterate(states->new, printElement);
-		state = "ready";
-		list_iterate(states->ready->elements, printElement);
-		state = "execute";
-		list_iterate(states->execute, printElement);
-		state = "block";
-		list_iterate(states->block, printElement);
-		state = "exit";
-		list_iterate(states->exit->elements, printElement);
+		wapperPrintAllProcess(STATE_CODE_NEW, states->new);
+		wapperPrintAllProcess(STATE_CODE_READY, states->ready->elements);
+		wapperPrintAllProcess(STATE_CODE_EXECUTE, states->execute);
+		wapperPrintAllProcess(STATE_CODE_BLOCK, states->block);
+		wapperPrintAllProcess(STATE_CODE_EXIT, states->exit->elements);
 	} else
 		printInvalidArguments(commands[2], commands[0]);
 }
@@ -135,35 +132,32 @@ void handleCommand_info_by_state_process(kernel_struct* kernelStruct,
 	if (commands[2] != NULL) {
 		if (commands[3] == NULL) {
 			char* state = commands[2];
-			bool valid = false;
+			int stateIndex = stringToStateIndex(state);
 			t_planningStates* states = getStates();
 			printHeaderProcess();
 			void printElement(void* element) {
 				Process* proces = element;
-				printProcess(proces, state);
+				printProcess(proces, stateIndex);
 			}
-			if (string_equals_ignore_case(state, "new")) {
+			switch (stateIndex) {
+			case STATE_CODE_NEW:
 				list_iterate(states->new, printElement);
-				valid = true;
-			}
-			if (string_equals_ignore_case(state, "ready")) {
+				break;
+			case STATE_CODE_READY:
 				list_iterate(states->ready->elements, printElement);
-				valid = true;
-			}
-			if (string_equals_ignore_case(state, "execute")) {
+				break;
+			case STATE_CODE_EXECUTE:
 				list_iterate(states->execute, printElement);
-				valid = true;
-			}
-			if (string_equals_ignore_case(state, "block")) {
+				break;
+			case STATE_CODE_BLOCK:
 				list_iterate(states->block, printElement);
-				valid = true;
-			}
-			if (string_equals_ignore_case(state, "exit")) {
+				break;
+			case STATE_CODE_EXIT:
 				list_iterate(states->exit->elements, printElement);
-				valid = true;
-			}
-			if (!valid) {
+				break;
+			default:
 				printInvalidArguments(state, commands[0]);
+				break;
 			}
 		} else
 			printInvalidArguments(commands[3], commands[0]);
@@ -176,9 +170,10 @@ void handleCommand_info_by_pid_process(kernel_struct* kernelStruct,
 	if (commands[2] != NULL) {
 		if (commands[3] == NULL) {
 			int pid = atoi(commands[2]);
-			Process* process = getProcessByPID(pid);
+			int stateIndex;
+			Process* process = getProcessAndStateIndexByPID(pid, &stateIndex);
 			if (process != NULL) {
-				printProcessFull(process);
+				printProcessFull(process, stateIndex);
 			} else {
 				if (pid == 0)
 					printInvalidArguments(commands[2], commands[0]);
@@ -228,16 +223,21 @@ void handleCommand_lock_unlock(kernel_struct* kernelStruct, char** commands) {
 void handleCommand_end_all_program(kernel_struct* kernelStruct, char** commands) {
 	if (commands[2] == NULL) {
 
-		void moveExit(void* element) {
-			Process* proces = element;
-			basicForceQuitProcess(proces, getProcessState(proces));
+		void wrapperToForceQuitAllProcess(int stateIndex, t_list* processList) {
+			void moveExit(void* element) {
+				Process* proces = element;
+				basicForceQuitProcess(proces, stateIndex);
+			}
+			list_iterate(processList, moveExit);
 		}
 
-		list_iterate(getStates()->new, moveExit);
-		list_iterate(getStates()->ready->elements, moveExit);
-		list_iterate(getStates()->block, moveExit);
-		list_iterate(getStates()->execute, moveExit);
-		list_iterate(getStates()->exit->elements, moveExit);
+		wrapperToForceQuitAllProcess(STATE_CODE_NEW, getStates()->new);
+		wrapperToForceQuitAllProcess(STATE_CODE_READY,
+				getStates()->ready->elements);
+		wrapperToForceQuitAllProcess(STATE_CODE_BLOCK, getStates()->block);
+		wrapperToForceQuitAllProcess(STATE_CODE_EXECUTE, getStates()->execute);
+		wrapperToForceQuitAllProcess(STATE_CODE_EXIT,
+				getStates()->exit->elements);
 
 		/*pthread_mutex_lock(&(kernelStruct->stdoutMutex));
 		 state = list_map(state, basicForceQuitProcess(process,state));
@@ -250,12 +250,10 @@ void handleCommand_end_by_pid_program(kernel_struct* kernelStruct,
 		char** commands) {
 	if (commands[2] != NULL && commands[3] == NULL) {
 		int pid = atoi(commands[2]);
-
-		Process* process = getProcessByPID(pid);
-		char * state = getProcessState(process);
-
+		int stateIndex;
+		Process* process = getProcessAndStateIndexByPID(pid, &stateIndex);
 		if (process != NULL) {
-			basicForceQuitProcess(process, state);
+			basicForceQuitProcess(process, stateIndex);
 		} else {
 			printPidNotFound(pid);
 		}

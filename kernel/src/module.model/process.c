@@ -5,6 +5,7 @@
  *      Author: utnso
  */
 
+
 #include "process.h"
 
 int currentPid = FIRST_PID;
@@ -90,13 +91,15 @@ void printHeaderProcess() {
 			"===============================================================");
 }
 
-void printProcess(Process* proceso, char* state) {
+void printProcess(Process* proceso, int stateIndex) {
 	char* exitCode = (proceso->pcb==NULL)? "" : string_itoa(proceso->pcb->exit_code);
+	char* state = stateIndexToString(stateIndex);
 	printf("%5d\t%20s\t%20s\n", proceso->pid, state, exitCode);
 }
 
-void printProcessFull(Process* proceso){
+void printProcessFull(Process* proceso, int stateIndex){
 	printf("\nInformación del proceso %d\n", proceso->pid);
+	printf("\nEstado %s",stateIndexToString(stateIndex));
 	printf("\tCantidad rafagas ejecutadas %d\n", 567);//TODO: completar rafagas ejecutadas
 	printf("\tCantidad de operaciones privilegiadas %d\n", 142);//TODO: completar
 	printf("\tTabla de archivos abiertos %d\n", 423);//TODO: completar

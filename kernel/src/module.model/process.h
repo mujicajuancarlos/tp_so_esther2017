@@ -16,8 +16,8 @@
 #include <dc-commons/logger.h>
 #include <dc-commons/protocol-kernel-cpu.h>
 #include <dc-commons/package.h>
+#include "../module.planning/stateConverter.h"
 #include "../kernelStruct.h"
-#include "../commons/collections/list.h"
 #include "fileDescriptor.h"
 
 #define FIRST_PID 1000
@@ -55,9 +55,9 @@ void replacePCB(Process* process, PCB* newPCB);
 
 void printHeaderProcess();
 
-void printProcess(Process* proceso, char* state);
+void printProcess(Process* proceso, int stateIndex);
 
-void printProcessFull(Process* proceso);
+void printProcessFull(Process* proceso, int stateIndex);
 
 void agregarPFD_Alista(Process* process,t_processFileDescriptor* pfd);
 
