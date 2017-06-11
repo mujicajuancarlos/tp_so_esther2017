@@ -17,6 +17,7 @@
 #include "../kernelStruct.h"
 #include "../module.model/fileDescriptor.h"
 #include "../module.model/process.h"
+#include "fileSystemAdministrator.h"
 
 bool validateFile(kernel_struct* kernelStruct, char* path);
 int openFile(Process* process, char* path, char* openMode);

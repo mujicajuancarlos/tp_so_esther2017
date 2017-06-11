@@ -30,6 +30,7 @@ typedef struct {
 typedef struct {
 	bool read;
 	bool write;
+	//bool create;
 }flags;
 
 typedef struct {

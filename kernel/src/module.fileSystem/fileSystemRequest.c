@@ -7,108 +7,132 @@
 
 #include "fileSystemRequest.h"
 
-bool validateFile(kernel_struct* kernelStruct, char* path) {
+bool validarExistenciaFile(char* path, Process* process) {
+
+	int socketFD = process->kernelStruct->socketClientFileSystem;
+
+	bool busqueda = isOpen(path); //valida si existe fijandose si esta en la tabla global de fd
+
+	if(busqueda){
+
+		logInfo("El Archivo ha sido validado correctamente y se encuentra en la ruta %s",
+							path);
+		return busqueda;
+	}
 
 	Package* package = createAndSendPackage(
-			kernelStruct->socketClientFileSystem, COD_VALIDAR_ARCHIVO,
+			socketFD, COD_VALIDAR_ARCHIVO,
 			strlen(path), path);
+
 	if (package != NULL) {
+
 		destroyPackage(package);
-		package = createAndReceivePackage(kernelStruct->socketClientFileSystem);
+		package = createAndReceivePackage(socketFD);
+
 		if (package != NULL) {
 			bool response = deserialize_int(package->stream);
+
 			if (response) {
 				logInfo(
 						"El Archivo ha sido validado correctamente y se encuentra en la ruta %s",
 						path);
+
 				destroyPackage(package);
+
 				return true;
 			} else
+
 				logInfo("El Archivo no se encuentra en la ruta %s", path);
 		} else
+
 			logInfo("No se pudo recibir los datos del FileSystem");
 	} else
+
 		logInfo("No se pudo enviar los datos al FileSystem");
-	destroyPackage(package);
+
+		destroyPackage(package);
+
 	return false;
 }
 
-int openFile(Process* process, char* path, char* openMode) {
 
-	if (isOpen(path)) { //Aca veo si esta abierto, si es asi no creo fd, solo aumento Open
 
-		bool condicion(void* element) {
-					t_processFileDescriptor* unPFD = element;
-					return strcmp(unPFD->fileDescriptor->path, path);
-		}
+int createFile(Process* process, char* path, char* openMode) {
 
-		t_fileDescriptor* fd = list_find(fileDescriptorGlobalList, condicion);
-		incrementarOpen(fd);
-		t_processFileDescriptor* pfd = createNew_t_processFileDescriptor(
-				openMode, fd);
-		agregarPFD_Alista(process, pfd);
-		return fd->fd;
-	} else {
-		int create = createFile(process, path, openMode);	//Si no está abierto, creo el FD
-		return create;
-	}
-}
+		int socketFS = process->kernelStruct->socketClientFileSystem;
 
-	int createFile(Process* process, char* path, char* openMode) {
+		bool existencia = validarExistenciaFile(path,process);
 
-		if (strcmp(openMode, "c")) { //Verifico permisos de creacion
-			t_fileDescriptor* file = createNew_t_fileDescriptor(path);
-			agregarFD_Alista(file);
+		if(!existencia){
 
-			t_processFileDescriptor* pfd = createNew_t_processFileDescriptor(
-					openMode, file);
-			agregarPFD_Alista(process, pfd);
+		if (strcmp(openMode, "c")) { //TODO: Verificar cual va a ser el manejo de flags al final
 
-			logInfo(
-					"El Archivo de fileDescriptor %d ha sido creado correctamente y se encuentra en la ruta %s",
-					file->fd, file->path);
+			Package* package = solicitudAlFileSystem(socketFS,COD_CREAR_ARCHIVO, path);
+			destroyPackage(package);
 
-			return file->fd;
+			package=createAndReceivePackage(socketFS);
+
+			if(package!=NULL){
+
+				bool response = deserialize_int(package->stream);
+
+				if(response){
+
+					t_fileDescriptor* file = createNew_t_fileDescriptor(path);
+
+								incrementarOpen(file);
+
+								agregarFD_Alista(file);
+
+								t_processFileDescriptor* pfd = createNew_t_processFileDescriptor(
+										openMode, file);
+								agregarPFD_Alista(process, pfd);
+
+								logInfo(
+										"El Archivo de fileDescriptor %d ha sido creado correctamente y se encuentra en la ruta %s",
+										file->fd, file->path);
+
+								return file->fd;
+				}
+				else
+				{
+					logInfo("El Archivo no se pudo crear");
+				}
+			}
+			else {
+				logInfo("Error en comunicarse con File System");
+			}
+
 		} else {
 			logInfo(
 					"El Archivo que se solicitó abrir no cuenta con los permisos necesarios para ser creado");
 			return -1;
 		}
 	}
+		t_fileDescriptor* file = createNew_t_fileDescriptor(path);
 
-	int closeFile(Process* process, char* path) { //Recibo el path del archivo a cerrar, y el proceso que lo contiene.
+		incrementarOpen(file);
 
-		if (isOpen(path)) {								// Si esta abierto =>
-			bool condicion(void* element) {									//{
-				t_processFileDescriptor* unPFD = element;					//
-				return strcmp(unPFD->fileDescriptor->path, path);//Busco el proceso
-			}																//
-			t_processFileDescriptor* pfd = list_find(
-					process->fileDescriptorList, condicion);				//}
-			if (pfd != NULL) {
-				decrementarOpen(pfd->fileDescriptor);						//
-				removerPFD_Lista(pfd, process);
-				logInfo(
-						"Se ha cerrado el archivo abierto %s perteneciente al proceso %d",
-						path, process->pid);
-				return 0;
-			} else
-				logInfo("El archivo %s no es un archivo abierto del proceso %d",
-						path, process->pid);
-			return -1;
-		} else
-			logInfo("El archivo %s no se encuentra abiero por ningún proceso",
-					path);
-		return -2;
+		agregarFD_Alista(file);
 
-	}
+		t_processFileDescriptor* pfd = createNew_t_processFileDescriptor(openMode, file);
+		agregarPFD_Alista(process, pfd);
 
-	int deleteFile(Process* process, char* path) {
+		logInfo("El Archivo de fileDescriptor %d ha sido creado correctamente y"
+				" se encuentra en la ruta %s",file->fd, file->path);
+
+		return file->fd;
+
+}
+
+
+
+int deleteFile(Process* process, char* path) {
 		if (isOpen(path)) {
 
 			bool condicion(void* element) {
 				t_processFileDescriptor* unPFD = element;
-				return strcmp(unPFD->fileDescriptor->path, path);
+				return string_equals_ignore_case(unPFD->fileDescriptor->path, path);
 			}
 
 			t_processFileDescriptor* processFDFound = list_find(
@@ -131,22 +155,10 @@ int openFile(Process* process, char* path, char* openMode) {
 
 	}
 
-	bool isOpen(char* path) {
-
-		bool condicion(void* element) {
-			t_fileDescriptor* unFD = element;
-			return strcmp(unFD->path, path);
-		}
-
-		return list_any_satisfy(fileDescriptorGlobalList, condicion);
-	}
-
-
-
 
 
 	/*
-	 writeFile(uint32_t fd, int offset,char*buffer, t_size tamanio, Process* process){
+writeFile(uint32_t fd, int offset,char*buffer, t_size tamanio, Process* process){
 	 char* path = obtenerPath(fd);
 
 	 //TODO: Esta funcion envia y devuelve el package
@@ -169,7 +181,7 @@ int openFile(Process* process, char* path, char* openMode) {
 
 	 }
 
-	 readFile(Process* process, char* path, char* buffer, int size){
+readFile(Process* process, char* path, char* buffer, int size){
 
 	 //TODO: Esta funcion SOLO ENVIA, la devolucion la manejara el handler correspondiente.
 	 //TODO: hay que serializar los datos y meterlos en el stream ¿Estructuras?  Sí.
