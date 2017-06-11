@@ -219,7 +219,7 @@ void executeMallocMemoryTo(CPU* cpu, Package* package) {
 	char* buffer;
 	Package* tmpPackage = NULL;
 	int mallocSize = deserialize_int(package->stream);
-	int status = basicMallocMemory(mallocSize, &pointer);
+	int status = basicMallocMemory(cpu->process, mallocSize, &pointer);
 	switch (status) {
 	case MALLOC_MEMORY_SUCCES:
 		buffer = serialize_int(pointer);
@@ -243,7 +243,7 @@ void executeMallocMemoryTo(CPU* cpu, Package* package) {
 void executeFreeMemoryTo(CPU* cpu, Package* package) {
 	t_puntero pointer = deserialize_int(package->stream);
 	Package* tmpPackage = NULL;
-	int status = basicFreeMemory(pointer);
+	int status = basicFreeMemory(cpu->process, pointer);
 	switch (status) {
 	case FREE_MEMORY_SUCCES:
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,

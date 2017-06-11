@@ -11,7 +11,6 @@
 int currentPid = FIRST_PID;
 pthread_mutex_t currentPidMutex;
 
-
 Process* createProcess(int socket, kernel_struct* kernelStruct) {
 	Process* newProcess = malloc(sizeof(Process));
 	newProcess->fileDescriptor = socket;
@@ -19,6 +18,7 @@ Process* createProcess(int socket, kernel_struct* kernelStruct) {
 	newProcess->kernelStruct = kernelStruct;
 	newProcess->pcb = NULL;
 	newProcess->forceQuit = false;
+	newProcess->heapPages = list_create();
 	//tablaProcesosFD = list_create();
 	return newProcess;
 }
@@ -27,9 +27,18 @@ void destroyProcess(Process* process) {
 	if (process != NULL) {
 		if (process->pcb != NULL)
 			destroy_PBC(process->pcb);
+		if( process->heapPages != NULL){
+			list_destroy_and_destroy_elements(process->heapPages,
+						(void*) destroy_heap_page);
+			process->heapPages = NULL;
+		}
+		if (process->fileDescriptorList != NULL){
+			list_destroy_and_destroy_elements(process->fileDescriptorList,
+						(void*) destroy_t_processFileDescriptor);
+			process->fileDescriptorList = NULL;
+		}
 		free(process);
-		list_destroy_and_destroy_elements(process->fileDescriptorList,
-			(void*) destroy_t_processFileDescriptor);
+
 	}
 }
 

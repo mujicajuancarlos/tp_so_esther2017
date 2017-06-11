@@ -5,15 +5,15 @@
  *      Author: utnso
  */
 
-#include "dynamicMemoryCore.h"
+#include "dynamicMemoryManager.h"
 
-int basicMallocMemory(int mallocSize, t_puntero* pointer){
+int basicMallocMemory(Process* process, int mallocSize, t_puntero* pointer){
 	int status = SC_ERROR_MEMORY_EXCEPTION;
 
 	return status;
 }
 
-int basicFreeMemory(t_puntero pointer){
+int basicFreeMemory(Process* process, t_puntero pointer){
 	int status = SC_ERROR_MEMORY_EXCEPTION;
 
 	return status;

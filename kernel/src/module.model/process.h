@@ -17,6 +17,7 @@
 #include <dc-commons/protocol-kernel-cpu.h>
 #include <dc-commons/package.h>
 #include "../module.planning/stateConverter.h"
+#include "../module.memory/heapMetadata.h"
 #include "../kernelStruct.h"
 #include "fileDescriptor.h"
 
@@ -28,6 +29,7 @@ typedef struct Process {
     int quantum;
     bool forceQuit;//usado para la finalizacion forzada de procesos en ejecucion
     PCB* pcb;
+    t_list* heapPages;
     kernel_struct* kernelStruct;
     t_list* fileDescriptorList;
     int exit_code;

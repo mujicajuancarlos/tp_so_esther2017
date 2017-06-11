@@ -14,11 +14,12 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-kernel-cpu.h>
 #include <dc-commons/protocol-process-exitCodes.h>
+
+#include "../module.memory/dynamicMemoryManager.h"
 #include "../module.model/cpu.h"
 #include "../module.model/process.h"
 #include "../module.planning/processLifeCycle.h"
 #include "../module.planning/scheduler.h"
-#include "../module.memory/dynamicMemoryCore.h"
 #include "cpuAdministrator.h"
 #include "cpuResponse.h"
 
