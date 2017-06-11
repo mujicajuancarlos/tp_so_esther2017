@@ -77,3 +77,7 @@ void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config){
 	destroyScheduler();
 	destroyCpuAdministrator();
 }
+
+kernel_struct* getKernelStruct(){
+	return &kernelStruct;
+}

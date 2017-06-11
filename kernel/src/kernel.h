@@ -36,4 +36,6 @@ void initializeStruct(kernel_struct* args, Configuration* config);
 
 void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config);
 
+kernel_struct* getKernelStruct();
+
 #endif /* KERNEL_H_ */

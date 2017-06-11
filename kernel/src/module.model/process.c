@@ -15,11 +15,11 @@ Process* createProcess(int socket, kernel_struct* kernelStruct) {
 	Process* newProcess = malloc(sizeof(Process));
 	newProcess->fileDescriptor = socket;
 	newProcess->pid = 0;
-	newProcess->kernelStruct = kernelStruct;
 	newProcess->pcb = NULL;
 	newProcess->forceQuit = false;
 	newProcess->heapPages = list_create();
 	//tablaProcesosFD = list_create();
+	newProcess->kernelStruct = kernelStruct;
 	return newProcess;
 }
 
@@ -38,7 +38,6 @@ void destroyProcess(Process* process) {
 			process->fileDescriptorList = NULL;
 		}
 		free(process);
-
 	}
 }
 
@@ -48,7 +47,7 @@ void freeProcessResources(Process* process){
 	metadata_destruir(process->pcb->metadata);
 	process->pcb->stackIndex = NULL;
 	process->pcb->metadata = NULL;
-	//todo: enviar solicitud a la memoria para que libere las paginas
+	//todo: enviar solicitud a la memoria para que libere las paginas -> considerar tmb heaps
 	//todo: enviar solicitud al file system para que libere los archivos
 }
 
