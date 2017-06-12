@@ -157,8 +157,8 @@ int deleteFile(Process* process, char* path) {
 
 
 
-	/*
-writeFile(uint32_t fd, int offset,char*buffer, t_size tamanio, Process* process){
+
+int writeFile(uint32_t fd, int offset,char*buffer, size_t size, Process* process){
 	 char* path = obtenerPath(fd);
 
 	 //TODO: Esta funcion envia y devuelve el package
@@ -166,8 +166,17 @@ writeFile(uint32_t fd, int offset,char*buffer, t_size tamanio, Process* process)
 
 	 int socket = process->kernelStruct->socketClientFileSystem;
 
+	 t_Write* write = malloc(sizeof(t_Write));
+
+	 write->buffer = buffer;
+	 write->offset = offset;
+	 write->path = path;
+	 write->size = size;
+
+	 char* stream = serialize_t_Write(write);
+
 	 Package* package = solicitudAlFileSystem(socket,
-	 COD_GUARDAR_DATOS,stream); //TODO: path,offset,tamanio,buffer
+	 COD_GUARDAR_DATOS,stream); //TODO: path,offset,size,buffer
 
 	 if(package == NULL){
 	 logInfo("Error en solicitud a FileSystem");
@@ -177,19 +186,36 @@ writeFile(uint32_t fd, int offset,char*buffer, t_size tamanio, Process* process)
 
 	 package = createAndReceivePackage(socket);
 
+	 if(package!=NULL){
+
+		 int respuesta = deserialize_int(package->stream); //TODO:agregar logs, finalizacion de la funcion, etc
+
+		 return respuesta;
+
+	 }
+
+
 	 //TODO Evaluar si hubo error terminar, si no mandar a Ready
 
 	 }
 
-readFile(Process* process, char* path, char* buffer, int size){
+void readFile(Process* process, char* path, char* buffer, size_t size, int offset){
 
 	 //TODO: Esta funcion SOLO ENVIA, la devolucion la manejara el handler correspondiente.
 	 //TODO: hay que serializar los datos y meterlos en el stream ¿Estructuras?  Sí.
 
 	 int socketFS = process->kernelStruct->socketClientFileSystem;
 
+	 t_Read* read = malloc(sizeof(t_Read));
+
+	 read->offset = offset;
+	 read->path = path;
+	 read->size = size;
+
+	 char* stream = serialize_t_Read(read);
+
 	 Package* package = solicitudAlFileSystem(socketFS,
-	 COD_OBTENER_DATOS,stream); //TODO:(path, buffer,size)  Struct
+	 COD_OBTENER_DATOS,stream); //TODO:(path,offset,size)  Struct
 
 	 if(package == NULL){
 	 logInfo("Error en solicitud a FileSystem");
@@ -197,14 +223,14 @@ readFile(Process* process, char* path, char* buffer, int size){
 	 }
 	 destroyPackage(package); //TODO: se podria poner aca solo
 
-	 package = createAndReceivePackage(socketFS);
+	// package = createAndReceivePackage(socketFS); TODO: esto no va ya que dice que solo recibe..
 
 	 //TODO:	si surgio error ejecutar la rutina de finalizacion de proceso con el codigo de error adecuado
 	 //si no hay error enviar a ready (ver donde se almacena el dato obtenido del fs)
 	 }
 
 
-	 */
+
 
 	Package* solicitudAlFileSystem(int socket, uint32_t msgCode, char* stream) {
 

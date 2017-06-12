@@ -19,6 +19,18 @@
 #include "../module.model/process.h"
 #include "fileSystemRequest.h"
 
+typedef struct {
+	char* path;
+	int offset;
+	size_t size;
+} t_Read;
+
+typedef struct{
+	char* path;
+	int offset;
+	size_t size;
+	char* buffer;
+}t_Write;
 
 bool isOpen(char* path);
 int openFile(Process* process, char* path, char* openMode);
