@@ -17,7 +17,7 @@ void loadMemoryPageSize(kernel_struct* kernel_struct) {
 	NULL);
 	if (package == NULL) {
 		logError("No se pudo solicitar el tamaño de pagina");
-		exit(ERROR_DISCONNECTED_SOCKET);
+		exit(EXIT_FAILURE);
 	}
 	destroyPackage(package);
 
@@ -26,9 +26,53 @@ void loadMemoryPageSize(kernel_struct* kernel_struct) {
 	if (package != NULL && package->msgCode == COD_PAGE_SIZE_RESPONSE) {
 		logInfo("Seteando el tamaño de pagina");
 		kernel_struct->pageSize = deserialize_int(package->stream);
+		destroyPackage(package);
 	} else {
 		logError("La memoria respondio con una accion no permitida.");
-		exit(ERROR_UNKNOWN_MESSAGE_CODE);
+		exit(EXIT_FAILURE);
+	}
+}
+
+void reserveNewHeapPageForProcess(Process* process, int* status) {
+	Package* tmpPackage;
+	t_AddPagesToProcess* content = create_t_AddPagesToProcess(process->pid, 1);
+	tmpPackage = createAndSendPackage(
+			process->kernelStruct->socketClientMemoria,
+			COD_ADD_PROCESS_PAGES_REQUEST, sizeof_t_AddPagesToProcess(),
+			(char*) content);
+	free(content);
+	if (tmpPackage == NULL) {
+		logError("La memoria no esta conectada %d", process->pid);
+		exit(EXIT_FAILURE);
+	}
+	destroyPackage(tmpPackage);
+	logInfo("Se solicitó una nueva pagina para el proceso pid %d",
+			process->pid);
+	//me quedo a la espera de la aprobacion
+	tmpPackage = createAndReceivePackage(
+			process->kernelStruct->socketClientMemoria);
+	if (tmpPackage != NULL) {
+		switch (tmpPackage->msgCode) {
+		case COD_ADD_PROCESS_PAGES_RESPONSE:
+			logInfo("La memoria reservo la nueva pagina para el proceso pid %d",
+					process->pid);
+			*status = MALLOC_MEMORY_SUCCES;
+			break;
+		case ERROR_MEMORY_FULL:
+			logInfo(
+					"La memoria indico que no hay un pagina disponible para el proceso pid %d",
+					process->pid);
+			*status = SC_ERROR_ADD_PAGE_REFUSED;
+			break;
+		default:
+			logError("La memoria envio un mensaje no esperado");
+			*status = SC_ERROR_MEMORY_EXCEPTION;
+			break;
+		}
+		destroyPackage(tmpPackage);
+	} else {
+		logError("La memoria no esta conectada");
+		exit(EXIT_FAILURE);
 	}
 }
 
@@ -37,32 +81,27 @@ void loadMemoryPageSize(kernel_struct* kernel_struct) {
  * package contiene el codigo fuente
  */
 void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
-	int pagesNumber;
 	Package* tmpPackage;
-	//pagesNumber = 5;
-	pagesNumber = sourceCodePackage->size / process->kernelStruct->pageSize; //como ambos estan bytes me da la cantidad de paginas
-	if (((sourceCodePackage->size) % (process->kernelStruct->pageSize)) > 0)  {
-		pagesNumber++;
-	}
+	bool hasOffset = (sourceCodePackage->size % process->kernelStruct->pageSize)
+			> 0;
+	int pagesNumber = hasOffset ? 1 : 0;
+	pagesNumber += sourceCodePackage->size / process->kernelStruct->pageSize; //como ambos estan bytes me da la cantidad de paginas
 	//agrego la cantidad de paginas para el stack
 	pagesNumber += process->kernelStruct->config->stack_size;
 
 	t_AddPagesToProcess* content = create_t_AddPagesToProcess(process->pid,
 			pagesNumber);
-
 	tmpPackage = createAndSendPackage(
 			process->kernelStruct->socketClientMemoria, COD_NEW_PROCESS_REQUEST,
-			sizeof_t_AddPagesToProcess(), (char*) content);	//todo verificar que content se envie como char*
-
+			sizeof_t_AddPagesToProcess(), (char*) content);
+	free(content);
 	if (tmpPackage == NULL) {
 		//Función de mensaje de rechazo porque no se pudo reservar pag en memoria
 		consoleResponseRepulseMessage(process);
-		destroyPackage(tmpPackage);
-		free(content);
 		logError(
 				"No se pudo solicitar la reserva de paginas para el proceso pid %d",
 				process->pid);
-		exit(ERROR_DISCONNECTED_SOCKET);
+		exit(EXIT_FAILURE);
 	}
 
 	destroyPackage(tmpPackage);
@@ -86,27 +125,20 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 			logInfo(
 					"La memoria indica que no hay espacio para el proceso pid %d",
 					process->pid);
-			destroyPackage(tmpPackage);
-			free(content);
-			exit(ERROR_WITHOUT_RESOURCES);
+			exit(EXIT_FAILURE);
 			break;
 		default:
 			logError("La memoria envio un mensaje no esperado");
-			destroyPackage(tmpPackage);
 			consoleResponseRepulseMessage(process);
-			free(content);
-			exit(ERROR_UNKNOWN_MESSAGE_CODE);
+			exit(EXIT_FAILURE);
 			break;
 		}
 	} else {
-		destroyPackage(tmpPackage);
 		logError(
 				"No se recibio la respuesta de la memoria para el proceso pid %d",
 				process->pid);
-		destroyPackage(tmpPackage);
 		consoleResponseRepulseMessage(process);
-		free(content);
-		exit(ERROR_DISCONNECTED_SOCKET);
+		exit(EXIT_FAILURE);
 	}
 
 	destroyPackage(tmpPackage);
@@ -126,7 +158,7 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 				(sourceCodePackage->size - offset > sourceCodePackage->size) ?
 						process->kernelStruct->pageSize :
 						sourceCodePackage->size - offset;
-		content = create_t_PageBytes(process->pid, index,0,sizeBuffer,
+		content = create_t_PageBytes(process->pid, index, 0, sizeBuffer,
 				sourceCodePackage->stream + offset);
 		content->pageNumber = index;
 		content->offset = 0;
@@ -136,10 +168,10 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 				"Solicitando a la memoria que almacene para el pid %d en la pagina %d offset %d tamaño del buffer %d",
 				content->pid, content->pageNumber, content->offset,
 				content->size);
-		createAndSendPackage(process->kernelStruct->socketClientMemoria,
-		COD_SAVE_PAGE_BYTES_REQUEST, sizeof_t_PageBytes(content),
-				(char*) content);//todo verificar que content se envie como char*
-
+		tmpPackage = createAndSendPackage(
+				process->kernelStruct->socketClientMemoria,
+				COD_SAVE_PAGE_BYTES_REQUEST, sizeof_t_PageBytes(content),
+				(char*) content);
 		if (tmpPackage == NULL) {
 			destroyPackage(tmpPackage);
 			destroy_t_PageBytes(content);
@@ -147,7 +179,7 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 					"No se pudo almacenar el codigo fuente en la memoria para el pid %d",
 					process->pid);
 			removeFromNEW(process);
-			exit(ERROR_DISCONNECTED_SOCKET);
+			exit(EXIT_FAILURE);
 		}
 		destroyPackage(tmpPackage);
 
@@ -168,13 +200,13 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 				destroyPackage(tmpPackage);
 				destroy_t_PageBytes(content);
 				removeFromNEW(process);
-				exit(ERROR_WITHOUT_RESOURCES);
+				exit(EXIT_FAILURE);
 				break;
 			default:
 				logError("La memoria envio un mensaje no esperado");
 				destroyPackage(tmpPackage);
 				destroy_t_PageBytes(content);
-				exit(ERROR_UNKNOWN_MESSAGE_CODE);
+				exit(EXIT_FAILURE);
 				break;
 			}
 		} else {
@@ -185,7 +217,7 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 			destroyPackage(tmpPackage);
 			destroy_t_PageBytes(content);
 			removeFromNEW(process);
-			exit(ERROR_DISCONNECTED_SOCKET);
+			exit(EXIT_FAILURE);
 		}
 
 		destroy_t_PageBytes(content);

@@ -10,6 +10,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/package.h>
@@ -22,10 +23,13 @@
 #include "../module.model/process.h"
 #include "../kernelStruct.h"
 #include "../module.console/consoleResponse.h"
+#include "dynamicMemoryManager.h"
 
 double pagesNumberAux;
 
 void loadMemoryPageSize(kernel_struct* kernel_struct);
+
+void reserveNewHeapPageForProcess(Process* process, int* status);
 
 void reservePagesForNewProcess(Process* process, Package* package);
 

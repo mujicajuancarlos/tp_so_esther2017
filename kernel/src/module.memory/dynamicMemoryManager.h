@@ -12,6 +12,7 @@
 #include <dc-commons/protocol-process-exitCodes.h>
 #include "../module.model/process.h"
 #include "../kernel.h"
+#include "memoryRequests.h"
 #include "heapMetadata.h"
 
 
@@ -25,8 +26,13 @@ int basicFreeMemory(Process* process, t_puntero pointer);
 heap_page* getHeapPageForProcess(int allocSize, Process* process, int* status);
 heap_page* getHeapPageIntoListFor(int allocSize, t_list* heapList);
 heap_page* createHeapPageFor(Process* process, int* status);
+void createHeapMetadataFor(heap_page* page);
+
 void validateMaxAllockSize(int allocSize, Process* process, int* status);
+
+int getNextHeapPageNumber(t_list* pageList);
 uint32_t getHeapFistPage(Process* process);
+
 t_puntero logicalAddressToPointer(dir_memoria address, Process* process);
 dir_memoria pointerToLogicalAddress(t_puntero pointer, Process* process);
 
