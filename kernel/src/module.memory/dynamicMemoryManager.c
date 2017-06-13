@@ -9,11 +9,15 @@
 
 int basicMallocMemory(Process* process, int allocSize, t_puntero* pointer) {
 	int status = SC_ERROR_MEMORY_EXCEPTION;
+	dir_memoria address;
 	heap_page* availablePage = getAvailableHeapPageForProcess(allocSize,process, &status);
 	if (status == MALLOC_MEMORY_SUCCES) {
 		int index;
 		heap_metadata* availableMetadata = getAvailableHeapMetadataForPage(allocSize,availablePage,&index);
 		saveAlloc(allocSize,availableMetadata, index, availablePage);
+		address.pagina = availablePage->page;
+		address.offset = availableMetadata->dataOffset;
+		*pointer = logicalAddressToPointer(address,process);
 	}
 	return status;
 }
