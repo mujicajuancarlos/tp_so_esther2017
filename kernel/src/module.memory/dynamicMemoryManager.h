@@ -23,6 +23,8 @@ int basicMallocMemory(Process* process, int mallocSize, t_puntero* pointer);
 
 int basicFreeMemory(Process* process, t_puntero pointer);
 
+void executeGarbageCollectorOn(heap_page* page, Process* process, int* status);
+
 void saveAlloc(int allocSize, heap_metadata* metadata, int index, heap_page* page);
 
 heap_page* getAvailableHeapPageForProcess(int allocSize, Process* process, int* status);

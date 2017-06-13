@@ -36,11 +36,23 @@ void destroy_heap_metadata(heap_metadata* metadata) {
 	free(metadata);
 }
 
+heap_metadata* getHeapMetadataFromDataOffset(heap_page* page,
+		uint32_t dataOffset, int* index) {
+	*index = -1; //todo verificar, si rompe probar con 0
+	bool condition(void* element) {
+		heap_metadata* metadata = element;
+		*index = *index + 1;
+		return metadata->dataOffset == dataOffset;
+	}
+	return list_find(page->metadataList, condition);
+}
+
 /*
  * devuelvo la primer metadara con espacio suficiente para almacenar sizeAlloc
  */
-heap_metadata* getAvailableHeapMetadataForPage(int allocSize, heap_page* page, int* index) {
-	*index = -1;//todo verificar, si rompe probar con 0
+heap_metadata* getAvailableHeapMetadataForPage(int allocSize, heap_page* page,
+		int* index) {
+	*index = -1; //todo verificar, si rompe probar con 0
 	bool condition(void* element) {
 		heap_metadata* metadata = element;
 		*index = *index + 1;
@@ -58,6 +70,14 @@ bool isAvailableHeapPage(int allocSize, heap_page* page) {
 		return isAvailableHeapMetadata(allocSize, metadata);
 	}
 	return list_any_satisfy(page->metadataList, condition);
+}
+
+bool isFreePage(heap_page* page) {
+	bool condition(void* element) {
+		heap_metadata* metadata = element;
+		return metadata->isFree;
+	}
+	return list_all_satisfy(page->metadataList,condition);
 }
 
 /*

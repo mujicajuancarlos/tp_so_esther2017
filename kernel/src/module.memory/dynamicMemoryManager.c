@@ -24,8 +24,26 @@ int basicMallocMemory(Process* process, int allocSize, t_puntero* pointer) {
 
 int basicFreeMemory(Process* process, t_puntero pointer) {
 	int status = SC_ERROR_MEMORY_EXCEPTION;
-
+	int index;
+	dir_memoria address = pointerToLogicalAddress(pointer,process);
+	heap_page* page = list_get(process->heapPages,address.pagina);
+	if(page!=NULL){
+		heap_metadata* metadata = getHeapMetadataFromDataOffset(page, address.offset,&index);
+		if(metadata!=NULL){
+			metadata->isFree = true;
+		}
+		executeGarbageCollectorOn(page, process, &status);
+	}
 	return status;
+}
+
+void executeGarbageCollectorOn(heap_page* page, Process* process, int* status){
+	if(isFreePage(page)){
+		//freePageForProcess(process,page->page); todo: completar
+	}else{
+		//todo: crear algoritmo para compactar la metadata libre
+	}
+
 }
 
 void saveAlloc(int allocSize, heap_metadata* metadata, int index, heap_page* page){
