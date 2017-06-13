@@ -14,6 +14,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <dc-commons/logger.h>
+#include <dc-commons/serialization.h>
 #include <commons/collections/list.h>
 
 #define FIRST_FD 3
@@ -36,6 +37,7 @@ typedef struct {
 typedef struct {
 	flags* flag;
 	t_fileDescriptor* fileDescriptor;
+	int offset;//Servira para seek
 
 }t_processFileDescriptor;
 
@@ -73,6 +75,7 @@ void imprimirListaDeFD(t_list* lista);
 char* serialize_FileDescriptor(t_fileDescriptor* fd);
 size_t sizeOf_FileDescriptor(t_fileDescriptor* fd);
 t_fileDescriptor* deserialize_FileDescriptor(char* buffer);
+char* getPathFromFD(int fileDesc);
 /*
 t_processFileDescriptor* createNew_t_processFileDescriptor(char* permiso, t_fileDescriptor* fd);
 

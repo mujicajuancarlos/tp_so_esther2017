@@ -5,7 +5,6 @@
  *      Author: utnso
  */
 
-
 #include "process.h"
 
 int currentPid = FIRST_PID;
@@ -27,23 +26,23 @@ void destroyProcess(Process* process) {
 	if (process != NULL) {
 		if (process->pcb != NULL)
 			destroy_PBC(process->pcb);
-		if( process->heapPages != NULL){
+		if (process->heapPages != NULL) {
 			list_destroy_and_destroy_elements(process->heapPages,
-						(void*) destroy_heap_page);
+					(void*) destroy_heap_page);
 			process->heapPages = NULL;
 		}
-		if (process->fileDescriptorList != NULL){
+		if (process->fileDescriptorList != NULL) {
 			list_destroy_and_destroy_elements(process->fileDescriptorList,
-						(void*) destroy_t_processFileDescriptor);
+					(void*) destroy_t_processFileDescriptor);
 			process->fileDescriptorList = NULL;
 		}
 		free(process);
 	}
 }
 
-void freeProcessResources(Process* process){
+void freeProcessResources(Process* process) {
 	process->fileDescriptor = -1;
-	destroy_stackArray(process->pcb->stackIndex,process->pcb->stackSize);
+	destroy_stackArray(process->pcb->stackIndex, process->pcb->stackSize);
 	metadata_destruir(process->pcb->metadata);
 	process->pcb->stackIndex = NULL;
 	process->pcb->metadata = NULL;
@@ -67,7 +66,7 @@ int getNextPID() {
 	return next;
 }
 
-void markForcedQuitProcess(Process* process){
+void markForcedQuitProcess(Process* process) {
 	process->forceQuit = true;
 }
 
@@ -88,7 +87,7 @@ void createPcbForNewProcess(Process* process, Package* sourceCodePackage) {
 	process->pcb = pcb;
 }
 
-void replacePCB(Process* process, PCB* newPCB){
+void replacePCB(Process* process, PCB* newPCB) {
 	PCB* oldPcb = process->pcb;
 	destroy_PBC(oldPcb);
 	process->pcb = newPCB;
@@ -100,21 +99,22 @@ void printHeaderProcess() {
 }
 
 void printProcess(Process* proceso, int stateIndex) {
-	char* exitCode = (proceso->pcb==NULL)? "" : string_itoa(proceso->pcb->exit_code);
+	char* exitCode =
+			(proceso->pcb == NULL) ? "" : string_itoa(proceso->pcb->exit_code);
 	char* state = stateIndexToString(stateIndex);
 	printf("%5d\t%20s\t%20s\n", proceso->pid, state, exitCode);
 }
 
-void printProcessFull(Process* proceso, int stateIndex){
+void printProcessFull(Process* proceso, int stateIndex) {
 	printf("\nInformación del proceso %d\n", proceso->pid);
-	printf("\nEstado %s",stateIndexToString(stateIndex));
+	printf("\nEstado %s", stateIndexToString(stateIndex));
 	printf("\tCantidad rafagas ejecutadas %d\n", 567);//TODO: completar rafagas ejecutadas
 	printf("\tCantidad de operaciones privilegiadas %d\n", 142);//TODO: completar
-	printf("\tTabla de archivos abiertos %d\n", 423);//TODO: completar
+	printf("\tTabla de archivos abiertos %d\n", 423);	//TODO: completar
 	printf("\tCantidad de paginas heap utilizadas %d\n", 423);//TODO: completar
-	printf("\tOtra cantidad %d\n", 432);//TODO: completar
-	printf("\tOtra cantidad %d\n", 234);//TODO: completar
-	printf("\tCantidad de syscall ejecutadas %d\n", 432);//TODO: completar
+	printf("\tOtra cantidad %d\n", 432);	//TODO: completar
+	printf("\tOtra cantidad %d\n", 234);	//TODO: completar
+	printf("\tCantidad de syscall ejecutadas %d\n", 432);	//TODO: completar
 }
 
 t_processFileDescriptor* createNew_t_processFileDescriptor(char* permiso,
@@ -124,6 +124,7 @@ t_processFileDescriptor* createNew_t_processFileDescriptor(char* permiso,
 
 	newPFD->fileDescriptor = fd;
 	newPFD->flag = habilitarPermisos(permiso);
+	newPFD->offset = 0;
 
 	return newPFD;
 
@@ -134,10 +135,9 @@ void destroy_t_processFileDescriptor(t_processFileDescriptor* pfd) {
 	free(pfd);
 }
 
-
 flags* habilitarPermisos(char* permiso) {
 	flags* flag = malloc(sizeof(flags));
-	int retorno=-1;
+	int retorno = -1;
 	retorno = strcmp(permiso, READ);
 	if (retorno == 0) {
 		flag->read = true;
@@ -165,9 +165,7 @@ flags* habilitarPermisos(char* permiso) {
 	return flag;
 }
 
-
-
-void agregarPFD_Alista(Process* process,t_processFileDescriptor* pfd) {
+void agregarPFD_Alista(Process* process, t_processFileDescriptor* pfd) {
 	list_add(process->fileDescriptorList, pfd);
 
 }
@@ -184,101 +182,101 @@ void removerPFD_Lista(t_processFileDescriptor* pfd, Process* process) {
 }
 
 /*
-char* serialize_Flags(flags* flags){
-	char* buffer = malloc(sizeof(flags));
-	uint32_t offset = 0;
+ char* serialize_Flags(flags* flags){
+ char* buffer = malloc(sizeof(flags));
+ uint32_t offset = 0;
 
-	serialize_and_copy_value(buffer,&(flags->read),sizeof(bool),&offset);
-	serialize_and_copy_value(buffer,&(flags->write),sizeof(bool),&offset);
+ serialize_and_copy_value(buffer,&(flags->read),sizeof(bool),&offset);
+ serialize_and_copy_value(buffer,&(flags->write),sizeof(bool),&offset);
 
-	return buffer;
-
-
-}
-
-flags* deserialize_Flags(char* buffer){
-	flags* f = malloc(sizeof(flags)) ;
-	uint32_t offset = 0;
-
-	deserialize_and_copy_value(&(f->read),buffer,sizeof(bool),&offset);
-	deserialize_and_copy_value(&(f->write),buffer,sizeof(bool),&offset);
-
-	return f;
-
-}
-uint32_t sizeof_ProcessFileDescriptor(t_processFileDescriptor* pfd) {
-	uint32_t longitud = 0;
-	longitud += sizeof(flags);
-	longitud += sizeof(t_fileDescriptor);
-
-	return longitud;
-}
+ return buffer;
 
 
-char* serialize_ProcessFileDescriptor(t_processFileDescriptor* pfd){
+ }
 
-	uint32_t total_size = sizeof_ProcessFileDescriptor(pfd);
+ flags* deserialize_Flags(char* buffer){
+ flags* f = malloc(sizeof(flags)) ;
+ uint32_t offset = 0;
 
-	char *stream = malloc(sizeof(char) * total_size);
+ deserialize_and_copy_value(&(f->read),buffer,sizeof(bool),&offset);
+ deserialize_and_copy_value(&(f->write),buffer,sizeof(bool),&offset);
 
-	char* tmpBuffer;
+ return f;
 
-	uint32_t offset = 0;
+ }
+ uint32_t sizeof_ProcessFileDescriptor(t_processFileDescriptor* pfd) {
+ uint32_t longitud = 0;
+ longitud += sizeof(flags);
+ longitud += sizeof(t_fileDescriptor);
 
-	tmpBuffer = serialize_Flags(pfd->flag);
-
-	serialize_and_copy_value(stream, tmpBuffer,
-			sizeof(flags), &offset);
-
-	free(tmpBuffer);
-
-	tmpBuffer = serialize_FileDescriptor(pfd->fileDescriptor);
-
-	serialize_and_copy_value(stream, tmpBuffer,
-			sizeof(t_fileDescriptor), &offset);
-
-	free(tmpBuffer);
+ return longitud;
+ }
 
 
-	return stream;
-}
+ char* serialize_ProcessFileDescriptor(t_processFileDescriptor* pfd){
 
-t_processFileDescriptor* deserialize_ProcessFileDescritpro(char* buffer) {
+ uint32_t total_size = sizeof_ProcessFileDescriptor(pfd);
 
-	uint32_t offset = 0;
+ char *stream = malloc(sizeof(char) * total_size);
 
-	t_processFileDescriptor* pfd = malloc(sizeof(t_processFileDescriptor));
+ char* tmpBuffer;
 
-	flags* f = malloc(sizeof(flags));
-	t_size ft = sizeof(flags);
+ uint32_t offset = 0;
 
-	deserialize_and_copy_value(&f,buffer, sizeof(flags),
-				&offset);
+ tmpBuffer = serialize_Flags(pfd->flag);
 
-		char* flagsBuffer = malloc(sizeof(flags));
+ serialize_and_copy_value(stream, tmpBuffer,
+ sizeof(flags), &offset);
 
-		deserialize_and_copy_value(flagsBuffer, buffer, ft,
-				&offset);
-		pfd->flag = deserialize_Flags(flagsBuffer);
+ free(tmpBuffer);
 
-		t_processFileDescriptor* unPFD = malloc(sizeof(t_processFileDescriptor));
+ tmpBuffer = serialize_FileDescriptor(pfd->fileDescriptor);
 
-	deserialize_and_copy_value(unPFD,buffer,sizeof(t_processFileDescriptor),&offset);
+ serialize_and_copy_value(stream, tmpBuffer,
+ sizeof(t_fileDescriptor), &offset);
 
-	char* pfdBuffer = malloc(sizeof(t_processFileDescriptor));
+ free(tmpBuffer);
 
-	t_size pdfT = sizeof(t_processFileDescriptor);
 
-	deserialize_and_copy_value(pfdBuffer,buffer,pdfT,&offset);
+ return stream;
+ }
 
-	pfd->fileDescriptor = deserialize_FileDescriptor(pfdBuffer);
+ t_processFileDescriptor* deserialize_ProcessFileDescritpro(char* buffer) {
 
-	free(f);  //verificar
+ uint32_t offset = 0;
 
-	free(pfdBuffer);
+ t_processFileDescriptor* pfd = malloc(sizeof(t_processFileDescriptor));
 
-	free(unPFD);
+ flags* f = malloc(sizeof(flags));
+ t_size ft = sizeof(flags);
 
-	return pfd;
-}
-*/
+ deserialize_and_copy_value(&f,buffer, sizeof(flags),
+ &offset);
+
+ char* flagsBuffer = malloc(sizeof(flags));
+
+ deserialize_and_copy_value(flagsBuffer, buffer, ft,
+ &offset);
+ pfd->flag = deserialize_Flags(flagsBuffer);
+
+ t_processFileDescriptor* unPFD = malloc(sizeof(t_processFileDescriptor));
+
+ deserialize_and_copy_value(unPFD,buffer,sizeof(t_processFileDescriptor),&offset);
+
+ char* pfdBuffer = malloc(sizeof(t_processFileDescriptor));
+
+ t_size pdfT = sizeof(t_processFileDescriptor);
+
+ deserialize_and_copy_value(pfdBuffer,buffer,pdfT,&offset);
+
+ pfd->fileDescriptor = deserialize_FileDescriptor(pfdBuffer);
+
+ free(f);  //verificar
+
+ free(pfdBuffer);
+
+ free(unPFD);
+
+ return pfd;
+ }
+ */
