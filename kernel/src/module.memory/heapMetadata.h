@@ -32,8 +32,12 @@ void destroy_heap_page(heap_page* heapPage);
 heap_metadata* create_heap_metadata(uint32_t startData, uint32_t dataSize);
 void destroy_heap_metadata(heap_metadata* metadata);
 
-bool isHeapPageAvailable(int sizeAlloc, heap_page* page);
-bool isHeapMetadataAvailable(int sizeAlloc, heap_metadata* metadata);
+heap_metadata* getHeapMetadataFromDataOffset(heap_page* page, uint32_t dataOffset,int* index);
+heap_metadata* getAvailableHeapMetadataForPage(int allocSize, heap_page* page, int* index);
+
+bool isFreePage(heap_page* page);
+bool isAvailableHeapPage(int sizeAlloc, heap_page* page);
+bool isAvailableHeapMetadata(int sizeAlloc, heap_metadata* metadata);
 
 size_t sizeof_heapMetadata();
 

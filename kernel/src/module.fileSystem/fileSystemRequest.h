@@ -19,11 +19,12 @@
 #include "../module.model/process.h"
 #include "fileSystemAdministrator.h"
 
-bool validateFile(kernel_struct* kernelStruct, char* path);
+bool validateFileExistence(Process* process, char* path);
 int openFile(Process* process, char* path, char* openMode);
 bool isOpen(char* path);
 int createFile(Process* process, char* path, char* openMode);
 int closeFile(Process* process, char* path);
 int deleteFile(Process* process, char* path);
+int readFile(Process* process, int fileDesc_file, int offset, size_t size);
 Package* solicitudAlFileSystem(int socket, uint32_t msgCode, char* stream);
 #endif /* MODULE_FILESYSTEM_FILESYSTEMREQUEST_H_ */

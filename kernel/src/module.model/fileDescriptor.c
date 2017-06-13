@@ -6,13 +6,11 @@
  */
 #include "fileDescriptor.h"
 
-
 int nextFD = FIRST_FD;
 
 pthread_mutex_t fileDescriptor_mutex;
 pthread_mutex_t tablaGlobalFD_mutex;
 pthread_mutex_t nextFD_mutex;
-
 
 void initializeFileSystemModule() {
 	logInfo("Inicializando el modulo FS");
@@ -41,7 +39,6 @@ void tablaGlobalFD_mutex_lock() {
 void tablaGlobalFD_mutex_unlock() {
 	pthread_mutex_unlock(&tablaGlobalFD_mutex);
 }
-
 
 void fileDescriptor_mutex_lock() {
 	pthread_mutex_lock(&fileDescriptor_mutex);
@@ -110,7 +107,7 @@ void incrementarOpen(t_fileDescriptor* fd) {
 	fileDescriptor_mutex_unlock();
 }
 
-void decrementarOpen(t_fileDescriptor* fd) {//TODO: Verificar funcion. Que pasa si es negativo por ejemplo? o si el numero de abiertos es 5, queda en 4 por que hace validacion con 0?
+void decrementarOpen(t_fileDescriptor* fd) { //TODO: Verificar funcion. Que pasa si es negativo por ejemplo? o si el numero de abiertos es 5, queda en 4 por que hace validacion con 0?
 	fileDescriptor_mutex_lock();
 	fd->open--;
 	if (fd->open == 0) {
@@ -149,14 +146,11 @@ char* serialize_FileDescriptor(t_fileDescriptor* fd) {
 
 	uint32_t offset = 0;
 
-	serialize_and_copy_value(buffer, &(fd->fd), sizeof(uint32_t),
-			&offset);
+	serialize_and_copy_value(buffer, &(fd->fd), sizeof(uint32_t), &offset);
 
-	serialize_and_copy_value(buffer, fd->path,
-			sizeof(char) * fd->fd, &offset);
+	serialize_and_copy_value(buffer, fd->path, sizeof(char) * fd->fd, &offset);
 
-	serialize_and_copy_value(buffer, &(fd->open), sizeof(uint32_t),
-			&offset);
+	serialize_and_copy_value(buffer, &(fd->open), sizeof(uint32_t), &offset);
 
 	return buffer;
 }
@@ -166,27 +160,27 @@ t_fileDescriptor* deserialize_FileDescriptor(char* buffer) {
 
 	uint32_t offset = 0;
 
-	deserialize_and_copy_value(&(fd->fd), buffer, sizeof(uint32_t),
-			&offset);
+	deserialize_and_copy_value(&(fd->fd), buffer, sizeof(uint32_t), &offset);
 
 	fd->path = malloc(sizeof(char) * fd->fd);
 
-	deserialize_and_copy_value(fd->path, buffer,
-			sizeof(char) * fd->fd, &offset);
-
-	deserialize_and_copy_value(&(fd->open), buffer, sizeof(uint32_t),
+	deserialize_and_copy_value(fd->path, buffer, sizeof(char) * fd->fd,
 			&offset);
+
+	deserialize_and_copy_value(&(fd->open), buffer, sizeof(uint32_t), &offset);
 	return fd;
 }
 
+char* getPathFromFD(int fileDesc) {
 
+	bool condicion(void* element) {
+		t_processFileDescriptor* unPFD = element;
+		return unPFD->fileDescriptor->fd == fileDesc;
+	}
 
+	t_processFileDescriptor* processFDFound = list_find(
+			fileDescriptorGlobalList, condicion);
 
-
-
-
-
-
-
-
+	return processFDFound->fileDescriptor->path;
+}
 
