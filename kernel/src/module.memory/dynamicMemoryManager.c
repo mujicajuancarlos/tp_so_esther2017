@@ -9,9 +9,11 @@
 
 int basicMallocMemory(Process* process, int allocSize, t_puntero* pointer) {
 	int status = SC_ERROR_MEMORY_EXCEPTION;
-	heap_page* availablePage = getHeapPageForProcess(allocSize,process, &status);
+	heap_page* availablePage = getAvailableHeapPageForProcess(allocSize,process, &status);
 	if (status == MALLOC_MEMORY_SUCCES) {
-		//todo: tengo una pagina con espacio disponible, a completar
+		int index;
+		heap_metadata* availableMetadata = getAvailableHeapMetadataForPage(allocSize,availablePage,&index);
+		saveAlloc(allocSize,availableMetadata, index, availablePage);
 	}
 	return status;
 }
@@ -22,15 +24,21 @@ int basicFreeMemory(Process* process, t_puntero pointer) {
 	return status;
 }
 
+void saveAlloc(int allocSize, heap_metadata* metadata, int index, heap_page* page){
+	metadata->dataSize = allocSize;
+	metadata->isFree = false;
+	createHeapMetadataFor(page,metadata,index);
+}
+
 /*
  * busco desde el proceso, si pido una nueva pagina
  * guardo en status el estado de la ejecucion
  */
-heap_page* getHeapPageForProcess(int allocSize, Process* process, int* status) {
+heap_page* getAvailableHeapPageForProcess(int allocSize, Process* process, int* status) {
 	heap_page* selectedPage = NULL;
 	validateMaxAllockSize(allocSize, process, status);
 	if (*status != SC_ERROR_MEMORY_ALLOC_EXCEEDED) {
-		selectedPage = getHeapPageIntoListFor(allocSize, process->heapPages);
+		selectedPage = getAvailableHeapPageIntoListFor(allocSize, process->heapPages);
 		if (selectedPage == NULL)
 			selectedPage = createHeapPageFor(process, status);
 	}
@@ -38,12 +46,12 @@ heap_page* getHeapPageForProcess(int allocSize, Process* process, int* status) {
 }
 
 /*
- * devuelvo un pagina con espacio o null si no hay
+ * devuelvo un pagina con espacio desde la lista o null si no hay
  */
-heap_page* getHeapPageIntoListFor(int allocSize, t_list* heapList) {
+heap_page* getAvailableHeapPageIntoListFor(int allocSize, t_list* heapList) {
 	bool condition(void* element) {
 		heap_page* page = element;
-		return isHeapPageAvailable(allocSize, page);
+		return isAvailableHeapPage(allocSize, page);
 	}
 	return list_find(heapList, condition);
 }
@@ -58,7 +66,7 @@ heap_page* createHeapPageFor(Process* process, int* status) {
 		int nextNumber = getNextHeapPageNumber(process->heapPages);
 		selectedPage = create_heap_page(nextNumber,
 				process->kernelStruct->pageSize);
-		createHeapMetadataFor(selectedPage);
+		createHeapMetadataFor(selectedPage, NULL, -1);
 		list_add_in_index(process->heapPages, nextNumber, selectedPage);
 	}
 	return selectedPage;
@@ -67,20 +75,21 @@ heap_page* createHeapPageFor(Process* process, int* status) {
 /*
  * agrego una metadata en la pagina, respetando el contexto actual
  * se debe invocar a esta funcion solo si se valido que tiene espacio disponible
- * si no se valido sizeData quedara negativo
+ * si no se valido sizeData quedara negativo y logueara el error
+ * estoy preparado para generar metadata incluso en el medio de la lista
  */
-void createHeapMetadataFor(heap_page* page) {
-	int dataOffset, sizeData;
-	heap_metadata* last = list_get(page->metadataList,
-			list_size(page->metadataList) - 1);
-	dataOffset = (last != NULL) ? last->dataOffset + last->dataSize : 0;
+void createHeapMetadataFor(heap_page* page, heap_metadata* previous, int previousIndex) {
+	int dataOffset, sizeData, maxSize;
+	heap_metadata* next = list_get(page->metadataList, previousIndex+1);
+	dataOffset = (previous != NULL) ? previous->dataOffset + previous->dataSize : 0;
 	dataOffset += sizeof_heapMetadata(); //fijo por el tamaño de la nueva metadata
-	sizeData = page->pageSize - dataOffset;
+	maxSize = (next!=NULL)? next->dataOffset - sizeof_heapMetadata() : page->pageSize;
+	sizeData = maxSize - dataOffset;
 	if (sizeData < 0)
 		logError(
 				"Uso incorrecto de la funcion createHeapMetadataFor(heap_page* page), se intenta crear metadata en una pagina que no tiene mas espacio libre");
 	heap_metadata* metadata = create_heap_metadata(dataOffset, sizeData);
-	list_add(page->metadataList, metadata);
+	list_add_in_index(page->metadataList,previousIndex + 1,metadata);
 }
 
 /*
@@ -104,7 +113,7 @@ int getNextHeapPageNumber(t_list* pageList) {
  * la cpu conoce y basa sus direcciones en el stackfirstpage,
  * por lo cual las direcciones del hep tmb deben basarse ene esa informacion
  */
-uint32_t getHeapFistPage(Process* process) {
+uint32_t getHeapFistPageNumber(Process* process) {
 	/*
 	 * esta es la pagina cero respecto al la pagina 0 del proceso
 	 * process->pcb->stackFirstPage + process->kernelStruct->config->stack_size;
@@ -117,7 +126,7 @@ uint32_t getHeapFistPage(Process* process) {
  */
 t_puntero logicalAddressToPointer(dir_memoria address, Process* process) {
 	t_puntero pointer = 0;
-	uint32_t heapFistPage = getHeapFistPage(process);
+	uint32_t heapFistPage = getHeapFistPageNumber(process);
 	pointer += (heapFistPage + address.pagina)
 			* process->kernelStruct->pageSize;
 	pointer += address.offset;
@@ -131,7 +140,7 @@ dir_memoria pointerToLogicalAddress(t_puntero pointer, Process* process) {
 	dir_memoria address;
 	int pageSize = process->kernelStruct->pageSize;
 	int pageNumber = pointer / pageSize;
-	uint32_t heapFistPage = getHeapFistPage(process);
+	uint32_t heapFistPage = getHeapFistPageNumber(process);
 	int offset = pointer % pageSize;
 	address.pagina = pageNumber - heapFistPage;
 	address.offset = offset;
