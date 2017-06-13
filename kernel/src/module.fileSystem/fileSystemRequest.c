@@ -159,7 +159,7 @@ int deleteFile(Process* process, char* path) {
 
 
 int writeFile(uint32_t fd, int offset,char*buffer, size_t size, Process* process){
-	 char* path = obtenerPath(fd);
+	 /* char* path = obtenerPath(fd);
 
 	 //TODO: Esta funcion envia y devuelve el package
 	 //TODO: hay que serializar los datos y meterlos en el stream ¿Estructuras?
@@ -196,7 +196,8 @@ int writeFile(uint32_t fd, int offset,char*buffer, size_t size, Process* process
 
 
 	 //TODO Evaluar si hubo error terminar, si no mandar a Ready
-
+*/
+	return (0);
 	 }
 
 void readFile(Process* process, char* path, char* buffer, size_t size, int offset){

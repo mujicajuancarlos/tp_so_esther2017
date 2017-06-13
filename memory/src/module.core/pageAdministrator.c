@@ -107,8 +107,11 @@ int processRead(memory_struct* memoryStruct, t_PageBytes* dataInfo) {
 	if ((dataInfo->offset + dataInfo->size) > memoryStruct->pageSize) {
 		// segmentation fault
 		return (-1);
-	} else
+	}
+	else {
+		dataInfo->buffer = malloc (dataInfo->size);
 		memcpy(dataInfo->buffer, memAddress, dataInfo->size);
+	}
 
 	return 0;
 }

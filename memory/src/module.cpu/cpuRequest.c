@@ -29,6 +29,7 @@ void cpuReadData(CPU* cpu, Package* package) {
 
 	int status = processRead(cpu->memoryStruct, pageBytes);
 
+
 	if (status == 0)
 		outPackage = createAndSendPackage(cpu->fileDescriptor,
 				COD_GET_PAGE_BYTES_RESPONSE, pageBytes->size,

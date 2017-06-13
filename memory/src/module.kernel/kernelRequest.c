@@ -46,20 +46,6 @@ void addNewPages(Package* package, kernel* kernel) {
 	destroyPackage(outPackage);
 }
 
-void startNewProcessTest(int processId, int pages, memory_struct* memoryStruct) {
-	Package* outPackage;
-	int status = assignNewPages(memoryStruct, processId, pages);
-
-	if (status == 0)
-		outPackage = createAndSendPackage(memoryStruct->socketClientKernel,
-				COD_NEW_PROCESS_RESPONSE_OK, 0, NULL);
-	else
-		outPackage = createAndSendPackage(memoryStruct->socketClientKernel,
-				ERROR_MEMORY_FULL, 0, NULL);
-
-	destroyPackage(outPackage);
-}
-
 void saveData(Package* package, kernel* kernel) {
 	t_PageBytes* pageBytes = deserialize_t_PageBytes(package->stream);
 	Package* outPackage;
