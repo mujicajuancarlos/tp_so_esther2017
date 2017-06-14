@@ -35,13 +35,15 @@ void handleCPUs(kernel_struct *kernelStruct) {
 void handleNewCPU(CPU* newCpu) {
 
 	Package* package;
-	addCPU(newCpu); //AGREGO E INCREMENTO EL SEMAFORO DE CPUS LIBRES
 	bool running = true;
 	char* tmpBuffer = serialize_int(newCpu->kernelStruct->config->stack_size);
 	package = createAndSendPackage(newCpu->fileDescriptor,
 	COD_SET_STACK_PAGE_SIZE, sizeof(uint32_t), tmpBuffer);
-	if (package == NULL)
+	if (package == NULL) {
 		running = false;
+	} else {
+		addCPU(newCpu); //AGREGO E INCREMENTO EL SEMAFORO DE CPUS LIBRES;
+	}
 	free(tmpBuffer);
 	destroyPackage(package);
 	while (running) {
@@ -89,11 +91,13 @@ void handleCPURequest(CPU* cpu, Package* package) {
 	case COD_SEM_SIGNAL:
 		resolveRequest_updateSemaphore(cpu, package);
 		break;
-	case COD_EXECUTION_ERROR://soy para los errores producidos exclusivamente en cpu, los errores de syscal se resuelven sincronicamente
+	case COD_EXECUTION_ERROR: //soy para los errores producidos exclusivamente en cpu, los errores de syscal se resuelven sincronicamente
 		resolveRequest_executionError(cpu, package);
 		break;
 	default:
-		logError("La cpu %d envio un mensaje desconocido, por cuestiones de seguridad la conexion sera desvinculada", cpu->fileDescriptor);
+		logError(
+				"La cpu %d envio un mensaje desconocido, por cuestiones de seguridad la conexion sera desvinculada",
+				cpu->fileDescriptor);
 		moveFromExcecToReady(cpu->process);
 		removeCPU(cpu);
 		break;
