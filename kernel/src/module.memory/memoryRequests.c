@@ -149,7 +149,10 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 	u_int32_t offset = 0;
 	u_int32_t sizeBuffer;
 	t_PageBytes* content;
-	int pagesNumber = sourceCodePackage->size / process->kernelStruct->pageSize;
+	bool hasOffset = (sourceCodePackage->size % process->kernelStruct->pageSize)
+			> 0;
+	int pagesNumber = hasOffset ? 1 : 0;
+	pagesNumber += sourceCodePackage->size / process->kernelStruct->pageSize;
 	int index;
 
 	for (index = 0; index < pagesNumber; ++index) {
@@ -188,7 +191,7 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 				process->kernelStruct->socketClientMemoria);
 		if (tmpPackage != NULL) {
 			switch (tmpPackage->msgCode) {
-			case COD_SAVE_PAGE_BYTES_REQUEST:
+			case COD_SAVE_PAGE_BYTES_RESPONSE:
 				logInfo(
 						"La memoria almaceno correctamente la pagina %d para el pid %d",
 						content->pageNumber, content->pid);

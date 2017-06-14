@@ -127,6 +127,7 @@ void ansisopExecuteInstruccion(cpu_struct* cpuStruct) {
 	pthread_mutex_lock(&executionMutex);
 	errorFlag = FLAG_OK;
 	char* instruccion = getNextInstruction(cpuStruct);
+	logTrace("La instruccion leida de la memoria es '%s'", instruccion);
 	if (errorFlag == FLAG_OK) {
 		pcb->programCounter++;
 		logTrace("Ansisop instruction - START");
