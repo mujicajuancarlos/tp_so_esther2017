@@ -33,7 +33,7 @@ void cpuReadData(CPU* cpu, Package* package) {
 	if (status == 0)
 		outPackage = createAndSendPackage(cpu->fileDescriptor,
 				COD_GET_PAGE_BYTES_RESPONSE, pageBytes->size,
-				pageBytes->buffer);
+				serialize_t_PageBytes (pageBytes));
 	else
 		outPackage = createAndSendPackage(cpu->fileDescriptor,
 				ERROR_SEGMENTATION_FAULT, 0, NULL);
