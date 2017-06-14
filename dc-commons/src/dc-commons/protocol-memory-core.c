@@ -18,7 +18,7 @@ char* serialize_t_PageBytes(t_PageBytes* object) {
 			&offset);
 	serialize_and_copy_value(stream, &(object->size), sizeof(uint32_t),
 			&offset);
-	serialize_and_copy_value(stream, &(object->buffer),
+	serialize_and_copy_value(stream, object->buffer,
 			sizeof(char) * object->size, &offset);
 
 	return stream;
@@ -39,7 +39,7 @@ t_PageBytes* deserialize_t_PageBytes(char* stream) {
 
 	size_t sizeBuffer = (sizeof(char) * object->size);
 	object->buffer = calloc(1, sizeBuffer);
-	deserialize_and_copy_value(&(object->buffer), stream,
+	deserialize_and_copy_value(object->buffer, stream,
 			sizeof(char) * object->size, &offset);
 
 	return object;
