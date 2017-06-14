@@ -35,4 +35,10 @@ void reservePagesForNewProcess(Process* process, Package* package);
 
 void sendSourceCodeForNewProcess(Process* process, Package* package);
 
+void saveDataOnMemory(Process* process, int startPage, u_int32_t offset,
+		t_size length, char* buffer, bool* hasError);
+
+void saveDataOnPage(Process* process, int pageNumber, int offset, int size,
+		char* buffer, bool* hasError);
+
 #endif /* MODULE_MEMORY_MEMORYREQUESTS_H_ */

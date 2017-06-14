@@ -145,86 +145,91 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 }
 
 void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
-	Package* tmpPackage;
-	u_int32_t offset = 0;
-	u_int32_t sizeBuffer;
-	t_PageBytes* content;
-	bool hasOffset = (sourceCodePackage->size % process->kernelStruct->pageSize)
-			> 0;
-	int pagesNumber = hasOffset ? 1 : 0;
-	pagesNumber += sourceCodePackage->size / process->kernelStruct->pageSize;
-	int index;
 
-	for (index = 0; index < pagesNumber; ++index) {
-		offset += process->kernelStruct->pageSize * index + 1;
-		sizeBuffer =
-				(sourceCodePackage->size - offset > sourceCodePackage->size) ?
-						process->kernelStruct->pageSize :
-						sourceCodePackage->size - offset;
-		content = create_t_PageBytes(process->pid, index, 0, sizeBuffer,
-				sourceCodePackage->stream + offset);
-		content->pageNumber = index;
-		content->offset = 0;
-		content->pid = process->pid;
+	bool hasError = false;
 
-		logInfo(
-				"Solicitando a la memoria que almacene para el pid %d en la pagina %d offset %d tamaño del buffer %d",
-				content->pid, content->pageNumber, content->offset,
-				content->size);
-		tmpPackage = createAndSendPackage(
-				process->kernelStruct->socketClientMemoria,
-				COD_SAVE_PAGE_BYTES_REQUEST, sizeof_t_PageBytes(content),
-				(char*) content);
-		if (tmpPackage == NULL) {
-			destroyPackage(tmpPackage);
-			destroy_t_PageBytes(content);
-			logError(
-					"No se pudo almacenar el codigo fuente en la memoria para el pid %d",
-					process->pid);
-			removeFromNEW(process);
-			exit(EXIT_FAILURE);
-		}
-		destroyPackage(tmpPackage);
-
-		//me quedo a la espera de la aprobacion
-		tmpPackage = createAndReceivePackage(
-				process->kernelStruct->socketClientMemoria);
-		if (tmpPackage != NULL) {
-			switch (tmpPackage->msgCode) {
-			case COD_SAVE_PAGE_BYTES_RESPONSE:
-				logInfo(
-						"La memoria almaceno correctamente la pagina %d para el pid %d",
-						content->pageNumber, content->pid);
-				break;
-			case ERROR_MEMORY_FULL:
-				logInfo(
-						"La memoria indica que no hay espacio para el proceso pid %d",
-						process->pid);
-				destroyPackage(tmpPackage);
-				destroy_t_PageBytes(content);
-				removeFromNEW(process);
-				exit(EXIT_FAILURE);
-				break;
-			default:
-				logError("La memoria envio un mensaje no esperado");
-				destroyPackage(tmpPackage);
-				destroy_t_PageBytes(content);
-				exit(EXIT_FAILURE);
-				break;
-			}
-		} else {
-			destroyPackage(tmpPackage);
-			logError(
-					"No se recibio la respuesta de la memoria para el proceso pid %d",
-					process->pid);
-			destroyPackage(tmpPackage);
-			destroy_t_PageBytes(content);
-			removeFromNEW(process);
-			exit(EXIT_FAILURE);
-		}
-
-		destroy_t_PageBytes(content);
-		destroyPackage(tmpPackage);
+	logInfo("Enviando el codigo fuente a la memoria para el pid: %d",process->pid);
+	saveDataOnMemory(process, 0, 0, sourceCodePackage->size, sourceCodePackage->stream, &hasError);//startPage 0 porque se trata del codigo
+	logInfo("Se envio el codigo fuente a la memoria para el pid: %d",process->pid);
+	if(hasError){
+		logError("No se pudo almacenar el codigo fuente para el proceso pid: %d, se procede a eliminarlo del sistema",process->pid);
+		removeFromNEW(process);
+		exit(EXIT_FAILURE);
 	}
 
+}
+
+/**
+ * Soy una funcion generica que sirve para guardar datos en la memoria
+ * SIN IMPORTAR QUE ESOS DATOS ESTEN PARTIDOS ENTRE DOS O MAS PAGINAS CONTIGUAS
+ * ---importante -> hay que pasarle un numero de pagina de inicio -> startPage
+ */
+void saveDataOnMemory(Process* process, int startPage, u_int32_t offset,
+		t_size length, char* buffer, bool* hasError) {
+	int bufferOffset = 0;
+	char* tmpBuffer;
+	int firstByte, lastByte, pageNumber, tmpBufferSize, pageSize;
+	pageSize = process->kernelStruct->pageSize;
+	int firstPage = startPage + (offset / pageSize);
+	int lastPage = startPage + ((offset + length) / pageSize);
+	int firstPageOffset = offset % pageSize;
+	int lastPageOffset = (offset + length) % pageSize;
+	for (pageNumber = firstPage; !*hasError && pageNumber <= lastPage;
+			++pageNumber) {
+		firstByte = (pageNumber == firstPage) ? firstPageOffset : 0;
+		lastByte = (pageNumber == lastPage) ? lastPageOffset : pageSize;
+		tmpBufferSize = lastByte - firstByte;
+		tmpBuffer = malloc(tmpBufferSize);
+		memcpy(tmpBuffer, buffer + bufferOffset, tmpBufferSize);
+		saveDataOnPage(process, pageNumber, firstByte, tmpBufferSize,
+				tmpBuffer, hasError);
+		if (!*hasError) {
+			bufferOffset += tmpBufferSize;
+		}
+		free(tmpBuffer);
+	}
+}
+
+void saveDataOnPage(Process* process, int pageNumber, int offset, int size,
+		char* buffer, bool* hasError) {
+	Package* package;
+	t_PageBytes* data = create_t_PageBytes(process->pid, pageNumber, offset,
+			size, buffer);
+	char* serializedData = serialize_t_PageBytes(data);
+	size_t serializedSize = sizeof_t_PageBytes(data);
+	logTrace("Enviando datos del pid: %d pag: %d offset: %d size: %d",
+			process->pid, pageNumber, offset, size);
+	package = createAndSendPackage(process->kernelStruct->socketClientMemoria,
+	COD_SAVE_PAGE_BYTES_REQUEST, serializedSize, serializedData);
+	free(serializedData);
+	destroy_t_PageBytes(data);
+	if (package != NULL) {
+		destroyPackage(package);
+		package = createAndReceivePackage(process->kernelStruct->socketClientMemoria);
+		if (package != NULL) {
+			switch (package->msgCode) {
+			case COD_SAVE_PAGE_BYTES_RESPONSE:
+				logInfo(
+						"Solicitud para guardar datos realizada para pid: %d pag: %d offset: %d size: %d",
+						process->pid, pageNumber, offset, size);
+				break;
+			case ERROR_SEGMENTATION_FAULT:
+				logError(
+						"La memoria informo que la solicitud produjo SegmentationFault");
+				*hasError = true;
+				break;
+			default:
+				logError("La memoria respondio con un codigo no esperado");
+				*hasError = true;
+				break;
+			}
+			destroyPackage(package);
+		} else {
+			logError("No se pudo recibir la solicitud a la memoria");
+			*hasError = true;
+		}
+	} else {
+		logError("No se pudo enviar la solicitud a la memoria");
+		*hasError = true;
+	}
 }
