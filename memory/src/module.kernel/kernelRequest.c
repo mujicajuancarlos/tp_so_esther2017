@@ -71,7 +71,7 @@ void readData(Package* package, kernel* kernel) {
 	if (status == 0)
 		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				COD_GET_PAGE_BYTES_RESPONSE, pageBytes->size,
-				pageBytes->buffer);
+				serialize_t_PageBytes (pageBytes));
 	else
 		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				ERROR_SEGMENTATION_FAULT, 0, NULL);
