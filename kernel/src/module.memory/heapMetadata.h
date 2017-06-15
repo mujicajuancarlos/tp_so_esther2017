@@ -17,6 +17,7 @@
 typedef struct {
     int page;	//numero de pagina -> pagina inicial es pag stack + stack size
     int pageSize;
+    bool isGarbage;
     t_list* metadataList; //lista de bloques de datos
 } heap_page;
 
@@ -31,6 +32,8 @@ void destroy_heap_page(heap_page* heapPage);
 
 heap_metadata* create_heap_metadata(uint32_t startData, uint32_t dataSize);
 void destroy_heap_metadata(heap_metadata* metadata);
+
+void markAsGarbage(heap_page* page);
 
 heap_metadata* getHeapMetadataFromDataOffset(heap_page* page, uint32_t dataOffset,int* index);
 heap_metadata* getAvailableHeapMetadataForPage(int allocSize, heap_page* page, int* index);

@@ -17,3 +17,14 @@ t_AddPagesToProcess* create_t_AddPagesToProcess(int pid, int size){
 	object->size = size;
 	return object;
 }
+
+size_t sizeof_t_FreePageToProcess(){
+	return (sizeof(uint32_t) * 2);
+}
+
+t_FreePageToProcess* create_t_FreePageToProcess(int pid, int pageNumber){
+	t_FreePageToProcess* object = malloc(sizeof_t_FreePageToProcess());
+	object->pid = pid;
+	object->page = pageNumber;
+	return object;
+}

@@ -10,14 +10,16 @@
 int basicMallocMemory(Process* process, int allocSize, t_puntero* pointer) {
 	int status = SC_ERROR_MEMORY_EXCEPTION;
 	dir_memoria address;
-	heap_page* availablePage = getAvailableHeapPageForProcess(allocSize,process, &status);
+	heap_page* availablePage = getAvailableHeapPageForProcess(allocSize,
+			process, &status);
 	if (status == MALLOC_MEMORY_SUCCES) {
 		int index;
-		heap_metadata* availableMetadata = getAvailableHeapMetadataForPage(allocSize,availablePage,&index);
-		saveAlloc(allocSize,availableMetadata, index, availablePage);
+		heap_metadata* availableMetadata = getAvailableHeapMetadataForPage(
+				allocSize, availablePage, &index);
+		saveAlloc(allocSize, availableMetadata, index, availablePage);
 		address.pagina = availablePage->page;
 		address.offset = availableMetadata->dataOffset;
-		*pointer = logicalAddressToPointer(address,process);
+		*pointer = logicalAddressToPointer(address, process);
 	}
 	return status;
 }
@@ -25,11 +27,12 @@ int basicMallocMemory(Process* process, int allocSize, t_puntero* pointer) {
 int basicFreeMemory(Process* process, t_puntero pointer) {
 	int status = SC_ERROR_MEMORY_EXCEPTION;
 	int index;
-	dir_memoria address = pointerToLogicalAddress(pointer,process);
-	heap_page* page = list_get(process->heapPages,address.pagina);
-	if(page!=NULL){
-		heap_metadata* metadata = getHeapMetadataFromDataOffset(page, address.offset,&index);
-		if(metadata!=NULL){
+	dir_memoria address = pointerToLogicalAddress(pointer, process);
+	heap_page* page = list_get(process->heapPages, address.pagina);
+	if (page != NULL) {
+		heap_metadata* metadata = getHeapMetadataFromDataOffset(page,
+				address.offset, &index);
+		if (metadata != NULL) {
 			metadata->isFree = true;
 		}
 		executeGarbageCollectorOn(page, process, &status);
@@ -37,30 +40,76 @@ int basicFreeMemory(Process* process, t_puntero pointer) {
 	return status;
 }
 
-void executeGarbageCollectorOn(heap_page* page, Process* process, int* status){
-	if(isFreePage(page)){
-		//freePageForProcess(process,page->page); todo: completar
-	}else{
-		//todo: crear algoritmo para compactar la metadata libre
+void executeGarbageCollectorOn(heap_page* page, Process* process, int* status) {
+	if (isFreePage(page)) {
+		freePageForProcess(process, page, status);
+		if (*status != FREE_MEMORY_SUCCES)
+			logError(
+					"La memoria no pudo liberar la pagina heap # %d del proceso %d",
+					page->page, process->pid);
+		markAsGarbage(page);
+	} else {
+		resolveFragmentation(process, page);
 	}
-
 }
 
-void saveAlloc(int allocSize, heap_metadata* metadata, int index, heap_page* page){
+void resolveFragmentation(Process* process, heap_page* page) {
+	heap_metadata* current = NULL;
+	heap_metadata* next = NULL;
+	int currentIndex = 0;
+	int nextIndex = 0;
+	logTrace("Iniciando algoritmo de optimizacion en la pagina heap #%d",
+			page->page);
+	current = list_get(page->metadataList, currentIndex);
+	while (current != NULL) {
+		if (current->isFree) {
+			logTrace(
+					"El bloque de metadatos #%d esta libre se buscara optimizar los bloques siguientes",
+					currentIndex);
+			nextIndex = currentIndex + 1;
+			next = list_get(page->metadataList, nextIndex);
+			while (next != NULL && next->isFree) {
+				logTrace(
+						"Se detecto el bloque de metadatos #%d tambien esta libre, se eliminara e incorporara en metadatos #",
+						nextIndex, currentIndex);
+				current->dataSize = current->dataSize + next->dataSize
+						+ sizeof_heapMetadata();
+				logTrace("Se trasfirio %d bytes al bloque #%d",
+						next->dataSize + sizeof_heapMetadata(), currentIndex);
+				list_remove_and_destroy_element(page->metadataList, nextIndex,
+						(void*) destroy_heap_metadata);
+				logTrace(
+						"Se elimino el bloque #%d y se procedera a verificar el siguiente bloque",
+						nextIndex);
+				//no asustarse como es una lista y se elimino un elemento no hace falta incrementar nextindex
+				next = list_get(page->metadataList, nextIndex);
+			}
+		}
+		currentIndex++;
+		current = list_get(page->metadataList, currentIndex);
+	}
+	logTrace("Finalizo el algoritmo de optimizacion en la pagina heap #%d",
+			page->page);
+}
+
+void saveAlloc(int allocSize, heap_metadata* metadata, int index,
+		heap_page* page) {
 	metadata->dataSize = allocSize;
 	metadata->isFree = false;
-	createHeapMetadataFor(page,metadata,index);
+	createHeapMetadataFor(page, metadata, index);
 }
 
 /*
  * busco desde el proceso, si pido una nueva pagina
  * guardo en status el estado de la ejecucion
  */
-heap_page* getAvailableHeapPageForProcess(int allocSize, Process* process, int* status) {
+heap_page* getAvailableHeapPageForProcess(int allocSize, Process* process,
+		int* status) {
 	heap_page* selectedPage = NULL;
 	validateMaxAllockSize(allocSize, process, status);
 	if (*status != SC_ERROR_MEMORY_ALLOC_EXCEEDED) {
-		selectedPage = getAvailableHeapPageIntoListFor(allocSize, process->heapPages);
+		selectedPage = getAvailableHeapPageIntoListFor(allocSize,
+				process->heapPages);
 		if (selectedPage == NULL)
 			selectedPage = createHeapPageFor(process, status);
 	}
@@ -100,18 +149,22 @@ heap_page* createHeapPageFor(Process* process, int* status) {
  * si no se valido sizeData quedara negativo y logueara el error
  * estoy preparado para generar metadata incluso en el medio de la lista
  */
-void createHeapMetadataFor(heap_page* page, heap_metadata* previous, int previousIndex) {
+void createHeapMetadataFor(heap_page* page, heap_metadata* previous,
+		int previousIndex) {
 	int dataOffset, sizeData, maxSize;
-	heap_metadata* next = list_get(page->metadataList, previousIndex+1);
-	dataOffset = (previous != NULL) ? previous->dataOffset + previous->dataSize : 0;
+	heap_metadata* next = list_get(page->metadataList, previousIndex + 1);
+	dataOffset =
+			(previous != NULL) ? previous->dataOffset + previous->dataSize : 0;
 	dataOffset += sizeof_heapMetadata(); //fijo por el tamaño de la nueva metadata
-	maxSize = (next!=NULL)? next->dataOffset - sizeof_heapMetadata() : page->pageSize;
+	maxSize =
+			(next != NULL) ?
+					next->dataOffset - sizeof_heapMetadata() : page->pageSize;
 	sizeData = maxSize - dataOffset;
 	if (sizeData < 0)
 		logError(
 				"Uso incorrecto de la funcion createHeapMetadataFor(heap_page* page), se intenta crear metadata en una pagina que no tiene mas espacio libre");
 	heap_metadata* metadata = create_heap_metadata(dataOffset, sizeData);
-	list_add_in_index(page->metadataList,previousIndex + 1,metadata);
+	list_add_in_index(page->metadataList, previousIndex + 1, metadata);
 }
 
 /*

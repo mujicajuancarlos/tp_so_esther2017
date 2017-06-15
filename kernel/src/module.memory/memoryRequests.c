@@ -76,6 +76,43 @@ void reserveNewHeapPageForProcess(Process* process, int* status) {
 	}
 }
 
+void freePageForProcess(Process* process, heap_page* page, int* status) {
+	Package* tmpPackage;
+	int memoryPageNumber = process->pcb->stackFirstPage + process->pcb->stackSize + page->page;
+	t_FreePageToProcess* content = create_t_FreePageToProcess(process->pid, memoryPageNumber);
+	tmpPackage = createAndSendPackage(
+			process->kernelStruct->socketClientMemoria,
+			COD_FREE_PAGE_REQUEST, sizeof_t_FreePageToProcess(),
+			(char*) content);
+	free(content);
+	if (tmpPackage == NULL) {
+		logError("La memoria no esta conectada");
+		exit(EXIT_FAILURE);
+	}
+	destroyPackage(tmpPackage);
+	logInfo("Se solicitó liberar la pagina: %d para el pid: %d",memoryPageNumber,process->pid);
+	//me quedo a la espera de la aprobacion
+	tmpPackage = createAndReceivePackage(
+			process->kernelStruct->socketClientMemoria);
+	if (tmpPackage != NULL) {
+		switch (tmpPackage->msgCode) {
+		case COD_FREE_PAGE_RESPONSE:
+			logInfo("La memoria libero la pagina %d para el proceso pid %d",memoryPageNumber,
+					process->pid);
+			*status = FREE_MEMORY_SUCCES;
+			break;
+		default:
+			logError("La memoria envio un mensaje no esperado");
+			exit(EXIT_FAILURE);
+			break;
+		}
+		destroyPackage(tmpPackage);
+	} else {
+		logError("La memoria no esta conectada");
+		exit(EXIT_FAILURE);
+	}
+}
+
 /**
  * calculo la cantidad de paginas a utilizar y hago la solicitud a la memoria
  * package contiene el codigo fuente
@@ -148,11 +185,16 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 
 	bool hasError = false;
 
-	logInfo("Enviando el codigo fuente a la memoria para el pid: %d",process->pid);
-	saveDataOnMemory(process, 0, 0, sourceCodePackage->size, sourceCodePackage->stream, &hasError);//startPage 0 porque se trata del codigo
-	logInfo("Se envio el codigo fuente a la memoria para el pid: %d",process->pid);
-	if(hasError){
-		logError("No se pudo almacenar el codigo fuente para el proceso pid: %d, se procede a eliminarlo del sistema",process->pid);
+	logInfo("Enviando el codigo fuente a la memoria para el pid: %d",
+			process->pid);
+	saveDataOnMemory(process, 0, 0, sourceCodePackage->size,
+			sourceCodePackage->stream, &hasError);//startPage 0 porque se trata del codigo
+	logInfo("Se envio el codigo fuente a la memoria para el pid: %d",
+			process->pid);
+	if (hasError) {
+		logError(
+				"No se pudo almacenar el codigo fuente para el proceso pid: %d, se procede a eliminarlo del sistema",
+				process->pid);
 		removeFromNEW(process);
 		exit(EXIT_FAILURE);
 	}
@@ -181,8 +223,8 @@ void saveDataOnMemory(Process* process, int startPage, u_int32_t offset,
 		tmpBufferSize = lastByte - firstByte;
 		tmpBuffer = malloc(tmpBufferSize);
 		memcpy(tmpBuffer, buffer + bufferOffset, tmpBufferSize);
-		saveDataOnPage(process, pageNumber, firstByte, tmpBufferSize,
-				tmpBuffer, hasError);
+		saveDataOnPage(process, pageNumber, firstByte, tmpBufferSize, tmpBuffer,
+				hasError);
 		if (!*hasError) {
 			bufferOffset += tmpBufferSize;
 		}
@@ -205,7 +247,8 @@ void saveDataOnPage(Process* process, int pageNumber, int offset, int size,
 	destroy_t_PageBytes(data);
 	if (package != NULL) {
 		destroyPackage(package);
-		package = createAndReceivePackage(process->kernelStruct->socketClientMemoria);
+		package = createAndReceivePackage(
+				process->kernelStruct->socketClientMemoria);
 		if (package != NULL) {
 			switch (package->msgCode) {
 			case COD_SAVE_PAGE_BYTES_RESPONSE:

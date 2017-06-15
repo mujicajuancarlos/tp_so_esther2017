@@ -33,6 +33,8 @@ void reserveNewHeapPageForProcess(Process* process, int* status);
 
 void reservePagesForNewProcess(Process* process, Package* package);
 
+void freePageForProcess(Process* process, heap_page* page, int* status);
+
 void sendSourceCodeForNewProcess(Process* process, Package* package);
 
 void saveDataOnMemory(Process* process, int startPage, u_int32_t offset,

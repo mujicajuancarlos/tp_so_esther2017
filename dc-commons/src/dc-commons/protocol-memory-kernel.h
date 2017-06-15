@@ -41,13 +41,28 @@
 #define COD_END_PROCESS_REQUEST 412
 #define COD_END_PROCESS_RESPONSE 413
 
+/*
+ * Liberar una pagina de proceso
+ *	Parámetros: [Identificador del Programa] [Numero de pagina]
+ */
+#define COD_FREE_PAGE_REQUEST 414
+#define COD_FREE_PAGE_RESPONSE 415
+
 
 typedef struct {
 	uint32_t pid;
 	uint32_t size;
 } t_AddPagesToProcess;
 
+typedef struct {
+	uint32_t pid;
+	uint32_t page;
+} t_FreePageToProcess;
+
 size_t sizeof_t_AddPagesToProcess();
 t_AddPagesToProcess* create_t_AddPagesToProcess(int pid, int size);
+
+size_t sizeof_t_FreePageToProcess();
+t_FreePageToProcess* create_t_FreePageToProcess(int pid, int pageNumber);
 
 #endif /* SRC_DC_COMMONS_PROTOCOL_MEMORY_KERNEL_H_ */

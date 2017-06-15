@@ -11,6 +11,7 @@ heap_page* create_heap_page(int numberPage, int pageSize) {
 	heap_page* heapPage = malloc(sizeof(heap_page));
 	heapPage->page = numberPage;
 	heapPage->pageSize = pageSize;
+	heapPage->isGarbage = false;
 	heapPage->metadataList = list_create();
 	return heapPage;
 }
@@ -34,6 +35,12 @@ heap_metadata* create_heap_metadata(uint32_t startData, uint32_t dataSize) {
 
 void destroy_heap_metadata(heap_metadata* metadata) {
 	free(metadata);
+}
+
+void markAsGarbage(heap_page* page){
+	page->isGarbage = true;
+	list_destroy_and_destroy_elements(page->metadataList,(void*)destroy_heap_metadata);
+	page->metadataList = NULL;
 }
 
 heap_metadata* getHeapMetadataFromDataOffset(heap_page* page,
