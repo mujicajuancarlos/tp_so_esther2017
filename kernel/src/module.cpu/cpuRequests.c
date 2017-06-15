@@ -267,6 +267,7 @@ void resolveRequest_endInstruction(CPU* cpu, Package* package) {
 		case ROUND_ROBIN:
 			cpu->process->quantum--;
 			if (cpu->process->quantum > 0) {
+				timeoutForInstruction(cpu);
 				continueCurrentExcecution(cpu);
 			} else {
 				contextSwitch(cpu);
@@ -274,6 +275,7 @@ void resolveRequest_endInstruction(CPU* cpu, Package* package) {
 			break;
 		case FIFO:
 		default:
+			timeoutForInstruction(cpu);
 			continueCurrentExcecution(cpu);
 			break;
 		}
@@ -341,3 +343,8 @@ void resolveRequest_executionError(CPU* cpu, Package* package) {
 	moveFromExcecToExit_withError(cpu->process, exitCode);
 	markFreeCPU(cpu);
 }
+
+void timeoutForInstruction(CPU* cpu){
+	usleep (cpu->kernelStruct->config->quantum_sleep);
+}
+

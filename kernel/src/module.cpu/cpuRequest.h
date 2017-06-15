@@ -9,6 +9,8 @@
 #define MODULE_CPU_CPUREQUEST_H_
 
 #include <parser/parser.h>
+#include <unistd.h>
+
 #include <dc-commons/logger.h>
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
@@ -55,5 +57,7 @@ void resolveRequest_fileSystemOperation(CPU* cpu, Package* package);
 void resolveRequest_updateSemaphore(CPU* cpu, Package* package);
 
 void resolveRequest_executionError(CPU* cpu, Package* package);
+
+void timeoutForInstruction(CPU* cpu);
 
 #endif /* MODULE_CPU_CPUREQUEST_H_ */
