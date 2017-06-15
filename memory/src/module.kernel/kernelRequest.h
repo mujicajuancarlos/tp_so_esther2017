@@ -23,7 +23,7 @@ void addNewPages (Package* package, kernel* kernel);
 
 void saveData (Package* package, kernel* kernel);
 
-void readData (Package* package, kernel* kernel);
+void readData(Package* package, kernel* kernel);
 
 void endProcess (kernel* kernel, int pid);
 

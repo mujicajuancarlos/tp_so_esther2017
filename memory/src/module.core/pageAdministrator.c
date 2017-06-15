@@ -53,7 +53,7 @@ int getFromCache (memory_struct* memoryStruct, int processId, int processPage) {
 		if (entry->pid == processId && entry->procPage == processPage)
 			return entry->globPage;
 	}
-	printf ("CACHE MISS!");
+	logInfo ("CACHE MISS");
 	usleep (memoryStruct->memorySleep);
 	return (-1);
 }
@@ -108,10 +108,8 @@ int processRead(memory_struct* memoryStruct, t_PageBytes* dataInfo) {
 		// segmentation fault
 		return (-1);
 	}
-	else {
-		dataInfo->buffer = malloc (dataInfo->size);
+	else
 		memcpy(dataInfo->buffer, memAddress, dataInfo->size);
-	}
 
 	return 0;
 }
@@ -166,15 +164,12 @@ int assignNewPages(memory_struct* memoryStruct, int processId, int pages) {
 			newPage->isFree = false;
 			list_replace(memoryStruct->referenceTable, newPage->globPage,
 					newPage);
-			printf(
-					"Se crea pagina nro %i para proceso nro %i. Pagina global: %i\n",
+			logTrace ("Se crea pagina nro %i para proceso nro %i. Pagina global: %i\n",
 					newPage->procPage, newPage->pid, newPage->globPage);
-			// responder que se agregaron las paginas OK
 		}
 		return 0;
 	} else {
-		printf("ERROR: no hay tantas paginas disponibles\n");
-		// error, porque no se puede cubrir el pedido de todas esas paginas
+		logError ("No hay tantas paginas disponibles");
 		return (-1);
 	}
 }

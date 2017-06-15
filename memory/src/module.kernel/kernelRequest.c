@@ -18,12 +18,16 @@ void startNewProcess(Package* package, kernel* kernel) {
 	int status = assignNewPages(kernel->memoryStruct, requestInfo->pid,
 			requestInfo->size);
 
-	if (status == 0)
+	if (status == 0) {
 		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				COD_NEW_PROCESS_RESPONSE_OK, 0, NULL);
-	else
+		logInfo ("Proceso %i cargado en memoria", requestInfo->pid);
+	}
+	else {
 		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				ERROR_MEMORY_FULL, 0, NULL);
+		logError ("No se puede cargar el proceso %i en memoria. No hay espacio disponible", requestInfo->pid);
+	}
 
 	destroyPackage(outPackage);
 }
@@ -51,12 +55,17 @@ void saveData(Package* package, kernel* kernel) {
 	Package* outPackage;
 	int status = processWrite(kernel->memoryStruct, pageBytes);
 
-	if (status == 0)
+	if (status == 0) {
 		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				COD_SAVE_PAGE_BYTES_RESPONSE, 0, NULL);
-	else
+		logTrace ("Se almacenan los datos enviados por Kernel para pid: %i pag: %i offset: %i size: %i", pageBytes->pid,
+				pageBytes->pageNumber, pageBytes->offset, pageBytes->size);
+	}
+	else {
 		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				ERROR_SEGMENTATION_FAULT, 0, NULL);
+		logError ("La peticion de escritura de Kernel produce segmentation fault");
+	}
 
 	destroyPackage(outPackage);
 	destroy_t_PageBytes(pageBytes);
@@ -68,13 +77,18 @@ void readData(Package* package, kernel* kernel) {
 
 	int status = processRead(kernel->memoryStruct, pageBytes);
 
-	if (status == 0)
+	if (status == 0) {
 		outPackage = createAndSendPackage(kernel->fileDescriptor,
-				COD_GET_PAGE_BYTES_RESPONSE, pageBytes->size,
+				COD_GET_PAGE_BYTES_RESPONSE, package->size,
 				serialize_t_PageBytes (pageBytes));
-	else
+		logTrace ("Se devuelven los datos pedidos por Kernel para pid: %i pag: %i offset: %i size: %i", pageBytes->pid,
+				pageBytes->pageNumber, pageBytes->offset, pageBytes->size);
+	}
+	else {
 		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				ERROR_SEGMENTATION_FAULT, 0, NULL);
+		logError ("La peticion de lectura de Kernel produce segmentation fault");
+	}
 
 	destroy_t_PageBytes(pageBytes);
 	destroyPackage(outPackage);
