@@ -34,7 +34,7 @@
 #define COD_OPEN_FD 214
 #define COD_DELETE_FD 215
 #define COD_CLOSE_FD 216
-#define COD_SEED_FD 217
+#define COD_SEEK_FD 217
 #define COD_WRITE_FD 218
 #define COD_READ_FD 219
 //syscall semaforos (bloqueante)

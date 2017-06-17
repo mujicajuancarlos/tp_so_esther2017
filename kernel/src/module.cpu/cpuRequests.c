@@ -260,6 +260,35 @@ void executeFreeMemoryTo(CPU* cpu, Package* package) {
 	destroyPackage(tmpPackage);
 }
 
+void executeOpenProcessFileTo(CPU* cpu, Package* package){
+
+}
+
+void executeDeleteProcessFileTo(CPU* cpu, Package* package){
+
+}
+
+void executeCloseProcessFileTo(CPU* cpu, Package* package){
+
+}
+
+void executeSeekProcessFileTo(CPU* cpu, Package* package){
+
+}
+
+void executeWriteProcessFileTo(CPU* cpu, Package* package){
+
+}
+
+void executeReadProcessFileTo(CPU* cpu, Package* package){
+
+}
+
+
+
+/*
+ * MANEJAN LAS SOLUCITUDES DEL CPU
+ */
 void resolveRequest_endInstruction(CPU* cpu, Package* package) {
 	if (!cpu->process->forceQuit) {
 		int algorithm = getAlgorithmIndex(cpu->kernelStruct->config->algoritmo);
@@ -321,7 +350,26 @@ void resolveRequest_dynamicMemoryOperation(CPU* cpu, Package* package) {
 }
 
 void resolveRequest_fileSystemOperation(CPU* cpu, Package* package) {
-
+	switch (package->msgCode) {
+	case COD_OPEN_FD:
+		executeOpenProcessFileTo(cpu, package);
+		break;
+	case COD_DELETE_FD:
+		executeDeleteProcessFileTo(cpu, package);
+		break;
+	case COD_CLOSE_FD:
+		executeCloseProcessFileTo(cpu, package);
+		break;
+	case COD_SEEK_FD:
+		executeSeekProcessFileTo(cpu, package);
+		break;
+	case COD_WRITE_FD:
+		executeWriteProcessFileTo(cpu, package);
+		break;
+	case COD_READ_FD:
+		executeReadProcessFileTo(cpu, package);
+		break;
+	}
 }
 
 void resolveRequest_updateSemaphore(CPU* cpu, Package* package) {
@@ -344,7 +392,7 @@ void resolveRequest_executionError(CPU* cpu, Package* package) {
 	markFreeCPU(cpu);
 }
 
-void timeoutForInstruction(CPU* cpu){
-	usleep (cpu->kernelStruct->config->quantum_sleep);
+void timeoutForInstruction(CPU* cpu) {
+	usleep(cpu->kernelStruct->config->quantum_sleep);
 }
 

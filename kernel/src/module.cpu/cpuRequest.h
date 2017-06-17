@@ -25,7 +25,6 @@
 #include "cpuAdministrator.h"
 #include "cpuResponse.h"
 
-
 void startProcessExecution(Process* selectedProcess, CPU* selectedCPU);
 
 void continueCurrentExcecution(CPU* cpu);
@@ -41,21 +40,20 @@ void executeGetSharedVar(CPU* cpu, Package* package);
 void executeMallocMemoryTo(CPU* cpu, Package* package);
 void executeFreeMemoryTo(CPU* cpu, Package* package);
 
+void executeOpenProcessFileTo(CPU* cpu, Package* package);
+void executeDeleteProcessFileTo(CPU* cpu, Package* package);
+void executeCloseProcessFileTo(CPU* cpu, Package* package);
+void executeSeekProcessFileTo(CPU* cpu, Package* package);
+void executeWriteProcessFileTo(CPU* cpu, Package* package);
+void executeReadProcessFileTo(CPU* cpu, Package* package);
 
 void resolveRequest_endInstruction(CPU* cpu, Package* package);
-
 void resolveRequest_programFinished(CPU* cpu, Package* package);
-
 void resolveRequest_cpuDisconnected(CPU* cpu, Package* package);
-
 void resolveRequest_sharedVarOperation(CPU* cpu, Package* package);
-
 void resolveRequest_dynamicMemoryOperation(CPU* cpu, Package* package);
-
 void resolveRequest_fileSystemOperation(CPU* cpu, Package* package);
-
 void resolveRequest_updateSemaphore(CPU* cpu, Package* package);
-
 void resolveRequest_executionError(CPU* cpu, Package* package);
 
 void timeoutForInstruction(CPU* cpu);

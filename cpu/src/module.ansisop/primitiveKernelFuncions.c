@@ -257,7 +257,7 @@ void ansisopKernel_moverCursor(t_descriptor_archivo fd, t_valor_variable offset)
 		t_seed_FD_request* data = create_t_seed_FD_request(fd, offset);
 		char* buffer = serialize_t_seed_FD_request(data);
 		size_t size = sizeof_t_seed_FD_request(data);
-		Package* package = createAndSendPackage(kernelSocket(), COD_SEED_FD,
+		Package* package = createAndSendPackage(kernelSocket(), COD_SEEK_FD,
 				size, buffer);
 		destroy_t_seed_FD_request(data);
 		free(buffer);

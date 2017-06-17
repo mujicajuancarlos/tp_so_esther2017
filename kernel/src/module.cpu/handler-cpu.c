@@ -82,7 +82,7 @@ void handleCPURequest(CPU* cpu, Package* package) {
 	case COD_OPEN_FD:
 	case COD_DELETE_FD:
 	case COD_CLOSE_FD:
-	case COD_SEED_FD:
+	case COD_SEEK_FD:
 	case COD_WRITE_FD:
 	case COD_READ_FD:
 		resolveRequest_fileSystemOperation(cpu, package);
