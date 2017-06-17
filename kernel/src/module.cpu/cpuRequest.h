@@ -22,6 +22,7 @@
 #include "../module.model/process.h"
 #include "../module.planning/processLifeCycle.h"
 #include "../module.planning/scheduler.h"
+#include "../module.fileSystem/fileSystemManager.h"
 #include "cpuAdministrator.h"
 #include "cpuResponse.h"
 

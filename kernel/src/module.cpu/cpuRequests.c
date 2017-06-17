@@ -260,31 +260,50 @@ void executeFreeMemoryTo(CPU* cpu, Package* package) {
 	destroyPackage(tmpPackage);
 }
 
-void executeOpenProcessFileTo(CPU* cpu, Package* package){
+void executeOpenProcessFileTo(CPU* cpu, Package* package) {
+	t_new_FD_request* request = deserialize_t_new_FD_request(package->stream);
+	Package* tmpPackage = NULL;
+	char* buffer;
+	int assignedFD;
+	int status = basicOpenProcessFile(cpu->process, request, &assignedFD);
+	destroy_t_new_FD_request(request);
+	switch (status) {
+	case OPEN_FD_SUCCESS:
+		buffer = serialize_int(assignedFD);
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_SUCCESS, sizeof(uint32_t), buffer);
+		free(buffer);
+		break;
+	case PERMISSIONS_DENIED_FD_FAILURE:
+	default:
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_FAILURE, 0, NULL);
+		moveFromExcecToExit_withError(cpu->process, SC_ERROR_FILE_CREATE_REFUSED);
+		markFreeCPU(cpu);
+		break;
+	}
+	destroyPackage(tmpPackage);
+}
+
+void executeDeleteProcessFileTo(CPU* cpu, Package* package) {
 
 }
 
-void executeDeleteProcessFileTo(CPU* cpu, Package* package){
+void executeCloseProcessFileTo(CPU* cpu, Package* package) {
 
 }
 
-void executeCloseProcessFileTo(CPU* cpu, Package* package){
+void executeSeekProcessFileTo(CPU* cpu, Package* package) {
 
 }
 
-void executeSeekProcessFileTo(CPU* cpu, Package* package){
+void executeWriteProcessFileTo(CPU* cpu, Package* package) {
 
 }
 
-void executeWriteProcessFileTo(CPU* cpu, Package* package){
+void executeReadProcessFileTo(CPU* cpu, Package* package) {
 
 }
-
-void executeReadProcessFileTo(CPU* cpu, Package* package){
-
-}
-
-
 
 /*
  * MANEJAN LAS SOLUCITUDES DEL CPU
