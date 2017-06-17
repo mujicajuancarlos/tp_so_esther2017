@@ -30,6 +30,7 @@
 #define SC_ERROR_GET_SHARED_VAR -13
 
 #define SC_ERROR_FILE_CREATE_REFUSED -14//sucede cuando se enviar open sin permisos de creacion
+#define SC_ERROR_FILE_IN_USE -15
 
 #define SC_ERROR_UNKNOWN -20
 

@@ -278,7 +278,8 @@ void executeOpenProcessFileTo(CPU* cpu, Package* package) {
 	default:
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
 		COD_SYSCALL_FAILURE, 0, NULL);
-		moveFromExcecToExit_withError(cpu->process, SC_ERROR_FILE_CREATE_REFUSED);
+		moveFromExcecToExit_withError(cpu->process,
+				SC_ERROR_FILE_CREATE_REFUSED);
 		markFreeCPU(cpu);
 		break;
 	}
@@ -286,11 +287,57 @@ void executeOpenProcessFileTo(CPU* cpu, Package* package) {
 }
 
 void executeDeleteProcessFileTo(CPU* cpu, Package* package) {
-
+	Package* tmpPackage = NULL;
+	int fileDescriptor = deserialize_int(package->stream);
+	int status = basicDeleteProcessFile(cpu->process, fileDescriptor);
+	switch (status) {
+	case DELETE_FD_SUCCESS:
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_SUCCESS, 0, NULL);
+		break;
+	case FILE_NOTFOUND_FD_FAILURE:
+	case FILE_IN_USED_FD_FAILUERE:
+	default:
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_FAILURE, 0, NULL);
+		markFreeCPU(cpu);
+		switch (status) {
+		case FILE_NOTFOUND_FD_FAILURE:
+			moveFromExcecToExit_withError(cpu->process,
+			SC_ERROR_FILE_NOT_FOUND);
+			break;
+		case FILE_IN_USED_FD_FAILUERE:
+			moveFromExcecToExit_withError(cpu->process, SC_ERROR_FILE_IN_USE);
+			break;
+		default:
+			moveFromExcecToExit_withError(cpu->process,
+			SC_ERROR_UNKNOWN);
+			break;
+		}
+		break;
+	}
+	destroyPackage(tmpPackage);
 }
 
 void executeCloseProcessFileTo(CPU* cpu, Package* package) {
-
+	Package* tmpPackage = NULL;
+	int fileDescriptor = deserialize_int(package->stream);
+	int status = basicCloseProcessFile(cpu->process, fileDescriptor);
+	switch (status) {
+	case CLOSE_FD_SUCCESS:
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_SUCCESS, 0, NULL);
+		break;
+	case FILE_NOTFOUND_FD_FAILURE:
+	default:
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_FAILURE, 0, NULL);
+		moveFromExcecToExit_withError(cpu->process,
+					SC_ERROR_FILE_NOT_FOUND);
+		markFreeCPU(cpu);
+		break;
+	}
+	destroyPackage(tmpPackage);
 }
 
 void executeSeekProcessFileTo(CPU* cpu, Package* package) {
