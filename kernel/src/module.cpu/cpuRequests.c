@@ -333,7 +333,7 @@ void executeCloseProcessFileTo(CPU* cpu, Package* package) {
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
 		COD_SYSCALL_FAILURE, 0, NULL);
 		moveFromExcecToExit_withError(cpu->process,
-					SC_ERROR_FILE_NOT_FOUND);
+		SC_ERROR_FILE_NOT_FOUND);
 		markFreeCPU(cpu);
 		break;
 	}
@@ -341,7 +341,25 @@ void executeCloseProcessFileTo(CPU* cpu, Package* package) {
 }
 
 void executeSeekProcessFileTo(CPU* cpu, Package* package) {
-
+	t_seed_FD_request* request = deserialize_t_seed_FD_request(package->stream);
+	Package* tmpPackage = NULL;
+	int status = basicSeekProcessFile(cpu->process, request);
+	destroy_t_seed_FD_request(request);
+	switch (status) {
+	case SEEK_FD_SUCCESS:
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_SUCCESS, 0, NULL);
+		break;
+	case FILE_NOTFOUND_FD_FAILURE:
+	default:
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_FAILURE, 0, NULL);
+		moveFromExcecToExit_withError(cpu->process,
+				SC_ERROR_FILE_NOT_FOUND);
+		markFreeCPU(cpu);
+		break;
+	}
+	destroyPackage(tmpPackage);
 }
 
 void executeWriteProcessFileTo(CPU* cpu, Package* package) {
