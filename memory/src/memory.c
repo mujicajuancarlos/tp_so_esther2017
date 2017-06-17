@@ -55,24 +55,20 @@ void initializeStruct(memory_struct* memoryStruct, Configuration* config) {
 	memoryStruct->listaCPUs = list_create();
 	pthread_mutex_init(&(memoryStruct->listaCPUsMutex), NULL);
 
-	memoryStruct->memorySize = 102400; // por ahora quiero probar harcodeado
-	memoryStruct->pageSize = 512; // por ahora quiero probar harcodeado
+	memoryStruct->memorySize = memoryStruct->config->marcos * memoryStruct->config->marco_size;
 	memoryStruct->memory = (void*) malloc (memoryStruct->memorySize);
 	memoryStruct->referenceTable = list_create();
 	memoryStruct->cacheEntries = list_create();
-	memoryStruct->maxEntries = 15;
-	memoryStruct->maxPPP = 3;
-	memoryStruct->memorySleep = 0;
 
 	int i;
-	int totalPages = memoryStruct->memorySize / memoryStruct->pageSize;
+	int totalPages = memoryStruct->memorySize / memoryStruct->config->marco_size;
 	for (i = 0; i < totalPages; i++) {
 		memory_page *p = malloc (sizeof (memory_page));
 		p->globPage = i;
 		p->isFree = true;
 		p->pid = 0;
 		p->procPage = 0;
-		p->startAddress = memoryStruct->memory + memoryStruct->pageSize * i;
+		p->startAddress = memoryStruct->memory + memoryStruct->config->marco_size * i;
 		list_add (memoryStruct->referenceTable, p);
 	}
 }

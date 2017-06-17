@@ -21,10 +21,12 @@ void startNewProcess(Package* package, kernel* kernel);
 
 void addNewPages (Package* package, kernel* kernel);
 
+void freeMemoryPage (Package* package, kernel* kernel);
+
 void saveData (Package* package, kernel* kernel);
 
 void readData(Package* package, kernel* kernel);
 
-void endProcess (kernel* kernel, int pid);
+void endProcess (Package* package, kernel* kernel);
 
 #endif /* MODULE_KERNEL_KERNELREQUEST_H_ */

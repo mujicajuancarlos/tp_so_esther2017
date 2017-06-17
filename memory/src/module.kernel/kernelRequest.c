@@ -50,6 +50,16 @@ void addNewPages(Package* package, kernel* kernel) {
 	destroyPackage(outPackage);
 }
 
+void freeMemoryPage (Package* package, kernel* kernel) {
+	t_FreePageToProcess* freePageToProcess = (t_FreePageToProcess*) package->stream;
+	Package* outPackage;
+
+	freePage (kernel->memoryStruct, freePageToProcess->pid, freePageToProcess->page);
+	outPackage = createAndSendPackage (kernel->fileDescriptor, COD_FREE_PAGE_RESPONSE, 0, NULL);
+
+	destroyPackage (outPackage);
+}
+
 void saveData(Package* package, kernel* kernel) {
 	t_PageBytes* pageBytes = deserialize_t_PageBytes(package->stream);
 	Package* outPackage;
@@ -94,6 +104,12 @@ void readData(Package* package, kernel* kernel) {
 	destroyPackage(outPackage);
 }
 
-void endProcess(kernel* kernel, int pid) {
-	freeProcess(kernel->memoryStruct, pid);
+void endProcess(Package* package, kernel* kernel) {
+	int* pid = (int*) package->stream;
+
+	Package* outPackage;
+	terminateProcess(kernel->memoryStruct, *pid);
+	outPackage = createAndSendPackage (kernel->fileDescriptor, COD_END_PROCESS_RESPONSE, 0, NULL);
+
+	destroyPackage (outPackage);
 }

@@ -7,14 +7,6 @@
 
 #include "pageAdministrator.h"
 
-void removeProcessFromCache (memory_struct* memoryStruct, int processId) {
-	bool notThisProcess (void* element) {
-		cache_entry* entry = element;
-		return (entry->pid != processId);
-	}
-
-	memoryStruct->cacheEntries = list_filter (memoryStruct->cacheEntries, notThisProcess);
-}
 
 void addEntryToCache (memory_struct* memoryStruct, int processId, int processPage, int globPage) {
 	cache_entry* entry = malloc (sizeof (entry));
@@ -22,6 +14,7 @@ void addEntryToCache (memory_struct* memoryStruct, int processId, int processPag
 	entry->procPage = processPage;
 	entry->pid = processId;
 	int i;
+
 	// la busco en la lista
 	for (i = 0; i < list_size (memoryStruct->cacheEntries); i++) {
 		// si ya esta en la lista lo muevo a mas reciente
@@ -34,7 +27,7 @@ void addEntryToCache (memory_struct* memoryStruct, int processId, int processPag
 
 	// como no la encontré en la lista, lo tengo que agregar
 	// si la lista de entradas no esta llena, solo tengo que agregarlo en el lugar de más reciente
-	if (list_size (memoryStruct->cacheEntries) < memoryStruct->maxEntries) {
+	if (list_size (memoryStruct->cacheEntries) < memoryStruct->config->entradas_cache) {
 		list_add (memoryStruct->cacheEntries, entry);
 		return;
 	}
@@ -54,7 +47,7 @@ int getFromCache (memory_struct* memoryStruct, int processId, int processPage) {
 			return entry->globPage;
 	}
 	logInfo ("CACHE MISS");
-	usleep (memoryStruct->memorySleep);
+	usleep (memoryStruct->config->retardo_memoria);
 	return (-1);
 }
 
@@ -90,7 +83,7 @@ int processWrite(memory_struct* memoryStruct, t_PageBytes* dataInfo) {
 			dataInfo->pageNumber);
 	char *memAddress = globalPage->startAddress + dataInfo->offset;
 
-	if ((dataInfo->offset + dataInfo->size) > memoryStruct->pageSize) {
+	if ((dataInfo->offset + dataInfo->size) > memoryStruct->config->marco_size) {
 		// segmentation fault
 		return (-1);
 	} else
@@ -104,7 +97,7 @@ int processRead(memory_struct* memoryStruct, t_PageBytes* dataInfo) {
 			dataInfo->pageNumber);
 	char *memAddress = globalPage->startAddress + dataInfo->offset;
 
-	if ((dataInfo->offset + dataInfo->size) > memoryStruct->pageSize) {
+	if ((dataInfo->offset + dataInfo->size) > memoryStruct->config->marco_size) {
 		// segmentation fault
 		return (-1);
 	}
@@ -112,22 +105,6 @@ int processRead(memory_struct* memoryStruct, t_PageBytes* dataInfo) {
 		memcpy(dataInfo->buffer, memAddress, dataInfo->size);
 
 	return 0;
-}
-
-void memoryDump(memory_struct* memoryStruct) {
-	/* dump de memoria, por ahora esta hecho sólo para debuggear */
-	int maxP = 20;
-	int i;
-	for (i = 0; i < maxP; i++) {
-		memory_page *p;
-		p = list_get(memoryStruct->referenceTable, i);
-		if (p->isFree) {
-			printf("La pagina %i esta libre\n", p->globPage);
-		} else {
-			printf("La pagina %i esta en uso por el proceso %i\n", p->globPage,
-					p->pid);
-		}
-	}
 }
 
 int assignNewPages(memory_struct* memoryStruct, int processId, int pages) {
@@ -174,13 +151,15 @@ int assignNewPages(memory_struct* memoryStruct, int processId, int pages) {
 	}
 }
 
-void freePage(memory_page* page) {
+void freePage(memory_struct* memoryStruct, int processId, int procPage) {
+	memory_page* page = getGlobalMemoryPage (memoryStruct, processId, procPage);
 	page->pid = 0;
 	page->isFree = true;
 	page->procPage = 0;
+	logTrace ("Pagina %i de proceso %i ha sido liberada", procPage, processId);
 }
 
-void freeProcess(memory_struct *memoryStruct, int processId) {
+void terminateProcess(memory_struct *memoryStruct, int processId) {
 	t_list* thisProcessPages;
 	thisProcessPages = list_create();
 
@@ -194,9 +173,10 @@ void freeProcess(memory_struct *memoryStruct, int processId) {
 
 	if (list_size(thisProcessPages) > 0) {
 		int i;
-		for (i = 0; i < list_size(thisProcessPages); i++)
-			freePage((memory_page*) list_get(thisProcessPages, i));
+		for (i = 0; i < list_size(thisProcessPages); i++) {
+			memory_page* page = list_get (thisProcessPages, i);
+			freePage (memoryStruct, page->pid, page->procPage);
+		}
 	}
-
-	removeProcessFromCache (memoryStruct, processId);
+	logInfo ("El proceso %i ha sido terminado", processId);
 }
