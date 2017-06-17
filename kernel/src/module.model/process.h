@@ -30,12 +30,10 @@ typedef struct Process {
     bool forceQuit;//usado para la finalizacion forzada de procesos en ejecucion
     PCB* pcb;
     t_list* heapPages;
+    t_list* files;
     kernel_struct* kernelStruct;
-    t_list* fileDescriptorList;
     int exit_code;
 } Process;
-
-//t_list* tablaProcesosFD;
 
 Process* createProcess(int socket,kernel_struct* kernelStruct);
 
@@ -60,17 +58,5 @@ void printHeaderProcess();
 void printProcess(Process* proceso, int stateIndex);
 
 void printProcessFull(Process* proceso, int stateIndex);
-
-void agregarPFD_Alista(Process* process,t_processFileDescriptor* pfd);
-
-void removerPFD_Lista(t_processFileDescriptor* pfd,Process* process);
-
-
-flags* habilitarPermisos(char* permiso);
-
-void destroy_t_processFileDescriptor(t_processFileDescriptor* pfd);
-
-t_processFileDescriptor* createNew_t_processFileDescriptor(char* permiso,
-		t_fileDescriptor* fd);
 
 #endif /* PROCESS_H_ */

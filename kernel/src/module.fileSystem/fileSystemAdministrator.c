@@ -10,30 +10,30 @@
 bool isOpen(char* path) {
 
 	bool condicion(void* element) {
-		t_fileDescriptor* unFD = element;
+		t_globalFile* unFD = element;
 		return string_equals_ignore_case(unFD->path, path);
 	}
 
-	return list_any_satisfy(fileDescriptorGlobalList, condicion);
+	return list_any_satisfy(globalFiles, condicion);
 }
 
 int openFile(Process* process, char* path, char* openMode) {
-	t_fileDescriptor* fd = getFileDescriptor(path);
+	t_globalFile* fd = getFileDescriptor(path);
 
 	if (fd != NULL) { //Aca veo si esta abierto, si es asi no creo fd, solo aumento Open
 
 		bool condicion(void* element) {
-			t_processFileDescriptor* unPFD = element;
-			return string_equals_ignore_case(unPFD->fileDescriptor->path, path);
+			t_processFile* unPFD = element;
+			return string_equals_ignore_case(unPFD->globalFile->path, path);
 		}
 
-		tablaGlobalFD_mutex_lock();
+		globalFilesMutex_lock();
 
 		incrementarOpen(fd);
 
-		tablaGlobalFD_mutex_unlock();
+		globalFilesMutex_unlock();
 
-		t_processFileDescriptor* pfd = createNew_t_processFileDescriptor(
+		t_processFile* pfd = createNew_t_processFileDescriptor(
 				openMode, fd);
 
 		agregarPFD_Alista(process, pfd);
@@ -47,14 +47,14 @@ int openFile(Process* process, char* path, char* openMode) {
 	}
 }
 
-t_fileDescriptor* getFileDescriptor(char* path) {
+t_globalFile* getFileDescriptor(char* path) {
 
 	bool condicion(void* element) {
-		t_fileDescriptor* unFD = element;
+		t_globalFile* unFD = element;
 		return string_equals_ignore_case(unFD->path, path);
 	}
 
-	t_fileDescriptor* encontrado = list_find(fileDescriptorGlobalList,
+	t_globalFile* encontrado = list_find(globalFiles,
 			condicion);
 
 	if (encontrado != NULL)
@@ -68,16 +68,16 @@ int closeFile(Process* process, char* path) { //Recibo el path del archivo a cer
 	if (isOpen(path)) {								// Si esta abierto =>
 
 		bool condicion(void* element) {									//{
-			t_processFileDescriptor* unPFD = element;					//
-			return string_equals_ignore_case(unPFD->fileDescriptor->path, path);//Busco el proceso
+			t_processFile* unPFD = element;					//
+			return string_equals_ignore_case(unPFD->globalFile->path, path);//Busco el proceso
 		}																//
 
-		t_processFileDescriptor* pfd = list_find(process->fileDescriptorList,
+		t_processFile* pfd = list_find(process->files,
 				condicion);				//}
 
 		if (pfd != NULL) {
 
-			decrementarOpen(pfd->fileDescriptor);						//
+			decrementarOpen(pfd->globalFile);						//
 
 			removerPFD_Lista(pfd, process);
 

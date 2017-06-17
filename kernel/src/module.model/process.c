@@ -17,7 +17,7 @@ Process* createProcess(int socket, kernel_struct* kernelStruct) {
 	newProcess->pcb = NULL;
 	newProcess->forceQuit = false;
 	newProcess->heapPages = list_create();
-	//tablaProcesosFD = list_create();
+	newProcess->files = list_create();
 	newProcess->kernelStruct = kernelStruct;
 	return newProcess;
 }
@@ -31,10 +31,10 @@ void destroyProcess(Process* process) {
 					(void*) destroy_heap_page);
 			process->heapPages = NULL;
 		}
-		if (process->fileDescriptorList != NULL) {
-			list_destroy_and_destroy_elements(process->fileDescriptorList,
-					(void*) destroy_t_processFileDescriptor);
-			process->fileDescriptorList = NULL;
+		if (process->files != NULL) {
+			list_destroy_and_destroy_elements(process->files,
+					(void*) destroy_t_processFile);
+			process->files = NULL;
 		}
 		free(process);
 	}
@@ -116,167 +116,3 @@ void printProcessFull(Process* proceso, int stateIndex) {
 	printf("\tOtra cantidad %d\n", 234);	//TODO: completar
 	printf("\tCantidad de syscall ejecutadas %d\n", 432);	//TODO: completar
 }
-
-t_processFileDescriptor* createNew_t_processFileDescriptor(char* permiso,
-		t_fileDescriptor* fd) {
-
-	t_processFileDescriptor* newPFD = malloc(sizeof(t_processFileDescriptor));
-
-	newPFD->fileDescriptor = fd;
-	newPFD->flag = habilitarPermisos(permiso);
-	newPFD->offset = 0;
-
-	return newPFD;
-
-}
-
-void destroy_t_processFileDescriptor(t_processFileDescriptor* pfd) {
-	destroy_t_filedescriptor(pfd->fileDescriptor);
-	free(pfd);
-}
-
-flags* habilitarPermisos(char* permiso) {
-	flags* flag = malloc(sizeof(flags));
-	int retorno = -1;
-	retorno = strcmp(permiso, READ);
-	if (retorno == 0) {
-		flag->read = true;
-		flag->write = false;
-		//logInfo("Los permisos para el FileDescriptor han sido seteados a Read Only");
-	} else {
-		retorno = strcmp(permiso, WRITE);
-		if (retorno == 0) {
-			flag->read = false;
-			flag->write = true;
-			//logInfo("Los permisos para el FileDescriptor %s han sido seteados a Write Only", auxPFD->fileDescriptor->fd);
-		} else {
-			retorno = strcmp(permiso, RW);
-			if (retorno == 0) {
-				flag->read = true;
-				flag->write = true;
-				//logInfo("Los permisos para el FileDescriptor %s han sido seteados a Read & Write", auxPFD->fileDescriptor->fd);
-			} else {
-				flag->read = false;
-				flag->write = false;
-				//logInfo("No se han podido setear los permisos correspondientes para el FileDescriptor %s", auxPFD->fileDescriptor->fd);
-			}
-		}
-	}
-	return flag;
-}
-
-void agregarPFD_Alista(Process* process, t_processFileDescriptor* pfd) {
-	list_add(process->fileDescriptorList, pfd);
-
-}
-
-void removerPFD_Lista(t_processFileDescriptor* pfd, Process* process) {
-	bool condicion(void* element) {
-		t_processFileDescriptor* pfd_aux = element;
-		return pfd_aux == pfd;
-	}
-
-	list_remove_and_destroy_by_condition(process->fileDescriptorList, condicion,
-			(void*) destroy_t_processFileDescriptor);
-
-}
-
-/*
- char* serialize_Flags(flags* flags){
- char* buffer = malloc(sizeof(flags));
- uint32_t offset = 0;
-
- serialize_and_copy_value(buffer,&(flags->read),sizeof(bool),&offset);
- serialize_and_copy_value(buffer,&(flags->write),sizeof(bool),&offset);
-
- return buffer;
-
-
- }
-
- flags* deserialize_Flags(char* buffer){
- flags* f = malloc(sizeof(flags)) ;
- uint32_t offset = 0;
-
- deserialize_and_copy_value(&(f->read),buffer,sizeof(bool),&offset);
- deserialize_and_copy_value(&(f->write),buffer,sizeof(bool),&offset);
-
- return f;
-
- }
- uint32_t sizeof_ProcessFileDescriptor(t_processFileDescriptor* pfd) {
- uint32_t longitud = 0;
- longitud += sizeof(flags);
- longitud += sizeof(t_fileDescriptor);
-
- return longitud;
- }
-
-
- char* serialize_ProcessFileDescriptor(t_processFileDescriptor* pfd){
-
- uint32_t total_size = sizeof_ProcessFileDescriptor(pfd);
-
- char *stream = malloc(sizeof(char) * total_size);
-
- char* tmpBuffer;
-
- uint32_t offset = 0;
-
- tmpBuffer = serialize_Flags(pfd->flag);
-
- serialize_and_copy_value(stream, tmpBuffer,
- sizeof(flags), &offset);
-
- free(tmpBuffer);
-
- tmpBuffer = serialize_FileDescriptor(pfd->fileDescriptor);
-
- serialize_and_copy_value(stream, tmpBuffer,
- sizeof(t_fileDescriptor), &offset);
-
- free(tmpBuffer);
-
-
- return stream;
- }
-
- t_processFileDescriptor* deserialize_ProcessFileDescritpro(char* buffer) {
-
- uint32_t offset = 0;
-
- t_processFileDescriptor* pfd = malloc(sizeof(t_processFileDescriptor));
-
- flags* f = malloc(sizeof(flags));
- t_size ft = sizeof(flags);
-
- deserialize_and_copy_value(&f,buffer, sizeof(flags),
- &offset);
-
- char* flagsBuffer = malloc(sizeof(flags));
-
- deserialize_and_copy_value(flagsBuffer, buffer, ft,
- &offset);
- pfd->flag = deserialize_Flags(flagsBuffer);
-
- t_processFileDescriptor* unPFD = malloc(sizeof(t_processFileDescriptor));
-
- deserialize_and_copy_value(unPFD,buffer,sizeof(t_processFileDescriptor),&offset);
-
- char* pfdBuffer = malloc(sizeof(t_processFileDescriptor));
-
- t_size pdfT = sizeof(t_processFileDescriptor);
-
- deserialize_and_copy_value(pfdBuffer,buffer,pdfT,&offset);
-
- pfd->fileDescriptor = deserialize_FileDescriptor(pfdBuffer);
-
- free(f);  //verificar
-
- free(pfdBuffer);
-
- free(unPFD);
-
- return pfd;
- }
- */

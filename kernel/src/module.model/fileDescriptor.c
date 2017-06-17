@@ -6,181 +6,75 @@
  */
 #include "fileDescriptor.h"
 
-int nextFD = FIRST_FD;
+int currentFD = FIRST_PROCESS_FD;
 
-pthread_mutex_t fileDescriptor_mutex;
-pthread_mutex_t tablaGlobalFD_mutex;
-pthread_mutex_t nextFD_mutex;
+t_list* globalFiles;
+pthread_mutex_t globalFilesMutex;
 
 void initializeFileSystemModule() {
 	logInfo("Inicializando el modulo FS");
-	pthread_mutex_init(&tablaGlobalFD_mutex, NULL);
-	pthread_mutex_init(&fileDescriptor_mutex, NULL);
-	pthread_mutex_init(&nextFD_mutex, NULL);
-
-	fileDescriptorGlobalList = list_create();
-
+	pthread_mutex_init(&globalFilesMutex, NULL);
+	globalFiles = list_create();
 }
 
 void destroyFileSystemModule() {
 	logInfo("Destruyendo el modulo FS");
-	pthread_mutex_destroy(&tablaGlobalFD_mutex);
-	pthread_mutex_destroy(&fileDescriptor_mutex);
-	pthread_mutex_destroy(&nextFD_mutex);
-	list_destroy_and_destroy_elements(fileDescriptorGlobalList,
-			(void*) destroy_t_filedescriptor);
-
+	pthread_mutex_destroy(&globalFilesMutex);
+	list_destroy_and_destroy_elements(globalFiles,
+			(void*) destroy_t_globalFile);
 }
 
-void tablaGlobalFD_mutex_lock() {
-	pthread_mutex_lock(&tablaGlobalFD_mutex);
+void globalFilesMutex_lock() {
+	pthread_mutex_lock(&globalFilesMutex);
+}
+void globalFilesMutex_unlock() {
+	pthread_mutex_unlock(&globalFilesMutex);
 }
 
-void tablaGlobalFD_mutex_unlock() {
-	pthread_mutex_unlock(&tablaGlobalFD_mutex);
+t_globalFile* create_t_globalFile(char* path) {
+	size_t sizePath = sizeof(char)*strlen(path);
+	t_globalFile* globalFile = malloc(sizeof(t_globalFile));
+	globalFile->open = 0;
+	globalFile->path = malloc(sizePath);
+	memcpy(globalFile->path, path, sizePath);
+	return globalFile;
 }
-
-void fileDescriptor_mutex_lock() {
-	pthread_mutex_lock(&fileDescriptor_mutex);
-}
-
-void fileDescriptor_mutex_unlock() {
-	pthread_mutex_unlock(&fileDescriptor_mutex);
-}
-
-void nextFD_mutex_lock() {
-	pthread_mutex_lock(&nextFD_mutex);
-}
-
-void nextFD_mutex_unlock() {
-	pthread_mutex_unlock(&nextFD_mutex);
-}
-
-t_fileDescriptor* createNew_t_fileDescriptor(char* path) {
-
-	t_fileDescriptor* newFD = malloc(sizeof(t_fileDescriptor));
-	newFD->fd = getNextFD();
-	newFD->open = 0;
-	size_t sizeBuffer = strlen(path); //TODO: asegurarse que el que lo llame pase un string y no un stream
-	newFD->path = calloc(1, sizeBuffer);
-	memcpy(newFD->path, path, sizeBuffer);
-
-	return newFD;
-}
-
-void destroy_t_filedescriptor(t_fileDescriptor* fd) {
-	if (fd->path != NULL) {
-		free(fd->path);
+void destroy_t_globalFile(t_globalFile* globalFile) {
+	if (globalFile->path != NULL) {
+		free(globalFile->path);
+		globalFile->path = NULL;
 	}
-	free(fd);
+	free(globalFile);
 }
 
-int getNextFD() {
-	int aux;
-	nextFD_mutex_lock();
-	aux = nextFD;
-	nextFD++;
-	nextFD_mutex_unlock();
-	return aux;
+t_processFile* create_t_processFile(uint32_t fd_number, t_globalFile* globalFile, flags flags){
+	t_processFile* processFile = malloc(sizeof(t_processFile));
+	processFile->fd = fd_number;
+	processFile->flag = flags;
+	processFile->globalFile = globalFile;
+	globalFile->open = globalFile->open + 1;
+	processFile->seekValue = 0;
+	return processFile;
+}
+void destroy_t_processFile(t_processFile* processFile){
+	processFile->globalFile->open = processFile->globalFile->open - 1;
+	processFile->globalFile = NULL;
+	free(processFile);
 }
 
-void agregarFD_Alista(t_fileDescriptor* fd) {
-	tablaGlobalFD_mutex_lock();
-	list_add(fileDescriptorGlobalList, fd);
-	tablaGlobalFD_mutex_unlock();
+void addGlobalFile(t_globalFile* globalFile) {
+	globalFilesMutex_lock();
+	list_add(globalFiles, globalFile);
+	globalFilesMutex_unlock();
 }
 
-void removerFD_Lista(t_fileDescriptor* fd) {
+void removeClosedGlobalFiles() {
 	bool condicion(void* element) {
-		t_fileDescriptor* unFD = element;
-		return unFD == fd;
+		t_globalFile* globalFile = element;
+		return globalFile->open == 0;
 	}
-	tablaGlobalFD_mutex_lock();
-	list_remove_and_destroy_by_condition(fileDescriptorGlobalList, condicion,
-			(void*) destroy_t_filedescriptor);
-	tablaGlobalFD_mutex_unlock();
+	globalFilesMutex_lock();
+	list_remove_and_destroy_by_condition(globalFiles, condicion,
+			(void*) destroy_t_globalFile);
+	globalFilesMutex_unlock();
 }
-
-void incrementarOpen(t_fileDescriptor* fd) {
-	fileDescriptor_mutex_lock();
-	fd->open = fd->open + 1;
-	fileDescriptor_mutex_unlock();
-}
-
-void decrementarOpen(t_fileDescriptor* fd) { //TODO: Verificar funcion. Que pasa si es negativo por ejemplo? o si el numero de abiertos es 5, queda en 4 por que hace validacion con 0?
-	fileDescriptor_mutex_lock();
-	fd->open--;
-	if (fd->open == 0) {
-		removerFD_Lista(fd);
-	}
-	fileDescriptor_mutex_unlock();
-}
-
-void imprimirEstructura(t_fileDescriptor* fd) {
-	printf("Estructura FD:\n File Descriptor: %d\n,Archivo: %s\n,Open: %d\n",
-			fd->fd, fd->path, fd->open);
-
-}
-
-void imprimirListaDeFD(t_list* lista) {
-	fileDescriptor_mutex_lock();
-	t_link_element* aux = lista->head;
-	while (aux != NULL) {
-		imprimirEstructura(aux->data);
-		aux = aux->next;
-	}
-	fileDescriptor_mutex_unlock();
-}
-
-//TODO: revisarlas
-
-size_t sizeOf_FileDescriptor(t_fileDescriptor* fd) {
-	size_t size = 0;
-	size += sizeof(uint32_t) * 2;
-	size += sizeof(char) * fd->fd;
-	return size;
-}
-
-char* serialize_FileDescriptor(t_fileDescriptor* fd) {
-	char* buffer = malloc(sizeOf_FileDescriptor(fd));
-
-	uint32_t offset = 0;
-
-	serialize_and_copy_value(buffer, &(fd->fd), sizeof(uint32_t), &offset);
-
-	serialize_and_copy_value(buffer, fd->path, sizeof(char) * fd->fd, &offset);
-
-	serialize_and_copy_value(buffer, &(fd->open), sizeof(uint32_t), &offset);
-
-	return buffer;
-}
-t_fileDescriptor* deserialize_FileDescriptor(char* buffer) {
-
-	t_fileDescriptor* fd = malloc(sizeof(t_fileDescriptor));
-
-	uint32_t offset = 0;
-
-	deserialize_and_copy_value(&(fd->fd), buffer, sizeof(uint32_t), &offset);
-
-	fd->path = malloc(sizeof(char) * fd->fd);
-
-	deserialize_and_copy_value(fd->path, buffer, sizeof(char) * fd->fd,
-			&offset);
-
-	deserialize_and_copy_value(&(fd->open), buffer, sizeof(uint32_t), &offset);
-	return fd;
-}
-
-char* getPathFromFD(int fileDesc) {
-
-	bool condicion(void* element) {
-		t_processFileDescriptor* unPFD = element;
-		return unPFD->fileDescriptor->fd == fileDesc;
-	}
-
-	t_processFileDescriptor* processFDFound = list_find(
-			fileDescriptorGlobalList, condicion);
-
-	return processFDFound->fileDescriptor->path;
-}
-

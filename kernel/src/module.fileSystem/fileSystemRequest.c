@@ -77,13 +77,13 @@ int createFile(Process* process, char* path, char* openMode) {
 
 				if (response) {
 
-					t_fileDescriptor* file = createNew_t_fileDescriptor(path);
+					t_globalFile* file = create_t_globalFile(path);
 
 					incrementarOpen(file);
 
-					agregarFD_Alista(file);
+					addGlobalFile(file);
 
-					t_processFileDescriptor* pfd =
+					t_processFile* pfd =
 							createNew_t_processFileDescriptor(openMode, file);
 					agregarPFD_Alista(process, pfd);
 
@@ -107,13 +107,13 @@ int createFile(Process* process, char* path, char* openMode) {
 			return COD_ERROR_PERMISSIONS_DENIED;
 		}
 	}
-	t_fileDescriptor* file = createNew_t_fileDescriptor(path);
+	t_globalFile* file = create_t_globalFile(path);
 
 	incrementarOpen(file);
 
-	agregarFD_Alista(file);
+	addGlobalFile(file);
 
-	t_processFileDescriptor* pfd = createNew_t_processFileDescriptor(openMode,
+	t_processFile* pfd = createNew_t_processFileDescriptor(openMode,
 			file);
 	agregarPFD_Alista(process, pfd);
 
@@ -128,12 +128,12 @@ int deleteFile(Process* process, char* path) {
 	if (isOpen(path)) {
 
 		bool condicion(void* element) {
-			t_processFileDescriptor* unPFD = element;
-			return string_equals_ignore_case(unPFD->fileDescriptor->path, path);
+			t_processFile* unPFD = element;
+			return string_equals_ignore_case(unPFD->globalFile->path, path);
 		}
 
-		t_processFileDescriptor* processFDFound = list_find(
-				process->fileDescriptorList, condicion);
+		t_processFile* processFDFound = list_find(
+				process->files, condicion);
 
 		if (processFDFound != NULL) {
 			solicitudAlFileSystem(process->kernelStruct->socketClientFileSystem,
