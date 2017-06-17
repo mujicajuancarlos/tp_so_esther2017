@@ -279,7 +279,7 @@ void executeOpenProcessFileTo(CPU* cpu, Package* package) {
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
 		COD_SYSCALL_FAILURE, 0, NULL);
 		moveFromExcecToExit_withError(cpu->process,
-				SC_ERROR_FILE_CREATE_REFUSED);
+		SC_ERROR_FILE_CREATE_REFUSED);
 		markFreeCPU(cpu);
 		break;
 	}
@@ -355,7 +355,7 @@ void executeSeekProcessFileTo(CPU* cpu, Package* package) {
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
 		COD_SYSCALL_FAILURE, 0, NULL);
 		moveFromExcecToExit_withError(cpu->process,
-				SC_ERROR_FILE_NOT_FOUND);
+		SC_ERROR_FILE_NOT_FOUND);
 		markFreeCPU(cpu);
 		break;
 	}
@@ -363,11 +363,73 @@ void executeSeekProcessFileTo(CPU* cpu, Package* package) {
 }
 
 void executeWriteProcessFileTo(CPU* cpu, Package* package) {
-
+	t_data_FD_request* request = deserialize_t_data_FD_request(package->stream);
+	Package* tmpPackage = NULL;
+	int status = basicWriteProcessFile(cpu->process, request);
+	destroy_t_data_FD_request(request);
+	switch (status) {
+	case WRITE_FD_SUCCESS:
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_SUCCESS, 0, NULL);
+		break;
+	case FILE_NOTFOUND_FD_FAILURE:
+	case PERMISSIONS_DENIED_FD_FAILURE:
+	default:
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_FAILURE, 0, NULL);
+		markFreeCPU(cpu);
+		switch (status) {
+		case FILE_NOTFOUND_FD_FAILURE:
+			moveFromExcecToExit_withError(cpu->process,
+			SC_ERROR_FILE_NOT_FOUND);
+			break;
+		case PERMISSIONS_DENIED_FD_FAILURE:
+			moveFromExcecToExit_withError(cpu->process,
+			SC_ERROR_FILE_WRITE_REFUSED);
+			break;
+		default:
+			moveFromExcecToExit_withError(cpu->process,
+			SC_ERROR_UNKNOWN);
+			break;
+		}
+		break;
+	}
+	destroyPackage(tmpPackage);
 }
 
 void executeReadProcessFileTo(CPU* cpu, Package* package) {
-
+	t_dataPointer_FD_request request =
+			(t_dataPointer_FD_request) package->stream;
+	Package* tmpPackage = NULL;
+	int status = basicReadProcessFile(cpu->process, request);
+	destroy_t_data_FD_request(request);
+	switch (status) {
+	case READ_FD_SUCCESS:
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_SUCCESS, 0, NULL);
+		break;
+	case FILE_NOTFOUND_FD_FAILURE:
+	case PERMISSIONS_DENIED_FD_FAILURE:
+	default:
+		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
+		COD_SYSCALL_FAILURE, 0, NULL);
+		markFreeCPU(cpu);
+		switch (status) {
+		case FILE_NOTFOUND_FD_FAILURE:
+			moveFromExcecToExit_withError(cpu->process,
+			SC_ERROR_FILE_NOT_FOUND);
+			break;
+		case PERMISSIONS_DENIED_FD_FAILURE:
+			moveFromExcecToExit_withError(cpu->process,
+			SC_ERROR_FILE_READ_REFUSED);
+			break;
+		default:
+			moveFromExcecToExit_withError(cpu->process,
+			SC_ERROR_UNKNOWN);
+			break;
+		}
+		break;
+	}
 }
 
 /*
