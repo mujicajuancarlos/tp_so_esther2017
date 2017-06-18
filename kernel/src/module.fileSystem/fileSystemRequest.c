@@ -66,7 +66,7 @@ int createFile(Process* process, char* path, char* openMode) {
 		if (string_equals_ignore_case(openMode, "c")) {
 
 			Package* package = solicitudAlFileSystem(socketFS,
-			COD_CREAR_ARCHIVO, path);
+			COD_CREATE_FILE_REQUEST, path);
 			destroyPackage(package);
 
 			package = createAndReceivePackage(socketFS);
@@ -166,7 +166,7 @@ int writeFile(Process* process, int fd, int offset, char*buffer, size_t size) {
 	char* stream = serialize_t_Write(write);
 
 	Package* package = solicitudAlFileSystem(socket,
-	COD_GUARDAR_DATOS, stream); //TODO: path,offset,size,buffer
+	COD_WRITE_FILE_REQUEST, stream); //TODO: path,offset,size,buffer
 
 	if (package != NULL) {
 		logInfo(
@@ -203,7 +203,7 @@ int readFile(Process* process, int fileDesc_file, int offset, size_t size) {
 	char* stream = serialize_t_Read(read);
 
 	Package* package = solicitudAlFileSystem(socketFS,
-	COD_OBTENER_DATOS, stream); //TODO:(path,offset,size)  Struct
+	COD_READ_FILE_REQUEST, stream); //TODO:(path,offset,size)  Struct
 
 	if (package != NULL) {
 		logInfo(
