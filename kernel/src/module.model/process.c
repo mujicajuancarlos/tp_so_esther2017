@@ -16,6 +16,7 @@ Process* createProcess(int socket, kernel_struct* kernelStruct) {
 	newProcess->pid = 0;
 	newProcess->pcb = NULL;
 	newProcess->forceQuit = false;
+	newProcess->nextFD = NEXT_FD;
 	newProcess->heapPages = list_create();
 	newProcess->files = list_create();
 	newProcess->kernelStruct = kernelStruct;
@@ -66,6 +67,12 @@ int getNextPID() {
 	return next;
 }
 
+int getNextFileDescriptorFor(Process* process){
+	int aux = process->nextFD;
+	process->nextFD = aux + 1;
+	return aux;
+}
+
 void markForcedQuitProcess(Process* process) {
 	process->forceQuit = true;
 }
@@ -91,6 +98,18 @@ void replacePCB(Process* process, PCB* newPCB) {
 	PCB* oldPcb = process->pcb;
 	destroy_PBC(oldPcb);
 	process->pcb = newPCB;
+}
+
+void addFile(Process* process, t_processFile* processFile){
+	list_add(process->files,process);
+}
+
+void removeFile(Process* process, int fileDescriptor){
+	bool condition(void* element){
+		t_processFile* file = element;
+		return file->fd == fileDescriptor;
+	}
+	list_remove_by_condition(process->files,condition);
 }
 
 void printHeaderProcess() {

@@ -22,11 +22,13 @@
 #include "fileDescriptor.h"
 
 #define FIRST_PID 1000
+#define NEXT_FD 3
 
 typedef struct Process {
     int fileDescriptor;	//file descriptor del socket de la consola
     int pid;	//PID del proceso que esta ejecutando actualmente
     int quantum;
+    int nextFD;
     bool forceQuit;//usado para la finalizacion forzada de procesos en ejecucion
     PCB* pcb;
     t_list* heapPages;
@@ -46,12 +48,16 @@ void initializeCurrentPidMutex();
 void destroyCurrentPidMutex();
 
 int getNextPID();
+int getNextFileDescriptorFor(Process* process);
 
 void markForcedQuitProcess(Process* process);
 
 void createPcbForNewProcess(Process* process, Package* package);
 
 void replacePCB(Process* process, PCB* newPCB);
+
+void addFile(Process* process, t_processFile* processFile);
+void removeFile(Process* process, int fileDescriptor);
 
 void printHeaderProcess();
 

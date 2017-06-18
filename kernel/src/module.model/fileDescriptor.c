@@ -6,8 +6,6 @@
  */
 #include "fileDescriptor.h"
 
-int currentFD = FIRST_PROCESS_FD;
-
 t_list* globalFiles;
 pthread_mutex_t globalFilesMutex;
 
@@ -32,7 +30,7 @@ void globalFilesMutex_unlock() {
 }
 
 t_globalFile* create_t_globalFile(char* path) {
-	size_t sizePath = sizeof(char)*strlen(path);
+	size_t sizePath = sizeof(char) * strlen(path);
 	t_globalFile* globalFile = malloc(sizeof(t_globalFile));
 	globalFile->open = 0;
 	globalFile->path = malloc(sizePath);
@@ -47,7 +45,8 @@ void destroy_t_globalFile(t_globalFile* globalFile) {
 	free(globalFile);
 }
 
-t_processFile* create_t_processFile(uint32_t fd_number, t_globalFile* globalFile, flags flags){
+t_processFile* create_t_processFile(uint32_t fd_number,
+		t_globalFile* globalFile, t_flags flags) {
 	t_processFile* processFile = malloc(sizeof(t_processFile));
 	processFile->fd = fd_number;
 	processFile->flag = flags;
@@ -56,25 +55,29 @@ t_processFile* create_t_processFile(uint32_t fd_number, t_globalFile* globalFile
 	processFile->seekValue = 0;
 	return processFile;
 }
-void destroy_t_processFile(t_processFile* processFile){
+void destroy_t_processFile(t_processFile* processFile) {
 	processFile->globalFile->open = processFile->globalFile->open - 1;
 	processFile->globalFile = NULL;
 	free(processFile);
 }
 
 void addGlobalFile(t_globalFile* globalFile) {
-	globalFilesMutex_lock();
 	list_add(globalFiles, globalFile);
-	globalFilesMutex_unlock();
 }
 
 void removeClosedGlobalFiles() {
-	bool condicion(void* element) {
+	bool condition(void* element) {
 		t_globalFile* globalFile = element;
 		return globalFile->open == 0;
 	}
-	globalFilesMutex_lock();
-	list_remove_and_destroy_by_condition(globalFiles, condicion,
+	list_remove_and_destroy_by_condition(globalFiles, condition,
 			(void*) destroy_t_globalFile);
-	globalFilesMutex_unlock();
+}
+
+t_globalFile* getGlobalFileFor(char* path) {
+	bool condition(void* element) {
+		t_globalFile* globalFile = element;
+		return string_equals_ignore_case(path,globalFile->path);
+	}
+	return list_find(globalFiles, condition);
 }
