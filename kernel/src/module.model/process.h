@@ -56,8 +56,12 @@ void createPcbForNewProcess(Process* process, Package* package);
 
 void replacePCB(Process* process, PCB* newPCB);
 
+t_processFile* getProcessFile(Process* process, int fileDescriptor);
+
 void addFile(Process* process, t_processFile* processFile);
 void removeFile(Process* process, int fileDescriptor);
+
+void removeAndDestroyFile(Process* process, t_processFile* file);
 
 void printHeaderProcess();
 

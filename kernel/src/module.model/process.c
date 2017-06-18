@@ -100,6 +100,14 @@ void replacePCB(Process* process, PCB* newPCB) {
 	process->pcb = newPCB;
 }
 
+t_processFile* getProcessFile(Process* process, int fileDescriptor){
+	bool condition(void* element){
+		t_processFile* file = element;
+		return file->fd == fileDescriptor;
+	}
+	return list_find(process->files, condition);
+}
+
 void addFile(Process* process, t_processFile* processFile){
 	list_add(process->files,process);
 }
@@ -110,6 +118,12 @@ void removeFile(Process* process, int fileDescriptor){
 		return file->fd == fileDescriptor;
 	}
 	list_remove_by_condition(process->files,condition);
+}
+
+void removeAndDestroyFile(Process* process, t_processFile* file){
+	removeFile(process,file->fd);
+	destroy_t_processFile(file);
+	removeClosedGlobalFiles();
 }
 
 void printHeaderProcess() {

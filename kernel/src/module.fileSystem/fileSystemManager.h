@@ -27,4 +27,27 @@
 
 #define VALIDATION_FD_OK 20
 
+int basicOpenProcessFile(Process* process, t_new_FD_request* dataRequest,
+		int* assignedFD);
+
+int basicDeleteProcessFile(Process* process, int fileDescriptor);
+
+int basicCloseProcessFile(Process* process, int fileDescriptor);
+
+int basicSeekProcessFile(Process* process, t_seed_FD_request* dataRequest);
+
+int basicWriteProcessFile(Process* process, t_data_FD_request* dataRequest);
+
+int basicReadProcessFile(Process* process, t_dataPointer_FD_request dataRequest);
+
+int createProcessFileWith(Process* process, t_globalFile* globalFile,
+		t_banderas externalFlags);
+
+t_globalFile* createGlobalFileWith(t_new_FD_request* dataRequest, int* status);
+
+void validatePermissionForCreateFile(t_banderas flags, int* status);
+void validateExistFile(t_processFile* file, int* status);
+void validatePermissionForWriteFile(t_processFile* file, int* status);
+void validatePermissionForReadFile(t_processFile* file, int* status);
+
 #endif /* MODULE_FILESYSTEM_FILESYSTEMMANAGER_H_ */

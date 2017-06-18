@@ -42,10 +42,7 @@ typedef struct {
 	char* buffer;
 } t_Write;
 
-bool isOpen(char* path);
-int openFile(Process* process, char* path, char* openMode);
-t_globalFile* getFileDescriptor(char* path);
-int closeFile(Process* process, char* path);
+
 char* serialize_t_Read(t_Read* read);
 char* serialize_t_Write(t_Write* write);
 #endif /* MODULE_FILESYSTEM_FILESYSTEMADMINISTRATOR_H_ */
