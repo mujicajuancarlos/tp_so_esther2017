@@ -160,5 +160,8 @@ void destroy_t_data_FD_request(t_data_FD_request* object);
 size_t sizeof_t_data_FD_request(t_data_FD_request* object);
 char* serialize_t_data_FD_request(t_data_FD_request* object);
 t_data_FD_request* deserialize_t_data_FD_request(char* buffer);
+//
+char* serialize_t_dataPointer_FD_request(t_dataPointer_FD_request* object);
+t_dataPointer_FD_request* deserialize_t_dataPointer_FD_request(char* buffer);
 
 #endif /* SRC_DC_COMMONS_PROTOCOL_KERNEL_CPU_H_ */

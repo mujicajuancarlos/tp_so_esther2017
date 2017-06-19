@@ -9,6 +9,9 @@
 #define SRC_DC_COMMONS_PROTOCOL_FILESYSTEM_KERNEL_H_
 
 #include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include "serialization.h"
 
 //prefijo = KC ; between 600 - 699
 

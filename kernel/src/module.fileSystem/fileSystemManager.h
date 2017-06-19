@@ -24,6 +24,7 @@
 #define PERMISSIONS_DENIED_FD_FAILURE 10
 #define FILE_NOTFOUND_FD_FAILURE 11
 #define FILE_IN_USED_FD_FAILUERE 12
+#define FS_ERROR_UNKNOWN 13
 
 #define VALIDATION_FD_OK 20
 
@@ -38,7 +39,7 @@ int basicSeekProcessFile(Process* process, t_seed_FD_request* dataRequest);
 
 int basicWriteProcessFile(Process* process, t_data_FD_request* dataRequest);
 
-int basicReadProcessFile(Process* process, t_dataPointer_FD_request dataRequest);
+int basicReadProcessFile(Process* process, t_dataPointer_FD_request* dataRequest);
 
 int createProcessFileWith(Process* process, t_globalFile* globalFile,
 		t_banderas externalFlags);

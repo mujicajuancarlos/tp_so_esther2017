@@ -45,13 +45,13 @@ void handleKernelRequest(fileSystem_struct *fsStruct, Package *package) {
 	 * TODO verificar los codigos de mensaje permitidos entre kernel y fs
 	 */
 	switch (package->msgCode) {
-	case COD_VALIDAR_ARCHIVO:
+	case COD_EXIST_FILE_REQUEST:
 		//	Verifica que el archivo del path exista
 		break;
 	case COD_CREATE_FILE_REQUEST:
 		//	En caso de que no exista (y en el path se pueda escribir) se va a crear el archivo dentro de ese path
 		break;
-	case COD_BORRAR_ARCHIVO:
+	case COD_DELETE_FILE_REQUEST:
 		//	En caso de que exista, borrará el archivo metadata y liberará bloques del bitmap
 		break;
 	case COD_READ_FILE_REQUEST:

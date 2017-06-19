@@ -398,11 +398,10 @@ void executeWriteProcessFileTo(CPU* cpu, Package* package) {
 }
 
 void executeReadProcessFileTo(CPU* cpu, Package* package) {
-	t_dataPointer_FD_request request =
-			(t_dataPointer_FD_request) package->stream;
+	t_dataPointer_FD_request* request = deserialize_t_dataPointer_FD_request(package->stream);
 	Package* tmpPackage = NULL;
 	int status = basicReadProcessFile(cpu->process, request);
-	destroy_t_data_FD_request(request);
+	free(request);
 	switch (status) {
 	case READ_FD_SUCCESS:
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
@@ -430,6 +429,7 @@ void executeReadProcessFileTo(CPU* cpu, Package* package) {
 		}
 		break;
 	}
+	destroyPackage(tmpPackage);
 }
 
 /*

@@ -26,8 +26,8 @@ int basicDeleteProcessFile(Process* process, int fileDescriptor) {
 	int status = DELETE_FD_SUCCESS;
 	t_processFile* file = getProcessFile(process, fileDescriptor);
 	validateExistFile(file, &status);
-	if (*status == VALIDATION_FD_OK) {
-		removeAndDestroyFile(file);
+	if (status == VALIDATION_FD_OK) {
+		removeAndDestroyFile(process, file);
 		//todo enviar la eliminacion del archivo al fs
 	}
 	return status;
@@ -37,8 +37,8 @@ int basicCloseProcessFile(Process* process, int fileDescriptor) {
 	int status = CLOSE_FD_SUCCESS;
 	t_processFile* file = getProcessFile(process, fileDescriptor);
 	validateExistFile(file, &status);
-	if (*status == VALIDATION_FD_OK) {
-		removeAndDestroyFile(file);
+	if (status == VALIDATION_FD_OK) {
+		removeAndDestroyFile(process, file);
 		//todo verificar si es necesario enviar a fs
 	}
 	return status;
@@ -48,7 +48,7 @@ int basicSeekProcessFile(Process* process, t_seed_FD_request* dataRequest) {
 	int status = SEEK_FD_SUCCESS;
 	t_processFile* file = getProcessFile(process, dataRequest->fd);
 	validateExistFile(file, &status);
-	if (*status == VALIDATION_FD_OK) {
+	if (status == VALIDATION_FD_OK) {
 		file->seekValue = dataRequest->offset;
 	}
 	return status;
@@ -58,22 +58,22 @@ int basicWriteProcessFile(Process* process, t_data_FD_request* dataRequest) {
 	int status = WRITE_FD_SUCCESS;
 	t_processFile* file = getProcessFile(process, dataRequest->fd);
 	validateExistFile(file, &status);
-	if (*status == VALIDATION_FD_OK) {
+	if (status == VALIDATION_FD_OK) {
 		validatePermissionForWriteFile(file, &status);
-		if (*status == VALIDATION_FD_OK) {
+		if (status == VALIDATION_FD_OK) {
 			//todo enviar la solicitud a fs
 		}
 	}
 	return status;
 }
 
-int basicReadProcessFile(Process* process, t_dataPointer_FD_request dataRequest) {
+int basicReadProcessFile(Process* process, t_dataPointer_FD_request* dataRequest) {
 	int status = READ_FD_SUCCESS;
 	t_processFile* file = getProcessFile(process, dataRequest->fd);
 	validateExistFile(file, &status);
-	if (*status == VALIDATION_FD_OK) {
+	if (status == VALIDATION_FD_OK) {
 		validatePermissionForReadFile(file, &status);
-		if (*status == VALIDATION_FD_OK) {
+		if (status == VALIDATION_FD_OK) {
 			//todo enviar la solicitud a fs
 		}
 	}
