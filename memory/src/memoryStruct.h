@@ -35,13 +35,9 @@ typedef struct memory_struct {
 	pthread_mutex_t listaCPUsMutex;
 	Configuration* config;
 	uint32_t memorySize;
-	uint32_t pageSize;
 	void* memory;
 	t_list* referenceTable;
-	int memorySleep;
 	t_list* cacheEntries;
-	int maxEntries;
-	int maxPPP;
 } memory_struct;
 
 #endif /* MEMORYSTRUCT_H_ */

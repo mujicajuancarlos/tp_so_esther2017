@@ -234,7 +234,7 @@ void handleCommand_set_sleep(memory_struct* memoryStruct, char** commands) {
 			printf ("El valor de retardo minimo posible es de 0 milisegundos\n");
 			sleep = 0;
 		}
-		memoryStruct->memorySleep = sleep;
+		memoryStruct->config->retardo_memoria = sleep;
 		printf("El valor de retardo fue modificado a %i milisegundos\n", sleep);
 		printf ("==================================\n");
 	} else
@@ -289,7 +289,7 @@ void handleCommand_size_pid(memory_struct* memoryStruct, char** commands) {
 		}
 		t_list* processPages = list_create();
 		processPages = list_filter (memoryStruct->referenceTable, justThisProcess);
-		uint32_t processSize = memoryStruct->pageSize * list_size (processPages);
+		uint32_t processSize = memoryStruct->config->marco_size * list_size (processPages);
 		printf ("==================================\n");
 		if (pid < 1000)
 			printf("pID invalido\n");

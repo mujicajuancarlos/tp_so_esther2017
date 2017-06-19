@@ -46,8 +46,11 @@ void handleKernelRequest(kernel* kernel, Package* package) {
 	case COD_ADD_PROCESS_PAGES_REQUEST: //para agregar paginas adicionales a un proceso existente
 		addNewPages(package, kernel);
 		break;
-	case COD_END_PROCESS_REQUEST: //para liberar paginas de un proceso que finalizo
-		//todo: la funcion endProcess está hecha, pero habría que asegurar que esté la parte de serialización para obtener el pid
+	case COD_FREE_PAGE_REQUEST:
+		freeMemoryPage (package, kernel);
+		break;
+	case COD_END_PROCESS_REQUEST: //para liberar todas las paginas de un proceso que finalizo
+		endProcess (package, kernel);
 		break;
 	default:
 		logError("El kernel solicito una accion desconocida FD: %d Cod: %d",

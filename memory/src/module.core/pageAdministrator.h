@@ -23,8 +23,8 @@ int processRead (memory_struct* memoryStruct, t_PageBytes* dataInfo);
 
 void memoryDump (memory_struct* memoryStruct); // NO DEBERÍA ESTAR ACA PORQUE ES UNA FUNCION DE LA CONSOLA DE LA MEMORIA
 
-void freePage (memory_page* page);
+void freePage(memory_struct* memoryStruct, int processId, int procPage);
 
-void freeProcess (memory_struct *memoryStruct, int processId);
+void terminateProcess(memory_struct *memoryStruct, int processId);
 
 #endif /* PAGEADMINISTRATOR_H_ */
