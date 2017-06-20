@@ -275,6 +275,7 @@ void executeOpenProcessFileTo(CPU* cpu, Package* package) {
 		free(buffer);
 		break;
 	case PERMISSIONS_DENIED_FD_FAILURE:
+	case WITHOUT_RESOURCES_FD_FAILURE:
 	default:
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
 		COD_SYSCALL_FAILURE, 0, NULL);

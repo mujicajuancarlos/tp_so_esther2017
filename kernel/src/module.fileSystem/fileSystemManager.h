@@ -11,6 +11,7 @@
 #include <parser/parser.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/protocol-kernel-cpu.h>
+#include <dc-commons/protocol-fileSystem-kernel.h>
 #include "../module.model/fileDescriptor.h"
 #include "../module.model/process.h"
 
@@ -25,6 +26,7 @@
 #define FILE_NOTFOUND_FD_FAILURE 11
 #define FILE_IN_USED_FD_FAILUERE 12
 #define FS_ERROR_UNKNOWN 13
+#define WITHOUT_RESOURCES_FD_FAILURE 14
 
 #define VALIDATION_FD_OK 20
 

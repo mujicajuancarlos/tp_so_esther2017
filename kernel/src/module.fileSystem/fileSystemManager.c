@@ -13,12 +13,25 @@ int basicOpenProcessFile(Process* process, t_new_FD_request* dataRequest,
 	t_globalFile* globalFile = getGlobalFileFor(dataRequest->path);
 	if (globalFile == NULL) {
 		globalFile = createGlobalFileWith(dataRequest, &status);
-		if (globalFile == NULL)
+		if (globalFile != NULL){
+			//realizo la verificacion en FS
+			validateExistFileRequest(process,dataRequest->path,&status);
+			if(status == FILE_NOTFOUND_FD_FAILURE){
+				logInfo("El archivo %s no existe en FS, se solicitara crear el archivo",dataRequest->path);
+				createFileRequest(process,dataRequest->path,&status);
+				if(status == COD_FS_RESPONSE_OK){
+					logInfo("El FS indico que el archivo %s se creo sin problemas");
+					status = OPEN_FD_SUCCESS;
+				}else{
+					return WITHOUT_RESOURCES_FD_FAILURE;
+				}
+			}
+		} else {
 			return PERMISSIONS_DENIED_FD_FAILURE;
+		}
 	}
 	*assignedFD = createProcessFileWith(process, globalFile,
 			dataRequest->flags);
-	//todo verificar si es necesario enviar a fs
 	return status;
 }
 
@@ -27,8 +40,21 @@ int basicDeleteProcessFile(Process* process, int fileDescriptor) {
 	t_processFile* file = getProcessFile(process, fileDescriptor);
 	validateExistFile(file, &status);
 	if (status == VALIDATION_FD_OK) {
+		size_t size = strlen(file->globalFile->path);
+		char* path = malloc(size);
+		memcpy(path,file->globalFile->path,size);
 		removeAndDestroyFile(process, file);
-		//todo enviar la eliminacion del archivo al fs
+		validateDeleteFile(path, &status);
+		if (status == VALIDATION_FD_OK){
+			deleteFileRequest(process,path,&status);
+			if(status==COD_FS_RESPONSE_OK){
+				status = DELETE_FD_SUCCESS;
+			}else{
+				status = FILE_NOTFOUND_FD_FAILURE;
+			}
+		}else{
+			status = FILE_IN_USED_FD_FAILUERE;
+		}
 	}
 	return status;
 }
@@ -39,7 +65,7 @@ int basicCloseProcessFile(Process* process, int fileDescriptor) {
 	validateExistFile(file, &status);
 	if (status == VALIDATION_FD_OK) {
 		removeAndDestroyFile(process, file);
-		//todo verificar si es necesario enviar a fs
+		status = CLOSE_FD_SUCCESS;//no es necesario informar a fs
 	}
 	return status;
 }
@@ -50,6 +76,7 @@ int basicSeekProcessFile(Process* process, t_seed_FD_request* dataRequest) {
 	validateExistFile(file, &status);
 	if (status == VALIDATION_FD_OK) {
 		file->seekValue = dataRequest->offset;
+		status = SEEK_FD_SUCCESS;//no es necesario informa a fs
 	}
 	return status;
 }
