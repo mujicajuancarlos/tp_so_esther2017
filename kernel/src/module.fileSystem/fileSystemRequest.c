@@ -121,10 +121,83 @@ void deleteFileRequest(Process* process, char* path, int* status) {
 }
 
 void writeFile(Process* process, t_fileData* data, int* status) {
-	//todo pendiente
+	Package* tmpPackage;
+	int fsSocket = process->kernelStruct->socketClientFileSystem;
+	size_t size = sizeof_t_fileData(data);
+	char* buffer = serialize_t_fileData(data);
+	tmpPackage = createAndSendPackage(fsSocket, COD_WRITE_FILE_REQUEST, size,
+			buffer);
+	free(buffer);
+	if (tmpPackage == NULL) {
+		logError("El file system no esta conectado");
+		exit(EXIT_FAILURE);
+	}
+	destroyPackage(tmpPackage);
+	logInfo("Se solicitó al FS escribir el archivo: %s para el pid: %d",
+			data->path, process->pid);
+	//me quedo a la espera de la aprobacion
+	tmpPackage = createAndReceivePackage(fsSocket);
+	if (tmpPackage != NULL) {
+		switch (tmpPackage->msgCode) {
+		case COD_FS_RESPONSE_OK:
+			logInfo("El FS escribio en el archivo: %s", data->path);
+			*status = COD_FS_RESPONSE_OK;
+			break;
+		case COD_FS_RESPONSE_ERROR:
+			logInfo("El FS no pudo escribir en el archivo: %s", data->path);
+			//todo definir en fs los codigos de error -> ej: no hay archivo, no se pudo eliminar por otro uso
+			*status = FILE_NOTFOUND_FD_FAILURE;
+			break;
+		default:
+			logError("El FS respondio con un mensaje desconocido");
+			*status = FS_ERROR_UNKNOWN;
+			break;
+		}
+		destroyPackage(tmpPackage);
+	} else {
+		logError("El file system no esta conectado");
+		exit(EXIT_FAILURE);
+	}
 }
 
 void readFile(Process* process, t_fileData* data, int* status) {
-	//todo pendiente
+	Package* tmpPackage;
+	int fsSocket = process->kernelStruct->socketClientFileSystem;
+	size_t size = sizeof_t_fileData(data);
+	char* buffer = serialize_t_fileData(data);
+	free(buffer);
+	tmpPackage = createAndSendPackage(fsSocket, COD_READ_FILE_REQUEST, size,
+			buffer);
+	if (tmpPackage == NULL) {
+		logError("El file system no esta conectado");
+		exit(EXIT_FAILURE);
+	}
+	destroyPackage(tmpPackage);
+	logInfo("Se solicitó al FS leer el archivo: %s para el pid: %d",
+			data->path, process->pid);
+	//me quedo a la espera de la aprobacion
+	tmpPackage = createAndReceivePackage(fsSocket);
+	if (tmpPackage != NULL) {
+		switch (tmpPackage->msgCode) {
+		case COD_FS_RESPONSE_OK:
+			logInfo("El FS leyó el archivo: %s", data->path);
+			memcpy(data->data,tmpPackage->stream,tmpPackage->size);
+			*status = COD_FS_RESPONSE_OK;
+			break;
+		case COD_FS_RESPONSE_ERROR:
+			logInfo("El FS no pudo escribir en el archivo: %s", data->path);
+			//todo definir en fs los codigos de error -> ej: no hay archivo, no se pudo eliminar por otro uso
+			*status = FILE_NOTFOUND_FD_FAILURE;
+			break;
+		default:
+			logError("El FS respondio con un mensaje desconocido");
+			*status = FS_ERROR_UNKNOWN;
+			break;
+		}
+		destroyPackage(tmpPackage);
+	} else {
+		logError("El file system no esta conectado");
+		exit(EXIT_FAILURE);
+	}
 }
 
