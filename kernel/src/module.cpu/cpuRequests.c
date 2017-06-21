@@ -399,7 +399,8 @@ void executeWriteProcessFileTo(CPU* cpu, Package* package) {
 }
 
 void executeReadProcessFileTo(CPU* cpu, Package* package) {
-	t_dataPointer_FD_request* request = deserialize_t_dataPointer_FD_request(package->stream);
+	t_dataPointer_FD_request* request = deserialize_t_dataPointer_FD_request(
+			package->stream);
 	Package* tmpPackage = NULL;
 	int status = basicReadProcessFile(cpu->process, request);
 	free(request);
@@ -409,6 +410,7 @@ void executeReadProcessFileTo(CPU* cpu, Package* package) {
 		COD_SYSCALL_SUCCESS, 0, NULL);
 		break;
 	case FILE_NOTFOUND_FD_FAILURE:
+	case MEMORY_SAVE_FAILURE:
 	case PERMISSIONS_DENIED_FD_FAILURE:
 	default:
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
@@ -422,6 +424,10 @@ void executeReadProcessFileTo(CPU* cpu, Package* package) {
 		case PERMISSIONS_DENIED_FD_FAILURE:
 			moveFromExcecToExit_withError(cpu->process,
 			SC_ERROR_FILE_READ_REFUSED);
+			break;
+		case MEMORY_SAVE_FAILURE:
+			moveFromExcecToExit_withError(cpu->process,
+			SC_ERROR_MEMORY_EXCEPTION);
 			break;
 		default:
 			moveFromExcecToExit_withError(cpu->process,

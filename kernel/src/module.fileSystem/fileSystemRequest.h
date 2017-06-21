@@ -22,8 +22,8 @@ void createFileRequest(Process* process, char* path, int* status);
 
 void deleteFileRequest(Process* process, char* path, int* status);
 
-void writeFile(Process* process, t_fileData* data, int* status);
+void writeFileRequest(Process* process, t_fileData* data, int* status);
 
-void readFile(Process* process, t_fileData* data, int* status);
+void readFileRequest(Process* process, t_fileData* data, int* status);
 
 #endif /* MODULE_FILESYSTEM_FILESYSTEMREQUEST_H_ */

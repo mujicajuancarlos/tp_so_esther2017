@@ -12,8 +12,10 @@
 #include <dc-commons/logger.h>
 #include <dc-commons/protocol-kernel-cpu.h>
 #include <dc-commons/protocol-fileSystem-kernel.h>
+#include "../module.memory/memoryRequests.h"
 #include "../module.model/fileDescriptor.h"
 #include "../module.model/process.h"
+#include "fileSystemRequest.h"
 
 #define OPEN_FD_SUCCESS 1
 #define DELETE_FD_SUCCESS 2
@@ -27,6 +29,7 @@
 #define FILE_IN_USED_FD_FAILUERE 12
 #define FS_ERROR_UNKNOWN 13
 #define WITHOUT_RESOURCES_FD_FAILURE 14
+#define MEMORY_SAVE_FAILURE 15
 
 #define VALIDATION_FD_OK 20
 
@@ -48,6 +51,7 @@ int createProcessFileWith(Process* process, t_globalFile* globalFile,
 
 t_globalFile* createGlobalFileWith(t_new_FD_request* dataRequest, int* status);
 
+void validateDeleteFile(t_globalFile* globalFile, int* status);
 void validatePermissionForCreateFile(t_banderas flags, int* status);
 void validateExistFile(t_processFile* file, int* status);
 void validatePermissionForWriteFile(t_processFile* file, int* status);

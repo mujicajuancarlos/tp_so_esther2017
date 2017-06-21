@@ -105,7 +105,6 @@ void deleteFileRequest(Process* process, char* path, int* status) {
 			break;
 		case COD_FS_RESPONSE_ERROR:
 			logInfo("El FS no pudo eiminar el archivo: %s", path);
-			//todo definir en fs los codigos de error -> ej: no hay archivo, no se pudo eliminar por otro uso
 			*status = FILE_NOTFOUND_FD_FAILURE;
 			break;
 		default:
@@ -120,7 +119,7 @@ void deleteFileRequest(Process* process, char* path, int* status) {
 	}
 }
 
-void writeFile(Process* process, t_fileData* data, int* status) {
+void writeFileRequest(Process* process, t_fileData* data, int* status) {
 	Package* tmpPackage;
 	int fsSocket = process->kernelStruct->socketClientFileSystem;
 	size_t size = sizeof_t_fileData(data);
@@ -145,7 +144,7 @@ void writeFile(Process* process, t_fileData* data, int* status) {
 			break;
 		case COD_FS_RESPONSE_ERROR:
 			logInfo("El FS no pudo escribir en el archivo: %s", data->path);
-			//todo definir en fs los codigos de error -> ej: no hay archivo, no se pudo eliminar por otro uso
+			//todo definir en fs los codigos de error -> ej: no hay espacio
 			*status = FILE_NOTFOUND_FD_FAILURE;
 			break;
 		default:
@@ -160,7 +159,7 @@ void writeFile(Process* process, t_fileData* data, int* status) {
 	}
 }
 
-void readFile(Process* process, t_fileData* data, int* status) {
+void readFileRequest(Process* process, t_fileData* data, int* status) {
 	Package* tmpPackage;
 	int fsSocket = process->kernelStruct->socketClientFileSystem;
 	size_t size = sizeof_t_fileData(data);

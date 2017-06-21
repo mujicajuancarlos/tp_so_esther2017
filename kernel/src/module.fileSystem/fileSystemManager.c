@@ -40,13 +40,10 @@ int basicDeleteProcessFile(Process* process, int fileDescriptor) {
 	t_processFile* file = getProcessFile(process, fileDescriptor);
 	validateExistFile(file, &status);
 	if (status == VALIDATION_FD_OK) {
-		size_t size = strlen(file->globalFile->path);
-		char* path = malloc(size);
-		memcpy(path,file->globalFile->path,size);
-		removeAndDestroyFile(process, file);
-		validateDeleteFile(path, &status);
+		validateDeleteFile(file->globalFile, &status);
 		if (status == VALIDATION_FD_OK){
-			deleteFileRequest(process,path,&status);
+			removeAndDestroyFile(process, file);
+			deleteFileRequest(process,file->globalFile->path,&status);
 			if(status==COD_FS_RESPONSE_OK){
 				status = DELETE_FD_SUCCESS;
 			}else{
@@ -88,7 +85,15 @@ int basicWriteProcessFile(Process* process, t_data_FD_request* dataRequest) {
 	if (status == VALIDATION_FD_OK) {
 		validatePermissionForWriteFile(file, &status);
 		if (status == VALIDATION_FD_OK) {
-			//todo enviar la solicitud a fs
+			t_fileData* fileData = create_t_fileData(file->globalFile->path,file->seekValue,dataRequest->sizeBuffer);
+			memcpy(fileData->data, dataRequest->buffer, dataRequest->sizeBuffer);
+			writeFileRequest(process, fileData, &status);
+			if(status == COD_FS_RESPONSE_OK){
+				status = WRITE_FD_SUCCESS;
+			}else{
+				status = FILE_NOTFOUND_FD_FAILURE;
+			}
+			destroy_t_fileData(fileData);
 		}
 	}
 	return status;
@@ -101,7 +106,22 @@ int basicReadProcessFile(Process* process, t_dataPointer_FD_request* dataRequest
 	if (status == VALIDATION_FD_OK) {
 		validatePermissionForReadFile(file, &status);
 		if (status == VALIDATION_FD_OK) {
-			//todo enviar la solicitud a fs
+			t_fileData* fileData = create_t_fileData(file->globalFile->path,file->seekValue,dataRequest->size);
+			readFileRequest(process,fileData,&status);
+			if(status == COD_FS_RESPONSE_OK){
+				dir_memoria address = pointerToLogicalAddress(dataRequest->pointer,process);
+				bool hasError;
+				logInfo("Enviando la informacion del archivo leido a la memoria");
+				saveDataOnMemory(process, address.pagina, address.offset, fileData->dataSize, fileData->data, &hasError);
+				if(!hasError){
+					status = READ_FD_SUCCESS;
+				}else{
+					status = MEMORY_SAVE_FAILURE;
+				}
+			}else{
+				status = FILE_NOTFOUND_FD_FAILURE;
+			}
+			destroy_t_fileData(fileData);
 		}
 	}
 	return status;
@@ -135,6 +155,10 @@ t_globalFile* createGlobalFileWith(t_new_FD_request* dataRequest, int* status) {
 		addGlobalFile(globalFile);
 	}
 	return globalFile;
+}
+
+void validateDeleteFile(t_globalFile* globalFile, int* status){
+	*status = (globalFile->open == 1) ? VALIDATION_FD_OK : FILE_IN_USED_FD_FAILUERE;
 }
 
 void validatePermissionForCreateFile(t_banderas flags, int* status) {
