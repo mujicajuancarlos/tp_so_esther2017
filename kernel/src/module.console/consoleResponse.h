@@ -17,6 +17,7 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/serialization.h>
 #include <dc-commons/protocol-kernel-console.h>
+#include <dc-commons/protocol-kernel-cpu.h>
 #include "consoleRequests.h"
 #include "../module.model/process.h"
 #include "../kernelStruct.h"
@@ -26,5 +27,7 @@ void consoleResponseRepulseMessage(Process* newProcess);
 void runProgramIsOK_response(Process* process);
 
 void notifyEndProcess(Process* process);
+
+void writeOnStdout(Process* process, t_data_FD_request* dataRequest);
 
 #endif /* MODULE_CONSOLE_CONSOLERESPONSE_H_ */

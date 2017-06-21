@@ -15,7 +15,10 @@
 #include "../module.memory/memoryRequests.h"
 #include "../module.model/fileDescriptor.h"
 #include "../module.model/process.h"
+#include "../module.console/consoleResponse.h"
 #include "fileSystemRequest.h"
+
+#define STDOUT_FD 1
 
 #define OPEN_FD_SUCCESS 1
 #define DELETE_FD_SUCCESS 2

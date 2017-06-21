@@ -80,6 +80,10 @@ int basicSeekProcessFile(Process* process, t_seed_FD_request* dataRequest) {
 
 int basicWriteProcessFile(Process* process, t_data_FD_request* dataRequest) {
 	int status = WRITE_FD_SUCCESS;
+	if(dataRequest->fd == STDOUT_FD){
+		writeOnStdout(process, dataRequest);
+		return WRITE_FD_SUCCESS;
+	}
 	t_processFile* file = getProcessFile(process, dataRequest->fd);
 	validateExistFile(file, &status);
 	if (status == VALIDATION_FD_OK) {

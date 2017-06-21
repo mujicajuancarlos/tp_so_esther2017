@@ -33,3 +33,13 @@ void notifyEndProcess(Process* process) {
 	destroyPackage(package);
 	close(process->fileDescriptor);
 }
+
+void writeOnStdout(Process* process, t_data_FD_request* dataRequest){
+	Package* package;
+	package = createAndSendPackage(process->fileDescriptor,COD_KC_PRINT_STDOUT,dataRequest->sizeBuffer,dataRequest->buffer);
+	if(package!=NULL){
+		logError("No se pudo comunicar a la consola el print del proceso %d",process->pid);
+	}
+	destroyPackage(package);
+}
+
