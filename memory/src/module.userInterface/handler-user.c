@@ -83,15 +83,30 @@ void handleCommand_dump(memory_struct* memoryStruct, char** commands) {
 
 void handleCommand_dump_cache(memory_struct* memoryStruct, char** commands) {
 	if (commands[2] == NULL) {
+		bool onlyValidEntries (void* element) {
+			cache_entry *c = element;
+			if (c->globPage == (-1) && c->pid == (-1) && c->procPage == (-1))
+				return false;
+			else
+				return true;
+		}
+		t_list* displayList;
+		displayList = list_create ();
+		displayList = list_filter (memoryStruct->cacheEntries, onlyValidEntries);
+
+
 		printf ("==================================\n");
-		if (list_size (memoryStruct->cacheEntries) == 0) {
+		if (list_size (displayList) == 0) {
 			printf ("No hay paginas cargadas en memoria cache\n");
 		}
 		else {
 			int i;
-			for (i = 0; i < list_size (memoryStruct->cacheEntries); i++) {
-				cache_entry* entry = list_get (memoryStruct->cacheEntries, i);
-				printf 	("| Pag %i   - pID %i   |\n", entry->procPage, entry->pid);
+			for (i = 0; i < list_size (displayList); i++) {
+				cache_entry* entry = list_get (displayList, i);
+				if ((i + 1) == list_size (displayList))
+					printf 	("| Pag %i  - pID %i  | <- LRU\n", entry->procPage, entry->pid);
+				else
+					printf 	("| Pag %i  - pID %i  |\n", entry->procPage, entry->pid);
 			}
 		}
 		printf ("==================================\n");
@@ -101,46 +116,45 @@ void handleCommand_dump_cache(memory_struct* memoryStruct, char** commands) {
 
 void handleCommand_dump_structure(memory_struct* memoryStruct, char** commands) {
 	if (commands[2] == NULL) {
-		t_list* occupiedPages = list_create();
-		int freePages = 0;
-
-		bool onlyOccupiedPages(void* element) {
-				memory_page* page = element;
-				return (page->isFree == false);
+		bool onlyOccupiedPages (void* element) {
+			memory_page *p = element;
+			if (p->isFree)
+				return false;
+			else
+				return true;
 		}
+		t_list* occupiedPages;
+		occupiedPages = list_create ();
 		occupiedPages = list_filter (memoryStruct->referenceTable, onlyOccupiedPages);
-		freePages = list_size (memoryStruct->referenceTable) - list_size (occupiedPages);
 
-		t_list* pids;
-		pids = list_create();
-		int getPid (void* element) {
-			memory_page* page = element;
-			return (page->pid);
+		bool onlyUniquePids (void* element) {
+			memory_page *p = element;
+			if (p->procPage == 0 && p->pid != (-1))
+				return true;
+			else
+				return false;
 		}
-		pids = list_map (occupiedPages, getPid);
-		int i;
-		for (i = 0; i < list_size (pids); i++) {
-			int j;
-			for (j = i; j < list_size (pids); j++) {
-				if (list_get(pids, i) == list_get(pids, j))
-					list_remove (pids, j--);
-			}
-		}
+		t_list* uniquePids;
+		uniquePids = list_create ();
+		uniquePids = list_filter (occupiedPages, onlyUniquePids);
 
 		printf ("==================================\n");
 		printf ("Total de paginas de memoria: %i\n", list_size (memoryStruct->referenceTable));
 		printf ("Paginas de memoria ocupadas: %i\n", list_size (occupiedPages));
-		printf ("Paginas de memoria libres:   %i\n", freePages);
-		if (list_size (pids) == 0)
-			printf ("Procesos activos:         ----\n");
+		printf ("Paginas de memoria libres:   %i\n", list_size (memoryStruct->referenceTable) - list_size (occupiedPages));
+		if (list_size (uniquePids) == 0)
+			printf ("PIDs de procesos activos:    ---\n");
 		else {
-			printf ("Procesos activos:");
-			for (i = 0; i < list_size (pids); i++) {
-				printf ("                  %i            \n", (int) list_get (pids, i));
+			int i;
+			for (i = 0; i < list_size (uniquePids); i++) {
+				memory_page *p = list_get (uniquePids, i);
+				if (i == 0)
+					printf ("PIDs de procesos activos:    %i\n", p->pid);
+				else
+					printf ("                             %i\n", p->pid);
 			}
 		}
 		printf ("==================================\n");
-
 	} else
 		printInvalidArguments(commands[2], commands[0]);
 }
@@ -150,7 +164,7 @@ void handleCommand_dump_content(memory_struct* memoryStruct, char** commands) {
 		if (equal_user_command(commands[2], OPT_ALL)) {
 			handleCommand_dump_content_all(memoryStruct, commands);
 		}
-		if (equal_user_command(commands[2], OPT_DESIRED_PID)) {
+		if (equal_user_command(commands[2], OPT_PID)) {
 			handleCommand_dump_content_pid(memoryStruct, commands);
 		}
 
@@ -162,31 +176,22 @@ void handleCommand_dump_content_all(memory_struct* memoryStruct,
 		char** commands) {
 	if (commands[3] == NULL) {
 
-		bool isPageOccupied (void* element) {
-			memory_page* page = element;
-			return (page->isFree == false);
+		bool onlyOccupiedPages (void* element) {
+			memory_page* p = element;
+			return (p->isFree == false);
 		}
 
-		t_list* occupiedPages = list_create();
-		occupiedPages = list_filter (memoryStruct->referenceTable, isPageOccupied);
+		t_list* occupiedPages = list_create ();
+		occupiedPages = list_filter (memoryStruct->referenceTable, onlyOccupiedPages);
 
 		printf ("==================================\n");
-		if (list_size (occupiedPages) == 0)
-			printf ("No hay paginas en memoria asignadas a procesos aun\n");
-		else {
-			bool orderMethod (void* elementOne, void* elementTwo) {
-				memory_page* pageOne = elementOne;
-				memory_page* pageTwo = elementTwo;
-				return (pageOne->pid <= pageTwo->pid);
-			}
-
-			list_sort (occupiedPages, orderMethod);
-
-			printf ("Tenemos las siguientes paginas cargadas en memoria\n");
-			int i;
-			for (i = 0; i < list_size (occupiedPages); i++) {
-				memory_page* page = list_get (occupiedPages, i);
-				printf ("Proceso %i, pagina %i\n", page->pid, page->procPage);
+		int i;
+		for (i = 0; i < list_size (occupiedPages); i++) {
+			memory_page *p = list_get (occupiedPages, i);
+			if (p->pid == (-1))
+				printf ("Frame %i: Pagina reservada para estructuras administrativas\n", p->globPage);
+			else {
+				printf ("Frame %i: Pagina %i del proceso %i\n", p->globPage, p->procPage, p->pid);
 			}
 		}
 		printf ("==================================\n");
@@ -199,13 +204,13 @@ void handleCommand_dump_content_pid(memory_struct* memoryStruct,
 	if (commands[3] != NULL && commands[4] == NULL) {
 		int pid = atoi(commands[3]);
 
-		bool justThisProcess (void* element) {
-			memory_page* page = element;
-			return (page->pid == pid);
+		bool onlyThisProcess (void* element) {
+			memory_page* p = element;
+			return (p->pid == pid);
 		}
 
 		t_list* processPages = list_create ();
-		processPages = list_filter (memoryStruct->referenceTable, justThisProcess);
+		processPages = list_filter (memoryStruct->referenceTable, onlyThisProcess);
 
 		printf ("==================================\n");
 		if (pid < 1000)
@@ -216,8 +221,8 @@ void handleCommand_dump_content_pid(memory_struct* memoryStruct,
 			printf("Para el proceso %i se encuentra las siguientes paginas cargadas en memoria:\n", pid);
 			int i;
 			for (i = 0; i < list_size (processPages); i++) {
-				memory_page* page = list_get (processPages, i);
-				printf ("Pagina %i del proceso %i\n", page->procPage, pid);
+				memory_page* p = list_get (processPages, i);
+				printf ("Frame %i: Pagina %i del proceso %i\n", p->globPage, p->procPage, pid);
 			}
 		}
 		printf ("==================================\n");
@@ -253,7 +258,13 @@ void handleCommand_flush(memory_struct* memoryStruct, char** commands) {
 
 void handleCommand_flush_cache(memory_struct* memoryStruct, char** commands) {
 	if (commands[2] == NULL) {
-		list_clean (memoryStruct->cacheEntries);
+		int i;
+		for (i = 0; i < list_size (memoryStruct->cacheEntries); i++) {
+			cache_entry *c = list_get (memoryStruct->cacheEntries, i);
+			c->globPage = -1;
+			c->pid = -1;
+			c->procPage = -1;
+		}
 		printf ("==================================\n");
 		printf("Memoria cache ha sido limpiada\n");
 		printf ("==================================\n");
@@ -266,7 +277,7 @@ void handleCommand_size(memory_struct* memoryStruct, char** commands) {
 		if (equal_user_command(commands[1], OPT_MEMORY)) {
 			handleCommand_size_memory(memoryStruct, commands);
 		}
-		if (equal_user_command(commands[1], OPT_DESIRED_PID)) {
+		if (equal_user_command(commands[1], OPT_PID)) {
 			handleCommand_size_pid(memoryStruct, commands);
 		}
 	} else
@@ -328,7 +339,7 @@ void printCommandsHelp() {
 	printf(patter, COD_CONSOLE_SIZE, OPT_MEMORY,
 			"Tamaño total de memoria");
 
-	printf(patter, COD_CONSOLE_SIZE, OPT_DESIRED_PID,
+	printf(patter, COD_CONSOLE_SIZE, OPT_PID,
 				"Tamaño total de un proceso en memoria");
 
 	printf(patter, COD_CONSOLE_CLEAR, "", "", "Limpia la pantalla");

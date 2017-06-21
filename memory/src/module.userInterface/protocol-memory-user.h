@@ -16,18 +16,11 @@
 #define COD_CONSOLE_FLUSH "flush"
 #define COD_CONSOLE_SIZE "size"
 
-// opciones para el dump
 #define OPT_STRUCTURE "struc"
 #define OPT_CONTENT "cont"
-// opcion para dump y flush
 #define OPT_CACHE "cache"
-
-// opciones para el size
-#define OPT_MEMORY "memo"
-#define OPT_PID "pid"
-
-#define OPT_MILISECONDS "-mil"
+#define OPT_MEMORY "memory"
 #define OPT_ALL "-all"
-#define OPT_DESIRED_PID "-pid"
+#define OPT_PID "-pid"
 
 #endif /* PROTOCOL_KERNEL_USER_H_ */
