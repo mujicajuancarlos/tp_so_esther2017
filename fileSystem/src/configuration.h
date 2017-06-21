@@ -19,13 +19,9 @@
 #define DEFAULT_CONFIG_PATH "../fileSystem.conf"
 #define ECLIPSE_CONFIG_PATH "fileSystem.conf"
 //process keys
-#define TAMANIO_BLOQUES "TAMANIO_BLOQUES"
-#define CANTIDAD_BLOQUES "CANTIDAD_BLOQUES"
-#define MAGIC_NUMBER "MAGIC_NUMBER"
-#define TAMANIO "TAMANIO"
-#define BLOQUES "BLOQUES"
 #define PUERTO "PUERTO"
 #define PUNTO_MONTAJE "PUNTO_MONTAJE"
+#define RELATIVE_PATH "RELATIVE_PATH"
 //log keys
 #define LOG_LEVEL "LOG_LEVEL"
 #define LOG_FILE "LOG_FILE"
@@ -35,6 +31,7 @@
 typedef struct Configuration {
 	int puerto;
 	char* punto_montaje;
+	char* relativePath;
 	char* log_level;
 	char* log_file;
 	char* log_program_name;
