@@ -69,3 +69,49 @@ Configuration* getConfiguration() {
 	return config;
 }
 
+
+void VerifiedFileModification(char *config_file){
+
+	char buffer[BUF_LEN];
+
+		// Al inicializar inotify este nos devuelve un descriptor de archivo
+		int file_descriptor = inotify_init();
+		if (file_descriptor < 0) {
+			perror("inotify_init");
+		}
+
+		// Creamos un monitor sobre un path indicando que eventos queremos escuchar
+		int watch_descriptor = inotify_add_watch(file_descriptor, "../kernel.conf", IN_MODIFY | IN_CREATE | IN_DELETE);
+
+		// El file descriptor creado por inotify, es el que recibe la información sobre los eventos ocurridos
+		// para leer esta información el descriptor se lee como si fuera un archivo comun y corriente pero
+		// la diferencia esta en que lo que leemos no es el contenido de un archivo sino la información
+		// referente a los eventos ocurridos
+		int length = read(file_descriptor, buffer, BUF_LEN);
+		if (length < 0) {
+			perror("read");
+		}
+
+		int offset = 0;
+
+		while (offset < length) {
+
+			struct inotify_event *event = (struct inotify_event *) &buffer[offset];
+
+			if (event->len) {
+				// Dentro de "mask" tenemos el evento que ocurrio
+				if (event->mask & IN_MODIFY) {
+					if (event->mask & IN_ISDIR) {
+						config_with(config_file);
+						printf("The file %s was modified.\n", event->name);
+						}
+				}
+			}
+			offset += sizeof (struct inotify_event) + event->len;
+		}
+
+		inotify_rm_watch(file_descriptor, watch_descriptor);
+		close(file_descriptor);
+
+}
+
