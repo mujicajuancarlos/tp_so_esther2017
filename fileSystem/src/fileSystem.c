@@ -22,6 +22,9 @@ int main(int argc, char *argv[]) {
 	logInfo("Inicializado proceso kernel");
 	initializeStruct(&fsStruct, config);
 
+	logInfo("Iniciando SADICA");
+	initializeSadicaFileSystem(&fsStruct);
+
 	logInfo("Creando socket server para file system");
 	createKernelServerSocket(&fsStruct);
 

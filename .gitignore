@@ -39,3 +39,7 @@
 
 .metadata
 RemoteSystemsTempFiles/
+
+fileSystem/mnt/FS_SADICA/metadata/bitmap.bin
+fileSystem/mnt/FS_SADICA/files/*.bin
+fileSystem/mnt/FS_SADICA/blocks/*.bin
