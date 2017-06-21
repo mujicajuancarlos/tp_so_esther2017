@@ -33,11 +33,6 @@
 #define LOG_PRINT_CONSOLE "LOG_PRINT_CONSOLE"
 
 typedef struct Configuration {
-	int tamanio_bloques;
-	int cantidad_bloques;
-	char* magic_number;
-	int tamanio;
-	int* bloques;
 	int puerto;
 	char* punto_montaje;
 	char* log_level;

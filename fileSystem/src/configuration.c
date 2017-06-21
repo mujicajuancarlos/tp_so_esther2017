@@ -32,10 +32,6 @@ Configuration* config_with(char *config_file) {
 		}
 	}
 
-	config_set_int_valid_value(&config->tamanio_bloques, temporalConfig, TAMANIO_BLOQUES);
-	config_set_int_valid_value(&config->cantidad_bloques, temporalConfig, CANTIDAD_BLOQUES);
-	config_set_string_valid_value(&config->magic_number, temporalConfig, MAGIC_NUMBER);
-	config_set_int_valid_value(&config->tamanio, temporalConfig, TAMANIO);
 	config_set_int_valid_value(&config->puerto, temporalConfig, PUERTO);
 	config_set_string_valid_value(&config->punto_montaje, temporalConfig, PUNTO_MONTAJE);
 
