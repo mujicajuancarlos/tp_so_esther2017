@@ -10,10 +10,18 @@
 sadica_metadata metadata;
 
 void initializeSadicaFileSystem(fileSystem_struct* fsStruct) {
+	loadMetadata(fsStruct);
+	loadBitmap(fsStruct);
+	loadBlocks(fsStruct);
+	loadFiles(fsStruct);
+}
+
+void loadMetadata(fileSystem_struct* fsStruct) {
 	char* path = getMetadataFilePath(fsStruct);
 	t_config* config = config_create(path);
 	if (config == NULL) {
-		logError("No se pudo cargar los metadatos de sadica desde el path %s", path);
+		logError("No se pudo cargar los metadatos de sadica desde el path %s",
+				path);
 		exit(1);
 	}
 	config_set_int_valid_value(&metadata.size, config, TAMANIO_BLOQUES);

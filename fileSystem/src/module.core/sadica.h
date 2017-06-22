@@ -38,6 +38,8 @@ typedef struct {
 
 void initializeSadicaFileSystem(fileSystem_struct* fsStruct);
 
+void loadMetadata(fileSystem_struct* fsStruct);
+
 char* getSadicaPath(fileSystem_struct* fsStruct);
 char* getMetadataFilePath(fileSystem_struct* fsStruct);
 char* getBitmapFilePath(fileSystem_struct* fsStruct);
