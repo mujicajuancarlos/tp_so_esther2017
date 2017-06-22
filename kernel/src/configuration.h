@@ -9,6 +9,12 @@
 #define CONFIGURATION_CONFIGURATION_H_
 
 //import commoms library
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/inotify.h>
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/log.h>
@@ -41,6 +47,13 @@
 #define LOG_PROGRAM_NAME "LOG_PROGRAM_NAME"
 #define LOG_PRINT_CONSOLE "LOG_PRINT_CONSOLE"
 
+
+//tamaño del evento de inotify
+#define EVENT_SIZE  ( sizeof (struct inotify_event) + 24 )
+//tamaño del buffer de inotify, en este caso puedo manejar 1024 eventos simultaneos
+#define BUF_LEN     ( 1024 * EVENT_SIZE )
+
+
 typedef struct Configuration {
 	int puerto_program;
 	int puerto_cpu;
@@ -71,5 +84,7 @@ Configuration* config_with(char *config_file);
  * devuelve la configuracion
  */
 Configuration* getConfiguration();
+
+void VerifiedFileModification(char *config_file);
 
 #endif /* CONFIGURATION_CONFIGURATION_H_ */

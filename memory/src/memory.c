@@ -9,7 +9,6 @@
  */
 
 #include "memory.h"
-#include "module.kernel/kernelRequest.h" // BORRAR LÍNEA UNA VEZ SE TERMINE DE DEBBUGEAR EN MEMORIA //
 
 memory_struct memoryStruct;
 
@@ -60,15 +59,68 @@ void initializeStruct(memory_struct* memoryStruct, Configuration* config) {
 	memoryStruct->referenceTable = list_create();
 	memoryStruct->cacheEntries = list_create();
 
+	/* se cargan estructuras administrativas: los struct de pagina y las entradas de cache */
 	int i;
 	int totalPages = memoryStruct->memorySize / memoryStruct->config->marco_size;
+	void* placeAddress = memoryStruct->memory;
+	int pagesUsed = 0;
+
 	for (i = 0; i < totalPages; i++) {
-		memory_page *p = malloc (sizeof (memory_page));
+		memory_page *p = placeAddress;
 		p->globPage = i;
 		p->isFree = true;
 		p->pid = 0;
 		p->procPage = 0;
 		p->startAddress = memoryStruct->memory + memoryStruct->config->marco_size * i;
 		list_add (memoryStruct->referenceTable, p);
+		placeAddress += sizeof (memory_page);
+		if ((i + 1) != totalPages) {
+			if ((placeAddress + sizeof (memory_page)) >= (memoryStruct->memory + (memoryStruct->config->marco_size * (pagesUsed + 1)))) {
+				pagesUsed++;
+				placeAddress = memoryStruct->memory + memoryStruct->config->marco_size * pagesUsed;
+			}
+		}
+	}
+
+	if ((placeAddress + sizeof (cache_entry)) > (memoryStruct->memory + (memoryStruct->config->marco_size * (pagesUsed + 1)))) {
+		pagesUsed++;
+		placeAddress = memoryStruct->memory + memoryStruct->config->marco_size * pagesUsed;
+	}
+
+	for (i = 0; i < memoryStruct->config->entradas_cache; i++) {
+		cache_entry *c = placeAddress;
+		c->globPage = -1;
+		c->pid = -1;
+		c->procPage = -1;
+		list_add (memoryStruct->cacheEntries, c);
+		placeAddress += sizeof (cache_entry);
+		if ((i + 1) != memoryStruct->config->entradas_cache) {
+			if ((placeAddress + sizeof (cache_entry)) >= (memoryStruct->memory + (memoryStruct->config->marco_size * (pagesUsed + 1)))) {
+				pagesUsed++;
+				placeAddress = memoryStruct->memory + memoryStruct->config->marco_size * pagesUsed;
+			}
+		}
+	}
+
+	pagesUsed++;
+	for (i = 0; i < pagesUsed; i++) {
+		memory_page *p = list_get (memoryStruct->referenceTable, i);
+		p->isFree = false;
+		p->pid = -1;
+		p->procPage = i;
+	}
+
+
+	logTrace ("Direccion de comienzo de memoria: %p", memoryStruct->memory);
+
+	for (i = 0; i < totalPages; i++) {
+		memory_page *p = list_get (memoryStruct->referenceTable, i);
+		logTrace ("Pagina de memoria: %i Proceso: %i Pagina %i Direccion: %p Direccion de pag: %p", p->globPage, p->pid, p->procPage, p, p->startAddress);
+	}
+
+	logTrace ("Cache inicializada");
+	for (i = 0; i < memoryStruct->config->entradas_cache; i++) {
+		cache_entry *c = list_get (memoryStruct->cacheEntries, i);
+		logTrace ("Pagina de memoria: %i Proceso: %i Pagina %i Direccion: %p", c->globPage, c->pid, c->procPage, c);
 	}
 }
