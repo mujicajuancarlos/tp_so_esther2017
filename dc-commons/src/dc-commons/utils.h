@@ -14,6 +14,9 @@
 #include <commons/string.h>
 #include "logger.h"
 
+
+long fileSize(char* pathFile);
+
 /**
  * @NAME: readFile
  * @DESC: devuelve el contenido del archivo pathFile
@@ -21,9 +24,9 @@
  *		char* path del archivo
  * @RETURN: char* contenido del archivo
  */
-char* readFile(char* pathFile, long* fsize);
+char* readFile(char* pathFile, long startByte, long endByte);
 
-void writeFile(char* buffer, char* pathFile, long fsize);
+void writeFile(char* buffer, long sizeBuffer, char* pathFile, long startByte);
 
 /**
  * @NAME: file_exists
@@ -33,7 +36,7 @@ void writeFile(char* buffer, char* pathFile, long fsize);
  *		char* modo de apertura
  * @RETURN: true si existe y puede ser manipulado en el modo indicado
  */
-bool file_exists(char* filePath, char* mode);
+bool existFile(char* filePath, char* mode);
 
 /**
  * @NAME: getStdinString

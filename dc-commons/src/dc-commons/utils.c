@@ -7,46 +7,46 @@
 
 #include "utils.h"
 
-char* readFile(char* pathFile, long* fsize) {
+long fileSize(char* pathFile) {
 	FILE *file;
-	char* buffer;
-
+	long fsize;
 	if ((file = fopen(pathFile, "r")) == NULL) {
 		logError("Error al abrir el archivo %s", pathFile);
 		exit(EXIT_FAILURE);
 	}
+	fseek(file, 0, SEEK_END);
+	fsize = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	return fsize;
+}
 
+char* readFile(char* pathFile, long startByte, long endByte) {
+	FILE *file;
+	long sizeBuffer = (endByte - startByte) + 1;
+	char* buffer = malloc((sizeof(char)) * sizeBuffer);
+	if ((file = fopen(pathFile, "r")) == NULL) {
+		logError("Error al abrir el archivo %s", pathFile);
+		exit(EXIT_FAILURE);
+	}
 	logDebug("Leyendo el archivo %s", pathFile);
 
-	//Obtengo el tamanio del archivo
-	fseek(file, 0, SEEK_END);
-	*fsize = ftell(file);
-	fseek(file, 0, SEEK_SET);
-
-	//Cargo el archivo en el buffer
-	buffer = malloc(*fsize + 1);
-	fread(buffer, *fsize, 1, file);
+	fseek(file, startByte, SEEK_SET);
+	fread(buffer, sizeBuffer, 1, file);
 	fclose(file);
 
-	//Agrego el caracter de fin al buffer
-	buffer[*fsize] = 0;
-
 	logDebug("Archivo leido: \n %s", buffer);
-
 	return buffer;
 }
 
-void writeFile(char* buffer, char* pathFile, long fsize) {
+void writeFile(char* buffer, long sizeBuffer, char* pathFile, long startByte) {
 	FILE *file;
-
 	file = fopen(pathFile, "w");  // w for write, b for binary
-
-	fwrite(buffer, (size_t) 1, (size_t) fsize, file); // write 10 bytes from our buffer
-
+	fseek(file, startByte, SEEK_SET);
+	fwrite(buffer, 1, sizeBuffer, file);
 	fclose(file);
 }
 
-bool file_exists(char* filePath, char* mode) {
+bool existFile(char* filePath, char* mode) {
 	FILE *file;
 	file = fopen(filePath, mode);
 	if (file != NULL) {
