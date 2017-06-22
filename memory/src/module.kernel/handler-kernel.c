@@ -26,10 +26,6 @@ void handleKernel(kernel* kernel) {
 }
 
 void handleKernelRequest(kernel* kernel, Package* package) {
-	/**
-	 * TODO completar con las funcionalidades que solicita el kernel
-	 */
-
 	switch (package->msgCode) {
 	case COD_PAGE_SIZE_REQUEST: //para pedir el tamaño de pagina
 		sendPageSizeToKernel(kernel);
