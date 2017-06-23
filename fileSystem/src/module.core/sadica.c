@@ -30,21 +30,26 @@ void loadBitmap(fileSystem_struct* fsStruct) {
 		cleanAllBits(fsStruct);
 		writeFile(bitmap->bitarray, size, path, 0);
 	}
+	free(path);
 }
 
 void loadBlocks(fileSystem_struct* fsStruct) {
 	int index;
-	char* free = calloc(1, metadata.size);
+	char* dataBuffer = calloc(1, metadata.size);
 	for (index = 0; index < metadata.quantity; index++) {
 		char* path = getBlockFilePath(fsStruct, index);
-		if(!existFile(path,"w")){
-			writeFile(free, metadata.size, path, 0);
+		if (!existFile(path, "w")) {
+			writeFile(dataBuffer, metadata.size, path, 0);
 		}
+		free(path);
 	}
+	free(dataBuffer);
 }
 
 void loadFiles(fileSystem_struct* fsStruct) {
-
+	char* path = getFilesPath(fsStruct);
+	findSadicaFilesOn(fsStruct, path);
+	free(path);
 }
 
 void loadMetadata(fileSystem_struct* fsStruct) {
@@ -53,11 +58,42 @@ void loadMetadata(fileSystem_struct* fsStruct) {
 	if (config == NULL) {
 		logError("No se pudo cargar los metadatos de sadica desde el path %s",
 				path);
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
+	free(path);
 	config_set_int_valid_value(&metadata.size, config, TAMANIO_BLOQUES);
 	config_set_int_valid_value(&metadata.quantity, config, CANTIDAD_BLOQUES);
 	config_set_string_valid_value(&metadata.magicNumber, config, MAGIC_NUMBER);
+}
+
+void loadSadicaFile(fileSystem_struct* fsStruct, char* pathFile){
+	printf("\nArchivo: %s", pathFile);
+}
+
+void findSadicaFilesOn(fileSystem_struct* fsStruct, char* relativePath) {
+	DIR *d;
+	struct dirent *dir;
+	d = opendir(relativePath);
+	if (d == NULL) {
+		logError("No se pudo abrir %s ", relativePath);
+		exit(EXIT_FAILURE);
+	}
+	while ((dir = readdir(d))) {
+		if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0) {
+			continue;
+		}
+		char* dirOrFile = string_new();
+		string_append(&dirOrFile, relativePath);
+		string_append(&dirOrFile, dir->d_name);
+		if (dir->d_type == DT_DIR) {
+			string_append(&dirOrFile,"/");
+			findSadicaFilesOn(fsStruct, dirOrFile);
+		} else {
+			loadSadicaFile(fsStruct, dirOrFile);
+		}
+		free(dirOrFile);
+	}
+	closedir(d);
 }
 
 size_t getBitsCharSize() {
@@ -107,5 +143,12 @@ char* getBlockFilePath(fileSystem_struct* fsStruct, int index) {
 	string_append(&path, BLOCK_FILE_PATH);
 	string_append(&path, string_itoa(index));
 	string_append(&path, BLOCK_EXT);
+	return path;
+}
+
+char* getFilesPath(fileSystem_struct* fsStruct) {
+	char *path = string_new();
+	string_append(&path, getSadicaPath(fsStruct));
+	string_append(&path, FILES_PATH);
 	return path;
 }

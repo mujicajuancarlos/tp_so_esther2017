@@ -8,6 +8,8 @@
 #ifndef MODULE_CORE_SADICA_H_
 #define MODULE_CORE_SADICA_H_
 
+#include <dirent.h>
+#include <stdlib.h>
 #include <commons/string.h>
 #include <commons/bitarray.h>
 #include <dc-commons/logger.h>
@@ -18,6 +20,7 @@
 #define METADATA_FILE_PATH "metadata/metadata.bin"
 #define BITMAP_FILE_PATH "metadata/bitmap.bin"
 #define BLOCK_FILE_PATH "blocks/"
+#define FILES_PATH "files/"
 #define BLOCK_EXT ".bin"
 
 #define TAMANIO_BLOQUES "TAMANIO_BLOQUES"
@@ -46,6 +49,9 @@ void loadMetadata(fileSystem_struct* fsStruct);
 void loadBitmap(fileSystem_struct* fsStruct);
 void loadBlocks(fileSystem_struct* fsStruct);
 void loadFiles(fileSystem_struct* fsStruct);
+void loadSadicaFile(fileSystem_struct* fsStruct, char* pathFile);
+
+void findSadicaFilesOn(fileSystem_struct* fsStruct, char* relativePath);
 
 size_t getBitsCharSize();
 
@@ -56,5 +62,6 @@ char* getSadicaPath(fileSystem_struct* fsStruct);
 char* getMetadataFilePath(fileSystem_struct* fsStruct);
 char* getBitmapFilePath(fileSystem_struct* fsStruct);
 char* getBlockFilePath(fileSystem_struct* fsStruct, int index);
+char* getFilesPath(fileSystem_struct* fsStruct);
 
 #endif /* MODULE_CORE_SADICA_H_ */
