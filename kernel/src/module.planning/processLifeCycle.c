@@ -204,10 +204,12 @@ void notifyLockedProcessFor(char* semKey, Process* process) {
 }
 
 void sendToEXIT(Process* process) {
+	//notifyEndProcess(process);
 	pthread_mutex_lock(&exitListMutex);
 	queue_push(states->exit, process);
 	pthread_mutex_unlock(&exitListMutex);
 	logTrace("El proceso %d ingresó a la lista de EXIT", process->pid);
+
 }
 
 Process* popToEXIT() {
@@ -224,6 +226,7 @@ void sendToNEW(Process* process) {
 	list_add(states->new, process);
 	pthread_mutex_unlock(&newListMutex);
 	logTrace("El proceso %d ingresó a la lista de NEW", process->pid);
+
 }
 
 void removeFromNEW(Process* process) {

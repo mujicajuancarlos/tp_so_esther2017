@@ -69,4 +69,6 @@ void printProcess(Process* proceso, int stateIndex);
 
 void printProcessFull(Process* proceso, int stateIndex);
 
+void notifyEndProcess(Process* process);
+
 #endif /* PROCESS_H_ */

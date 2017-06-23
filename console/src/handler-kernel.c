@@ -43,6 +43,7 @@ void handleKernelRequest(Program* program, Package* package) {
 		printMessage("\nPID: %d, > %s", program->pid, message);
 		free(message);
 		break;
+
 	case COD_KC_END_PROGRAM:
 		program->endDate = time(NULL);
 		printProgramStatus(program,"Finalizó el programa");
@@ -50,6 +51,7 @@ void handleKernelRequest(Program* program, Package* package) {
 		logInfo("Kernel indico la finalizacion del programa %d", program->pid);
 		destroyProgram(program);
 		break;
+
 	default:
 		logError("Kernel envio una solicitud no valida. Cod: %s",
 				package->msgCode);
