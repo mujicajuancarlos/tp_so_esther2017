@@ -84,4 +84,6 @@ void initializeProcessCounters(t_processCounter* processCounters);
 
 void incrementCounter(int counter, int quantity);
 
+void notifyEndProcess(Process* process);
+
 #endif /* PROCESS_H_ */

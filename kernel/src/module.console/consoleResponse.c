@@ -27,11 +27,11 @@ void runProgramIsOK_response(Process* process) {
 void notifyEndProcess(Process* process) {
 	Package* package;
 	package = createAndSendPackage(process->fileDescriptor,
-	COD_KC_STOP_PROGRAM_RESPONSE, 0, NULL);
-	/*package = createAndSendPackage(process->fileDescriptor,
-	COD_FORCE_QUIT_PROGRAM, 0, NULL);*/
+		COD_KC_END_PROGRAM, 0, NULL);
+	logInfo("Indico la finalizacion del proceso a la Consola %d", process->pid);
 	destroyPackage(package);
-	close(process->fileDescriptor);
+	//close(process->fileDescriptor);
+
 }
 
 void writeOnStdout(Process* process, t_data_FD_request* dataRequest){

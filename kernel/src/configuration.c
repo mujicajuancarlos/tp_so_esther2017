@@ -81,7 +81,7 @@ void VerifiedFileModification(char *config_file){
 		}
 
 		// Creamos un monitor sobre un path indicando que eventos queremos escuchar
-		int watch_descriptor = inotify_add_watch(file_descriptor, "../kernel.conf", IN_MODIFY | IN_CREATE | IN_DELETE);
+		int watch_descriptor = inotify_add_watch(file_descriptor, "../kernel.conf", IN_MODIFY);
 
 		// El file descriptor creado por inotify, es el que recibe la información sobre los eventos ocurridos
 		// para leer esta información el descriptor se lee como si fuera un archivo comun y corriente pero
@@ -114,4 +114,19 @@ void VerifiedFileModification(char *config_file){
 		close(file_descriptor);
 
 }
+
+/*
+void SetQUANTUM_SLEEP(){
+	int timeQuantum;
+	Configuration* config;
+	printf("introduzca un el tiempo de retardo \n");
+	scanf("%i", &timeQuantum);
+	config_set_int_valid_value(&config->quantum_sleep, timeQuantum, QUANTUM_SLEEP);
+	fputs(config->quantum_sleep,"../kernel.conf");
+	//printf("el dato que introducio fue: %i\n", time);
+
+	return;
+}
+*/
+
 
