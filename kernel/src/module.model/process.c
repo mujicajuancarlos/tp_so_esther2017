@@ -20,7 +20,7 @@ Process* createProcess(int socket, kernel_struct* kernelStruct) {
 	newProcess->heapPages = list_create();
 	newProcess->files = list_create();
 	newProcess->kernelStruct = kernelStruct;
-	newProcess->processCounters = NULL;
+	newProcess->processCounters = malloc(sizeof(t_processCounter));
 	initializeProcessCounters(newProcess->processCounters);
 	return newProcess;
 }
@@ -38,6 +38,10 @@ void destroyProcess(Process* process) {
 			list_destroy_and_destroy_elements(process->files,
 					(void*) destroy_t_processFile);
 			process->files = NULL;
+		}
+		if(process->processCounters != NULL){
+			free(process->processCounters);
+			process->processCounters = NULL;
 		}
 		free(process);
 	}
