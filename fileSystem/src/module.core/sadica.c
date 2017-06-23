@@ -9,6 +9,7 @@
 
 sadica_metadata metadata;
 t_bitarray* bitmap;
+t_list* sadicaFiles;
 
 void initializeSadicaFileSystem(fileSystem_struct* fsStruct) {
 	loadMetadata(fsStruct);
@@ -47,6 +48,7 @@ void loadBlocks(fileSystem_struct* fsStruct) {
 }
 
 void loadFiles(fileSystem_struct* fsStruct) {
+	sadicaFiles = list_create();
 	char* path = getFilesPath(fsStruct);
 	findSadicaFilesOn(fsStruct, path);
 	free(path);
@@ -67,7 +69,8 @@ void loadMetadata(fileSystem_struct* fsStruct) {
 }
 
 void loadSadicaFile(fileSystem_struct* fsStruct, char* pathFile){
-	printf("\nArchivo: %s", pathFile);
+	sadica_file* sadicaFile = createSadicaFileFrom(fsStruct,pathFile);
+	list_add(sadicaFiles,sadicaFile);
 }
 
 void findSadicaFilesOn(fileSystem_struct* fsStruct, char* relativePath) {
@@ -114,6 +117,10 @@ void setAllBits(fileSystem_struct* fsStruct) {
 	for (index = 0; index < bitmap->size; index++) {
 		bitarray_set_bit(bitmap, index);
 	}
+}
+
+sadica_metadata* getSadicaMetadata(){
+	return &metadata;
 }
 
 char* getSadicaPath(fileSystem_struct* fsStruct) {

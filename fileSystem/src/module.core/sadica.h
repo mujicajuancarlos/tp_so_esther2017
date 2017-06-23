@@ -12,10 +12,13 @@
 #include <stdlib.h>
 #include <commons/string.h>
 #include <commons/bitarray.h>
+#include <commons/collections/list.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/config.h>
 #include <dc-commons/utils.h>
 #include "../fileSystemStruct.h"
+#include "sadicaFile.h"
+
 
 #define METADATA_FILE_PATH "metadata/metadata.bin"
 #define BITMAP_FILE_PATH "metadata/bitmap.bin"
@@ -30,11 +33,6 @@
 //file metadata
 #define TAMANIO "TAMANIO"
 #define BLOQUES "BLOQUES"
-
-typedef struct {
-	int size;
-	int* blocks;
-} file_metadata;
 
 typedef struct {
 	int size;
@@ -57,6 +55,8 @@ size_t getBitsCharSize();
 
 void cleanAllBits(fileSystem_struct* fsStruct);
 void setAllBits(fileSystem_struct* fsStruct);
+
+sadica_metadata* getSadicaMetadata();
 
 char* getSadicaPath(fileSystem_struct* fsStruct);
 char* getMetadataFilePath(fileSystem_struct* fsStruct);
