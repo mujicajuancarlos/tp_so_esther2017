@@ -153,6 +153,7 @@ void executeWaitTo(CPU* cpu, Package* package) {
 		moveFromExcecToExit_withError(cpu->process, SC_ERROR_WAIT_SEMAPHORE);
 		markFreeCPU(cpu);
 	}
+	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
 }
 
 void executeSignalTo(CPU* cpu, Package* package) {
@@ -176,6 +177,7 @@ void executeSignalTo(CPU* cpu, Package* package) {
 		moveFromExcecToExit_withError(cpu->process, SC_ERROR_WAIT_SEMAPHORE);
 		markFreeCPU(cpu);
 	}
+	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
 }
 
 void executeSetSharedVar(CPU* cpu, Package* package) {
@@ -192,6 +194,7 @@ void executeSetSharedVar(CPU* cpu, Package* package) {
 		moveFromExcecToExit_withError(cpu->process, SC_ERROR_SET_SHARED_VAR);
 		markFreeCPU(cpu);
 	}
+	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
 	destroySetSharedVar(data);
 	destroyPackage(tmpPackage);
 }
@@ -211,6 +214,7 @@ void executeGetSharedVar(CPU* cpu, Package* package) {
 		moveFromExcecToExit_withError(cpu->process, SC_ERROR_GET_SHARED_VAR);
 		markFreeCPU(cpu);
 	}
+	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
 	destroyPackage(tmpPackage);
 }
 
@@ -238,6 +242,7 @@ void executeMallocMemoryTo(CPU* cpu, Package* package) {
 		break;
 	}
 	destroyPackage(tmpPackage);
+	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
 }
 
 void executeFreeMemoryTo(CPU* cpu, Package* package) {
@@ -258,6 +263,7 @@ void executeFreeMemoryTo(CPU* cpu, Package* package) {
 		break;
 	}
 	destroyPackage(tmpPackage);
+	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
 }
 
 void executeOpenProcessFileTo(CPU* cpu, Package* package) {
@@ -285,6 +291,7 @@ void executeOpenProcessFileTo(CPU* cpu, Package* package) {
 		break;
 	}
 	destroyPackage(tmpPackage);
+	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
 }
 
 void executeDeleteProcessFileTo(CPU* cpu, Package* package) {
@@ -318,6 +325,7 @@ void executeDeleteProcessFileTo(CPU* cpu, Package* package) {
 		break;
 	}
 	destroyPackage(tmpPackage);
+	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
 }
 
 void executeCloseProcessFileTo(CPU* cpu, Package* package) {
@@ -339,6 +347,7 @@ void executeCloseProcessFileTo(CPU* cpu, Package* package) {
 		break;
 	}
 	destroyPackage(tmpPackage);
+	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
 }
 
 void executeSeekProcessFileTo(CPU* cpu, Package* package) {
@@ -361,6 +370,7 @@ void executeSeekProcessFileTo(CPU* cpu, Package* package) {
 		break;
 	}
 	destroyPackage(tmpPackage);
+	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
 }
 
 void executeWriteProcessFileTo(CPU* cpu, Package* package) {
@@ -396,6 +406,7 @@ void executeWriteProcessFileTo(CPU* cpu, Package* package) {
 		break;
 	}
 	destroyPackage(tmpPackage);
+	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
 }
 
 void executeReadProcessFileTo(CPU* cpu, Package* package) {
@@ -437,6 +448,7 @@ void executeReadProcessFileTo(CPU* cpu, Package* package) {
 		break;
 	}
 	destroyPackage(tmpPackage);
+	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
 }
 
 /*
@@ -464,6 +476,7 @@ void resolveRequest_endInstruction(CPU* cpu, Package* package) {
 	} else {
 		contextSwitchForForceQuitProcess(cpu);
 	}
+	incrementCounter(cpu->process->processCounters->burst_Counter,1);
 }
 
 void resolveRequest_programFinished(CPU* cpu, Package* package) {
@@ -471,6 +484,7 @@ void resolveRequest_programFinished(CPU* cpu, Package* package) {
 	replacePCB(cpu->process, newPcb);
 	moveFromExcecToExit_withoutError(cpu->process);
 	markFreeCPU(cpu);
+	incrementCounter(cpu->process->processCounters->burst_Counter,1);
 }
 
 void resolveRequest_cpuDisconnected(CPU* cpu, Package* package) {
@@ -534,6 +548,7 @@ void resolveRequest_updateSemaphore(CPU* cpu, Package* package) {
 		executeSignalTo(cpu, package);
 		break;
 	}
+
 }
 
 /*

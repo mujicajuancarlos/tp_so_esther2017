@@ -173,7 +173,7 @@ void handleCommand_info_by_pid_process(kernel_struct* kernelStruct,
 			int stateIndex;
 			Process* process = getProcessAndStateIndexByPID(pid, &stateIndex);
 			if (process != NULL) {
-				printProcessFull(process, stateIndex);
+				printProcessFull(process);
 			} else {
 				if (pid == 0)
 					printInvalidArguments(commands[2], commands[0]);

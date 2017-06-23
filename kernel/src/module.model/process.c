@@ -20,6 +20,8 @@ Process* createProcess(int socket, kernel_struct* kernelStruct) {
 	newProcess->heapPages = list_create();
 	newProcess->files = list_create();
 	newProcess->kernelStruct = kernelStruct;
+	newProcess->processCounters = NULL;
+	initializeProcessCounters(newProcess->processCounters);
 	return newProcess;
 }
 
@@ -67,7 +69,7 @@ int getNextPID() {
 	return next;
 }
 
-int getNextFileDescriptorFor(Process* process){
+int getNextFileDescriptorFor(Process* process) {
 	int aux = process->nextFD;
 	process->nextFD = aux + 1;
 	return aux;
@@ -100,28 +102,28 @@ void replacePCB(Process* process, PCB* newPCB) {
 	process->pcb = newPCB;
 }
 
-t_processFile* getProcessFile(Process* process, int fileDescriptor){
-	bool condition(void* element){
+t_processFile* getProcessFile(Process* process, int fileDescriptor) {
+	bool condition(void* element) {
 		t_processFile* file = element;
 		return file->fd == fileDescriptor;
 	}
 	return list_find(process->files, condition);
 }
 
-void addFile(Process* process, t_processFile* processFile){
-	list_add(process->files,process);
+void addFile(Process* process, t_processFile* processFile) {
+	list_add(process->files, process);
 }
 
-void removeFile(Process* process, int fileDescriptor){
-	bool condition(void* element){
+void removeFile(Process* process, int fileDescriptor) {
+	bool condition(void* element) {
 		t_processFile* file = element;
 		return file->fd == fileDescriptor;
 	}
-	list_remove_by_condition(process->files,condition);
+	list_remove_by_condition(process->files, condition);
 }
 
-void removeAndDestroyFile(Process* process, t_processFile* file){
-	removeFile(process,file->fd);
+void removeAndDestroyFile(Process* process, t_processFile* file) {
+	removeFile(process, file->fd);
 	destroy_t_processFile(file);
 	removeClosedGlobalFiles();
 }
@@ -138,14 +140,26 @@ void printProcess(Process* proceso, int stateIndex) {
 	printf("%5d\t%20s\t%20s\n", proceso->pid, state, exitCode);
 }
 
-void printProcessFull(Process* proceso, int stateIndex) {
+void printProcessFull(Process* proceso) {
 	printf("\nInformación del proceso %d\n", proceso->pid);
-	printf("\nEstado %s", stateIndexToString(stateIndex));
-	printf("\tCantidad rafagas ejecutadas %d\n", 567);//TODO: completar rafagas ejecutadas
-	printf("\tCantidad de operaciones privilegiadas %d\n", 142);//TODO: completar
-	printf("\tTabla de archivos abiertos %d\n", 423);	//TODO: completar
-	printf("\tCantidad de paginas heap utilizadas %d\n", 423);//TODO: completar
-	printf("\tOtra cantidad %d\n", 432);	//TODO: completar
-	printf("\tOtra cantidad %d\n", 234);	//TODO: completar
-	printf("\tCantidad de syscall ejecutadas %d\n", 432);	//TODO: completar
+//	printf("\nEstado %s", stateIndexToString(getProcessStateIndex(proceso)));
+	printf("\tCantidad rafagas ejecutadas %d\n", proceso->processCounters->burst_Counter);
+	printf("\tCantidad de operaciones privilegiadas o syscalls: %d\n", proceso->processCounters->sysC_Counter);
+	printf("\tTabla de archivos abiertos: %d\n", proceso->files->elements_count);
+	printf("\tCantidad de paginas heap utilizadas: %d\n", proceso->heapPages->elements_count);
+	printf("\tCantidad de operaciones alocar: %d en Bytes: %d\n", proceso->processCounters->allocateTimes_Counter, proceso->processCounters->allocateSize_Counter);
+	printf("\tCantidad de operaciones liberar: %d en Bytes: %d\n", proceso->processCounters->freeTimes_Counter, proceso->processCounters->freeSize_Counter);
+}
+
+void initializeProcessCounters(t_processCounter* processCounters) {
+	processCounters->allocateSize_Counter = 0;
+	processCounters->allocateTimes_Counter = 0;
+	processCounters->burst_Counter = 0;
+	processCounters->freeSize_Counter = 0;
+	processCounters->freeTimes_Counter = 0;
+	processCounters->sysC_Counter = 0;
+}
+
+void incrementCounter(int counter, int quantity) {
+	counter = counter + quantity;
 }

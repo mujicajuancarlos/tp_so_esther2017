@@ -78,8 +78,10 @@ void reserveNewHeapPageForProcess(Process* process, int* status) {
 
 void freePageForProcess(Process* process, heap_page* page, int* status) {
 	Package* tmpPackage;
-	int memoryPageNumber = process->pcb->stackFirstPage + process->pcb->stackSize + page->page;
-	t_FreePageToProcess* content = create_t_FreePageToProcess(process->pid, memoryPageNumber);
+	int memoryPageNumber = process->pcb->stackFirstPage
+			+ process->pcb->stackSize + page->page;
+	t_FreePageToProcess* content = create_t_FreePageToProcess(process->pid,
+			memoryPageNumber);
 	tmpPackage = createAndSendPackage(
 			process->kernelStruct->socketClientMemoria,
 			COD_FREE_PAGE_REQUEST, sizeof_t_FreePageToProcess(),
@@ -90,15 +92,16 @@ void freePageForProcess(Process* process, heap_page* page, int* status) {
 		exit(EXIT_FAILURE);
 	}
 	destroyPackage(tmpPackage);
-	logInfo("Se solicitó liberar la pagina: %d para el pid: %d",memoryPageNumber,process->pid);
+	logInfo("Se solicitó liberar la pagina: %d para el pid: %d",
+			memoryPageNumber, process->pid);
 	//me quedo a la espera de la aprobacion
 	tmpPackage = createAndReceivePackage(
 			process->kernelStruct->socketClientMemoria);
 	if (tmpPackage != NULL) {
 		switch (tmpPackage->msgCode) {
 		case COD_FREE_PAGE_RESPONSE:
-			logInfo("La memoria libero la pagina %d para el proceso pid %d",memoryPageNumber,
-					process->pid);
+			logInfo("La memoria libero la pagina %d para el proceso pid %d",
+					memoryPageNumber, process->pid);
 			*status = FREE_MEMORY_SUCCES;
 			break;
 		default:

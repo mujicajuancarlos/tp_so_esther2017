@@ -21,23 +21,34 @@
 #include "../kernelStruct.h"
 #include "fileDescriptor.h"
 
+
 #define FIRST_PID 1000
 #define NEXT_FD 3
 
+typedef struct {
+	int burst_Counter;
+	int sysC_Counter;
+	int allocateTimes_Counter;
+	int allocateSize_Counter;
+	int freeTimes_Counter;
+	int freeSize_Counter;
+} t_processCounter;
+
 typedef struct Process {
-    int fileDescriptor;	//file descriptor del socket de la consola
-    int pid;	//PID del proceso que esta ejecutando actualmente
-    int quantum;
-    int nextFD;
-    bool forceQuit;//usado para la finalizacion forzada de procesos en ejecucion
-    PCB* pcb;
-    t_list* heapPages;
-    t_list* files;
-    kernel_struct* kernelStruct;
-    int exit_code;
+	int fileDescriptor;	//file descriptor del socket de la consola
+	int pid;	//PID del proceso que esta ejecutando actualmente
+	int quantum;
+	int nextFD;
+	bool forceQuit;	//usado para la finalizacion forzada de procesos en ejecucion
+	PCB* pcb;
+	t_list* heapPages;
+	t_list* files;
+	kernel_struct* kernelStruct;
+	int exit_code;
+	t_processCounter* processCounters;
 } Process;
 
-Process* createProcess(int socket,kernel_struct* kernelStruct);
+Process* createProcess(int socket, kernel_struct* kernelStruct);
 
 void destroyProcess(Process* process);
 
@@ -67,6 +78,10 @@ void printHeaderProcess();
 
 void printProcess(Process* proceso, int stateIndex);
 
-void printProcessFull(Process* proceso, int stateIndex);
+void printProcessFull(Process* proceso);
+
+void initializeProcessCounters(t_processCounter* processCounters);
+
+void incrementCounter(int counter, int quantity);
 
 #endif /* PROCESS_H_ */
