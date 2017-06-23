@@ -64,7 +64,7 @@ void handleUserRequest(console_struct* consoleStruct) {
 
 void handleCommand_start_program(console_struct* consoleStruct, char** commands) {
 	if (commands[1] != NULL && commands[2] == NULL) {
-		if (file_exists(commands[1], "r")) {
+		if (existFile(commands[1], "r")) {
 			logInfo("El usuario solicitó ejecutar el programa ansisop %s",
 					commands[1]);
 			pthread_t hiloPrograma;
