@@ -91,7 +91,7 @@ t_stack_index* getCurrentContext() {
 
 t_puntero logicalAddressToPointer(dir_memoria* dir) {
 	t_puntero pointer = 0;
-	pointer += (pcb->stackFirstPage + dir->pagina) * pageSize;
+	pointer += (dir->pagina - pcb->stackFirstPage) * pageSize;
 	pointer += dir->offset;
 	return pointer;
 }
@@ -100,7 +100,7 @@ dir_memoria* pointerToLogicalAddress(t_puntero pointer) {
 	dir_memoria* address = malloc(sizeof(dir_memoria));
 	int pageNumber = pointer / pageSize;
 	int offset = pointer % pageSize;
-	address->pagina = pageNumber - pcb->stackFirstPage;
+	address->pagina = pageNumber + pcb->stackFirstPage;
 	address->offset = offset;
 	address->size = sizeof(uint32_t);
 	return address;
@@ -127,14 +127,14 @@ void ansisopExecuteInstruccion(cpu_struct* cpuStruct) {
 	pthread_mutex_lock(&executionMutex);
 	errorFlag = FLAG_OK;
 	char* instruccion = getNextInstruction(cpuStruct);
-	logTrace("La instruccion leida de la memoria es '%s'", instruccion);
+	logTrace("La instruccion leida de la memoria es %s", instruccion);
 	if (errorFlag == FLAG_OK) {
 		pcb->programCounter++;
-		logTrace("Ansisop instruction - START");
-		logTrace("Ejecutando '%s'", instruccion);
+		logTrace("INSTRUCCION ANSISOP START");
+		logTrace("Ejecutando %s", instruccion);
 		analizadorLinea(instruccion, &ansisop_funtions,
 				&ansisop_kernelFunctions);
-		logTrace("Ansisop instruction - START");
+		logTrace("INSTRUCCION ANSISOP END");
 		free(instruccion);
 	}
 	pthread_mutex_unlock(&executionMutex);
@@ -152,7 +152,7 @@ void ansisopExecuteInstruccion(cpu_struct* cpuStruct) {
 	case FLAG_END_CPU: //si la cpu se va desconectar necesito mandar un mensaje especial al kernel
 		reportCpuDisconected(cpuStruct);
 		logInfo("Fin de proceso CPU");
-		exit(0); //FIN
+		exit(EXIT_SUCCESS); //FIN
 		break;
 	case FLAG_PROCESS_BLOCK:
 	case FLAG_SYSCALL_FAILURE:

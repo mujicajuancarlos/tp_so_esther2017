@@ -48,6 +48,7 @@ void sendPCB(cpu_struct* cpuStruct, int messageCode) {
 			messageCode, size, buffer);
 	logTrace("Se envio en PCB del pid: %d actualizado al kernel fd:%d",
 			newPCB->pid, cpuStruct->socketClientKernel);
+	free(buffer);
 	destroyPackage(package);
 }
 

@@ -44,7 +44,7 @@ void handleKernelRequest(cpu_struct* cpuStruct, Package* package) {
 		break;
 	default:
 		logError("El kernel solicito una accion no permitida, finalizara la cpu");
-		exit(1);
+		exit(EXIT_FAILURE);
 		break;
 	}
 }

@@ -52,7 +52,9 @@ void handleNewCPU(CPU* newCpu) {
 			handleCPURequest(newCpu, package);
 		} else {
 			running = false;
-			moveFromExcecToReady(newCpu->process);
+			if(newCpu->process != NULL){
+				moveFromExcecToReady(newCpu->process);
+			}
 			removeCPU(newCpu);
 			logError("Se desconecto la cpu con FD: %d", newCpu->fileDescriptor);
 		}
@@ -65,21 +67,21 @@ void handleNewCPU(CPU* newCpu) {
 void handleCPURequest(CPU* cpu, Package* package) {
 	switch (package->msgCode) {
 	case COD_END_INSTRUCCION:
-		resolveRequest_endInstruction(cpu, package); //Burst
+		resolveRequest_endInstruction(cpu, package);
 		break;
 	case COD_PROGRAM_FINISHED:
-		resolveRequest_programFinished(cpu, package); //Burst
+		resolveRequest_programFinished(cpu, package);
 		break;
 	case COD_SIGNAL_DISCONNECTED:
 		resolveRequest_cpuDisconnected(cpu, package);
 		break;
 	case COD_GET_SHARED_VAR:
 	case COD_SET_SHARED_VAR:
-		resolveRequest_sharedVarOperation(cpu, package); //SC
+		resolveRequest_sharedVarOperation(cpu, package);
 		break;
 	case COD_MALLOC_MEMORY:
 	case COD_FREE_MEMORY:
-		resolveRequest_dynamicMemoryOperation(cpu, package); //SC
+		resolveRequest_dynamicMemoryOperation(cpu, package);
 		break;
 	case COD_OPEN_FD:
 	case COD_DELETE_FD:
@@ -87,11 +89,11 @@ void handleCPURequest(CPU* cpu, Package* package) {
 	case COD_SEEK_FD:
 	case COD_WRITE_FD:
 	case COD_READ_FD:
-		resolveRequest_fileSystemOperation(cpu, package); //SC
+		resolveRequest_fileSystemOperation(cpu, package);
 		break;
 	case COD_SEM_WAIT:
 	case COD_SEM_SIGNAL:
-		resolveRequest_updateSemaphore(cpu, package); //SC
+		resolveRequest_updateSemaphore(cpu, package);
 		break;
 	case COD_EXECUTION_ERROR: //soy para los errores producidos exclusivamente en cpu, los errores de syscal se resuelven sincronicamente
 		resolveRequest_executionError(cpu, package);

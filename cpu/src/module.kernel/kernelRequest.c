@@ -27,8 +27,9 @@ void executeNewPcb(cpu_struct* cpuStruct, Package* package) {
 
 void continueExecution(cpu_struct* cpuStruct, Package* package) {
 	logTrace("Continuando la ejecucion de la siguiente instruccion ansisop");
+	int pid = getPCB()->pid;
 	ansisopExecuteInstruccion(cpuStruct);
-	logTrace("Se ejecuto la instruccion ansisop del pid: %d", getPCB()->pid);
+	logTrace("Se ejecuto la instruccion ansisop del pid: %d", pid);
 }
 
 void contextSwitch(cpu_struct* cpuStruct, Package* package) {
