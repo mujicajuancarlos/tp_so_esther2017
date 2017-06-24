@@ -86,12 +86,12 @@ void validateStackOverflow(size_t requiredSize) {
 }
 
 t_stack_index* getCurrentContext() {
-	return (pcb->stackIndex != NULL) ? &(pcb->stackIndex[pcb->stackSize]) : NULL;
+	return (pcb->stackIndex != NULL) ? &(pcb->stackIndex[pcb->stackSize - 1]) : NULL;
 }
 
 t_puntero logicalAddressToPointer(dir_memoria* dir) {
 	t_puntero pointer = 0;
-	pointer += (dir->pagina - pcb->stackFirstPage) * pageSize;
+	pointer += (pcb->stackFirstPage + dir->pagina) * pageSize;
 	pointer += dir->offset;
 	return pointer;
 }
@@ -100,7 +100,7 @@ dir_memoria* pointerToLogicalAddress(t_puntero pointer) {
 	dir_memoria* address = malloc(sizeof(dir_memoria));
 	int pageNumber = pointer / pageSize;
 	int offset = pointer % pageSize;
-	address->pagina = pcb->stackFirstPage + pageNumber;
+	address->pagina = pageNumber - pcb->stackFirstPage;
 	address->offset = offset;
 	address->size = sizeof(uint32_t);
 	return address;
@@ -250,10 +250,8 @@ t_variable* createVariableForCurrentPCB(t_nombre_variable name) {
 	currentContext->vars = realloc(currentContext->vars,
 			sizeof(t_variable) * (currentContext->var_len + 1));
 	currentContext->vars[currentContext->var_len].nombre = name;
-	//TODO verificar la correcta asignacion
 	currentContext->vars[currentContext->var_len].direccion.pagina =
 			pcb->stackFirstPage + (pcb->stackOffset / pageSize);
-	//TODO verificar la correcta asignacion
 	currentContext->vars[currentContext->var_len].direccion.offset =
 			pcb->stackOffset % pageSize;
 	currentContext->vars[currentContext->var_len].direccion.size =

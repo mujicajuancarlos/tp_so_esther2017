@@ -122,9 +122,7 @@ void freePageForProcess(Process* process, heap_page* page, int* status) {
  */
 void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 	Package* tmpPackage;
-	bool hasOffset = (sourceCodePackage->size % process->kernelStruct->pageSize)
-			> 0;
-	int pagesNumber = hasOffset ? 1 : 0;
+	int pagesNumber = (sourceCodePackage->size % process->kernelStruct->pageSize) ? 1 : 0;
 	pagesNumber += sourceCodePackage->size / process->kernelStruct->pageSize; //como ambos estan bytes me da la cantidad de paginas
 	//agrego la cantidad de paginas para el stack
 	pagesNumber += process->kernelStruct->config->stack_size;

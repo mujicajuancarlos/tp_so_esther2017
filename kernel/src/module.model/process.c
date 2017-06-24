@@ -91,9 +91,8 @@ void createPcbForNewProcess(Process* process, Package* sourceCodePackage) {
 	t_metadata_program* metadata = metadata_desde_literal(
 			sourceCodePackage->stream);
 
-	//el va despues del codigo, por lo tanto con esta cuenta puedo saber cual es la primer pagina del stack
-	uint32_t stackFirstPage = sourceCodePackage->size
-			/ process->kernelStruct->pageSize;
+	uint32_t stackFirstPage = (sourceCodePackage->size % process->kernelStruct->pageSize) ? 1 : 0;
+	stackFirstPage += sourceCodePackage->size / process->kernelStruct->pageSize;
 
 	logInfo("Generando el pcb para el proceso %d", process->pid);
 	PCB* pcb = create_new_PCB(process->pid, stackFirstPage, metadata);
