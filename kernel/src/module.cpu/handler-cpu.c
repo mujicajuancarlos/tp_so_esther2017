@@ -52,6 +52,8 @@ void handleNewCPU(CPU* newCpu) {
 			handleCPURequest(newCpu, package);
 		} else {
 			running = false;
+			moveFromExcecToReady(newCpu->process);
+			removeCPU(newCpu);
 			logError("Se desconecto la cpu con FD: %d", newCpu->fileDescriptor);
 		}
 		destroyPackage(package);
