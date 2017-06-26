@@ -14,22 +14,8 @@ memory_page *getGlobalMemoryPage(memory_struct* memoryStruct, int processId, int
 		return list_get (memoryStruct->referenceTable, inCache);
 	}
 
-	t_list* thisProcessPages;
-	thisProcessPages = list_create();
-	bool onlyThisProcess(void* element) {
-		memory_page* page = element;
-		return (page->pid == processId);
-	}
+	memory_page *page = list_get (memoryStruct->referenceTable, getHashed (memoryStruct, processId, processPage));
 
-	thisProcessPages = list_filter(memoryStruct->referenceTable,
-			onlyThisProcess);
-
-	bool onlyThisPage(void* element) {
-		memory_page* page = element;
-		return (page->procPage == processPage);
-	}
-
-	memory_page* page = list_find (thisProcessPages, onlyThisPage);
 	addEntryToCache (memoryStruct, page->pid, page->procPage, page->globPage);
 	return page;
 }
@@ -91,7 +77,11 @@ int assignNewPages(memory_struct* memoryStruct, int processId, int pages) {
 	if (list_size(freePages) >= pages) {
 		for (i = 0; i < pages; i++) {
 			memory_page *newPage;
-			newPage = list_get(freePages, i);
+			int hashNumber = hashThis (memoryStruct, processId, maxPage);
+			if (hashNumber != -1)
+				newPage = list_get (memoryStruct->referenceTable, hashNumber);
+			else
+				newPage = list_get (freePages, i);
 			newPage->pid = processId;
 			newPage->procPage = maxPage++;
 			newPage->isFree = false;
