@@ -13,7 +13,6 @@
 #include <dc-commons/utils.h>
 #include <dc-commons/serialization.h>
 #include "../fileSystemStruct.h"
-#include "sadica.h"
 
 typedef struct {
 	char* path;
@@ -22,6 +21,8 @@ typedef struct {
 } sadica_file;
 
 sadica_file* createSadicaFile(char* path);
+void destroySadicaFile(fileSystem_struct* fsStruct, sadica_file* file);
+void destroyAndRemoveSadicaFile(fileSystem_struct* fsStruct, sadica_file* file);
 
 sadica_file* createSadicaFileFrom(fileSystem_struct* fsStruct, char* path);
 sadica_file* createSadicaFileTo(fileSystem_struct* fsStruct, char* path,

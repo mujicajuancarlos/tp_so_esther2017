@@ -5,16 +5,32 @@
  *      Author: utnso
  */
 
+#include "sadicaCore.h"
 #include "sadicaFile.h"
 
 sadica_file* createSadicaFile(char* path) {
 	sadica_file* file = malloc(sizeof(sadica_file));
-	size_t size = sizeof(char) * strlen(path);
-	file->path = malloc(size);
-	memcpy(file->path, path, size);
+	file->path = string_duplicate(path);
 	file->size = 0;
 	file->blocks = NULL;
 	return file;
+}
+
+void destroySadicaFile(fileSystem_struct* fsStruct, sadica_file* file) {
+	if (file->path != NULL) {
+		free(file->path);
+		file->path = NULL;
+	}
+	if (file->blocks != NULL) {
+		free(file->blocks);
+		file->blocks = NULL;
+	}
+	free(file);
+}
+
+void destroyAndRemoveSadicaFile(fileSystem_struct* fsStruct, sadica_file* file){
+	remove(file->path);
+	destroySadicaFile(fsStruct,file);
 }
 
 sadica_file* createSadicaFileFrom(fileSystem_struct* fsStruct, char* path) {

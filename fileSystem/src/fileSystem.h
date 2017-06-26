@@ -15,9 +15,9 @@
 #include <commons/config.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/socket-server.h>
-#include "module.core/sadica.h"
 #include "handler-kernel.h"
 #include "fileSystemStruct.h"
+#include "module.core/sadicaCore.h"
 
 void createKernelServerSocket(fileSystem_struct* fsStruct);
 

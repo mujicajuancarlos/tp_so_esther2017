@@ -31,7 +31,6 @@
 typedef struct Configuration {
 	int puerto;
 	char* punto_montaje;
-	char* relativePath;
 	char* log_level;
 	char* log_file;
 	char* log_program_name;

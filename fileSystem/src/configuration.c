@@ -34,7 +34,6 @@ Configuration* config_with(char *config_file) {
 
 	config_set_int_valid_value(&config->puerto, temporalConfig, PUERTO);
 	config_set_string_valid_value(&config->punto_montaje, temporalConfig, PUNTO_MONTAJE);
-	config_set_string_valid_value(&config->relativePath, temporalConfig, RELATIVE_PATH);
 
 	//configuracion de log
 	config_set_string_valid_value(&config->log_level, temporalConfig, LOG_LEVEL);

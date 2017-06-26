@@ -5,7 +5,7 @@
  *      Author: utnso
  */
 
-#include "sadica.h"
+#include "sadicaCore.h"
 
 sadica_metadata metadata;
 t_bitarray* bitmap;
@@ -36,20 +36,23 @@ void loadBitmap(fileSystem_struct* fsStruct) {
 
 void loadBlocks(fileSystem_struct* fsStruct) {
 	int index;
-	char* dataBuffer = calloc(1, metadata.size);
+	char* path;
+	sadica_block* block;
 	for (index = 0; index < metadata.quantity; index++) {
-		char* path = getBlockFilePath(fsStruct, index);
+		path = getBlockFilePath(fsStruct, index);
 		if (!existFile(path, "w")) {
-			writeFile(dataBuffer, metadata.size, path, 0);
+			block = createSadicaBlockTo(fsStruct, path);
+			writeBlockData(fsStruct, block);
+			destroySadicaBlock(fsStruct, block);
 		}
 		free(path);
 	}
-	free(dataBuffer);
 }
 
 void loadFiles(fileSystem_struct* fsStruct) {
 	sadicaFiles = list_create();
 	char* path = getFilesPath(fsStruct);
+	logInfo("Buscando archivos sadica en el punto de montaje especificado");
 	findSadicaFilesOn(fsStruct, path);
 	free(path);
 }
@@ -66,11 +69,41 @@ void loadMetadata(fileSystem_struct* fsStruct) {
 	config_set_int_valid_value(&metadata.size, config, TAMANIO_BLOQUES);
 	config_set_int_valid_value(&metadata.quantity, config, CANTIDAD_BLOQUES);
 	config_set_string_valid_value(&metadata.magicNumber, config, MAGIC_NUMBER);
+	if (!string_equals_ignore_case(metadata.magicNumber, MAGIC_NUMBER_VALUE)) {
+		logError("El magic number es incorrecto");
+		exit(EXIT_FAILURE);
+	}
 }
 
-void loadSadicaFile(fileSystem_struct* fsStruct, char* pathFile){
-	sadica_file* sadicaFile = createSadicaFileFrom(fsStruct,pathFile);
-	list_add(sadicaFiles,sadicaFile);
+void loadSadicaFile(fileSystem_struct* fsStruct, char* pathFile) {
+	logInfo("Cargando el archivo %s", pathFile);
+	sadica_file* sadicaFile = createSadicaFileFrom(fsStruct, pathFile);
+	list_add(sadicaFiles, sadicaFile);
+}
+
+void addSadicaFile(fileSystem_struct* fsStruct, char* pathFile, int* status) {
+	int block;
+	assignBlocks(fsStruct, 1, &block, status);//asigno por defecto un bloque
+	if (*status == EXC_OK) {
+		sadica_file* sadicaFile = createSadicaFileTo(fsStruct, pathFile, block);
+		list_add(sadicaFiles, sadicaFile);
+	}
+}
+
+void removeSadicaFile(fileSystem_struct* fsStruct, sadica_file* file) {
+	bool condition(void* element) {
+		char* anyPath = element;
+		return string_equals_ignore_case(anyPath, file->path);
+	}
+	list_remove_by_condition(sadicaFiles, condition);
+	uint32_t quantity = getBlocksQuantity(fsStruct, file->size);
+	uint32_t blockIndex, blockNumber;
+	for (blockIndex = 0; blockIndex < quantity; ++blockIndex) {
+		blockNumber = file->blocks[blockIndex];
+		bitarray_clean_bit(bitmap, blockNumber);
+	}
+	destroyAndRemoveSadicaFile(fsStruct, file);
+	persistBitMap(fsStruct);
 }
 
 void findSadicaFilesOn(fileSystem_struct* fsStruct, char* relativePath) {
@@ -82,6 +115,7 @@ void findSadicaFilesOn(fileSystem_struct* fsStruct, char* relativePath) {
 		exit(EXIT_FAILURE);
 	}
 	while ((dir = readdir(d))) {
+		logInfo("Buscando archivos el directorio %s", relativePath);
 		if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0) {
 			continue;
 		}
@@ -89,7 +123,7 @@ void findSadicaFilesOn(fileSystem_struct* fsStruct, char* relativePath) {
 		string_append(&dirOrFile, relativePath);
 		string_append(&dirOrFile, dir->d_name);
 		if (dir->d_type == DT_DIR) {
-			string_append(&dirOrFile,"/");
+			string_append(&dirOrFile, "/");
 			findSadicaFilesOn(fsStruct, dirOrFile);
 		} else {
 			loadSadicaFile(fsStruct, dirOrFile);
@@ -97,6 +131,36 @@ void findSadicaFilesOn(fileSystem_struct* fsStruct, char* relativePath) {
 		free(dirOrFile);
 	}
 	closedir(d);
+}
+
+void assignBlocks(fileSystem_struct* fsStruct, int size, int* blocks,
+		int* status) {
+	int index;
+	int auxSize = 0;
+	for (index = 0; (auxSize < size) && (index < bitmap->size); index++) {
+		if (bitarray_test_bit(bitmap, index) == 0) {
+			memcpy(&(blocks[auxSize]), &index, sizeof(uint32_t));
+			auxSize++;
+		}
+	}
+	if (auxSize == size) {
+		*status = EXC_OK;
+		for (index = 0; index < auxSize; index++) {
+			if (bitarray_test_bit(bitmap, index) == 0) {
+				bitarray_set_bit(bitmap, blocks[index]);
+			}
+		}
+		persistBitMap(fsStruct);
+	} else {
+		*status = EXC_ERROR_FILE_SYSTEM_FULL;
+	}
+}
+
+void persistBitMap(fileSystem_struct* fsStruct) {
+	size_t size = getBitsCharSize();
+	char* path = getBitmapFilePath(fsStruct);
+	writeFile(bitmap->bitarray, size, path, 0);
+	free(path);
 }
 
 size_t getBitsCharSize() {
@@ -119,34 +183,40 @@ void setAllBits(fileSystem_struct* fsStruct) {
 	}
 }
 
-sadica_metadata* getSadicaMetadata(){
+sadica_file* getSadicaFile(fileSystem_struct* fsStruct, char* fullPath) {
+	logTrace("Buscando el archivo %s", fullPath);
+	bool condition(void* element) {
+		char* anyPath = element;
+		return string_equals_ignore_case(anyPath, fullPath);
+	}
+	return list_find(sadicaFiles, condition);
+}
+
+sadica_metadata* getSadicaMetadata() {
 	return &metadata;
 }
 
-char* getSadicaPath(fileSystem_struct* fsStruct) {
-	char *path = string_new();
-	string_append(&path, fsStruct->config->relativePath);
-	string_append(&path, fsStruct->config->punto_montaje);
-	return path;
+char* getSadicaRootPath(fileSystem_struct* fsStruct) {
+	return fsStruct->config->punto_montaje;
 }
 
 char* getMetadataFilePath(fileSystem_struct* fsStruct) {
 	char *path = string_new();
-	string_append(&path, getSadicaPath(fsStruct));
+	string_append(&path, getSadicaRootPath(fsStruct));
 	string_append(&path, METADATA_FILE_PATH);
 	return path;
 }
 
 char* getBitmapFilePath(fileSystem_struct* fsStruct) {
 	char *path = string_new();
-	string_append(&path, getSadicaPath(fsStruct));
+	string_append(&path, getSadicaRootPath(fsStruct));
 	string_append(&path, BITMAP_FILE_PATH);
 	return path;
 }
 
 char* getBlockFilePath(fileSystem_struct* fsStruct, int index) {
 	char *path = string_new();
-	string_append(&path, getSadicaPath(fsStruct));
+	string_append(&path, getSadicaRootPath(fsStruct));
 	string_append(&path, BLOCK_FILE_PATH);
 	string_append(&path, string_itoa(index));
 	string_append(&path, BLOCK_EXT);
@@ -155,7 +225,13 @@ char* getBlockFilePath(fileSystem_struct* fsStruct, int index) {
 
 char* getFilesPath(fileSystem_struct* fsStruct) {
 	char *path = string_new();
-	string_append(&path, getSadicaPath(fsStruct));
+	string_append(&path, getSadicaRootPath(fsStruct));
 	string_append(&path, FILES_PATH);
 	return path;
+}
+
+char* getFullFilePath(fileSystem_struct* fsStruct, char* path) {
+	char* fullPath = getFilesPath(fsStruct);
+	string_append(&fullPath, path);
+	return fullPath;
 }
