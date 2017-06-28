@@ -23,8 +23,13 @@ void basicReadFile(fileSystem_struct* fsStruct, char* path, int offset,
 
 void saveDataOnFS(fileSystem_struct* fsStruct,sadica_file* file,int offset,
 		int size, char* buffer);
-void readDataOnFS(fileSystem_struct* fsStruct,sadica_file* file,int offset,
+void readDataFromFS(fileSystem_struct* fsStruct,sadica_file* file,int offset,
 		int size, char* buffer);
+
+void saveDataOnBlock(fileSystem_struct* fsStruct, sadica_file* file,
+		int blockNumber, int firstByte, int bufferSize, char* buffer);
+void readDataFromBlock(fileSystem_struct* fsStruct, sadica_file* file,
+		int blockNumber, int firstByte, int bufferSize, char* buffer);
 
 void validateBlocksQuantity(sadica_file* file, int maxSize, int*status);
 void resizeBlocksQuantity(fileSystem_struct* fsStruct, sadica_file* file,

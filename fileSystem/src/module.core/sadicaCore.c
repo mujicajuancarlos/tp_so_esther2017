@@ -82,7 +82,7 @@ void loadSadicaFile(fileSystem_struct* fsStruct, char* pathFile) {
 }
 
 void addSadicaFile(fileSystem_struct* fsStruct, char* pathFile, int* status) {
-	int block;
+	uint32_t block;
 	assignBlocks(fsStruct, 1, &block, status);//asigno por defecto un bloque
 	if (*status == EXC_OK) {
 		sadica_file* sadicaFile = createSadicaFileTo(fsStruct, pathFile, block);
@@ -133,7 +133,7 @@ void findSadicaFilesOn(fileSystem_struct* fsStruct, char* relativePath) {
 	closedir(d);
 }
 
-void assignBlocks(fileSystem_struct* fsStruct, int size, int* blocks,
+void assignBlocks(fileSystem_struct* fsStruct, int size, uint32_t* blocks,
 		int* status) {
 	int index;
 	int auxSize = 0;

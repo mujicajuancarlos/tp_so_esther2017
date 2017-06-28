@@ -59,7 +59,7 @@ void basicReadFile(fileSystem_struct* fsStruct, char* path, int offset,
 	if (file != NULL) {
 		validateBlocksQuantity(file, offset + size, status);
 		if (*status == EXC_OK) {
-			readDataOnFS(fsStruct, file, offset, size, buffer);
+			readDataFromFS(fsStruct, file, offset, size, buffer);
 		}
 	} else {
 		*status = EXC_ERROR_FILE_NOT_FOUND;
@@ -67,14 +67,69 @@ void basicReadFile(fileSystem_struct* fsStruct, char* path, int offset,
 	free(fullPath);
 }
 
-void saveDataOnFS(fileSystem_struct* fsStruct,sadica_file* file,int offset,
-		int size, char* buffer){
-
+void saveDataOnFS(fileSystem_struct* fsStruct, sadica_file* file, int offset,
+		int length, char* buffer) {
+	int bufferOffset = 0;
+	char* tmpBuffer;
+	int firstByte, lastByte, blockNumber, tmpBufferSize;
+	int blockSize = getSadicaMetadata()->size;
+	int firstBlock = offset / blockSize;
+	int lastBlock = (offset + length) / blockSize;
+	int firstPageOffset = offset % blockSize;
+	int lastPageOffset = (offset + length) % blockSize;
+	for (blockNumber = firstBlock; blockNumber <= lastBlock; ++blockNumber) {
+		firstByte = (blockNumber == firstBlock) ? firstPageOffset : 0;
+		lastByte = (blockNumber == lastBlock) ? lastPageOffset : blockSize;
+		tmpBufferSize = lastByte - firstByte;
+		tmpBuffer = malloc(tmpBufferSize);
+		memcpy(tmpBuffer, buffer + bufferOffset, tmpBufferSize);
+		saveDataOnBlock(fsStruct, file, blockNumber, firstByte, tmpBufferSize,
+				tmpBuffer);
+		bufferOffset += tmpBufferSize;
+		free(tmpBuffer);
+	}
 }
 
-void readDataOnFS(fileSystem_struct* fsStruct,sadica_file* file,int offset,
-		int size, char* buffer){
+void readDataFromFS(fileSystem_struct* fsStruct, sadica_file* file, int offset,
+		int length, char* buffer) {
+	int bufferOffset = 0;
+	char* tmpBuffer;
+	int firstByte, lastByte, blockNumber, tmpBufferSize;
+	int blockSize = getSadicaMetadata()->size;
+	int firstBlock = offset / blockSize;
+	int lastPage = (offset + length) / blockSize;
+	int firstPageOffset = offset % blockSize;
+	int lastPageOffset = (offset + length) % blockSize;
+	for (blockNumber = firstBlock; blockNumber <= lastPage; ++blockNumber) {
+		firstByte = (blockNumber == firstBlock) ? firstPageOffset : 0;
+		lastByte = (blockNumber == lastPage) ? lastPageOffset : blockSize;
+		tmpBufferSize = lastByte - firstByte;
+		tmpBuffer = malloc(tmpBufferSize);
+		readDataFromBlock(fsStruct, file, blockNumber, firstByte, tmpBufferSize,
+				tmpBuffer);
+		memcpy(buffer + bufferOffset, tmpBuffer, tmpBufferSize);
+		bufferOffset += tmpBufferSize;
+		free(tmpBuffer);
+	}
+}
 
+void saveDataOnBlock(fileSystem_struct* fsStruct, sadica_file* file,
+		int blockNumber, int firstByte, int bufferSize, char* buffer) {
+	char* path = getBlockFilePath(fsStruct, blockNumber);
+	sadica_block* block = createSadicaBlockFrom(fsStruct, path);
+	memcpy(block->data, buffer + firstByte, bufferSize);
+	writeBlockData(fsStruct, block);
+	destroySadicaBlock(fsStruct, block);
+	free(path);
+}
+
+void readDataFromBlock(fileSystem_struct* fsStruct, sadica_file* file,
+		int blockNumber, int firstByte, int bufferSize, char* buffer) {
+	char* path = getBlockFilePath(fsStruct, blockNumber);
+	sadica_block* block = createSadicaBlockFrom(fsStruct, path);
+	memcpy(buffer, block->data + firstByte, bufferSize);
+	destroySadicaBlock(fsStruct, block);
+	free(path);
 }
 
 void validateBlocksQuantity(sadica_file* file, int maxSize, int*status) {
@@ -83,9 +138,13 @@ void validateBlocksQuantity(sadica_file* file, int maxSize, int*status) {
 
 void resizeBlocksQuantity(fileSystem_struct* fsStruct, sadica_file* file,
 		int maxSize, int* status) {
-	int current = getBlocksQuantity(fsStruct, file->size);
-	int new = getBlocksQuantity(fsStruct, maxSize);
-	int missing = new - current;
-	int* blocks = malloc(sizeof(uint32_t) * missing);
-	assignBlocks(fsStruct, missing, blocks, status);
+	uint32_t current = getBlocksQuantity(fsStruct, file->size);
+	uint32_t new = getBlocksQuantity(fsStruct, maxSize);
+	uint32_t missing = new - current;
+	file->blocks = realloc(file->blocks, sizeof(uint32_t) * new);
+	assignBlocks(fsStruct, missing, file->blocks + current, status);
+	if(*status == EXC_OK){
+		file->size = maxSize;
+		writeMetadataFile(fsStruct,file);
+	}
 }

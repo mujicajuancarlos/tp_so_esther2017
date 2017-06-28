@@ -56,7 +56,7 @@ void removeSadicaFile(fileSystem_struct* fsStruct, sadica_file* file);
 
 void findSadicaFilesOn(fileSystem_struct* fsStruct, char* relativePath);
 
-void assignBlocks(fileSystem_struct* fsStruct, int size, int* blocks,int* status);
+void assignBlocks(fileSystem_struct* fsStruct, int size, uint32_t* blocks,int* status);
 void persistBitMap(fileSystem_struct* fsStruct);
 size_t getBitsCharSize();
 
