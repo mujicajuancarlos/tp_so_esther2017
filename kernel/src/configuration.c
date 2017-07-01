@@ -70,63 +70,54 @@ Configuration* getConfiguration() {
 }
 
 
-void VerifiedFileModification(char *config_file){
+void VerifiedFileModificationINOTIFY(char *config_file){
 
-	char buffer[BUF_LEN];
+  int length, i = 0;
+  int fd;
+  int wd;
+  char buffer[BUF_LEN];
 
-		// Al inicializar inotify este nos devuelve un descriptor de archivo
-		int file_descriptor = inotify_init();
-		if (file_descriptor < 0) {
-			perror("inotify_init");
-		}
+  fd = inotify_init();
 
-		// Creamos un monitor sobre un path indicando que eventos queremos escuchar
-		int watch_descriptor = inotify_add_watch(file_descriptor, "../kernel.conf", IN_MODIFY);
+  if ( fd < 0 ) {
+    perror( "inotify_init" );
+  }
 
-		// El file descriptor creado por inotify, es el que recibe la información sobre los eventos ocurridos
-		// para leer esta información el descriptor se lee como si fuera un archivo comun y corriente pero
-		// la diferencia esta en que lo que leemos no es el contenido de un archivo sino la información
-		// referente a los eventos ocurridos
-		int length = read(file_descriptor, buffer, BUF_LEN);
-		if (length < 0) {
-			perror("read");
-		}
+  wd = inotify_add_watch( fd, "/home/utnso/tp-2017-1c-Los-5-Fant-sticos/kernel",
+                         IN_MODIFY | IN_CREATE | IN_DELETE );
+  length = read( fd, buffer, BUF_LEN );
 
-		int offset = 0;
+  if ( length < 0 ) {
+    perror( "read" );
+  }
 
-		while (offset < length) {
+  while ( i < length ) {
+    struct inotify_event *event = ( struct inotify_event * ) &buffer[ i ];
+    if ( event->len ) {
+      if ( event->mask & IN_CREATE ) {
+        if ( event->mask & IN_ISDIR ) {
+          printf( "The file %s was created.\n", event->name );
+        }
+      }
+      else if ( event->mask & IN_DELETE ) {
+        if ( event->mask & IN_ISDIR ) {
+          printf( "The file %s was deleted.\n", event->name );
+        }
+      }
+      else if ( event->mask & IN_MODIFY ) {
+        if ( event->mask & IN_ISDIR ) {
+          printf( "The file %s was modified.\n", event->name );
+          // vuelvo a leer el archivo de configuracion si esta modificado
+          config_with(config_file);
+        }
+      }
+    }
+    i += EVENT_SIZE + event->len;
+  }
 
-			struct inotify_event *event = (struct inotify_event *) &buffer[offset];
+  ( void ) inotify_rm_watch( fd, wd );
+  ( void ) close( fd );
 
-			if (event->len) {
-				// Dentro de "mask" tenemos el evento que ocurrio
-				if (event->mask & IN_MODIFY) {
-					if (event->mask & IN_ISDIR) {
-						config_with(config_file);
-						printf("The file %s was modified.\n", event->name);
-						}
-				}
-			}
-			offset += sizeof (struct inotify_event) + event->len;
-		}
-
-		inotify_rm_watch(file_descriptor, watch_descriptor);
-		close(file_descriptor);
-
+  exit( 0 );
 }
-
-/*
-void SetQUANTUM_SLEEP(){
-	int timeQuantum;
-	Configuration* config;
-	printf("introduzca un el tiempo de retardo \n");
-	scanf("%i", &timeQuantum);
-	config_set_int_valid_value(&config->quantum_sleep, timeQuantum, QUANTUM_SLEEP);
-	fputs(config->quantum_sleep,"../kernel.conf");
-	//printf("el dato que introducio fue: %i\n", time);
-
-	return;
-}
-*/
-
 

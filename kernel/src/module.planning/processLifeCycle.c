@@ -204,7 +204,7 @@ void notifyLockedProcessFor(char* semKey, Process* process) {
 }
 
 void sendToEXIT(Process* process) {
-	//notifyEndProcess(process);
+	notifyEndProcess(process);
 	pthread_mutex_lock(&exitListMutex);
 	queue_push(states->exit, process);
 	pthread_mutex_unlock(&exitListMutex);

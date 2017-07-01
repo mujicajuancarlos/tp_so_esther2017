@@ -49,10 +49,9 @@
 
 
 //tamaño del evento de inotify
-#define EVENT_SIZE  ( sizeof (struct inotify_event) + 24 )
+#define EVENT_SIZE  ( sizeof (struct inotify_event) )
 //tamaño del buffer de inotify, en este caso puedo manejar 1024 eventos simultaneos
-#define BUF_LEN     ( 1024 * EVENT_SIZE )
-
+#define BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
 
 typedef struct Configuration {
 	int puerto_program;
