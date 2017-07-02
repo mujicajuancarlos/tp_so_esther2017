@@ -22,8 +22,12 @@
 #define COD_WRITE_FILE_REQUEST 605 // Almacena en el path enviado, requiere archivo en modo escritura)
 
 #define COD_FS_RESPONSE_OK 606 //usado para responder en los casos que la solicitud se haya realizado con exito
-#define COD_FS_RESPONSE_ERROR 607 //usado para responder que la solicitud realizada no salio bien -> debe ir acompañado de un mensaje de error
 
+#define COD_FS_RESPONSE_ERROR_GENERIC 607 //usado para responder que la solicitud realizada no salio bien -> debe ir acompañado de un mensaje de error
+
+#define COD_FS_RESPONSE_FILE_NOTFOUND 610
+#define COD_FS_RESPONSE_FILE_EXIST 611
+#define COD_FS_RESPONSE_FS_FULL 612
 
 typedef struct {
 	uint32_t pathSize;

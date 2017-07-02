@@ -28,7 +28,6 @@ void basicCreateFile(fileSystem_struct* fsStruct, char* path, int*status) {
 	sadica_file* file = getSadicaFile(fsStruct, fullPath);
 	if (file == NULL) {
 		addSadicaFile(fsStruct, fullPath, status);
-		*status = EXC_OK;
 	} else {
 		*status = EXC_ERROR_EXIST_FILE;
 	}

@@ -20,7 +20,6 @@ void validateExistFileRequest(Process* process, char* path, int* status) {
 	logInfo(
 			"Se solicitó al FS verificar la existencia del archivo: %s para el pid: %d",
 			path, process->pid);
-	//me quedo a la espera de la aprobacion
 	tmpPackage = createAndReceivePackage(fsSocket);
 	if (tmpPackage != NULL) {
 		switch (tmpPackage->msgCode) {
@@ -30,7 +29,7 @@ void validateExistFileRequest(Process* process, char* path, int* status) {
 					path, process->pid);
 			*status = COD_FS_RESPONSE_OK;
 			break;
-		case COD_FS_RESPONSE_ERROR:
+		case COD_FS_RESPONSE_FILE_NOTFOUND:
 			logInfo("El FS indico que no existe el archivo: %s", path);
 			*status = FILE_NOTFOUND_FD_FAILURE;
 			break;
@@ -66,10 +65,14 @@ void createFileRequest(Process* process, char* path, int* status) {
 			logInfo("El FS creo el archivo: %s", path);
 			*status = COD_FS_RESPONSE_OK;
 			break;
-		case COD_FS_RESPONSE_ERROR:
-			logInfo("El FS no pudo crear el archivo: %s", path);
-			//todo definir en fs los codigos de error -> ej: no hay espacio,
+		case COD_FS_RESPONSE_FILE_EXIST:
+			logInfo("El FS no pudo crear el archivo porque ya existe: %s",
+					path);
 			*status = FILE_NOTFOUND_FD_FAILURE;
+			break;
+		case COD_FS_RESPONSE_FS_FULL:
+			logInfo("El FS no pudo crear el archivo no hay espacio: %s", path);
+			*status = WITHOUT_RESOURCES_FD_FAILURE;
 			break;
 		default:
 			logError("El FS respondio con un mensaje desconocido");
@@ -103,7 +106,7 @@ void deleteFileRequest(Process* process, char* path, int* status) {
 			logInfo("El FS eliminó el archivo: %s", path);
 			*status = COD_FS_RESPONSE_OK;
 			break;
-		case COD_FS_RESPONSE_ERROR:
+		case COD_FS_RESPONSE_FILE_NOTFOUND:
 			logInfo("El FS no pudo eiminar el archivo: %s", path);
 			*status = FILE_NOTFOUND_FD_FAILURE;
 			break;
@@ -142,10 +145,14 @@ void writeFileRequest(Process* process, t_fileData* data, int* status) {
 			logInfo("El FS escribio en el archivo: %s", data->path);
 			*status = COD_FS_RESPONSE_OK;
 			break;
-		case COD_FS_RESPONSE_ERROR:
+		case COD_FS_RESPONSE_FILE_NOTFOUND:
 			logInfo("El FS no pudo escribir en el archivo: %s", data->path);
-			//todo definir en fs los codigos de error -> ej: no hay espacio
 			*status = FILE_NOTFOUND_FD_FAILURE;
+			break;
+		case COD_FS_RESPONSE_FS_FULL:
+			logInfo("El FS no pudo escribir por falta de espacio: %s",
+					data->path);
+			*status = WITHOUT_RESOURCES_FD_FAILURE;
 			break;
 		default:
 			logError("El FS respondio con un mensaje desconocido");
@@ -172,20 +179,19 @@ void readFileRequest(Process* process, t_fileData* data, int* status) {
 		exit(EXIT_FAILURE);
 	}
 	destroyPackage(tmpPackage);
-	logInfo("Se solicitó al FS leer el archivo: %s para el pid: %d",
-			data->path, process->pid);
+	logInfo("Se solicitó al FS leer el archivo: %s para el pid: %d", data->path,
+			process->pid);
 	//me quedo a la espera de la aprobacion
 	tmpPackage = createAndReceivePackage(fsSocket);
 	if (tmpPackage != NULL) {
 		switch (tmpPackage->msgCode) {
 		case COD_FS_RESPONSE_OK:
 			logInfo("El FS leyó el archivo: %s", data->path);
-			memcpy(data->data,tmpPackage->stream,tmpPackage->size);
+			memcpy(data->data, tmpPackage->stream, tmpPackage->size);
 			*status = COD_FS_RESPONSE_OK;
 			break;
-		case COD_FS_RESPONSE_ERROR:
-			logInfo("El FS no pudo escribir en el archivo: %s", data->path);
-			//todo definir en fs los codigos de error -> ej: no hay archivo, no se pudo eliminar por otro uso
+		case COD_FS_RESPONSE_FILE_NOTFOUND:
+			logInfo("El FS no pudo leer en el archivo: %s", data->path);
 			*status = FILE_NOTFOUND_FD_FAILURE;
 			break;
 		default:

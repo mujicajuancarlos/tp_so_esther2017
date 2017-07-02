@@ -13,7 +13,8 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/protocol-fileSystem-kernel.h>
-#include "fileSystemStruct.h"
+#include "../fileSystemStruct.h"
+#include "kernelRequest.h"
 
 void handleKernel(fileSystem_struct *fsStruct);
 

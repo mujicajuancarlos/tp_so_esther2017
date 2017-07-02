@@ -16,5 +16,19 @@
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-fileSystem-kernel.h>
 #include "../module.core/fsStatusCodes.h"
+#include "../module.core/sadicaManager.h"
+#include "../fileSystemStruct.h"
+
+
+void executeExistFileRequest(fileSystem_struct* fsStruct, Package* package);
+
+void executeCreateFileRequest(fileSystem_struct* fsStruct, Package* package);
+
+void executeDeleteFileRequest(fileSystem_struct* fsStruct, Package* package);
+
+void executeReadFileRequest(fileSystem_struct* fsStruct, Package* package);
+
+void executeWriteFileRequest(fileSystem_struct* fsStruct, Package* package);
+
 
 #endif /* MODULE_KERNEL_KERNELREQUEST_H_ */
