@@ -21,6 +21,7 @@ Process* createProcess(int socket, kernel_struct* kernelStruct) {
 	newProcess->heapPages = list_create();
 	newProcess->files = list_create();
 	newProcess->kernelStruct = kernelStruct;
+	newProcess->exit_code = -1;
 	newProcess->processCounters = malloc(sizeof(t_processCounter));
 	initializeProcessCounters(newProcess->processCounters);
 	return newProcess;
@@ -167,8 +168,7 @@ void printHeaderProcess() {
 }
 
 void printProcess(Process* proceso, int stateIndex) {
-	char* exitCode =
-			(proceso->pcb == NULL) ? "" : string_itoa(proceso->pcb->exit_code);
+	char* exitCode = (proceso->exit_code == -1) ? "" : string_itoa(proceso->exit_code);
 	char* state = stateIndexToString(stateIndex);
 	printf("%5d\t%20s\t%20s\n", proceso->pid, state, exitCode);
 }

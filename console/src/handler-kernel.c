@@ -20,9 +20,9 @@ void handleKernelRequest(Program* program, Package* package) {
 		break;
 	case COD_KC_END_PROGRAM:
 		status = deserialize_int(package->stream);
+		logInfo("Finalizo el programa %d con status code ",program->pid, status);
 		program->endDate = time(NULL);
-		printProgramStatus(program, "Finalizó el programa exitCode: %d",
-				status);
+		printProgramStatus(program, "Finalizó el programa");
 		removeProgram(program);
 		logInfo("La solicitud del usuario fue exitosa PID: %d", program->pid);
 		destroyProgram(program);

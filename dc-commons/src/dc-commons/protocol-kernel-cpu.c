@@ -21,7 +21,6 @@ PCB* create_new_PCB(uint32_t pid, uint32_t stackFirstPage,
 	newPBC->metadata = metadata;
 	newPBC->stackSize = 0;
 	newPBC->stackIndex = NULL;
-	newPBC->exit_code = 0;
 	return newPBC;
 }
 void destroy_PBC(PCB* pcb) {
@@ -37,7 +36,7 @@ void destroy_PBC(PCB* pcb) {
 }
 uint32_t sizeOf_PCB(PCB* pcb) {
 	uint32_t size = 0;
-	size = sizeof(uint32_t) * 6; //corresponde a los 6 atributos de tipo uint32_t, si se agrega o se elimina algino hay que modificar esto
+	size = sizeof(uint32_t) * 5; //corresponde a los 6 atributos de tipo uint32_t, si se agrega o se elimina algino hay que modificar esto
 	size += sizeof(uint32_t); //corresponde al tamaño de metadata
 	size += sizeOf_metadata_program(pcb->metadata);
 	size += sizeof(uint32_t); //corresponde al tamaño del stack
@@ -79,9 +78,6 @@ char* serialize_PCB(PCB* pcb) {
 			&offset);
 	free(streamStack);
 	//serializar stack
-	serialize_and_copy_value(stream, &(pcb->exit_code), sizeof(uint32_t),
-			&offset);
-
 	return stream;
 }
 PCB* deserialize_PCB(char* stream) {
@@ -125,9 +121,6 @@ PCB* deserialize_PCB(char* stream) {
 	} else {
 		pcb->stackIndex = NULL;
 	}
-
-	deserialize_and_copy_value(&(pcb->exit_code), stream, sizeof(uint32_t),
-			&offset);
 	return pcb;
 }
 

@@ -80,7 +80,6 @@ typedef struct {
 	t_metadata_program* metadata;	//indice de codigo
 	uint32_t stackSize;				//tamaño de items del stack
 	t_stack_index* stackIndex;		//context
-	uint32_t exit_code; //Agrego Exit Code a PCB (No hace falta serializar, usa solo Kernel)
 } PCB;
 
 //ESTRUCTURAS PARA SYSCALL DE FS
