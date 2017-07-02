@@ -15,5 +15,6 @@
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
 #include <dc-commons/protocol-fileSystem-kernel.h>
+#include "../module.core/fsStatusCodes.h"
 
 #endif /* MODULE_KERNEL_KERNELREQUEST_H_ */

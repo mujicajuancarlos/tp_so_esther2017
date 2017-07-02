@@ -43,19 +43,19 @@ void handleKernelRequest(fileSystem_struct* fsStruct, Package* package) {
 
 	switch (package->msgCode) {
 	case COD_EXIST_FILE_REQUEST:
-		resolveExistFileRequest(fsStruct, package);
+		executeExistFileRequest(fsStruct, package);
 		break;
 	case COD_CREATE_FILE_REQUEST:
-		//	En caso de que no exista (y en el path se pueda escribir) se va a crear el archivo dentro de ese path
+		executeCreateFileRequest(fsStruct, package);
 		break;
 	case COD_DELETE_FILE_REQUEST:
-		//	En caso de que exista, borrará el archivo metadata y liberará bloques del bitmap
+		executeDeleteFileRequest(fsStruct, package);
 		break;
 	case COD_READ_FILE_REQUEST:
-		//	Si pide datos el Kernel, y el path está en modo lectura, se devolverá la cant de bytes definidos por el size en base al offset
+		executeReadFileRequest(fsStruct, package);
 		break;
 	case COD_WRITE_FILE_REQUEST:
-		//	Si se encuentra en modo escritura, se almacenará en el path los bytes del buffer definidos por el size
+		executeWriteFileRequest(fsStruct, package);
 		break;
 	default:
 		logError("El kernel solicitó una accion no permitida");
