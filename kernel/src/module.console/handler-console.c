@@ -63,7 +63,7 @@ void handleConsoleRequestForProcess(Process* process, Package* package) {
 		startNewProcess(process, package);
 		break;
 	case COD_KC_STOP_PROGRAM_REQUEST:
-		basicForceQuitProcess(process,getProcessStateIndex(process));
+		stopProcess(process, package);
 		break;
 	}
 }

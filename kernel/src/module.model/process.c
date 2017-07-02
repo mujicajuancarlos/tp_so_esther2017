@@ -6,6 +6,7 @@
  */
 
 #include "process.h"
+#include "../module.memory/memoryRequests.h"
 
 int currentPid = FIRST_PID;
 pthread_mutex_t currentPidMutex;
@@ -39,25 +40,51 @@ void destroyProcess(Process* process) {
 					(void*) destroy_t_processFile);
 			process->files = NULL;
 		}
-		if(process->processCounters != NULL){
+		if (process->processCounters != NULL) {
 			free(process->processCounters);
 			process->processCounters = NULL;
 		}
 		free(process);
 	}
 }
-
+/**
+ * liberar recursos para un proceso que finalizo la ejecucion o fue stopeado
+ */
 void freeProcessResources(Process* process) {
+	notifyEndProcess(process);
+	close(process->fileDescriptor);
 	process->fileDescriptor = -1;
-	destroy_stackArray(process->pcb->stackIndex, process->pcb->stackSize);
-	metadata_destruir(process->pcb->metadata);
-	process->pcb->stackIndex = NULL;
-	process->pcb->metadata = NULL;
-
-	//todo: enviar solicitud a la memoria para que libere las paginas -> considerar tmb heaps
-	//todo: enviar solicitud al file system para que libere los archivos
+	if (process->pcb != NULL) {
+		destroy_PBC(process->pcb);
+	}
+	if (process->heapPages != NULL) {
+		freeProcessHeapPagesResources(process);
+	}
+	if (process->files != NULL) {
+		freeProcessFilesResources(process);
+	}
 }
 
+void freeProcessHeapPagesResources(Process* process) {
+	void freeHeapPageResources(void* element){
+		heap_page* page = element;
+		if(page->metadataList!=NULL){
+			int status;
+			list_destroy_and_destroy_elements(page->metadataList, (void*) destroy_heap_metadata);
+			page->metadataList = NULL;
+			freePageForProcess(process,page,&status);
+		}
+	}
+	list_iterate(process->heapPages,freeHeapPageResources);
+	list_destroy_and_destroy_elements(process->heapPages, (void*) destroy_heap_page);
+	process->heapPages = NULL;
+}
+
+void freeProcessFilesResources(Process* process) {
+	list_destroy_and_destroy_elements(process->files, (void*) destroy_t_processFile);
+	process->files = NULL;
+	removeClosedGlobalFiles();
+}
 
 void initializeCurrentPidMutex() {
 	pthread_mutex_init(&currentPidMutex, NULL);
@@ -91,7 +118,8 @@ void createPcbForNewProcess(Process* process, Package* sourceCodePackage) {
 	t_metadata_program* metadata = metadata_desde_literal(
 			sourceCodePackage->stream);
 
-	uint32_t stackFirstPage = (sourceCodePackage->size % process->kernelStruct->pageSize) ? 1 : 0;
+	uint32_t stackFirstPage =
+			(sourceCodePackage->size % process->kernelStruct->pageSize) ? 1 : 0;
 	stackFirstPage += sourceCodePackage->size / process->kernelStruct->pageSize;
 
 	logInfo("Generando el pcb para el proceso %d", process->pid);
@@ -148,12 +176,20 @@ void printProcess(Process* proceso, int stateIndex) {
 void printProcessFull(Process* proceso) {
 	printf("\nInformación del proceso %d\n", proceso->pid);
 //	printf("\nEstado %s", stateIndexToString(getProcessStateIndex(proceso)));
-	printf("\tCantidad rafagas ejecutadas %d\n", proceso->processCounters->burst_Counter);
-	printf("\tCantidad de operaciones privilegiadas o syscalls: %d\n", proceso->processCounters->sysC_Counter);
-	printf("\tTabla de archivos abiertos: %d\n", proceso->files->elements_count);
-	printf("\tCantidad de paginas heap utilizadas: %d\n", proceso->heapPages->elements_count);
-	printf("\tCantidad de operaciones alocar: %d en Bytes: %d\n", proceso->processCounters->allocateTimes_Counter, proceso->processCounters->allocateSize_Counter);
-	printf("\tCantidad de operaciones liberar: %d en Bytes: %d\n", proceso->processCounters->freeTimes_Counter, proceso->processCounters->freeSize_Counter);
+	printf("\tCantidad rafagas ejecutadas %d\n",
+			proceso->processCounters->burst_Counter);
+	printf("\tCantidad de operaciones privilegiadas o syscalls: %d\n",
+			proceso->processCounters->sysC_Counter);
+	printf("\tTabla de archivos abiertos: %d\n",
+			proceso->files->elements_count);
+	printf("\tCantidad de paginas heap utilizadas: %d\n",
+			proceso->heapPages->elements_count);
+	printf("\tCantidad de operaciones alocar: %d en Bytes: %d\n",
+			proceso->processCounters->allocateTimes_Counter,
+			proceso->processCounters->allocateSize_Counter);
+	printf("\tCantidad de operaciones liberar: %d en Bytes: %d\n",
+			proceso->processCounters->freeTimes_Counter,
+			proceso->processCounters->freeSize_Counter);
 }
 
 void initializeProcessCounters(t_processCounter* processCounters) {

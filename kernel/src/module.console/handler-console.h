@@ -19,7 +19,6 @@
 #include <dc-commons/protocol-kernel-console.h>
 #include "consoleRequests.h"
 #include "../module.model/process.h"
-#include "../module.planning/processLifeCycle.h"
 #include "../kernelStruct.h"
 
 void handleConsolas(kernel_struct *args);

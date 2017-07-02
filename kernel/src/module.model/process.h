@@ -54,6 +54,10 @@ void destroyProcess(Process* process);
 
 void freeProcessResources(Process* process);
 
+void freeProcessHeapPagesResources(Process* process);
+
+void freeProcessFilesResources(Process* process);
+
 void initializeCurrentPidMutex();
 
 void destroyCurrentPidMutex();

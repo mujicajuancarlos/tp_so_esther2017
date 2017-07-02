@@ -26,12 +26,12 @@ void runProgramIsOK_response(Process* process) {
 
 void notifyEndProcess(Process* process) {
 	Package* package;
+	char* exitCode = serialize_int(process->exit_code);
 	package = createAndSendPackage(process->fileDescriptor,
-		COD_KC_END_PROGRAM, 0, NULL);
+		COD_KC_END_PROGRAM, sizeof(uint32_t), exitCode);
+	free(exitCode);
 	logInfo("Indico la finalizacion del proceso a la Consola %d", process->pid);
 	destroyPackage(package);
-	//close(process->fileDescriptor);
-
 }
 
 void writeOnStdout(Process* process, t_data_FD_request* dataRequest){

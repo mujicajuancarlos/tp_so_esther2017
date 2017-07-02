@@ -25,6 +25,8 @@
 
 void startNewProcess(Process* process, Package* package);
 
+void stopProcess(Process* process, Package* package);
+
 bool canContinueNewProcessExecution(Process* process);
 
 #endif /* MODULE_CONSOLE_CONSOLEREQUESTS_H_ */

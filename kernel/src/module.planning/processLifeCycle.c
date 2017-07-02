@@ -28,11 +28,17 @@ void moveFromExcecToReady(Process* process) {
 	sendToREADY(process);
 }
 
+/**
+ * usado en el curso normal de ejecucion
+ */
 void moveFromExcecToExit_withError(Process* process, int statusCode) {
 	process->exit_code = statusCode;
 	basic_moveFromExcecToExit(process);
 }
 
+/**
+ * usado en el curso normal de ejecucion
+ */
 void moveFromExcecToExit_withoutError(Process* process) {
 	process->exit_code = SC_SUCCESS;
 	basic_moveFromExcecToExit(process);
@@ -41,6 +47,7 @@ void moveFromExcecToExit_withoutError(Process* process) {
 void basic_moveFromExcecToExit(Process* process) {
 	removeFromEXEC(process);
 	sendToEXIT(process);
+	freeProcessResources(process);
 	_incrementMultiprogrammingLevel();
 }
 
@@ -48,6 +55,7 @@ void moveFromNewToExit(Process* process) {
 	removeFromNEW(process);
 	sendToEXIT(process);
 	process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
+	freeProcessResources(process);
 }
 
 void moveFromReadyToExit(Process* process) {
@@ -55,6 +63,7 @@ void moveFromReadyToExit(Process* process) {
 	removeFromREADY(process);
 	sendToEXIT(process);
 	process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
+	freeProcessResources(process);
 	_incrementMultiprogrammingLevel();
 }
 
@@ -62,6 +71,7 @@ void moveFromExecToExit(Process* process) {
 	removeFromEXEC(process);
 	sendToEXIT(process);
 	process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
+	freeProcessResources(process);
 	_incrementMultiprogrammingLevel();
 }
 
@@ -70,6 +80,7 @@ void moveFromBlockToExit(Process* process) {
 	removeFromBLOCK(process);
 	sendToEXIT(process);
 	process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
+	freeProcessResources(process);
 	_incrementMultiprogrammingLevel();
 }
 
@@ -204,7 +215,6 @@ void notifyLockedProcessFor(char* semKey, Process* process) {
 }
 
 void sendToEXIT(Process* process) {
-	notifyEndProcess(process);
 	pthread_mutex_lock(&exitListMutex);
 	queue_push(states->exit, process);
 	pthread_mutex_unlock(&exitListMutex);
