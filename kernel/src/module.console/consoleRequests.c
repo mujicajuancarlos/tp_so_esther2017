@@ -33,12 +33,22 @@ void startNewProcess(Process* process, Package* package) {
 	_decrementMultiprogrammingLevel();
 	logInfo("El pid: %d ingreso oficialmente al sistema por el grado de multiprogramacion", process->pid);
 
-	reservePagesForNewProcess(process, package);
+	if(canContinueNewProcessExecution(process)){
 
-	sendSourceCodeForNewProcess(process, package);
+		reservePagesForNewProcess(process, package);
 
-	createPcbForNewProcess(process, package);
+		sendSourceCodeForNewProcess(process, package);
 
-	moveFromNewToReady(process);
+		createPcbForNewProcess(process, package);
+
+		moveFromNewToReady(process);
+	}
+}
+
+/*
+ * debo continuar solo si el proceso no fue enviado a exit
+ */
+bool canContinueNewProcessExecution(Process* process){
+	return getProcessStateIndex(process) == STATE_CODE_NEW;
 }
 

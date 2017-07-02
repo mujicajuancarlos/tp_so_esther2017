@@ -20,8 +20,11 @@
 #include "../module.memory/memoryRequests.h"
 #include "../module.planning/processLifeCycle.h"
 #include "../module.model/process.h"
+#include "../module.model/processFinder.h"
 #include "../module.planning/longTermScheduler.h"
 
 void startNewProcess(Process* process, Package* package);
+
+bool canContinueNewProcessExecution(Process* process);
 
 #endif /* MODULE_CONSOLE_CONSOLEREQUESTS_H_ */
