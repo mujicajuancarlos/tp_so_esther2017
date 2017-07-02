@@ -10,7 +10,7 @@
 /**
  * Estoy configurado para atender una sola conexion a la vez (Un unico kernel)
  */
-void handleKernel(fileSystem_struct *fsStruct) {
+void handleKernel(fileSystem_struct* fsStruct) {
 
 	Package* package;
 	while (true) {
@@ -39,14 +39,11 @@ void handleKernel(fileSystem_struct *fsStruct) {
 	}
 }
 
-void handleKernelRequest(fileSystem_struct *fsStruct, Package *package) {
+void handleKernelRequest(fileSystem_struct* fsStruct, Package* package) {
 
-	/**
-	 * TODO verificar los codigos de mensaje permitidos entre kernel y fs
-	 */
 	switch (package->msgCode) {
 	case COD_EXIST_FILE_REQUEST:
-		//	Verifica que el archivo del path exista
+		resolveExistFileRequest(fsStruct, package);
 		break;
 	case COD_CREATE_FILE_REQUEST:
 		//	En caso de que no exista (y en el path se pueda escribir) se va a crear el archivo dentro de ese path
