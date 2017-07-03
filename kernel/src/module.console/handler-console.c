@@ -49,6 +49,7 @@ void handleNewProcess(Process* newProcess) {
 			logError("Consola cerro la conexion para FD: %d",
 					newProcess->fileDescriptor);
 			stopProcess(newProcess,package);
+			newProcess->exit_code = SC_ERROR_END_PROCESS_BY_DISCONECT; //segun tp la desconexion guarda el status -6
 		}
 		destroyPackage(package);
 	}
