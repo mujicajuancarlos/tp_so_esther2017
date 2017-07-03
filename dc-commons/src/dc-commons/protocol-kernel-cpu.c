@@ -413,8 +413,8 @@ void createNewContext(PCB* pcb) {
 	pcb->stackIndex[pcb->stackSize].var_len = 0;
 	pcb->stackIndex[pcb->stackSize].vars = NULL;
 	pcb->stackSize++;
-	logInfo("Se creó el contexto principal (mail) del stack para el pid: %d",
-			pcb->pid);
+	logInfo("Se creó el contexto #%d del stack para el pid: %d",
+			pcb->stackSize, pcb->pid);
 }
 
 void destroyCurrentContext(PCB* pcb) {

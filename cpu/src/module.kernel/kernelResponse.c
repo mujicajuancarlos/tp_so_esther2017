@@ -65,20 +65,22 @@ void reportExcecutionError(cpu_struct* cpuStruct, int errorFlag) {
 		package = createAndSendPackage(socket, COD_EXECUTION_ERROR, size,
 				buffer);
 		free(buffer);
-		exit(1);	//finalizo porque es un error irecuperable
+		if(errorFlag==FLAG_DISCONNECTED_MEMORY){
+			exit(EXIT_SUCCESS);//no puede operar sin memoria
+		}
 		break;
 	case FLAG_DISCONNECTED_KERNEL:
 		logError(
 				"El kernel esta desconectado, no puedo continuar ejecuarnado por lo tanto finalizo tambien");
 		logTrace(
 				"Finalizando proceso cpu porque no se pudo conectar con el kernel");
-		exit(1);
+		exit(EXIT_SUCCESS);
 		break;
 	case FLAG_UNKNOWN_MESSAGE_CODE:
 		logError(
 				"El kernel no esta respondiendo adecuadamente, no puedo continuar ejecuarnado");
 		logTrace("Finalizando proceso cpu porque hay errores en el kernel");
-		exit(1);
+		exit(EXIT_SUCCESS);
 		break;
 	case FLAG_UNKNOWN_ERROR:
 	default:

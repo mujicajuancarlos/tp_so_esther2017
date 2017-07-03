@@ -141,7 +141,7 @@ void ansisopExecuteInstruccion(cpu_struct* cpuStruct) {
 	switch (errorFlag) {
 	case FLAG_OK: //caso feliz reporto que finalizo ejecucion de la instruccion
 		if (isFinishedProcess()) {
-			reportEndProcess(cpuStruct);//todo: verificar si es necesario o con el flag FLAG_END_PROGRAM alcanza
+			reportEndProcess(cpuStruct);
 		} else {
 			reportEndInstruction(cpuStruct);
 		}
