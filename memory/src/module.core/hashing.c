@@ -12,8 +12,14 @@ int getHashNumber (memory_struct* memoryStruct, int processId, int procPage) {
 	int startingPoint = 200 - (processId - 999) * educatedGuess;
 	int hashNumber = startingPoint + procPage;
 
-	while (hashNumber >= memoryStruct->config->marcos)
-		hashNumber -= memoryStruct->config->marcos;
+	if (hashNumber >= memoryStruct->config->marcos) {
+		while (hashNumber >= memoryStruct->config->marcos)
+			hashNumber -= memoryStruct->config->marcos;
+	}
+	else if (hashNumber < 0) {
+		while (hashNumber < 0)
+			hashNumber += memoryStruct->config->marcos;
+	}
 
 	return (hashNumber);
 }
