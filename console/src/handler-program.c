@@ -42,24 +42,16 @@ int handleNewProgram(Program* program) {
 		package = createAndReceivePackage(program->fd_client);
 		if (package != NULL){
 			handleKernelRequest(program, package);
+			if(program->exit){
+				destroyProgram(program);
+				close(program->fd_client);
+			}
 		}else {
 			running = false;
-			logError("El kernel cerro la conexion para FD: %d",
-					program->fd_client);
-			close(program->fd_client);
-			if (program->pid == -1) { // pid -1 correnponde a un programa que nunca llego a ejecutar
-				printMessage("Se cancelo la ejecucion del programa %s, kernel no esta disponible.", program->sourceCodePath);
-			} else {
-				//llego a ejecutar pero el kernel lo cancelo
-				program->endDate = time(NULL);
-				printProgramStatus(program, "Se cancelo la ejecucion del programa");
-				removeProgram(program);
-			}
+			logWarning("El kernel finalizo inesperadamente");
 		}
 		destroyPackage(package);
 	}
-	destroyProgram(program);
-	close(program->fd_client);
 	pthread_exit(EXIT_SUCCESS);
 }
 

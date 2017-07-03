@@ -25,14 +25,15 @@ void handleKernelRequest(Program* program, Package* package) {
 		printProgramStatus(program, "Finalizó el programa");
 		removeProgram(program);
 		logInfo("La solicitud del usuario fue exitosa PID: %d", program->pid);
-		destroyProgram(program);
+		logInfo("Se cerrara el socket %d de conexion con kernel", program->fd_client);
+		program->exit = true;
 		break;
 
 	case COD_KC_CANT_RUN_PROGRAM_RESPONSE:
 		printProgramStatus(program, "Solicitud Rechazada");
 		removeProgram(program);
 		logInfo("Kernel no pudo iniciar el programa %d", program->pid);
-		destroyProgram(program);
+		program->exit = true;
 		break;
 
 	case COD_KC_PRINT_STDOUT:

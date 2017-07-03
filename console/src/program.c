@@ -18,6 +18,7 @@ Program* createNewProgram(console_struct* console, char* sourceCodePath) {
 	program->fd_client = -1;
 	program->pid = -1;
 	program->printSize = 0;
+	program->exit = false;
 	program->sourceCodePath = string_duplicate(sourceCodePath);
 	program->console = console;
 	return program;
@@ -25,9 +26,12 @@ Program* createNewProgram(console_struct* console, char* sourceCodePath) {
 
 void destroyProgram(Program* program) {
 	if (program != NULL) {
-		free(program->sourceCodePath);
+		if(program->sourceCodePath!=NULL){
+			free(program->sourceCodePath);
+		}
+		free(program);
+		program = NULL;
 	}
-	free(program);
 }
 
 void printProgramStatus(Program* program, char* statusMessage) {

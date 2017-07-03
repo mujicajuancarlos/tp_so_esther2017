@@ -66,6 +66,7 @@ void initializeStruct(kernel_struct* kernelStruct, Configuration* config) {
 	initializeCurrentPidMutex();
 	initializeScheduler(kernelStruct);
 	initializeCpuAdministrator();
+	initializeFileSystemModule();
 }
 
 void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config){
@@ -76,6 +77,7 @@ void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config){
 	destroyCurrentPidMutex();
 	destroyScheduler();
 	destroyCpuAdministrator();
+	destroyFileSystemModule();
 }
 
 kernel_struct* getKernelStruct(){

@@ -46,11 +46,9 @@ void startNewProcess(Process* process, Package* package) {
 }
 
 void stopProcess(Process* process, Package* package){
-	logInfo("La consola solicitó finalizar el proceso %d", process->pid);
 	int state = getProcessStateIndex(process);
 	if(state != STATE_CODE_NOTFOUND){
 		basicForceQuitProcess(process,state);
-		logInfo("El proceso %d fue detenido", process->pid);
 	} else {
 		logError("El proceso %d tiene un estado desconocido", process->pid);
 	}

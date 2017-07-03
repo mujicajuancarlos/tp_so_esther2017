@@ -14,6 +14,7 @@
 
 #include "module.cpu/handler-cpu.h"
 #include "module.model/process.h"
+#include "module.model/fileDescriptor.h"
 #include "module.console/handler-console.h"
 #include "module.planning/handler-planning.h"
 #include "module.planning/scheduler.h"

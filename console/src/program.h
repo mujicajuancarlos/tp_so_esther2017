@@ -10,6 +10,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "console.h"
 
 typedef struct {
@@ -18,6 +19,7 @@ typedef struct {
 	time_t endDate;
 	int fd_client;
 	int printSize;
+	bool exit;
 	char* sourceCodePath;
 	console_struct* console;
 } Program;

@@ -310,10 +310,8 @@ void basicForceQuitProcess(Process* process, int stateCode) {
 		moveFromBlockToExit(process);
 		break;
 	case STATE_CODE_EXIT:
-	default:
-		logError(
-				"El proceso pid: %d tiene el estado: %s y no puede ser finalizado",
-				process->pid, stateIndexToString(stateCode));
+		logInfo("El proceso pid: %d tiene el estado: EXIT ya fue finalizado",
+				process->pid);
 		break;
 	}
 }
