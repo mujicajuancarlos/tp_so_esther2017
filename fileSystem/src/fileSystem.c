@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 			config->log_print_console,
 			log_level_from_string(config->log_level));
 
-	logInfo("Inicializado proceso kernel");
+	logInfo("Inicializado proceso FILE SYSTEM");
 	initializeStruct(&fsStruct, config);
 
 	logInfo("Iniciando SADICA");
