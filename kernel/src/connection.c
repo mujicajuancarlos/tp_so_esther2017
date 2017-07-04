@@ -45,9 +45,10 @@ void createMemoryClientSocket(kernel_struct* kernel_struct) {
 	kernel_struct->socketClientMemoria = crearSocketCliente(
 			kernel_struct->config->ip_memoria,
 			kernel_struct->config->puerto_memoria);
-	if (kernel_struct->socketClientMemoria == -1)
+	if (kernel_struct->socketClientMemoria == -1){
 		logError("No se pudo establecer la conexion con la memoria");
-	else {
+		exit(EXIT_FAILURE);
+	} else {
 		logInfo("Conexion establecida a traves del FD %d",
 						kernel_struct->socketClientMemoria);
 		logInfo("Esperando solicitud de identificación de la memoria");
@@ -80,8 +81,9 @@ void createFileSystemClientSocket(kernel_struct* kernel_struct) {
 
 	kernel_struct->socketClientFileSystem = crearSocketCliente(kernel_struct->config->ip_fs,
 			kernel_struct->config->puerto_fs);
-	if (kernel_struct->socketClientFileSystem == -1)
+	if (kernel_struct->socketClientFileSystem == -1){
 		logError("No se pudo establecer la conexion con el file system");
-	else
+		exit(EXIT_FAILURE);
+	} else
 		logInfo("Conexion establecida a traves del FD %d", kernel_struct->socketClientFileSystem);
 }
