@@ -163,7 +163,6 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 			logInfo(
 					"La memoria indica que no hay espacio para el proceso pid %d",
 					process->pid);
-			exit(EXIT_FAILURE);
 			break;
 		default:
 			logError("La memoria envio un mensaje no esperado");

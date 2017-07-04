@@ -18,7 +18,7 @@
  */
 
 typedef struct Package {
-	uint32_t msgCode;
+	int32_t msgCode;
 	uint32_t size;
 	char* stream;
 } Package;

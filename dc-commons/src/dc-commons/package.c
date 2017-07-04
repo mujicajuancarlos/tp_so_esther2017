@@ -48,7 +48,7 @@ char* serializePackage(Package *package){
 	int offset = 0;
 	size_t size_to_send;
 
-	size_to_send =  sizeof(uint32_t);
+	size_to_send =  sizeof(int32_t);
 	memcpy(serializedPackage + offset, &(package->msgCode), size_to_send);
 	offset += size_to_send;
 
