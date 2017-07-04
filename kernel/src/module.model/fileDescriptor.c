@@ -33,8 +33,7 @@ t_globalFile* create_t_globalFile(char* path) {
 	size_t sizePath = sizeof(char) * strlen(path);
 	t_globalFile* globalFile = malloc(sizeof(t_globalFile));
 	globalFile->open = 0;
-	globalFile->path = malloc(sizePath);
-	memcpy(globalFile->path, path, sizePath);
+	globalFile->path = string_duplicate(path);
 	return globalFile;
 }
 void destroy_t_globalFile(t_globalFile* globalFile) {
@@ -49,7 +48,8 @@ t_processFile* create_t_processFile(uint32_t fd_number,
 		t_globalFile* globalFile, t_flags flags) {
 	t_processFile* processFile = malloc(sizeof(t_processFile));
 	processFile->fd = fd_number;
-	processFile->flag = flags;
+	processFile->flag.read = flags.read;
+	processFile->flag.write = flags.write;
 	processFile->globalFile = globalFile;
 	globalFile->open = globalFile->open + 1;
 	processFile->seekValue = 0;

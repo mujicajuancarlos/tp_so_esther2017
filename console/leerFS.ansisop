@@ -1,7 +1,7 @@
 begin
   variables a, f
   alocar a 100
-  abrir f LE /archivo.bin
+  abrir f LEC /archivo.bin
   wait mutexArch
     leer f a 10
     prints n *a

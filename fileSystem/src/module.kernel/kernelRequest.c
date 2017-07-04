@@ -15,12 +15,12 @@ void executeExistFileRequest(fileSystem_struct* fsStruct, Package* package) {
 	if (exist) {
 		tmpPackage = createAndSendPackage(fsStruct->fd_kernel,
 		COD_FS_RESPONSE_OK, 0, NULL);
-		logInfo("Se informo que el archivo %s existe en el file system %s",
+		logInfo("Se informo que el archivo %s existe en el file system",
 				path);
 	} else {
 		tmpPackage = createAndSendPackage(fsStruct->fd_kernel,
 		COD_FS_RESPONSE_FILE_NOTFOUND, 0, NULL);
-		logInfo("Se informo que el archivo %s NO existe en el file system %s",
+		logInfo("Se informo que el archivo %s NO existe en el file system",
 				path);
 	}
 	free(path);
@@ -31,7 +31,7 @@ void executeCreateFileRequest(fileSystem_struct* fsStruct, Package* package) {
 	Package* tmpPackage = NULL;
 	char* path = string_substring_until(package->stream, package->size);
 	int status;
-	logInfo("El kernel solicito verificar la existencia del archivo %s", path);
+	logInfo("El kernel solicito crear del archivo %s", path);
 	basicCreateFile(fsStruct, path, &status);
 	switch (status) {
 	case EXC_OK:

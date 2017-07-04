@@ -42,6 +42,7 @@ sadica_file* createSadicaFileFrom(fileSystem_struct* fsStruct, char* path) {
 sadica_file* createSadicaFileTo(fileSystem_struct* fsStruct, char* path,
 		uint32_t firstBlock) {
 	sadica_file* file = createSadicaFile(path);
+	file->blocks = malloc(sizeof(uint32_t));
 	memcpy(file->blocks, &firstBlock, sizeof(uint32_t));
 	writeMetadataFile(fsStruct, file);
 	return file;

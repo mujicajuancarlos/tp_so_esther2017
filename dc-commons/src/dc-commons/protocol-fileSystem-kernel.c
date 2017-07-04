@@ -35,9 +35,10 @@ t_fileData* deserialize_t_fileData(char* stream) {
 
 	deserialize_and_copy_value(&(object->pathSize), stream, sizeof(uint32_t),
 			&offset);
-	object->path = malloc(sizeof(char) * object->pathSize);
-	deserialize_and_copy_value(object->path, stream,
-			sizeof(char) * object->pathSize, &offset);
+
+	object->path = string_substring(stream,offset,object->pathSize);
+	offset+=object->pathSize;
+
 	deserialize_and_copy_value(&(object->offset), stream, sizeof(uint32_t),
 			&offset);
 	deserialize_and_copy_value(&(object->dataSize), stream, sizeof(uint32_t),

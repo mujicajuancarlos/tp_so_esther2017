@@ -10,15 +10,16 @@
 int basicOpenProcessFile(Process* process, t_new_FD_request* dataRequest,
 		int* assignedFD) {
 	int status = OPEN_FD_SUCCESS;
-	t_globalFile* globalFile = getGlobalFileFor(dataRequest->path);
+	char* path = string_substring_until(dataRequest->path,dataRequest->sizePath);
+	t_globalFile* globalFile = getGlobalFileFor(path);
 	if (globalFile == NULL) {
 		globalFile = createGlobalFileWith(dataRequest, &status);
 		if (globalFile != NULL){
 			//realizo la verificacion en FS
-			validateExistFileRequest(process,dataRequest->path,&status);
+			validateExistFileRequest(process,path,&status);
 			if(status == FILE_NOTFOUND_FD_FAILURE){
-				logInfo("El archivo %s no existe en FS, se solicitara crear el archivo",dataRequest->path);
-				createFileRequest(process,dataRequest->path,&status);
+				logInfo("El archivo %s no existe en FS, se solicitara crear el archivo",path);
+				createFileRequest(process,path,&status);
 				if(status == COD_FS_RESPONSE_OK){
 					logInfo("El FS indico que el archivo %s se creo sin problemas");
 					status = OPEN_FD_SUCCESS;
@@ -30,6 +31,7 @@ int basicOpenProcessFile(Process* process, t_new_FD_request* dataRequest,
 			return PERMISSIONS_DENIED_FD_FAILURE;
 		}
 	}
+	free(path);
 	*assignedFD = createProcessFileWith(process, globalFile,
 			dataRequest->flags);
 	return status;
@@ -153,11 +155,13 @@ int createProcessFileWith(Process* process, t_globalFile* globalFile,
 t_globalFile* createGlobalFileWith(t_new_FD_request* dataRequest, int* status) {
 	t_globalFile* globalFile = NULL;
 	validatePermissionForCreateFile(dataRequest->flags, status);
+	char* path = string_substring_until(dataRequest->path,dataRequest->sizePath);
 	if (*status == VALIDATION_FD_OK) {
-		logInfo("Creando fd global para el archivo %s", dataRequest->path);
-		globalFile = create_t_globalFile(dataRequest->path);
+		logInfo("Creando fd global para el archivo %s", path);
+		globalFile = create_t_globalFile(path);
 		addGlobalFile(globalFile);
 	}
+	free(path);
 	return globalFile;
 }
 

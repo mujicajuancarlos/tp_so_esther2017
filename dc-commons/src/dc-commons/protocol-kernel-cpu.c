@@ -473,9 +473,9 @@ set_shared_var* deserialize_SetSharedVar(char* buffer) {
 	uint32_t offset = 0;
 	deserialize_and_copy_value(&(object->sizeName), buffer, sizeof(uint32_t),
 			&offset);
-	object->name = malloc(sizeof(char) * object->sizeName);
-	deserialize_and_copy_value(object->name, buffer,
-			sizeof(char) * object->sizeName, &offset);
+	object->name = string_substring(buffer,offset,object->sizeName);
+	offset += object->sizeName;
+
 	deserialize_and_copy_value(&(object->newValue), buffer, sizeof(uint32_t),
 			&offset);
 	return object;

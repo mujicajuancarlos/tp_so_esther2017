@@ -134,7 +134,7 @@ void contextSwitchForForceQuitProcess(CPU* cpu) {
 }
 
 void executeWaitTo(CPU* cpu, Package* package) {
-	t_nombre_semaforo semId = package->stream;
+	t_nombre_semaforo semId = string_substring_until(package->stream,package->size);
 	bool shouldLock = false;
 	bool hasError = executeBasicWait(semId, &shouldLock) == UPDATE_SEM_SUCCESS;
 	notifyUpdateSemaphoreStatus(cpu, hasError, shouldLock);
@@ -153,10 +153,11 @@ void executeWaitTo(CPU* cpu, Package* package) {
 		moveFromExcecToExit_withError(cpu->process, SC_ERROR_WAIT_SEMAPHORE);
 		markFreeCPU(cpu);
 	}
+	free(semId);
 }
 
 void executeSignalTo(CPU* cpu, Package* package) {
-	t_nombre_semaforo semId = package->stream;
+	t_nombre_semaforo semId = string_substring_until(package->stream,package->size);
 	bool shouldUnlock = false;
 	bool hasError = executeBasicSignal(semId,
 			&shouldUnlock) == UPDATE_SEM_SUCCESS;
@@ -176,6 +177,7 @@ void executeSignalTo(CPU* cpu, Package* package) {
 		moveFromExcecToExit_withError(cpu->process, SC_ERROR_WAIT_SEMAPHORE);
 		markFreeCPU(cpu);
 	}
+	free(semId);
 }
 
 void executeSetSharedVar(CPU* cpu, Package* package) {
@@ -198,7 +200,7 @@ void executeSetSharedVar(CPU* cpu, Package* package) {
 }
 
 void executeGetSharedVar(CPU* cpu, Package* package) {
-	char* key = package->stream;
+	char* key = string_substring_until(package->stream,package->size);
 	int value;
 	Package* tmpPackage;
 	if (getSharedVar(key, &value) == UPDATE_VAR_SUCCESS) {
@@ -213,6 +215,7 @@ void executeGetSharedVar(CPU* cpu, Package* package) {
 		markFreeCPU(cpu);
 	}
 	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
+	free(key);
 	destroyPackage(tmpPackage);
 }
 
