@@ -11,9 +11,7 @@ void consoleResponseRepulseMessage(Process* newProcess) {
 	package = createAndSendPackage(newProcess->fileDescriptor,
 	COD_KC_CANT_RUN_PROGRAM_RESPONSE, 0, NULL);
 	destroyPackage(package);
-	removeFromNEW(newProcess);
-	close(newProcess->fileDescriptor);
-	destroyProcess(newProcess);
+	newProcess->forceQuit = true;
 }
 
 void runProgramIsOK_response(Process* process) {

@@ -139,7 +139,6 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 		logError(
 				"No se pudo solicitar la reserva de paginas para el proceso pid %d",
 				process->pid);
-		exit(EXIT_FAILURE);
 	}
 
 	destroyPackage(tmpPackage);
@@ -175,7 +174,6 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 				"No se recibio la respuesta de la memoria para el proceso pid %d",
 				process->pid);
 		consoleResponseRepulseMessage(process);
-		exit(EXIT_FAILURE);
 	}
 
 	destroyPackage(tmpPackage);

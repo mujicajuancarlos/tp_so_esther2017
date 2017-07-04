@@ -34,14 +34,17 @@ void startNewProcess(Process* process, Package* package) {
 	logInfo("El pid: %d ingreso oficialmente al sistema por el grado de multiprogramacion", process->pid);
 
 	if(canContinueNewProcessExecution(process)){
-
 		reservePagesForNewProcess(process, package);
-
-		sendSourceCodeForNewProcess(process, package);
-
-		createPcbForNewProcess(process, package);
-
-		moveFromNewToReady(process);
+		if(!process->forceQuit){
+			sendSourceCodeForNewProcess(process, package);
+			createPcbForNewProcess(process, package);
+			moveFromNewToReady(process);
+		}else{
+			logInfo("El proceso %d va a ser removido del sistema porque no pudo iniciar satisfactoriamente", process->pid);
+			removeFromNEW(process);
+			close(process->fileDescriptor);
+			destroyProcess(process);
+		}
 	}
 }
 
