@@ -29,4 +29,6 @@ void readData(Package* package, kernel* kernel);
 
 void endProcess (Package* package, kernel* kernel);
 
+void kernelDisconnect (kernel* kernel);
+
 #endif /* MODULE_KERNEL_KERNELREQUEST_H_ */
