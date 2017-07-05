@@ -54,7 +54,7 @@ void handleUserRequest(kernel_struct* kernelStruct) {
 			}
 
 			if (shouldCompareCommand && equal_user_command(commands[0],
-			COD_CONSOLE_PLANING)) {
+			COD_CONSOLE_LOCK_UNLOCK_SCHEDULER)) {
 				shouldCompareCommand = false;
 				handleCommand_lock_unlock(kernelStruct, commands);
 			}
@@ -201,21 +201,14 @@ void handleCommand_end_program(kernel_struct* kernelStruct, char** commands) {
 void handleCommand_lock_unlock(kernel_struct* kernelStruct, char** commands) {
 	if (commands[1] != NULL) {
 		if (commands[2] == NULL) {
-			char* planning = commands[1];
-			//bool validar = false;
-
-			if (string_equals_ignore_case(planning, "Bloqueado")) {
+			if (string_equals_ignore_case(commands[1], OPT_LOCK)) {
 				shortTermScheduler_lock();
-				//	validar = true;
-			} else if (string_equals_ignore_case(planning, "Desbloqueado")) {
+			} else if (string_equals_ignore_case(commands[1], OPT_UNLOCK)) {
 				shortTermScheduler_unlock();
-				//	validar = true;
 			} else
 				printInvalidArguments(commands[1], commands[0]);
-
 		} else
 			printInvalidArguments(commands[2], commands[0]);
-
 	} else
 		printInvalidArguments("", commands[0]);
 }
@@ -298,7 +291,10 @@ void printCommandsHelp() {
 			"Actualiza el nivel de multiprogramacion a «new level»");
 
 	printf(patter,
-	COD_CONSOLE_PLANING, "", "", "Bloquea o Desbloquea el planificador");
+	COD_CONSOLE_LOCK_UNLOCK_SCHEDULER, OPT_LOCK, "", "Bloquea el planificador de corto plazo");
+
+	printf(patter,
+		COD_CONSOLE_LOCK_UNLOCK_SCHEDULER, OPT_UNLOCK, "", "Desbloquea el planificador de corto plazo");
 
 	printf(patter, COD_CONSOLE_CLEAR, "", "", "Limpia la pantalla");
 

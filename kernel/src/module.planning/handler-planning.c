@@ -12,7 +12,10 @@ void handlePlanning(kernel_struct *kernel_struct) {
 	CPU* cpu;
 	int algorithm;
 	while (true) {
-		shortTermScheduler_lock();
+		if(!isEnableShortTermScheduler()){
+			logInfo("El planificador de corto plazo se encuentra bloqueado por la consola del kernel");
+			shortTermSchedulerMutex_lock();
+		}
 		cpu = searchAndMarkBusyCPU();
 		algorithm = getAlgorithmIndex(kernel_struct->config->algoritmo);
 		switch (algorithm) {
@@ -27,7 +30,6 @@ void handlePlanning(kernel_struct *kernel_struct) {
 			exit (-1);
 			break;
 		}
-		shortTermScheduler_unlock();
 	}
 
 }

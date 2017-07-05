@@ -8,6 +8,7 @@
 #include "shortTermScheduler.h"
 
 pthread_mutex_t shortTermSchedulerMutex;
+bool enableShortTermScheduler;
 
 /**
  * incremento cuando: agregan un elemento a la lista ready
@@ -20,6 +21,7 @@ sem_t processInReady_sem;
 void initializeshortTermScheduler() {
 	pthread_mutex_init(&shortTermSchedulerMutex, NULL);
 	sem_init(&processInReady_sem, 1, 0);
+	enableShortTermScheduler = true;
 }
 
 void destroyshortTermScheduler() {
@@ -28,13 +30,34 @@ void destroyshortTermScheduler() {
 }
 
 void shortTermScheduler_lock() {
-	pthread_mutex_lock(&shortTermSchedulerMutex);
-	logInfo("El planificador de corto plazo fue bloqueado");
+	if (enableShortTermScheduler) {
+		enableShortTermScheduler = false;
+		logInfo("El planificador de corto plazo fue bloqueado");
+	} else {
+		logInfo("El planificador de corto plazo ya se encontraba bloqueado");
+	}
 }
 
 void shortTermScheduler_unlock() {
+	if (!enableShortTermScheduler) {
+		shortTermSchedulerMutex_unlock();
+		enableShortTermScheduler = true;
+		logInfo("El planificador de corto plazo fue desbloqueado");
+	} else {
+		logInfo("El planificador de corto plazo ya se encontraba desbloqueado");
+	}
+}
+
+void shortTermSchedulerMutex_lock() {
+	pthread_mutex_lock(&shortTermSchedulerMutex);
+}
+
+void shortTermSchedulerMutex_unlock() {
 	pthread_mutex_unlock(&shortTermSchedulerMutex);
-	logInfo("El planificador de corto plazo fue desbloqueado");
+}
+
+bool isEnableShortTermScheduler() {
+	return enableShortTermScheduler;
 }
 
 void processInReady_wait() {

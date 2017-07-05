@@ -17,6 +17,8 @@
 #define OPT_STATE "-s"
 #define OPT_PID "-p"
 #define COD_CONSOLE_SET_NEW_MULTIPROGRAMMING_LEVEL "setmlvl"
-#define COD_CONSOLE_PLANING "planning"
+#define COD_CONSOLE_LOCK_UNLOCK_SCHEDULER "scheduler"
+#define OPT_LOCK "lock"
+#define OPT_UNLOCK "unlock"
 
 #endif /* PROTOCOL_KERNEL_USER_H_ */

@@ -33,8 +33,8 @@ void markFreeCPU(CPU* cpu) {
 	cpu->process = NULL;
 	cpu->libre = true;
 	sem_post(&freeCPU_sem);
-	pthread_mutex_unlock(&cpuListMutex);
 	logInfo("Se marco como libre la cpu %d",cpu->fileDescriptor);
+	pthread_mutex_unlock(&cpuListMutex);
 }
 
 /*
@@ -52,8 +52,8 @@ CPU* searchAndMarkBusyCPU() {
 	pthread_mutex_lock(&cpuListMutex);
 	cpu = list_find(cpuList, condicion);
 	cpu->libre = false;
-	pthread_mutex_unlock(&cpuListMutex);
 	logInfo("Se marco como ocupada la cpu %d",cpu->fileDescriptor);
+	pthread_mutex_unlock(&cpuListMutex);
 	return cpu;
 }
 
