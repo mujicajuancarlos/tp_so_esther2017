@@ -74,10 +74,10 @@ void handleCommand_start_program(console_struct* consoleStruct, char** commands)
 			logInfo("Creando una nueva estructura de programa para  %s",
 					commands[1]);
 			Program* program = createNewProgram(consoleStruct, commands[1]); //no olvidar librerar memoria al finalizar el hilo
-			logDebug("Creando el hilo para ejectar %s", commands[1]);
+			logDebug("Creando el hilo para ejecutar %s", commands[1]);
 			pthread_create(&hiloPrograma, &threadAttr, (void*) handleNewProgram,
 					program);
-			logDebug("Hilo ejecutando %s", commands[1]);
+			logDebug("El hilo comenzo a ejecutarse %s", commands[1]);
 		} else
 			printFileNotFound(commands[1]);
 	} else

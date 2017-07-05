@@ -29,7 +29,7 @@ void notifyEndProcessToConsole(Process* process) {
 		package = createAndSendPackage(process->fileDescriptor,
 		COD_KC_END_PROGRAM, sizeof(uint32_t), exitCode);
 		free(exitCode);
-		logInfo("Indico la finalizacion del proceso a la Consola %d",
+		logInfo("Se indico la finalizacion del proceso a la Consola %d",
 				process->pid);
 		destroyPackage(package);
 	}
