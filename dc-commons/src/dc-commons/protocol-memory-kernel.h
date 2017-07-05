@@ -48,6 +48,7 @@
 #define COD_FREE_PAGE_REQUEST 414
 #define COD_FREE_PAGE_RESPONSE 415
 
+#define COD_KERNEL_DISCONNECT 416
 
 typedef struct {
 	uint32_t pid;

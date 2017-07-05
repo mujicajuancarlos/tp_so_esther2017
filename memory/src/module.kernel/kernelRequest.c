@@ -114,3 +114,27 @@ void endProcess(Package* package, kernel* kernel) {
 
 	destroyPackage (outPackage);
 }
+
+void kernelDisconnect (kernel* kernel) {
+	int i;
+	logInfo ("Kernel se desconecto, la memoria se restablece");
+	for (i = 0; i < list_size (kernel->memoryStruct->referenceTable); i++) {
+		memory_page *p = list_get (kernel->memoryStruct->referenceTable, i);
+		if (p->pid != -1 && p->isFree == false) {
+			p->isFree = true;
+			p->pid = 0;
+			p->procPage = 0;
+		}
+	}
+	logInfo ("Paginas ocupadas por procesos liberadas");
+
+	for (i = 0; i < list_size (kernel->memoryStruct->cacheEntries); i++) {
+		cache_entry *c = list_get (kernel->memoryStruct->cacheEntries, i);
+		if (c->globPage != -1) {
+			c->globPage = -1;
+			c->pid = -1;
+			c->procPage = -1;
+		}
+	}
+	logInfo ("Memoria cache ha sido limpiada");
+}

@@ -18,6 +18,7 @@ void handleKernel(kernel* kernel) {
 			running = false;
 			logError("Kernel cerro la conexion para FD: %d",
 					kernel->fileDescriptor);
+			handleKernelRequest (kernel, createPackage (COD_KERNEL_DISCONNECT, 0, NULL));
 		}
 		destroyPackage(package);
 	}
@@ -47,6 +48,9 @@ void handleKernelRequest(kernel* kernel, Package* package) {
 		break;
 	case COD_END_PROCESS_REQUEST: //para liberar todas las paginas de un proceso que finalizo
 		endProcess (package, kernel);
+		break;
+	case COD_KERNEL_DISCONNECT:
+		kernelDisconnect (kernel);
 		break;
 	default:
 		logError("El kernel solicito una accion desconocida FD: %d Cod: %d",
