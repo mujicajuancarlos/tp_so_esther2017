@@ -22,7 +22,7 @@ void runProgramIsOK_response(Process* process) {
 	destroyPackage(package);
 }
 
-void notifyEndProcess(Process* process) {
+void notifyEndProcessToConsole(Process* process) {
 	if (!process->aborted && process->fileDescriptor != -1) {
 		Package* package;
 		char* exitCode = serialize_int(process->exit_code);

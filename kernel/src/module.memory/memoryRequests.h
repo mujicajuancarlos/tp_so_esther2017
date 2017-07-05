@@ -33,7 +33,9 @@ void reserveNewHeapPageForProcess(Process* process, int* status);
 
 void reservePagesForNewProcess(Process* process, Package* package);
 
-void freePageForProcess(Process* process, heap_page* page, int* status);
+void freePageForProcess(Process* process, int pageNumber, int* status);
+
+void notifyEndProcessToMemory(Process* process);
 
 void sendSourceCodeForNewProcess(Process* process, Package* package);
 

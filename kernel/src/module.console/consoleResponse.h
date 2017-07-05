@@ -26,7 +26,7 @@ void consoleResponseRepulseMessage(Process* newProcess);
 
 void runProgramIsOK_response(Process* process);
 
-void notifyEndProcess(Process* process);
+void notifyEndProcessToConsole(Process* process);
 
 void writeOnStdout(Process* process, t_data_FD_request* dataRequest);
 

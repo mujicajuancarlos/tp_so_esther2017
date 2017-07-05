@@ -70,11 +70,13 @@ void freeProcessResources(Process* process) {
 	if (process->files != NULL) {
 		freeProcessFilesResources(process);
 	}
-	notifyEndProcess(process);
+	notifyEndProcessToConsole(process);
+	notifyEndProcessToMemory(process);
 	close(process->fileDescriptor);
 }
 
 void freeProcessHeapPagesResources(Process* process) {
+	int startHeap = process->pcb->stackFirstPage + process->pcb->stackSize;
 	void freeHeapPageResources(void* element) {
 		heap_page* page = element;
 		if (page->metadataList != NULL) {
@@ -82,7 +84,8 @@ void freeProcessHeapPagesResources(Process* process) {
 			list_destroy_and_destroy_elements(page->metadataList,
 					(void*) destroy_heap_metadata);
 			page->metadataList = NULL;
-			freePageForProcess(process, page, &status);
+			int pageNumber = startHeap + page->page;
+			freePageForProcess(process, pageNumber, &status);
 		}
 	}
 	list_iterate(process->heapPages, freeHeapPageResources);
@@ -196,12 +199,12 @@ void printProcessFull(Process* proceso) {
 		printf("\tTabla de archivos abiertos: %d\n",
 				proceso->files->elements_count);
 		if (proceso->files->elements_count > 0) {
-			printf("\t%5s %5s %5s %5s %s \n", "FD", "Seek", "Read",
-					"Write", "Name");
+			printf("\t%5s %5s %5s %5s %s \n", "FD", "Seek", "Read", "Write",
+					"Name");
 			void printProcessFile(void* element) {
 				t_processFile* file = element;
-				printf("\t%5d %5d %5s %5s %s \n", file->fd,
-						file->seekValue, file->flag.read ? "true" : "false",
+				printf("\t%5d %5d %5s %5s %s \n", file->fd, file->seekValue,
+						file->flag.read ? "true" : "false",
 						file->flag.write ? "true" : "false",
 						file->globalFile->path);
 			}
@@ -212,9 +215,10 @@ void printProcessFull(Process* proceso) {
 		printf("\tTabla de archivos abiertos: 0\n");
 	}
 
-	if(proceso->heapPages!=NULL){
-		printf("\tCantidad de paginas heap utilizadas: %d\n",proceso->heapPages->elements_count);
-	}else {
+	if (proceso->heapPages != NULL) {
+		printf("\tCantidad de paginas heap utilizadas: %d\n",
+				proceso->heapPages->elements_count);
+	} else {
 		printf("\tCantidad de paginas heap utilizadas: 0\n");
 	}
 

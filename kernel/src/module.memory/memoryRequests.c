@@ -76,10 +76,8 @@ void reserveNewHeapPageForProcess(Process* process, int* status) {
 	}
 }
 
-void freePageForProcess(Process* process, heap_page* page, int* status) {
+void freePageForProcess(Process* process, int memoryPageNumber, int* status) {
 	Package* tmpPackage;
-	int memoryPageNumber = process->pcb->stackFirstPage
-			+ process->pcb->stackSize + page->page;
 	t_FreePageToProcess* content = create_t_FreePageToProcess(process->pid,
 			memoryPageNumber);
 	tmpPackage = createAndSendPackage(
@@ -177,6 +175,46 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 		exit(EXIT_FAILURE);	//tiene sentido por que la memoria no responde
 	}
 
+	destroyPackage(tmpPackage);
+}
+
+/**
+ * usado cuando un proceso es enviado a EXIT
+ */
+void notifyEndProcessToMemory(Process* process) {
+	char* buffer = serialize_int(process->pid);
+	Package* tmpPackage = createAndSendPackage(
+			process->kernelStruct->socketClientMemoria, COD_END_PROCESS_REQUEST,
+			sizeof(uint32_t), buffer);
+	free(buffer);
+	if (tmpPackage == NULL) {
+		logError(
+				"No se pudo solicitar la liberacion de paginas del proceso pid %d",
+				process->pid);
+		exit(EXIT_FAILURE);	//tiene sentido por que la memoria no responde
+	}
+	destroyPackage(tmpPackage);
+	logInfo("Se envio la solicitud para liberar las paginas del proceso pid %d",
+			process->pid);
+
+	//me quedo a la espera de la aprobacion
+	tmpPackage = createAndReceivePackage(
+			process->kernelStruct->socketClientMemoria);
+	if (tmpPackage != NULL) {
+		if (tmpPackage->msgCode == COD_END_PROCESS_RESPONSE) {
+			logInfo("La memoria libero las paginas del proceso %d", process->pid);
+		} else {
+			logError(
+					"La memoria respondio con un codigo no esperado despues de la solicitud 'Liberar paginas para proceso %d'",
+					process->pid);
+			exit(EXIT_FAILURE);
+		}
+	} else {
+		logError(
+				"La memoria cerro la conexion despues de la solicitud 'Liberar paginas para proceso %d'",
+				process->pid);
+		exit(EXIT_FAILURE);
+	}
 	destroyPackage(tmpPackage);
 }
 

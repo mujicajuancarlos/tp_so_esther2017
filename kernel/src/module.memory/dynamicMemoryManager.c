@@ -49,7 +49,9 @@ int basicFreeMemory(Process* process, t_puntero pointer) {
 
 void executeGarbageCollectorOn(heap_page* page, Process* process, int* status) {
 	if (isFreePage(page)) {
-		freePageForProcess(process, page, status);
+		int memoryPageNumber = process->pcb->stackFirstPage
+					+ process->pcb->stackSize + page->page;
+		freePageForProcess(process, memoryPageNumber, status);
 		if (*status != FREE_MEMORY_SUCCES)
 			logError(
 					"La memoria no pudo liberar la pagina heap # %d del proceso %d",
