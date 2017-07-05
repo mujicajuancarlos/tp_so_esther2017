@@ -17,6 +17,7 @@ Process* createProcess(int socket, kernel_struct* kernelStruct) {
 	newProcess->pid = 0;
 	newProcess->pcb = NULL;
 	newProcess->forceQuit = false;
+	newProcess->aborted = false;
 	newProcess->nextFD = NEXT_FD;
 	newProcess->heapPages = list_create();
 	newProcess->files = list_create();
@@ -71,7 +72,6 @@ void freeProcessResources(Process* process) {
 	}
 	notifyEndProcess(process);
 	close(process->fileDescriptor);
-	process->fileDescriptor = -1;
 }
 
 void freeProcessHeapPagesResources(Process* process) {

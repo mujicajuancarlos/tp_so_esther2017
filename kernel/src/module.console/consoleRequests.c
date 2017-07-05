@@ -31,19 +31,21 @@ void startNewProcess(Process* process, Package* package) {
 
 	logInfo("Verifico el grado de multiprogramacion para el pid %d", process->pid);
 	_decrementMultiprogrammingLevel();
-	logInfo("El pid: %d ingreso oficialmente al sistema por el grado de multiprogramacion", process->pid);
 
 	if(canContinueNewProcessExecution(process)){
+		logInfo("El pid: %d ingreso oficialmente al sistema por el grado de multiprogramacion", process->pid);
 		reservePagesForNewProcess(process, package);
-		if(!process->forceQuit){
+		if(!process->aborted){
 			sendSourceCodeForNewProcess(process, package);
+		}
+		if(!process->aborted){
 			createPcbForNewProcess(process, package);
 			moveFromNewToReady(process);
-		}else{
+		}
+		if(process->aborted){
 			logInfo("El proceso %d va a ser removido del sistema porque no pudo iniciar satisfactoriamente", process->pid);
 			removeFromNEW(process);
 			close(process->fileDescriptor);
-			destroyProcess(process);
 		}
 	}
 }
@@ -58,7 +60,11 @@ void stopProcess(Process* process, Package* package){
 	if(state != STATE_CODE_NOTFOUND){
 		basicForceQuitProcess(process,state);
 	} else {
-		logError("El proceso %d tiene un estado desconocido", process->pid);
+		if(process->aborted){
+			destroyProcess(process);
+		}else{
+			logError("El proceso %d tiene un estado desconocido", process->pid);
+		}
 	}
 }
 

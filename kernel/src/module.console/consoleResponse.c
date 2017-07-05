@@ -7,11 +7,11 @@
 #include "consoleResponse.h"
 
 void consoleResponseRepulseMessage(Process* newProcess) {
+	newProcess->aborted = true;
 	Package* package;
 	package = createAndSendPackage(newProcess->fileDescriptor,
 	COD_KC_CANT_RUN_PROGRAM_RESPONSE, 0, NULL);
 	destroyPackage(package);
-	newProcess->forceQuit = true;
 }
 
 void runProgramIsOK_response(Process* process) {
@@ -23,13 +23,16 @@ void runProgramIsOK_response(Process* process) {
 }
 
 void notifyEndProcess(Process* process) {
-	Package* package;
-	char* exitCode = serialize_int(process->exit_code);
-	package = createAndSendPackage(process->fileDescriptor,
-	COD_KC_END_PROGRAM, sizeof(uint32_t), exitCode);
-	free(exitCode);
-	logInfo("Indico la finalizacion del proceso a la Consola %d", process->pid);
-	destroyPackage(package);
+	if (!process->aborted && process->fileDescriptor != -1) {
+		Package* package;
+		char* exitCode = serialize_int(process->exit_code);
+		package = createAndSendPackage(process->fileDescriptor,
+		COD_KC_END_PROGRAM, sizeof(uint32_t), exitCode);
+		free(exitCode);
+		logInfo("Indico la finalizacion del proceso a la Consola %d",
+				process->pid);
+		destroyPackage(package);
+	}
 }
 
 void writeOnStdout(Process* process, t_data_FD_request* dataRequest) {

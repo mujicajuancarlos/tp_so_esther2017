@@ -54,6 +54,7 @@ void decrementMultiprogrammingLevel(int* number) {
 	int i;
 	for (i = 0; i < *number; i++) {
 		_decrementMultiprogrammingLevel();
+		logInfo("Se decremento en 1 el nivel de multiprogramacion");
 	}
 	free(number);
 }
@@ -71,5 +72,4 @@ void _incrementMultiprogrammingLevel(){
  */
 void _decrementMultiprogrammingLevel(){
 	sem_wait(&multiprogrammingLevelSem);
-	logInfo("Se decremento en 1 el nivel de multiprogramacion");
 }

@@ -122,7 +122,8 @@ void freePageForProcess(Process* process, heap_page* page, int* status) {
  */
 void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 	Package* tmpPackage;
-	int pagesNumber = (sourceCodePackage->size % process->kernelStruct->pageSize) ? 1 : 0;
+	int pagesNumber =
+			(sourceCodePackage->size % process->kernelStruct->pageSize) ? 1 : 0;
 	pagesNumber += sourceCodePackage->size / process->kernelStruct->pageSize; //como ambos estan bytes me da la cantidad de paginas
 	//agrego la cantidad de paginas para el stack
 	pagesNumber += process->kernelStruct->config->stack_size;
@@ -134,11 +135,10 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 			sizeof_t_AddPagesToProcess(), (char*) content);
 	free(content);
 	if (tmpPackage == NULL) {
-		//Función de mensaje de rechazo porque no se pudo reservar pag en memoria
-		consoleResponseRepulseMessage(process);
 		logError(
 				"No se pudo solicitar la reserva de paginas para el proceso pid %d",
 				process->pid);
+		exit(EXIT_FAILURE);	//tiene sentido por que la memoria no responde
 	}
 
 	destroyPackage(tmpPackage);
@@ -164,16 +164,17 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 					process->pid);
 			break;
 		default:
-			logError("La memoria envio un mensaje no esperado");
-			consoleResponseRepulseMessage(process);
+			logError(
+					"La memoria envio un mensaje no esperado despues de la solicitud 'Reservar paginas para proceso %d'",
+					process->pid);
 			exit(EXIT_FAILURE);
 			break;
 		}
 	} else {
 		logError(
-				"No se recibio la respuesta de la memoria para el proceso pid %d",
+				"La memoria cerro la conexion despues de la solicitud 'Reservar paginas para proceso %d'",
 				process->pid);
-		consoleResponseRepulseMessage(process);
+		exit(EXIT_FAILURE);	//tiene sentido por que la memoria no responde
 	}
 
 	destroyPackage(tmpPackage);
@@ -193,8 +194,7 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 		logError(
 				"No se pudo almacenar el codigo fuente para el proceso pid: %d, se procede a eliminarlo del sistema",
 				process->pid);
-		removeFromNEW(process);
-		exit(EXIT_FAILURE);
+		consoleResponseRepulseMessage(process);
 	}
 
 }

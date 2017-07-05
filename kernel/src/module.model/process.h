@@ -40,6 +40,7 @@ typedef struct Process {
 	int quantum;
 	int nextFD;
 	bool forceQuit;	//usado para la finalizacion forzada de procesos en ejecucion
+	bool aborted; //usado para los procesos que pueden iniciar por falta de recursos de memoria
 	PCB* pcb;
 	t_list* heapPages;
 	t_list* files;
