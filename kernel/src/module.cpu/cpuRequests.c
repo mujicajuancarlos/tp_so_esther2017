@@ -136,7 +136,7 @@ void contextSwitchForForceQuitProcess(CPU* cpu) {
 void executeWaitTo(CPU* cpu, Package* package) {
 	t_nombre_semaforo semId = string_substring_until(package->stream,package->size);
 	bool shouldLock = false;
-	bool hasError = executeBasicWait(semId, &shouldLock) == UPDATE_SEM_SUCCESS;
+	bool hasError = executeBasicWait(semId, &shouldLock) != UPDATE_SEM_SUCCESS;
 	notifyUpdateSemaphoreStatus(cpu, hasError, shouldLock);
 	if (!hasError) {
 		if (shouldLock) {

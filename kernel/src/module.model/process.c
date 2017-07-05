@@ -145,7 +145,7 @@ t_processFile* getProcessFile(Process* process, int fileDescriptor) {
 }
 
 void addFile(Process* process, t_processFile* processFile) {
-	list_add(process->files, process);
+	list_add(process->files, processFile);
 }
 
 void removeFile(Process* process, int fileDescriptor) {

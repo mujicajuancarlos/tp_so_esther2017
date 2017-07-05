@@ -35,7 +35,7 @@ int executeBasicWait(t_nombre_semaforo semKey, bool* shouldLock) {
 		value = dictionary_get(semaphores, semKey);
 		*value = *value - 1;
 		*shouldLock = *value < 0;
-		logInfo("El semaforo: %s ahora tiene el valor %d", semKey, value);
+		logInfo("El semaforo: %s ahora tiene el valor %d", semKey, *value);
 		status = UPDATE_SEM_SUCCESS;
 	} else {
 		logError("Se intento ejecutar wait sobre el semaforo: %s que no existe",
