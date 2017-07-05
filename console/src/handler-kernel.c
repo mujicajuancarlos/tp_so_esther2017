@@ -20,19 +20,19 @@ void handleKernelRequest(Program* program, Package* package) {
 		break;
 	case COD_KC_END_PROGRAM:
 		status = deserialize_int(package->stream);
-		logInfo("Finalizo el programa %d con status code ",program->pid, status);
+		logInfo("El programa %d se ha finalizado con status code ",program->pid, status);
 		program->endDate = time(NULL);
 		printProgramStatus(program, "Finalizó el programa");
 		removeProgram(program);
 		logInfo("La solicitud del usuario fue exitosa PID: %d", program->pid);
-		logInfo("Se cerrara el socket %d de conexion con kernel", program->fd_client);
+		logInfo("La conexion con el kernel mediante el socket %d se esta cerrando", program->fd_client);
 		program->exit = true;
 		break;
 
 	case COD_KC_CANT_RUN_PROGRAM_RESPONSE:
 		printProgramStatus(program, "Solicitud Rechazada");
 		removeProgram(program);
-		logInfo("Kernel no pudo iniciar el programa %d", program->pid);
+		logInfo("El kernel no ha podido iniciar el programa %d ", program->pid);
 		program->exit = true;
 		break;
 
@@ -42,7 +42,7 @@ void handleKernelRequest(Program* program, Package* package) {
 		free(message);
 		break;
 	default:
-		logError("Kernel envio una solicitud no valida. Cod: %s",
+		logError("El Kernel ha enviado una solicitud no valida. Cod: %s",
 				package->msgCode);
 		break;
 	}

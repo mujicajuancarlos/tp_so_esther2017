@@ -29,7 +29,7 @@ void startNewProcess(Process* process, Package* package) {
 	logInfo("Se asigno el pid: %d al proceso de FD: %d", process->pid, process->fileDescriptor);
 	sendToNEW(process);
 
-	logInfo("Verifico el grado de multiprogramacion para el pid %d", process->pid);
+	logInfo("Se está verificando el grado de multiprogramacion para el pid %d", process->pid);
 	_decrementMultiprogrammingLevel();
 
 	if(canContinueNewProcessExecution(process)){
