@@ -48,6 +48,11 @@ void startNewProcess(Process* process, Package* package) {
 	}
 }
 
+/**
+ * soy invocado cuando:
+ * 		- la consola solicita finalizar un proceso
+ * 		- la consola se desconecta inesperadamente
+ */
 void stopProcess(Process* process, Package* package){
 	int state = getProcessStateIndex(process);
 	if(state != STATE_CODE_NOTFOUND){

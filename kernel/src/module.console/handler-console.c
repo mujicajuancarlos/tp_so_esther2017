@@ -46,10 +46,9 @@ void handleNewProcess(Process* newProcess) {
 			handleConsoleRequestForProcess(newProcess, package);
 		} else {
 			running = false;
-			logError("Consola cerro la conexion para FD: %d",
-					newProcess->fileDescriptor);
+			logInfo("Consola cerro la conexion del proceso %d ", newProcess->pid);
+			newProcess->fileDescriptor = -1;//como esta desconectada seteo un fd invalido
 			stopProcess(newProcess,package);
-			newProcess->exit_code = SC_ERROR_END_PROCESS_BY_DISCONECT; //segun tp la desconexion guarda el status -6
 		}
 		destroyPackage(package);
 	}

@@ -33,7 +33,7 @@ void moveFromExcecToReady(Process* process) {
  */
 void moveFromExcecToExit_withError(Process* process, int statusCode) {
 	process->exit_code = statusCode;
-	basic_moveFromExcecToExit(process);
+	moveFromExcecToExit(process);
 }
 
 /**
@@ -41,12 +41,13 @@ void moveFromExcecToExit_withError(Process* process, int statusCode) {
  */
 void moveFromExcecToExit_withoutError(Process* process) {
 	process->exit_code = SC_SUCCESS;
-	basic_moveFromExcecToExit(process);
+	moveFromExcecToExit(process);
 }
 
-void basic_moveFromExcecToExit(Process* process) {
+void moveFromExcecToExit(Process* process) {
 	removeFromEXEC(process);
 	sendToEXIT(process);
+	//setForceExitCode(process); !IMPORTANTE <- NO es necesario porque el status se setea en otro lugar
 	freeProcessResources(process);
 	_incrementMultiprogrammingLevel();
 }
@@ -54,7 +55,7 @@ void basic_moveFromExcecToExit(Process* process) {
 void moveFromNewToExit(Process* process) {
 	removeFromNEW(process);
 	sendToEXIT(process);
-	process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
+	setForceExitCode(process);
 	freeProcessResources(process);
 }
 
@@ -62,15 +63,7 @@ void moveFromReadyToExit(Process* process) {
 	processInReady_wait(); //importante para el planificador
 	removeFromREADY(process);
 	sendToEXIT(process);
-	process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
-	freeProcessResources(process);
-	_incrementMultiprogrammingLevel();
-}
-
-void moveFromExecToExit(Process* process) {
-	removeFromEXEC(process);
-	sendToEXIT(process);
-	process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
+	setForceExitCode(process);
 	freeProcessResources(process);
 	_incrementMultiprogrammingLevel();
 }
@@ -79,7 +72,7 @@ void moveFromBlockToExit(Process* process) {
 	removeFromBlockQueues(process);
 	removeFromBLOCK(process);
 	sendToEXIT(process);
-	process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
+	setForceExitCode(process);
 	freeProcessResources(process);
 	_incrementMultiprogrammingLevel();
 }
@@ -289,6 +282,11 @@ void destroyProcessLifeCycle() {
 	pthread_mutex_destroy(&blockQueuesMutex);
 }
 
+/**
+ * soy invocado cuando:
+ * 		- la consola solicita finalizar un proceso
+ * 		- la consola se desconecta inesperadamente
+ */
 void basicForceQuitProcess(Process* process, int stateCode) {
 	switch (stateCode) {
 	case STATE_CODE_NEW:
@@ -310,8 +308,9 @@ void basicForceQuitProcess(Process* process, int stateCode) {
 		moveFromBlockToExit(process);
 		break;
 	case STATE_CODE_EXIT:
-		logInfo("El proceso pid: %d tiene el estado: EXIT ya fue finalizado",
-				process->pid);
+		logInfo(
+				"El proceso pid: %d finalizo satisfactriamente con exit code: %d",
+				process->pid, process->exit_code);
 		break;
 	}
 }

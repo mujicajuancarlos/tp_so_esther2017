@@ -45,11 +45,10 @@ void moveFromBlockToReady(Process* process);
 //move to exit from execute
 void moveFromExcecToExit_withError(Process* process, int statusCode);
 void moveFromExcecToExit_withoutError(Process* process);
-void basic_moveFromExcecToExit(Process* process);
+void moveFromExcecToExit(Process* process);
 //move to exit
 void moveFromNewToExit(Process* process);
 void moveFromReadyToExit(Process* process);
-void moveFromExecToExit(Process* process);
 void moveFromBlockToExit(Process* process);
 void removeFromBlockQueues(Process* process);
 //move to block

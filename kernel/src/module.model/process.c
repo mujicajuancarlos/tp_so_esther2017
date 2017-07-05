@@ -48,13 +48,18 @@ void destroyProcess(Process* process) {
 		free(process);
 	}
 }
+
+void setForceExitCode(Process* process){
+	if(process->fileDescriptor==-1){
+		process->exit_code = SC_ERROR_END_PROCESS_BY_DISCONECT;
+	}else{
+		process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
+	}
+}
 /**
  * liberar recursos para un proceso que finalizo la ejecucion o fue stopeado
  */
 void freeProcessResources(Process* process) {
-	notifyEndProcess(process);
-	close(process->fileDescriptor);
-	process->fileDescriptor = -1;
 	if (process->pcb != NULL) {
 		destroy_PBC(process->pcb);
 	}
@@ -64,25 +69,31 @@ void freeProcessResources(Process* process) {
 	if (process->files != NULL) {
 		freeProcessFilesResources(process);
 	}
+	notifyEndProcess(process);
+	close(process->fileDescriptor);
+	process->fileDescriptor = -1;
 }
 
 void freeProcessHeapPagesResources(Process* process) {
-	void freeHeapPageResources(void* element){
+	void freeHeapPageResources(void* element) {
 		heap_page* page = element;
-		if(page->metadataList!=NULL){
+		if (page->metadataList != NULL) {
 			int status;
-			list_destroy_and_destroy_elements(page->metadataList, (void*) destroy_heap_metadata);
+			list_destroy_and_destroy_elements(page->metadataList,
+					(void*) destroy_heap_metadata);
 			page->metadataList = NULL;
-			freePageForProcess(process,page,&status);
+			freePageForProcess(process, page, &status);
 		}
 	}
-	list_iterate(process->heapPages,freeHeapPageResources);
-	list_destroy_and_destroy_elements(process->heapPages, (void*) destroy_heap_page);
+	list_iterate(process->heapPages, freeHeapPageResources);
+	list_destroy_and_destroy_elements(process->heapPages,
+			(void*) destroy_heap_page);
 	process->heapPages = NULL;
 }
 
 void freeProcessFilesResources(Process* process) {
-	list_destroy_and_destroy_elements(process->files, (void*) destroy_t_processFile);
+	list_destroy_and_destroy_elements(process->files,
+			(void*) destroy_t_processFile);
 	process->files = NULL;
 	removeClosedGlobalFiles();
 }
@@ -168,7 +179,8 @@ void printHeaderProcess() {
 }
 
 void printProcess(Process* proceso, int stateIndex) {
-	char* exitCode = (proceso->exit_code == -1) ? "" : string_itoa(proceso->exit_code);
+	char* exitCode =
+			(proceso->exit_code == -1) ? "" : string_itoa(proceso->exit_code);
 	char* state = stateIndexToString(stateIndex);
 	printf("%5d\t%20s\t%20s\n", proceso->pid, state, exitCode);
 }

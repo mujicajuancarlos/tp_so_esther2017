@@ -52,6 +52,8 @@ Process* createProcess(int socket, kernel_struct* kernelStruct);
 
 void destroyProcess(Process* process);
 
+void setForceExitCode(Process* process);
+
 void freeProcessResources(Process* process);
 
 void freeProcessHeapPagesResources(Process* process);
