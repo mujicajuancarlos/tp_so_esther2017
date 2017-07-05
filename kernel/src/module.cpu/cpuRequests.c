@@ -589,9 +589,12 @@ void resolveRequest_executionError(CPU* cpu, Package* package) {
 }
 
 void timeoutForInstruction(CPU* cpu) {
+	int delay;
 	logTrace("El quantum_sleep esta realizando un retardo de: %d  ",
 			cpu->kernelStruct->config->quantum_sleep);
-	usleep(cpu->kernelStruct->config->quantum_sleep);
+	//Paso de milisegundos a microsegundos
+	delay = cpu->kernelStruct->config->quantum_sleep * 1000 ;
+	usleep(delay);
 	logTrace("Finaliza retardo");
 }
 
