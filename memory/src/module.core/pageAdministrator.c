@@ -100,7 +100,7 @@ void freePage(memory_struct* memoryStruct, int processId, int procPage) {
 	page->pid = 0;
 	page->isFree = true;
 	page->procPage = 0;
-	removeEntryFromCache (memoryStruct, page->pid, page->procPage, page->globPage);
+	removeEntryFromCache (memoryStruct, processId, procPage, page->globPage);
 	logTrace ("Pagina %i de proceso %i ha sido liberada", procPage, processId);
 }
 
