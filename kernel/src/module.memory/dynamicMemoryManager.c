@@ -21,8 +21,8 @@ int basicMallocMemory(Process* process, int allocSize, t_puntero* pointer) {
 		address.offset = availableMetadata->dataOffset;
 		*pointer = logicalAddressToPointer(address, process);
 
-		incrementCounter(process->processCounters->allocateTimes_Counter,1);
-		incrementCounter(process->processCounters->allocateSize_Counter,allocSize);
+		incrementCounter(&(process->processCounters->allocateTimes_Counter),1);
+		incrementCounter(&(process->processCounters->allocateSize_Counter),allocSize);
 	}
 	return status;
 }
@@ -39,8 +39,8 @@ int basicFreeMemory(Process* process, t_puntero pointer) {
 			metadata->isFree = true;
 		}
 		executeGarbageCollectorOn(page, process, &status);
-		incrementCounter(process->processCounters->freeTimes_Counter,1);
-		incrementCounter(process->processCounters->freeSize_Counter,metadata->dataSize);
+		incrementCounter(&(process->processCounters->freeTimes_Counter),1);
+		incrementCounter(&(process->processCounters->freeSize_Counter),metadata->dataSize);
 	}else{
 		status = SC_ERROR_MEMORY_EXCEPTION;
 	}

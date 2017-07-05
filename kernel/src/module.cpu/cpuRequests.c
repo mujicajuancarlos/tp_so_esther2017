@@ -462,7 +462,7 @@ void executeReadProcessFileTo(CPU* cpu, Package* package) {
 void resolveRequest_endInstruction(CPU* cpu, Package* package) {
 	logTrace("La cpu %d informo que ejecuto la instruccion ansisop",
 			cpu->fileDescriptor);
-	incrementCounter(cpu->process->processCounters->burst_Counter, 1);
+	incrementCounter(&(cpu->process->processCounters->burst_Counter), 1);
 	if (!cpu->process->forceQuit) {
 		int algorithm = getAlgorithmIndex(cpu->kernelStruct->config->algoritmo);
 		switch (algorithm) {
@@ -489,7 +489,7 @@ void resolveRequest_endInstruction(CPU* cpu, Package* package) {
 void resolveRequest_programFinished(CPU* cpu, Package* package) {
 	logTrace("La cpu %d informo que el programa ansisop finalizó",
 			cpu->fileDescriptor);
-	incrementCounter(cpu->process->processCounters->burst_Counter, 1);
+	incrementCounter(&(cpu->process->processCounters->burst_Counter), 1);
 	PCB* newPcb = deserialize_PCB(package->stream);
 	replacePCB(cpu->process, newPcb);
 	moveFromExcecToExit_withoutError(cpu->process);
@@ -500,7 +500,7 @@ void resolveRequest_cpuDisconnected(CPU* cpu, Package* package) {
 	logTrace(
 			"La cpu %d informo que se va desconectar pero termino la ejecucion de la instruccion ansisop",
 			cpu->fileDescriptor);
-	incrementCounter(cpu->process->processCounters->burst_Counter, 1);
+	incrementCounter(&(cpu->process->processCounters->burst_Counter), 1);
 	PCB* newPcb = deserialize_PCB(package->stream);
 	replacePCB(cpu->process, newPcb);
 	moveFromExcecToReady(cpu->process);
@@ -511,7 +511,7 @@ void resolveRequest_sharedVarOperation(CPU* cpu, Package* package) {
 	logTrace(
 			"La cpu %d solicito la ejecucion de syscall de variables compartidas",
 			cpu->fileDescriptor);
-	incrementCounter(cpu->process->processCounters->sysC_Counter, 1);
+	incrementCounter(&(cpu->process->processCounters->sysC_Counter), 1);
 	switch (package->msgCode) {
 	case COD_SET_SHARED_VAR:
 		executeSetSharedVar(cpu, package);
@@ -525,7 +525,7 @@ void resolveRequest_sharedVarOperation(CPU* cpu, Package* package) {
 void resolveRequest_dynamicMemoryOperation(CPU* cpu, Package* package) {
 	logTrace("La cpu %d solicito la ejecucion de syscall de memoria dinamica",
 			cpu->fileDescriptor);
-	incrementCounter(cpu->process->processCounters->sysC_Counter, 1);
+	incrementCounter(&(cpu->process->processCounters->sysC_Counter), 1);
 	switch (package->msgCode) {
 	case COD_MALLOC_MEMORY:
 		executeMallocMemoryTo(cpu, package);
@@ -539,7 +539,7 @@ void resolveRequest_dynamicMemoryOperation(CPU* cpu, Package* package) {
 void resolveRequest_fileSystemOperation(CPU* cpu, Package* package) {
 	logTrace("La cpu %d solicito la ejecucion de syscall de file system",
 			cpu->fileDescriptor);
-	incrementCounter(cpu->process->processCounters->sysC_Counter, 1);
+	incrementCounter(&(cpu->process->processCounters->sysC_Counter), 1);
 	switch (package->msgCode) {
 	case COD_OPEN_FD:
 		executeOpenProcessFileTo(cpu, package);
@@ -565,7 +565,7 @@ void resolveRequest_fileSystemOperation(CPU* cpu, Package* package) {
 void resolveRequest_updateSemaphore(CPU* cpu, Package* package) {
 	logTrace("La cpu %d solicito la ejecucion de syscall semaforos",
 			cpu->fileDescriptor);
-	incrementCounter(cpu->process->processCounters->sysC_Counter, 1);
+	incrementCounter(&(cpu->process->processCounters->sysC_Counter), 1);
 	switch (package->msgCode) {
 	case COD_SEM_WAIT:
 		executeWaitTo(cpu, package);

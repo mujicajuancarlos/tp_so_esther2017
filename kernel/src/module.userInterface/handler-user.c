@@ -40,6 +40,13 @@ void handleUserRequest(kernel_struct* kernelStruct) {
 				shouldCompareCommand = false;
 				handleCommand_info_program(kernelStruct, commands);
 			}
+
+			if (shouldCompareCommand && equal_user_command(commands[0],
+					COD_DUMP_FILES)) {
+				shouldCompareCommand = false;
+				handleCommand_dumpFiles(kernelStruct, commands);
+			}
+
 			if (shouldCompareCommand && equal_user_command(commands[0],
 			COD_CONSOLE_SET_NEW_MULTIPROGRAMMING_LEVEL)) {
 				shouldCompareCommand = false;
@@ -81,6 +88,13 @@ void handleCommand_info_program(kernel_struct* kernelStruct, char** commands) {
 		}
 	} else
 		printInvalidArguments("", commands[0]);
+}
+
+void handleCommand_dumpFiles(kernel_struct* kernelStruct, char** commands) {
+	if (commands[1] == NULL) {
+		dumpGlobalFiles();
+	} else
+		printInvalidArguments(commands[1], commands[0]);
 }
 
 void handleCommand_set_new_multiprogramming_level(kernel_struct* kernelStruct,
@@ -286,15 +300,19 @@ void printCommandsHelp() {
 	COD_CONSOLE_STOP_PROGRAM, OPT_PID, "«pid»",
 			"Detiene la ejecución del programa con «pid»");
 
+	printf(patter, COD_DUMP_FILES, "", "", "Muestra la tabl global de archivos");
+
 	printf(patter,
 	COD_CONSOLE_SET_NEW_MULTIPROGRAMMING_LEVEL, "", "«new level»",
 			"Actualiza el nivel de multiprogramacion a «new level»");
 
 	printf(patter,
-	COD_CONSOLE_LOCK_UNLOCK_SCHEDULER, OPT_LOCK, "", "Bloquea el planificador de corto plazo");
+	COD_CONSOLE_LOCK_UNLOCK_SCHEDULER, OPT_LOCK, "",
+			"Bloquea el planificador de corto plazo");
 
 	printf(patter,
-		COD_CONSOLE_LOCK_UNLOCK_SCHEDULER, OPT_UNLOCK, "", "Desbloquea el planificador de corto plazo");
+	COD_CONSOLE_LOCK_UNLOCK_SCHEDULER, OPT_UNLOCK, "",
+			"Desbloquea el planificador de corto plazo");
 
 	printf(patter, COD_CONSOLE_CLEAR, "", "", "Limpia la pantalla");
 

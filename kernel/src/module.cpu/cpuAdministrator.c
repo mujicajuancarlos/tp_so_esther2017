@@ -73,7 +73,6 @@ void removeCPU(CPU* cpu) {
 		CPU* anCpu = element;
 		return anCpu->fileDescriptor == cpu->fileDescriptor;
 	}
-	close(cpu->fileDescriptor);
 	if(cpu->libre == true){
 		sem_wait(&freeCPU_sem);
 	}
@@ -84,4 +83,6 @@ void removeCPU(CPU* cpu) {
 					(void*) destroyCPU);
 	}
 	pthread_mutex_unlock(&cpuListMutex);
+	close(cpu->fileDescriptor);
+	cpu->fileDescriptor = -1;
 }

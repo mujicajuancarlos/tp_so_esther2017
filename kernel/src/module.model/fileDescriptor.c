@@ -80,3 +80,15 @@ t_globalFile* getGlobalFileFor(char* path) {
 	}
 	return list_find(globalFiles, condition);
 }
+
+void dumpGlobalFiles(){
+	printf("\tTabla global de archivos: %d\n", globalFiles->elements_count);
+	if (globalFiles->elements_count > 0) {
+		printf("\t%5s %s\n", "Open","Name");
+		void printGlobalFile(void* element) {
+			t_globalFile* file = element;
+			printf("\t%5d %s\n", file->open, file->path);
+		}
+		list_iterate(globalFiles, printGlobalFile);
+	}
+}

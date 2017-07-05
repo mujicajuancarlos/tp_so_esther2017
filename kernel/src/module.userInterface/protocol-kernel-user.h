@@ -20,5 +20,6 @@
 #define COD_CONSOLE_LOCK_UNLOCK_SCHEDULER "scheduler"
 #define OPT_LOCK "lock"
 #define OPT_UNLOCK "unlock"
+#define COD_DUMP_FILES "dumpFiles"
 
 #endif /* PROTOCOL_KERNEL_USER_H_ */

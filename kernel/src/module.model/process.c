@@ -49,10 +49,10 @@ void destroyProcess(Process* process) {
 	}
 }
 
-void setForceExitCode(Process* process){
-	if(process->fileDescriptor==-1){
+void setForceExitCode(Process* process) {
+	if (process->fileDescriptor == -1) {
 		process->exit_code = SC_ERROR_END_PROCESS_BY_DISCONECT;
-	}else{
+	} else {
 		process->exit_code = SC_ERROR_END_PROCESS_BY_REQUEST;
 	}
 }
@@ -192,10 +192,32 @@ void printProcessFull(Process* proceso) {
 			proceso->processCounters->burst_Counter);
 	printf("\tCantidad de operaciones privilegiadas o syscalls: %d\n",
 			proceso->processCounters->sysC_Counter);
-	printf("\tTabla de archivos abiertos: %d\n",
-			proceso->files->elements_count);
-	printf("\tCantidad de paginas heap utilizadas: %d\n",
-			proceso->heapPages->elements_count);
+	if (proceso->files != NULL) {
+		printf("\tTabla de archivos abiertos: %d\n",
+				proceso->files->elements_count);
+		if (proceso->files->elements_count > 0) {
+			printf("\t%5s %5s %5s %5s %s \n", "FD", "Seek", "Read",
+					"Write", "Name");
+			void printProcessFile(void* element) {
+				t_processFile* file = element;
+				printf("\t%5d %5d %5s %5s %s \n", file->fd,
+						file->seekValue, file->flag.read ? "true" : "false",
+						file->flag.write ? "true" : "false",
+						file->globalFile->path);
+			}
+			list_iterate(proceso->files, printProcessFile);
+		}
+
+	} else {
+		printf("\tTabla de archivos abiertos: 0\n");
+	}
+
+	if(proceso->heapPages!=NULL){
+		printf("\tCantidad de paginas heap utilizadas: %d\n",proceso->heapPages->elements_count);
+	}else {
+		printf("\tCantidad de paginas heap utilizadas: 0\n");
+	}
+
 	printf("\tCantidad de operaciones alocar: %d en Bytes: %d\n",
 			proceso->processCounters->allocateTimes_Counter,
 			proceso->processCounters->allocateSize_Counter);
@@ -213,6 +235,6 @@ void initializeProcessCounters(t_processCounter* processCounters) {
 	processCounters->sysC_Counter = 0;
 }
 
-void incrementCounter(int counter, int quantity) {
-	counter = counter + quantity;
+void incrementCounter(int* counter, int quantity) {
+	*counter += quantity;
 }

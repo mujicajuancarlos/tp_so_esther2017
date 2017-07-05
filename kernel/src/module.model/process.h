@@ -88,7 +88,7 @@ void printProcessFull(Process* proceso);
 
 void initializeProcessCounters(t_processCounter* processCounters);
 
-void incrementCounter(int counter, int quantity);
+void incrementCounter(int* counter, int quantity);
 
 void notifyEndProcess(Process* process);
 

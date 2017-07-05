@@ -53,5 +53,6 @@ void addGlobalFile(t_globalFile* globalFile);
 void removeClosedGlobalFiles();
 
 t_globalFile* getGlobalFileFor(char* path);
+void dumpGlobalFiles();
 
 #endif /* MODULE_MODEL_FILEDESCRIPTOR_H_ */

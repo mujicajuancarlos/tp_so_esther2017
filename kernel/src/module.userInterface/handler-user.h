@@ -17,6 +17,7 @@
 #include "../module.planning/longTermScheduler.h"
 #include "../module.planning/shortTermScheduler.h"
 #include "../module.model/processFinder.h"
+#include "../module.model/fileDescriptor.h"
 #include "../kernelStruct.h"
 #include "../module.model/process.h"
 #include "protocol-kernel-user.h"
@@ -34,6 +35,8 @@ void handleCommand_info_by_state_process(kernel_struct* kernelStruct,
 
 void handleCommand_info_by_pid_process(kernel_struct* kernelStruct,
 		char** commands);
+
+void handleCommand_dumpFiles(kernel_struct* kernelStruct, char** commands);
 
 void handleCommand_set_new_multiprogramming_level(kernel_struct* kernelStruct,
 		char** commands);
