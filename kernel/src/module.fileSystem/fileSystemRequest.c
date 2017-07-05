@@ -27,7 +27,7 @@ void validateExistFileRequest(Process* process, char* path, int* status) {
 			logInfo(
 					"El FS verifico la existencia del archivo: %s para el pid: %d",
 					path, process->pid);
-			*status = COD_FS_RESPONSE_OK;
+			*status = OPEN_FD_SUCCESS;
 			break;
 		case COD_FS_RESPONSE_FILE_NOTFOUND:
 			logInfo("El FS indico que no existe el archivo: %s", path);
@@ -135,23 +135,21 @@ void writeFileRequest(Process* process, t_fileData* data, int* status) {
 		exit(EXIT_FAILURE);
 	}
 	destroyPackage(tmpPackage);
-	logInfo("Se solicitó al FS escribir el archivo: %s para el pid: %d",
-			data->path, process->pid);
+	logInfo("Se solicitó al FS escribir en el archivo para el pid: %d", process->pid);
 	//me quedo a la espera de la aprobacion
 	tmpPackage = createAndReceivePackage(fsSocket);
 	if (tmpPackage != NULL) {
 		switch (tmpPackage->msgCode) {
 		case COD_FS_RESPONSE_OK:
-			logInfo("El FS escribio en el archivo: %s", data->path);
+			logInfo("El FS escribió en el archivo");
 			*status = COD_FS_RESPONSE_OK;
 			break;
 		case COD_FS_RESPONSE_FILE_NOTFOUND:
-			logInfo("El FS no pudo escribir en el archivo: %s", data->path);
+			logInfo("El FS no pudo escribir en el archivo");
 			*status = FILE_NOTFOUND_FD_FAILURE;
 			break;
 		case COD_FS_RESPONSE_FS_FULL:
-			logInfo("El FS no pudo escribir por falta de espacio: %s",
-					data->path);
+			logInfo("El FS no pudo escribir por falta de espacio");
 			*status = WITHOUT_RESOURCES_FD_FAILURE;
 			break;
 		default:
@@ -179,8 +177,7 @@ void readFileRequest(Process* process, t_fileData* data, int* status) {
 		exit(EXIT_FAILURE);
 	}
 	destroyPackage(tmpPackage);
-	logInfo("Se solicitó al FS leer el archivo: %s para el pid: %d", data->path,
-			process->pid);
+	logInfo("Se solicitó al FS leer el archivo para el pid: %d", process->pid);
 	//me quedo a la espera de la aprobacion
 	tmpPackage = createAndReceivePackage(fsSocket);
 	if (tmpPackage != NULL) {
@@ -191,7 +188,7 @@ void readFileRequest(Process* process, t_fileData* data, int* status) {
 			*status = COD_FS_RESPONSE_OK;
 			break;
 		case COD_FS_RESPONSE_FILE_NOTFOUND:
-			logInfo("El FS no pudo leer en el archivo: %s", data->path);
+			logInfo("El FS no pudo leer en el archivo");
 			*status = FILE_NOTFOUND_FD_FAILURE;
 			break;
 		default:

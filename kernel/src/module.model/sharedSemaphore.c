@@ -55,7 +55,7 @@ int executeBasicSignal(t_nombre_semaforo semKey, bool* shouldUnlock) {
 		value = dictionary_get(semaphores, semKey);
 		*value = *value + 1;
 		*shouldUnlock = *value <= 0;
-		logInfo("El semaforo: %s ahora tiene el valor %d", semKey, value);
+		logInfo("El semaforo: %s ahora tiene el valor %d", semKey, *value);
 		status = UPDATE_SEM_SUCCESS;
 	} else {
 		logError(

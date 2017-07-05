@@ -41,6 +41,8 @@ int basicFreeMemory(Process* process, t_puntero pointer) {
 		executeGarbageCollectorOn(page, process, &status);
 		incrementCounter(process->processCounters->freeTimes_Counter,1);
 		incrementCounter(process->processCounters->freeSize_Counter,metadata->dataSize);
+	}else{
+		status = SC_ERROR_MEMORY_EXCEPTION;
 	}
 	return status;
 }
@@ -194,12 +196,7 @@ int getNextHeapPageNumber(t_list* pageList) {
  * por lo cual las direcciones del hep tmb deben basarse ene esa informacion
  */
 uint32_t getHeapFistPageNumber(Process* process) {
-	/*
-	 * esta es la pagina cero respecto al la pagina 0 del proceso
-	 * process->pcb->stackFirstPage + process->kernelStruct->config->stack_size;
-	 */
-	//todo: probar en detalle cuando lo ejecuta la cpu
-	return process->kernelStruct->config->stack_size; //<- esta es la pagina cero respecto del stack
+	return process->kernelStruct->config->stack_size; //<- esta es la pagina cero del heap
 }
 /**
  * solo para memoria dinamica
@@ -222,6 +219,9 @@ dir_memoria pointerToLogicalAddress(t_puntero pointer, Process* process) {
 	int pageNumber = pointer / pageSize;
 	uint32_t heapFistPage = getHeapFistPageNumber(process);
 	int offset = pointer % pageSize;
+	if(pageNumber<heapFistPage){
+		logWarning("El puntero genero una direccion logica invalida");
+	}
 	address.pagina = pageNumber - heapFistPage;
 	address.offset = offset;
 	return address;

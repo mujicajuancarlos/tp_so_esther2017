@@ -161,9 +161,9 @@ void findSadicaFilesOn(fileSystem_struct* fsStruct, char* relativePath) {
 		}
 		char* dirOrFile = string_new();
 		string_append(&dirOrFile, relativePath);
+		string_append(&dirOrFile, "/");
 		string_append(&dirOrFile, dir->d_name);
 		if (dir->d_type == DT_DIR) {
-			string_append(&dirOrFile, "/");
 			findSadicaFilesOn(fsStruct, dirOrFile);
 		} else {
 			loadSadicaFile(fsStruct, dirOrFile);
@@ -236,8 +236,8 @@ void setAllBits(fileSystem_struct* fsStruct) {
 sadica_file* getSadicaFile(fileSystem_struct* fsStruct, char* fullPath) {
 	logTrace("Buscando el archivo %s", fullPath);
 	bool condition(void* element) {
-		char* anyPath = element;
-		return string_equals_ignore_case(anyPath, fullPath);
+		sadica_file* file = element;
+		return string_equals_ignore_case(file->path, fullPath);
 	}
 	return list_find(sadicaFiles, condition);
 }

@@ -523,9 +523,9 @@ t_new_FD_request* deserialize_t_new_FD_request(char* buffer) {
 	uint32_t offset = 0;
 	deserialize_and_copy_value(&(object->sizePath), buffer, sizeof(uint32_t),
 			&offset);
-	object->path = malloc(sizeof(char) * object->sizePath);
-	deserialize_and_copy_value(object->path, buffer,
-			sizeof(char) * object->sizePath, &offset);
+	object->path = string_substring(buffer,offset,object->sizePath);
+	offset += object->sizePath;
+
 	deserialize_and_copy_value(&(object->flags), buffer, sizeof(t_banderas),
 			&offset);
 	return object;

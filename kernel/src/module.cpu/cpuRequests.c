@@ -134,7 +134,8 @@ void contextSwitchForForceQuitProcess(CPU* cpu) {
 }
 
 void executeWaitTo(CPU* cpu, Package* package) {
-	t_nombre_semaforo semId = string_substring_until(package->stream,package->size);
+	t_nombre_semaforo semId = string_substring_until(package->stream,
+			package->size);
 	bool shouldLock = false;
 	bool hasError = executeBasicWait(semId, &shouldLock) != UPDATE_SEM_SUCCESS;
 	notifyUpdateSemaphoreStatus(cpu, hasError, shouldLock);
@@ -157,10 +158,11 @@ void executeWaitTo(CPU* cpu, Package* package) {
 }
 
 void executeSignalTo(CPU* cpu, Package* package) {
-	t_nombre_semaforo semId = string_substring_until(package->stream,package->size);
+	t_nombre_semaforo semId = string_substring_until(package->stream,
+			package->size);
 	bool shouldUnlock = false;
 	bool hasError = executeBasicSignal(semId,
-			&shouldUnlock) == UPDATE_SEM_SUCCESS;
+			&shouldUnlock) != UPDATE_SEM_SUCCESS;
 	notifyUpdateSemaphoreStatus(cpu, hasError, false); //notifico el estado, siempre enviar false
 	if (!hasError) {
 		if (shouldUnlock) {
@@ -182,8 +184,13 @@ void executeSignalTo(CPU* cpu, Package* package) {
 
 void executeSetSharedVar(CPU* cpu, Package* package) {
 	set_shared_var* data = deserialize_SetSharedVar(package->stream);
+	char* key = string_new();
+	if (!string_starts_with(data->name, SHARED_VAR_PREFIX)) {
+		string_append(&key, SHARED_VAR_PREFIX);
+	}
+	string_append(&key, data->name);
 	Package* tmpPackage;
-	if (setSharedVar(data->name, data->newValue) == UPDATE_VAR_SUCCESS) {
+	if (setSharedVar(key, data->newValue) == UPDATE_VAR_SUCCESS) {
 		char* buffer = serialize_int(data->newValue);
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
 		COD_SYSCALL_SUCCESS, sizeof(int), buffer);
@@ -194,13 +201,19 @@ void executeSetSharedVar(CPU* cpu, Package* package) {
 		moveFromExcecToExit_withError(cpu->process, SC_ERROR_SET_SHARED_VAR);
 		markFreeCPU(cpu);
 	}
-	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
+	free(key);
 	destroySetSharedVar(data);
 	destroyPackage(tmpPackage);
 }
 
 void executeGetSharedVar(CPU* cpu, Package* package) {
-	char* key = string_substring_until(package->stream,package->size);
+	char* key = string_new();
+	char* varName = string_substring_until(package->stream, package->size);
+	if (!string_starts_with(varName, SHARED_VAR_PREFIX)) {
+		string_append(&key, SHARED_VAR_PREFIX);
+	}
+	string_append(&key, varName);
+	free(varName);
 	int value;
 	Package* tmpPackage;
 	if (getSharedVar(key, &value) == UPDATE_VAR_SUCCESS) {
@@ -214,7 +227,6 @@ void executeGetSharedVar(CPU* cpu, Package* package) {
 		moveFromExcecToExit_withError(cpu->process, SC_ERROR_GET_SHARED_VAR);
 		markFreeCPU(cpu);
 	}
-	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
 	free(key);
 	destroyPackage(tmpPackage);
 }
@@ -448,8 +460,9 @@ void executeReadProcessFileTo(CPU* cpu, Package* package) {
  * MANEJAN LAS SOLUCITUDES DEL CPU
  */
 void resolveRequest_endInstruction(CPU* cpu, Package* package) {
-	logTrace("La cpu %d informo que ejecuto la instruccion ansisop", cpu->fileDescriptor);
-	incrementCounter(cpu->process->processCounters->burst_Counter,1);
+	logTrace("La cpu %d informo que ejecuto la instruccion ansisop",
+			cpu->fileDescriptor);
+	incrementCounter(cpu->process->processCounters->burst_Counter, 1);
 	if (!cpu->process->forceQuit) {
 		int algorithm = getAlgorithmIndex(cpu->kernelStruct->config->algoritmo);
 		switch (algorithm) {
@@ -474,8 +487,9 @@ void resolveRequest_endInstruction(CPU* cpu, Package* package) {
 }
 
 void resolveRequest_programFinished(CPU* cpu, Package* package) {
-	logTrace("La cpu %d informo que el programa ansisop finalizó", cpu->fileDescriptor);
-	incrementCounter(cpu->process->processCounters->burst_Counter,1);
+	logTrace("La cpu %d informo que el programa ansisop finalizó",
+			cpu->fileDescriptor);
+	incrementCounter(cpu->process->processCounters->burst_Counter, 1);
 	PCB* newPcb = deserialize_PCB(package->stream);
 	replacePCB(cpu->process, newPcb);
 	moveFromExcecToExit_withoutError(cpu->process);
@@ -483,8 +497,10 @@ void resolveRequest_programFinished(CPU* cpu, Package* package) {
 }
 
 void resolveRequest_cpuDisconnected(CPU* cpu, Package* package) {
-	logTrace("La cpu %d informo que se va desconectar pero termino la ejecucion de la instruccion ansisop", cpu->fileDescriptor);
-	incrementCounter(cpu->process->processCounters->burst_Counter,1);
+	logTrace(
+			"La cpu %d informo que se va desconectar pero termino la ejecucion de la instruccion ansisop",
+			cpu->fileDescriptor);
+	incrementCounter(cpu->process->processCounters->burst_Counter, 1);
 	PCB* newPcb = deserialize_PCB(package->stream);
 	replacePCB(cpu->process, newPcb);
 	moveFromExcecToReady(cpu->process);
@@ -492,8 +508,10 @@ void resolveRequest_cpuDisconnected(CPU* cpu, Package* package) {
 }
 
 void resolveRequest_sharedVarOperation(CPU* cpu, Package* package) {
-	logTrace("La cpu %d solicito la ejecucion de syscall de variables compartidas", cpu->fileDescriptor);
-	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
+	logTrace(
+			"La cpu %d solicito la ejecucion de syscall de variables compartidas",
+			cpu->fileDescriptor);
+	incrementCounter(cpu->process->processCounters->sysC_Counter, 1);
 	switch (package->msgCode) {
 	case COD_SET_SHARED_VAR:
 		executeSetSharedVar(cpu, package);
@@ -505,8 +523,9 @@ void resolveRequest_sharedVarOperation(CPU* cpu, Package* package) {
 }
 
 void resolveRequest_dynamicMemoryOperation(CPU* cpu, Package* package) {
-	logTrace("La cpu %d solicito la ejecucion de syscall de memoria dinamica", cpu->fileDescriptor);
-	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
+	logTrace("La cpu %d solicito la ejecucion de syscall de memoria dinamica",
+			cpu->fileDescriptor);
+	incrementCounter(cpu->process->processCounters->sysC_Counter, 1);
 	switch (package->msgCode) {
 	case COD_MALLOC_MEMORY:
 		executeMallocMemoryTo(cpu, package);
@@ -518,8 +537,9 @@ void resolveRequest_dynamicMemoryOperation(CPU* cpu, Package* package) {
 }
 
 void resolveRequest_fileSystemOperation(CPU* cpu, Package* package) {
-	logTrace("La cpu %d solicito la ejecucion de syscall de file system", cpu->fileDescriptor);
-	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
+	logTrace("La cpu %d solicito la ejecucion de syscall de file system",
+			cpu->fileDescriptor);
+	incrementCounter(cpu->process->processCounters->sysC_Counter, 1);
 	switch (package->msgCode) {
 	case COD_OPEN_FD:
 		executeOpenProcessFileTo(cpu, package);
@@ -543,8 +563,9 @@ void resolveRequest_fileSystemOperation(CPU* cpu, Package* package) {
 }
 
 void resolveRequest_updateSemaphore(CPU* cpu, Package* package) {
-	logTrace("La cpu %d solicito la ejecucion de syscall semaforos", cpu->fileDescriptor);
-	incrementCounter(cpu->process->processCounters->sysC_Counter,1);
+	logTrace("La cpu %d solicito la ejecucion de syscall semaforos",
+			cpu->fileDescriptor);
+	incrementCounter(cpu->process->processCounters->sysC_Counter, 1);
 	switch (package->msgCode) {
 	case COD_SEM_WAIT:
 		executeWaitTo(cpu, package);
@@ -559,14 +580,17 @@ void resolveRequest_updateSemaphore(CPU* cpu, Package* package) {
  * cuando la cpu lanza un error invoca al kernel esta funcion para que el proceso finalize y libere la cpu
  */
 void resolveRequest_executionError(CPU* cpu, Package* package) {
-	logTrace("La cpu %d informo un error en la ejecucion de la instruccion ansisop", cpu->fileDescriptor);
+	logTrace(
+			"La cpu %d informo un error en la ejecucion de la instruccion ansisop",
+			cpu->fileDescriptor);
 	uint32_t exitCode = deserialize_int(package->stream);
 	moveFromExcecToExit_withError(cpu->process, exitCode);
 	markFreeCPU(cpu);
 }
 
 void timeoutForInstruction(CPU* cpu) {
-	logTrace("El quantum_sleep esta realizando un retardo de: %d  ", cpu->kernelStruct->config->quantum_sleep);
+	logTrace("El quantum_sleep esta realizando un retardo de: %d  ",
+			cpu->kernelStruct->config->quantum_sleep);
 	usleep(cpu->kernelStruct->config->quantum_sleep);
 	logTrace("Finaliza retardo");
 }

@@ -34,6 +34,7 @@ int basicOpenProcessFile(Process* process, t_new_FD_request* dataRequest,
 	free(path);
 	*assignedFD = createProcessFileWith(process, globalFile,
 			dataRequest->flags);
+	status = OPEN_FD_SUCCESS;
 	return status;
 }
 

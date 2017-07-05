@@ -26,6 +26,8 @@
 #include "cpuAdministrator.h"
 #include "cpuResponse.h"
 
+#define SHARED_VAR_PREFIX "!"
+
 void startProcessExecution(Process* selectedProcess, CPU* selectedCPU);
 
 void continueCurrentExcecution(CPU* cpu);

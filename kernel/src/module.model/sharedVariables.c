@@ -43,7 +43,8 @@ int setSharedVar(char* varKey, int value) {
 	int status;
 	pthread_mutex_lock(&sharedVarsMutex);
 	if (dictionary_has_key(sharedVars, varKey)) {
-		*(int*)dictionary_get(sharedVars, varKey) = value;
+		int* data = dictionary_get(sharedVars, varKey);
+		*data = value;
 		status = UPDATE_VAR_SUCCESS;
 	} else {
 		logError("La variable compartida: %s no esta declarada en el sistema",varKey);
