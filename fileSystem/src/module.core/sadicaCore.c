@@ -45,7 +45,14 @@ void loadBitmap(fileSystem_struct* fsStruct) {
 void loadBlocks(fileSystem_struct* fsStruct) {
 	logInfo("Verificando los bloques de datos de SADICA");
 	int index;
-	char* path;
+	char* path = getBlocksDirPath(fsStruct);
+	DIR* directory = opendir(path);
+	if (directory == NULL) {
+		logError("No existe el directorio %s ", path);
+		exit(EXIT_FAILURE);
+	}
+	closedir(directory);
+	free(path);
 	sadica_block* block;
 	for (index = 0; index < metadata.quantity; index++) {
 		path = getBlockFilePath(fsStruct, index);
@@ -65,7 +72,13 @@ void loadBlocks(fileSystem_struct* fsStruct) {
 void loadFiles(fileSystem_struct* fsStruct) {
 	logInfo("Iniciando la carga de archivos SADICA");
 	sadicaFiles = list_create();
-	char* path = getFilesPath(fsStruct);
+	char* path = getFilesDirPath(fsStruct);
+	DIR* directory = opendir(path);
+	if (directory == NULL) {
+		logError("No existe el directorio %s ", path);
+		exit(EXIT_FAILURE);
+	}
+	closedir(directory);
 	logInfo("Buscando archivos sadica en el punto de montaje especificado");
 	findSadicaFilesOn(fsStruct, path);
 	free(path);
@@ -134,14 +147,14 @@ void removeSadicaFile(fileSystem_struct* fsStruct, sadica_file* file) {
 }
 
 void findSadicaFilesOn(fileSystem_struct* fsStruct, char* relativePath) {
-	DIR *d;
+	DIR *directory;
 	struct dirent *dir;
-	d = opendir(relativePath);
-	if (d == NULL) {
+	directory = opendir(relativePath);
+	if (directory == NULL) {
 		logError("No se pudo abrir %s ", relativePath);
 		exit(EXIT_FAILURE);
 	}
-	while ((dir = readdir(d))) {
+	while ((dir = readdir(directory))) {
 		logInfo("Buscando archivos en el directorio %s", relativePath);
 		if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0) {
 			continue;
@@ -157,7 +170,7 @@ void findSadicaFilesOn(fileSystem_struct* fsStruct, char* relativePath) {
 		}
 		free(dirOrFile);
 	}
-	closedir(d);
+	closedir(directory);
 }
 
 void assignBlocks(fileSystem_struct* fsStruct, int size, uint32_t* blocks,
@@ -234,7 +247,12 @@ sadica_metadata* getSadicaMetadata() {
 }
 
 char* getSadicaRootPath(fileSystem_struct* fsStruct) {
-	return fsStruct->config->punto_montaje;
+	char *path = string_new();
+	string_append(&path, fsStruct->config->punto_montaje);
+	if (!string_ends_with(path, PATH_DIV)) {
+		string_append(&path, PATH_DIV);
+	}
+	return path;
 }
 
 char* getMetadataFilePath(fileSystem_struct* fsStruct) {
@@ -251,16 +269,22 @@ char* getBitmapFilePath(fileSystem_struct* fsStruct) {
 	return path;
 }
 
-char* getBlockFilePath(fileSystem_struct* fsStruct, int index) {
+char* getBlocksDirPath(fileSystem_struct* fsStruct) {
 	char *path = string_new();
 	string_append(&path, getSadicaRootPath(fsStruct));
 	string_append(&path, BLOCK_FILE_PATH);
+	return path;
+}
+
+char* getBlockFilePath(fileSystem_struct* fsStruct, int index) {
+	char *path = getBlocksDirPath(fsStruct);
+	string_append(&path, PATH_DIV);
 	string_append(&path, string_itoa(index));
 	string_append(&path, BLOCK_EXT);
 	return path;
 }
 
-char* getFilesPath(fileSystem_struct* fsStruct) {
+char* getFilesDirPath(fileSystem_struct* fsStruct) {
 	char *path = string_new();
 	string_append(&path, getSadicaRootPath(fsStruct));
 	string_append(&path, FILES_PATH);
@@ -268,7 +292,10 @@ char* getFilesPath(fileSystem_struct* fsStruct) {
 }
 
 char* getFullFilePath(fileSystem_struct* fsStruct, char* path) {
-	char* fullPath = getFilesPath(fsStruct);
+	char* fullPath = getFilesDirPath(fsStruct);
+	if (!string_starts_with(path, PATH_DIV)) {
+		string_append(&path, PATH_DIV);
+	}
 	string_append(&fullPath, path);
 	return fullPath;
 }

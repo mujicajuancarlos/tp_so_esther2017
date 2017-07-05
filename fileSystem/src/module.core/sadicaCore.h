@@ -23,9 +23,10 @@
 
 #define METADATA_FILE_PATH "metadata/metadata.bin"
 #define BITMAP_FILE_PATH "metadata/bitmap.bin"
-#define BLOCK_FILE_PATH "blocks/"
-#define FILES_PATH "files/"
+#define BLOCK_FILE_PATH "blocks"
+#define FILES_PATH "files"
 #define BLOCK_EXT ".bin"
+#define PATH_DIV "/"
 
 #define MAGIC_NUMBER_VALUE "SADICA"
 #define TAMANIO_BLOQUES "TAMANIO_BLOQUES"
@@ -69,8 +70,11 @@ sadica_metadata* getSadicaMetadata();
 char* getSadicaRootPath(fileSystem_struct* fsStruct);
 char* getMetadataFilePath(fileSystem_struct* fsStruct);
 char* getBitmapFilePath(fileSystem_struct* fsStruct);
+
+char* getBlocksDirPath(fileSystem_struct* fsStruct);
 char* getBlockFilePath(fileSystem_struct* fsStruct, int index);
-char* getFilesPath(fileSystem_struct* fsStruct);
+
+char* getFilesDirPath(fileSystem_struct* fsStruct);
 char* getFullFilePath(fileSystem_struct* fsStruct, char* path);
 
 #endif /* MODULE_CORE_SADICACORE_H_ */

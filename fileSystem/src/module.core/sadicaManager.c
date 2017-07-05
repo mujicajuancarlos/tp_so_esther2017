@@ -8,7 +8,8 @@
 #include "sadicaManager.h"
 
 bool basicExistFile(fileSystem_struct* fsStruct, char* path) {
-	return getSadicaFile(fsStruct, path) != NULL;
+	char* fullPath = getFullFilePath(fsStruct, path);
+	return getSadicaFile(fsStruct, fullPath) != NULL;
 }
 
 void basicDeleteFile(fileSystem_struct* fsStruct, char* path, int* status) {

@@ -37,7 +37,7 @@ void executeCreateFileRequest(fileSystem_struct* fsStruct, Package* package) {
 	case EXC_OK:
 		tmpPackage = createAndSendPackage(fsStruct->fd_kernel,
 		COD_FS_RESPONSE_OK, 0, NULL);
-		logInfo("El file system indico crear el archivo %s fue creado", path);
+		logInfo("El file system indico al kernel que el archivo %s fue creado", path);
 		break;
 	case EXC_ERROR_EXIST_FILE:
 		tmpPackage = createAndSendPackage(fsStruct->fd_kernel,

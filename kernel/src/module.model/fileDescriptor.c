@@ -30,7 +30,6 @@ void globalFilesMutex_unlock() {
 }
 
 t_globalFile* create_t_globalFile(char* path) {
-	size_t sizePath = sizeof(char) * strlen(path);
 	t_globalFile* globalFile = malloc(sizeof(t_globalFile));
 	globalFile->open = 0;
 	globalFile->path = string_duplicate(path);
