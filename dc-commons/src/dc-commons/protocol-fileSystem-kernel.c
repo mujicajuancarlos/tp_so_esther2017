@@ -20,6 +20,7 @@ char* serialize_t_fileData(t_fileData* object) {
 			&offset);
 	serialize_and_copy_value(stream, object->path,
 			sizeof(char) * object->pathSize, &offset);
+
 	serialize_and_copy_value(stream, &(object->offset), sizeof(uint32_t),
 			&offset);
 	serialize_and_copy_value(stream, &(object->dataSize), sizeof(uint32_t),
@@ -36,8 +37,8 @@ t_fileData* deserialize_t_fileData(char* stream) {
 	deserialize_and_copy_value(&(object->pathSize), stream, sizeof(uint32_t),
 			&offset);
 
-	object->path = string_substring(stream,offset,object->pathSize);
-	offset+=object->pathSize;
+	object->path = string_substring(stream, offset, object->pathSize);
+	offset += object->pathSize;
 
 	deserialize_and_copy_value(&(object->offset), stream, sizeof(uint32_t),
 			&offset);
@@ -52,8 +53,7 @@ t_fileData* deserialize_t_fileData(char* stream) {
 t_fileData* create_t_fileData(char* path, uint32_t offset, uint32_t dataSize) {
 	t_fileData* object = malloc(sizeof(t_fileData));
 	object->pathSize = sizeof(char) * strlen(path);
-	object->path = malloc(sizeof(char) * object->pathSize);
-	memcpy(object->path, path, object->pathSize);
+	object->path = string_duplicate(path);
 	object->offset = offset;
 	object->dataSize = sizeof(char) * dataSize;
 	object->data = malloc(object->dataSize);

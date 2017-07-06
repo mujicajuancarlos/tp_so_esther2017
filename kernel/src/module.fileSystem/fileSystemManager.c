@@ -116,7 +116,7 @@ int basicReadProcessFile(Process* process, t_dataPointer_FD_request* dataRequest
 			t_fileData* fileData = create_t_fileData(file->globalFile->path,file->seekValue,dataRequest->size);
 			readFileRequest(process,fileData,&status);
 			if(status == COD_FS_RESPONSE_OK){
-				dir_memoria address = pointerToLogicalAddress(dataRequest->pointer,process);
+				dir_memoria address = pointerToMemoryLogicalAddress(dataRequest->pointer,process);
 				bool hasError;
 				logInfo("Enviando la informacion del archivo leido a la memoria");
 				saveDataOnMemory(process, address.pagina, address.offset, fileData->dataSize, fileData->data, &hasError);

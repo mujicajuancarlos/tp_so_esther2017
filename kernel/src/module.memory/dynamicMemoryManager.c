@@ -21,8 +21,9 @@ int basicMallocMemory(Process* process, int allocSize, t_puntero* pointer) {
 		address.offset = availableMetadata->dataOffset;
 		*pointer = logicalAddressToPointer(address, process);
 
-		incrementCounter(&(process->processCounters->allocateTimes_Counter),1);
-		incrementCounter(&(process->processCounters->allocateSize_Counter),allocSize);
+		incrementCounter(&(process->processCounters->allocateTimes_Counter), 1);
+		incrementCounter(&(process->processCounters->allocateSize_Counter),
+				allocSize);
 	}
 	return status;
 }
@@ -30,8 +31,12 @@ int basicMallocMemory(Process* process, int allocSize, t_puntero* pointer) {
 int basicFreeMemory(Process* process, t_puntero pointer) {
 	int status = SC_ERROR_MEMORY_EXCEPTION;
 	int index;
-	dir_memoria address = pointerToLogicalAddress(pointer, process);
-	heap_page* page = list_get(process->heapPages, address.pagina);
+	dir_memoria address = pointerToHeapLogicalAddress(pointer, process);
+	bool condition(void* element){
+		heap_page* page = element;
+		return page->page == address.pagina;
+	}
+	heap_page* page = list_find(process->heapPages, condition);
 	if (page != NULL) {
 		heap_metadata* metadata = getHeapMetadataFromDataOffset(page,
 				address.offset, &index);
@@ -39,27 +44,43 @@ int basicFreeMemory(Process* process, t_puntero pointer) {
 			metadata->isFree = true;
 		}
 		executeGarbageCollectorOn(page, process, &status);
-		incrementCounter(&(process->processCounters->freeTimes_Counter),1);
-		incrementCounter(&(process->processCounters->freeSize_Counter),metadata->dataSize);
-	}else{
+		incrementCounter(&(process->processCounters->freeTimes_Counter), 1);
+		incrementCounter(&(process->processCounters->freeSize_Counter),
+				metadata->dataSize);
+	} else {
 		status = SC_ERROR_MEMORY_EXCEPTION;
 	}
 	return status;
 }
 
+/**
+ *
+ */
 void executeGarbageCollectorOn(heap_page* page, Process* process, int* status) {
 	if (isFreePage(page)) {
 		int memoryPageNumber = process->pcb->stackFirstPage
-					+ process->pcb->stackSize + page->page;
+				+ process->kernelStruct->config->stack_size + page->page;
 		freePageForProcess(process, memoryPageNumber, status);
-		if (*status != FREE_MEMORY_SUCCES)
+		if (*status != FREE_MEMORY_SUCCES) {
 			logError(
 					"La memoria no pudo liberar la pagina heap # %d del proceso %d",
 					page->page, process->pid);
-		markAsGarbage(page);
+		} else {
+			markAsGarbage(page);
+			removeGarbagePages(process);
+		}
 	} else {
 		resolveFragmentation(process, page);
 	}
+}
+
+void removeGarbagePages(Process* process) {
+	bool condition(void* element) {
+		heap_page* page = element;
+		return page->isGarbage;
+	}
+	list_remove_and_destroy_by_condition(process->heapPages, condition,
+			(void*) destroy_heap_page);
 }
 
 void resolveFragmentation(Process* process, heap_page* page) {
@@ -147,7 +168,7 @@ heap_page* createHeapPageFor(Process* process, int* status) {
 		selectedPage = create_heap_page(nextNumber,
 				process->kernelStruct->pageSize);
 		createHeapMetadataFor(selectedPage, NULL, -1);
-		list_add_in_index(process->heapPages, nextNumber, selectedPage);
+		list_add(process->heapPages,selectedPage);
 	}
 	return selectedPage;
 }
@@ -188,8 +209,25 @@ void validateMaxAllockSize(int allocSize, Process* process, int* status) {
 										SC_ERROR_MEMORY_ALLOC_EXCEEDED;
 }
 
+/**
+ * busca el numero de pag que aun no se este usando
+ * ej:
+ * 		0,1,2 => 3
+ * 		0,1,3 => 2
+ * 		0,2,4 => 1
+ */
 int getNextHeapPageNumber(t_list* pageList) {
-	return list_size(pageList);
+	int selected = -1;
+	bool shouldSearch = true;
+	bool includes(void* element) {
+		heap_page* page = element;
+		return page->page == selected;
+	}
+	while (shouldSearch) {
+		selected++;
+		shouldSearch = list_any_satisfy(pageList, includes);
+	}
+	return selected;
 }
 
 /*
@@ -201,7 +239,8 @@ uint32_t getHeapFistPageNumber(Process* process) {
 	return process->kernelStruct->config->stack_size; //<- esta es la pagina cero del heap
 }
 /**
- * solo para memoria dinamica
+ * El puntero es para que sea utilizado por la cpu -> por lo tanto la pagina 0 corresponde a la del STACK
+ *
  */
 t_puntero logicalAddressToPointer(dir_memoria address, Process* process) {
 	t_puntero pointer = 0;
@@ -213,15 +252,27 @@ t_puntero logicalAddressToPointer(dir_memoria address, Process* process) {
 }
 
 /**
- * solo para memoria dinamica
+ * esto es para solicitudes a la memoria por lo tanto la pagina 0 corresponde a la del PROCESO
  */
-dir_memoria pointerToLogicalAddress(t_puntero pointer, Process* process) {
+dir_memoria pointerToMemoryLogicalAddress(t_puntero pointer, Process* process) {
+	dir_memoria address;
+	int pageSize = process->kernelStruct->pageSize;
+	int pageNumber = pointer / pageSize;
+	int offset = pointer % pageSize;
+	address.pagina = pageNumber + process->pcb->stackFirstPage;
+	address.offset = offset;
+	return address;
+}
+/**
+ * esto es para solicitudes a la DINAMICA por lo tanto la pagina 0 corresponde a la del HEAP
+ */
+dir_memoria pointerToHeapLogicalAddress(t_puntero pointer, Process* process) {
 	dir_memoria address;
 	int pageSize = process->kernelStruct->pageSize;
 	int pageNumber = pointer / pageSize;
 	uint32_t heapFistPage = getHeapFistPageNumber(process);
 	int offset = pointer % pageSize;
-	if(pageNumber<heapFistPage){
+	if (pageNumber < heapFistPage) {
 		logWarning("El puntero genero una direccion logica invalida");
 	}
 	address.pagina = pageNumber - heapFistPage;
