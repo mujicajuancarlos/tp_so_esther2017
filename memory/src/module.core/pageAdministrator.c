@@ -61,8 +61,22 @@ int assignNewPages(memory_struct* memoryStruct, int processId, int pages) {
 
 	myProcessPages = list_filter(memoryStruct->referenceTable, onlyThisProcess);
 
-	int maxPage = list_size(myProcessPages);
+	int newPageNbr = list_size(myProcessPages);
 	int i;
+
+	for (i = 0; i < newPageNbr; i++) {
+		bool thisParticularPage (void* element) {
+			memory_page* page = element;
+			if (page->procPage == i)
+				return true;
+			else
+				return false;
+		}
+		if (!list_any_satisfy (myProcessPages, thisParticularPage)) {
+			newPageNbr = i;
+			break;
+		}
+	}
 
 	t_list *freePages;
 	freePages = list_create();
@@ -77,13 +91,13 @@ int assignNewPages(memory_struct* memoryStruct, int processId, int pages) {
 	if (list_size(freePages) >= pages) {
 		for (i = 0; i < pages; i++) {
 			memory_page *newPage;
-			int hashNumber = hashThis (memoryStruct, processId, maxPage);
+			int hashNumber = hashThis (memoryStruct, processId, newPageNbr);
 			if (hashNumber != -1)
 				newPage = list_get (memoryStruct->referenceTable, hashNumber);
 			else
 				newPage = list_get (freePages, i);
 			newPage->pid = processId;
-			newPage->procPage = maxPage++;
+			newPage->procPage = newPageNbr++;
 			newPage->isFree = false;
 			logTrace ("Se crea pagina nro %i para proceso nro %i. Pagina global: %i\n",
 					newPage->procPage, newPage->pid, newPage->globPage);
