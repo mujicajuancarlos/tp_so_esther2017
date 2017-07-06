@@ -23,7 +23,7 @@ void removeEntryFromCache (memory_struct* memoryStruct, int processId, int proce
 		for (; i >= 0; i--) {
 			if (i == 0) {
 				cache_entry *myEntry = list_get (memoryStruct->cacheEntries, i);
-				myEntry->procPage = -1;
+				myEntry->globPage = -1;
 				myEntry->pid = -1;
 				myEntry->procPage = -1;
 			}
