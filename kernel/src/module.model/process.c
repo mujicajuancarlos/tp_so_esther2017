@@ -72,7 +72,6 @@ void freeProcessResources(Process* process) {
 	}
 	notifyEndProcessToConsole(process);
 	notifyEndProcessToMemory(process);
-	close(process->fileDescriptor);
 }
 
 void freeProcessHeapPagesResources(Process* process) {
@@ -188,13 +187,14 @@ void printProcess(Process* proceso, int stateIndex) {
 	printf("%5d\t%20s\t%20s\n", proceso->pid, state, exitCode);
 }
 
-void printProcessFull(Process* proceso) {
-	printf("\nInformación del proceso %d\n", proceso->pid);
-//	printf("\nEstado %s", stateIndexToString(getProcessStateIndex(proceso)));
+void printProcessCounters(Process* proceso) {
 	printf("\tCantidad rafagas ejecutadas %d\n",
 			proceso->processCounters->burst_Counter);
 	printf("\tCantidad de operaciones privilegiadas o syscalls: %d\n",
 			proceso->processCounters->sysC_Counter);
+}
+
+void printProcessFiles(Process* proceso) {
 	if (proceso->files != NULL) {
 		printf("\tTabla de archivos abiertos: %d\n",
 				proceso->files->elements_count);
@@ -210,24 +210,69 @@ void printProcessFull(Process* proceso) {
 			}
 			list_iterate(proceso->files, printProcessFile);
 		}
-
 	} else {
 		printf("\tTabla de archivos abiertos: 0\n");
 	}
+}
 
-	if (proceso->heapPages != NULL) {
+void printProcessHeaps(Process* process) {
+	if (process->heapPages != NULL) {
 		printf("\tCantidad de paginas heap utilizadas: %d\n",
-				proceso->heapPages->elements_count);
+				process->heapPages->elements_count);
 	} else {
 		printf("\tCantidad de paginas heap utilizadas: 0\n");
 	}
+}
 
+void printProcessHeapCounters(Process* process) {
 	printf("\tCantidad de operaciones alocar: %d en Bytes: %d\n",
-			proceso->processCounters->allocateTimes_Counter,
-			proceso->processCounters->allocateSize_Counter);
+			process->processCounters->allocateTimes_Counter,
+			process->processCounters->allocateSize_Counter);
 	printf("\tCantidad de operaciones liberar: %d en Bytes: %d\n",
-			proceso->processCounters->freeTimes_Counter,
-			proceso->processCounters->freeSize_Counter);
+			process->processCounters->freeTimes_Counter,
+			process->processCounters->freeSize_Counter);
+}
+
+void printProcessFull(Process* process) {
+	printf("\nInformación del proceso %d\n", process->pid);
+	printProcessCounters(process);
+	printProcessFiles(process);
+	printProcessHeaps(process);
+}
+
+void printQuitStatusToProcess(Process* process) {
+	printf(">> El proceso %d finalizó exitosamente\n", process->pid);
+	printProcessCounters(process);
+	printProcessHeapCounters(process);
+	if (process->files != NULL && process->files->elements_count > 0) {
+		printf("[Advertencia!] El proceso no cerró los siguientes archivos\n");
+		printProcessFiles(process);
+	}
+	bool condition(void* element) {
+		heap_page* page = element;
+		return !page->isGarbage;
+	}
+	if (process->heapPages != NULL) {
+		t_list* sublist = list_filter(process->heapPages, condition);
+		if (sublist->elements_count > 0) {
+			printf(
+					"[Advertencia!] El proceso no liberó los siguientes bloques de memoria\n");
+			printf("\t%5s %6s %5s\n", "Page", "Offset", "Size");
+			void printNotFreePage(void* element) {
+				heap_page* page = element;
+				void printNotFreeBlock(void* blockElement) {
+					heap_metadata* block = blockElement;
+					if (!block->isFree) {
+						printf("\t%5d %6d %5d\n", page->page, block->dataOffset,
+								block->dataSize);
+					}
+				}
+				list_iterate(page->metadataList, printNotFreeBlock);
+			}
+			list_iterate(sublist, printNotFreePage);
+		}
+		list_destroy(sublist);
+	}
 }
 
 void initializeProcessCounters(t_processCounter* processCounters) {

@@ -55,7 +55,7 @@ void startNewProcess(Process* process, Package* package) {
  * 		- la consola solicita finalizar un proceso
  * 		- la consola se desconecta inesperadamente
  */
-void stopProcess(Process* process, Package* package){
+void stopProcess(Process* process){
 	int state = getProcessStateIndex(process);
 	if(state != STATE_CODE_NOTFOUND){
 		basicForceQuitProcess(process,state);

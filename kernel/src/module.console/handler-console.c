@@ -46,14 +46,16 @@ void handleNewProcess(Process* newProcess) {
 			handleConsoleRequestForProcess(newProcess, package);
 		} else {
 			running = false;
+			close(newProcess->fileDescriptor);
 			logInfo("Consola cerro la conexion del proceso %d ", newProcess->pid);
-			newProcess->fileDescriptor = -1;//como esta desconectada seteo un fd invalido
-			stopProcess(newProcess,package);
+			if(newProcess!=NULL){
+				newProcess->fileDescriptor = -1;//como esta desconectada seteo un fd invalido
+				stopProcess(newProcess);
+			}
 		}
 		destroyPackage(package);
 	}
 	//no se debe destruir process porque viven para siempre en estado exit
-	close(newProcess->fileDescriptor);
 	pthread_exit(EXIT_SUCCESS);
 }
 
@@ -64,7 +66,7 @@ void handleConsoleRequestForProcess(Process* process, Package* package) {
 		break;
 	case COD_KC_STOP_PROGRAM_REQUEST:
 		logInfo("La consola solicitó finalizar el proceso %d", process->pid);
-		stopProcess(process, package);
+		stopProcess(process);
 		logInfo("El proceso %d fue detenido", process->pid);
 		break;
 	}

@@ -85,7 +85,13 @@ void printHeaderProcess();
 
 void printProcess(Process* proceso, int stateIndex);
 
+void printProcessCounters(Process* proceso);
+void printProcessFiles(Process* proceso);
+void printProcessHeaps(Process* process);
+void printProcessHeapCounters(Process* process);
+
 void printProcessFull(Process* proceso);
+void printQuitStatusToProcess(Process* process);
 
 void initializeProcessCounters(t_processCounter* processCounters);
 

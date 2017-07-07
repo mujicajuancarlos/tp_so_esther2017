@@ -28,6 +28,7 @@ void notifyEndProcessToConsole(Process* process) {
 		char* exitCode = serialize_int(process->exit_code);
 		package = createAndSendPackage(process->fileDescriptor,
 		COD_KC_END_PROGRAM, sizeof(uint32_t), exitCode);
+		close(process->fileDescriptor);//NI BIEN LE AVISO ME DESCONECTO
 		free(exitCode);
 		logInfo("Se indico la finalizacion del proceso a la Consola %d",
 				process->pid);

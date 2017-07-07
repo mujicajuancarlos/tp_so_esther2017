@@ -25,7 +25,7 @@
 
 void startNewProcess(Process* process, Package* package);
 
-void stopProcess(Process* process, Package* package);
+void stopProcess(Process* process);
 
 bool canContinueNewProcessExecution(Process* process);
 
