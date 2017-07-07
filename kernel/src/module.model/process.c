@@ -238,6 +238,7 @@ void printProcessFull(Process* process) {
 	printProcessCounters(process);
 	printProcessFiles(process);
 	printProcessHeaps(process);
+	printProcessHeapCounters(process);
 }
 
 void printQuitStatusToProcess(Process* process) {

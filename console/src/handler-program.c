@@ -5,7 +5,6 @@
  *      Author: utnso
  */
 
-
 #include "handler-program.h"
 
 int handleNewProgram(Program* program) {
@@ -19,7 +18,8 @@ int handleNewProgram(Program* program) {
 			program->console->config->puerto_kernel);
 	if (program->fd_client == -1) {
 		logError("No se pudo establecer conexion con el kernel");
-		printMessage("No se pudo iniciar el programa, kernel no acepta conexiones.");
+		printMessage(
+				"No se pudo iniciar el programa, kernel no acepta conexiones.");
 		pthread_exit(NULL);
 	}
 
@@ -27,11 +27,13 @@ int handleNewProgram(Program* program) {
 	logDebug("Creando paquete de inicio de programa para enviar a kernel.");
 	fsize = fileSize(program->sourceCodePath);
 	char* stream = readFile(program->sourceCodePath, 0, fsize);
-	package = createAndSendPackage(program->fd_client, COD_KC_RUN_PROGRAM_REQUEST, fsize, stream);
+	package = createAndSendPackage(program->fd_client,
+	COD_KC_RUN_PROGRAM_REQUEST, fsize, stream);
 	free(stream);
 	if (package == NULL) {
 		logError("No se pudo enviar datos al kernel");
-		printMessage("No se pudo iniciar el programa, kernel no acepta peticiones.");
+		printMessage(
+				"No se pudo iniciar el programa, kernel no acepta peticiones.");
 		pthread_exit(NULL);
 	}
 	destroyPackage(package);
@@ -40,29 +42,39 @@ int handleNewProgram(Program* program) {
 	running = true;
 	while (running) {
 		package = createAndReceivePackage(program->fd_client);
-		if (package != NULL){
+		if (package != NULL) {
 			handleKernelRequest(program, package);
-			if(program->exit){
-				destroyProgram(program);
+			if (program->exit) {
 				close(program->fd_client);
 			}
-		}else {
+		} else {
+			close(program->fd_client);
 			running = false;
-			logWarning("Se ha cerrado la conexion con el kernel");
+			logWarning(
+					"Se ha cerrado la conexion con el kernel para el programa %d",
+					program->pid);
+			removeProgram(program);
 		}
 		destroyPackage(package);
 	}
+	destroyProgram(program);
+	program = NULL;
 	pthread_exit(EXIT_SUCCESS);
 }
 
-void sendEndProgramRequest(Program* program, console_struct* consoleStruct){
+void sendEndProgramRequest(Program* program, console_struct* consoleStruct) {
 	char* pidStream = serialize_int(program->pid);
-	Package* package = createAndSendPackage(program->fd_client, COD_KC_STOP_PROGRAM_REQUEST, sizeof(int), pidStream);
-	if(package != NULL){
-		logInfo("Se ha enviado la solicitud para finalizar el programa %d", program->pid);
-	}else{
-		logError("No se ha podido enviar la solicitud para finalizar el programa %d", program->pid);
-		printProgramStatus(program, "El kernel no acepta peticiones, no se pudo procesar el pedido para el programa");
+	Package* package = createAndSendPackage(program->fd_client,
+	COD_KC_STOP_PROGRAM_REQUEST, sizeof(int), pidStream);
+	if (package != NULL) {
+		logInfo("Se ha enviado la solicitud para finalizar el programa %d",
+				program->pid);
+	} else {
+		logError(
+				"No se ha podido enviar la solicitud para finalizar el programa %d",
+				program->pid);
+		printProgramStatus(program,
+				"El kernel no acepta peticiones, no se pudo procesar el pedido para el programa");
 	}
 	free(pidStream);
 	destroyPackage(package);

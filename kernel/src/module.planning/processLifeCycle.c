@@ -41,7 +41,7 @@ void moveFromExcecToExit_withError(Process* process, int statusCode) {
  */
 void moveFromExcecToExit_withoutError(Process* process) {
 	process->exit_code = SC_SUCCESS;
-	printQuitStatusToProcess(process);
+	printQuitStatusToProcess(process);//solo cuando finaliza OK
 	moveFromExcecToExit(process);
 }
 

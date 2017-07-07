@@ -20,7 +20,7 @@ void handleKernelRequest(Program* program, Package* package) {
 		break;
 	case COD_KC_END_PROGRAM:
 		status = deserialize_int(package->stream);
-		logInfo("El programa %d se ha finalizado con status code ",program->pid, status);
+		logInfo("El programa %d se ha finalizado con status code %d",program->pid, status);
 		program->endDate = time(NULL);
 		printProgramStatus(program, "Finalizó el programa");
 		removeProgram(program);
@@ -38,7 +38,8 @@ void handleKernelRequest(Program* program, Package* package) {
 
 	case COD_KC_PRINT_STDOUT:
 		message = string_substring_until(package->stream, package->size);
-		printMessage("\nPID: %d, > %s", program->pid, message);
+		program->printSize++;
+		printMessage("\nStdout pid: %d, > %s", program->pid, message);
 		free(message);
 		break;
 	default:
