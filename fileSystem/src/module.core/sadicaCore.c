@@ -177,31 +177,53 @@ void assignBlocks(fileSystem_struct* fsStruct, int size, uint32_t* blocks,
 		int* status) {
 	int index;
 	int auxSize = 0;
-	logInfo("Solicitaron reservar %d bloques para un archivo", size);
-	for (index = 0; (auxSize < size) && (index < metadata.quantity); index++) {
-		if (bitarray_test_bit(bitmap, index) == 0) {
+	if (size > 0) {
+		logInfo(
+				"Se redimencionara la cantidad de bloques asignados al archivo, se agregaran %d bloques",
+				size);
+		for (index = 0; (auxSize < size) && (index < metadata.quantity);
+				index++) {
+			if (bitarray_test_bit(bitmap, index) == 0) {
+				logTrace(
+						"Se marco el bloque %d como candidato para la solicitud de reserva",
+						index);
+				memcpy(&(blocks[auxSize]), &index, sizeof(uint32_t));
+				auxSize++;
+			}
+		}
+		if (auxSize == size) {
+			*status = EXC_OK;
 			logTrace(
-					"Se marco el bloque %d como candidato para la solicitud de reserva",
-					index);
-			memcpy(&(blocks[auxSize]), &index, sizeof(uint32_t));
-			auxSize++;
+					"Se encontro la cantidad de bloques solicitados, se persistira la reserva");
+			for (index = 0; index < auxSize; index++) {
+				if (bitarray_test_bit(bitmap, index) == 0) {
+					bitarray_set_bit(bitmap, blocks[index]);
+				}
+			}
+			persistBitMap(fsStruct);
+		} else {
+			logTrace(
+					"NO se encontro la cantidad de bloques solicitados, FILE SYSTEM FULL");
+			*status = EXC_ERROR_FILE_SYSTEM_FULL;
 		}
 	}
-	if (auxSize == size) {
-		*status = EXC_OK;
-		logTrace(
-				"Se encontro la cantidad de bloques solicitados, se persistira la reserva");
-		for (index = 0; index < auxSize; index++) {
+}
+
+void unassignBlocks(fileSystem_struct* fsStruct, int size, uint32_t* blocks,
+		int* status) {
+	int index;
+	if (size > 0) {
+		logInfo(
+				"Se redimencionara la cantidad de bloques asignados al archivo, se reduciran %d bloques",
+				size);
+		for (index = 0; index < size; index++) {
 			if (bitarray_test_bit(bitmap, index) == 0) {
-				bitarray_set_bit(bitmap, blocks[index]);
+				bitarray_clean_bit(bitmap, blocks[index]);
 			}
 		}
 		persistBitMap(fsStruct);
-	} else {
-		logTrace(
-				"NO se encontro la cantidad de bloques solicitados, FILE SYSTEM FULL");
-		*status = EXC_ERROR_FILE_SYSTEM_FULL;
 	}
+	*status = EXC_OK;
 }
 
 void persistBitMap(fileSystem_struct* fsStruct) {

@@ -40,8 +40,8 @@ void basicWriteFile(fileSystem_struct* fsStruct, char* path, int offset,
 	char* fullPath = getFullFilePath(fsStruct, path);
 	sadica_file* file = getSadicaFile(fsStruct, fullPath);
 	if (file != NULL) {
-		validateBlocksQuantity(file, offset + size, status);
-		if (*status == EXC_ERROR_BLOCK_FAULT) {
+		//si el tamaño cabia posiblemente necesite un resize
+		if (file->size != offset + size) {
 			resizeBlocksQuantity(fsStruct, file, offset + size, status);
 		}
 		if (*status == EXC_OK) {
@@ -139,13 +139,22 @@ void validateBlocksQuantity(sadica_file* file, int maxSize, int*status) {
 
 void resizeBlocksQuantity(fileSystem_struct* fsStruct, sadica_file* file,
 		int maxSize, int* status) {
-	uint32_t current = getBlocksQuantity(fsStruct, file->size);
-	uint32_t new = getBlocksQuantity(fsStruct, maxSize);
-	uint32_t missing = new - current;
-	file->blocks = realloc(file->blocks, sizeof(uint32_t) * new);
-	assignBlocks(fsStruct, missing, file->blocks + current, status);
-	if(*status == EXC_OK){
-		file->size = maxSize;
-		writeMetadataFile(fsStruct,file);
+	int current = getBlocksQuantity(fsStruct, file->size);
+	int new = getBlocksQuantity(fsStruct, maxSize);
+	int missing = new - current;
+	if (missing != 0) {
+		if (missing > 0) {
+			file->blocks = realloc(file->blocks, sizeof(uint32_t) * new);
+			assignBlocks(fsStruct, missing, file->blocks + current, status);
+		} else {
+			unassignBlocks(fsStruct, missing * (-1), file->blocks + new, status);
+			file->blocks = realloc(file->blocks, sizeof(uint32_t) * new);
+		}
+		if (*status == EXC_OK) {
+			file->size = maxSize;
+			writeMetadataFile(fsStruct, file);
+		}
+	} else {
+		*status = EXC_OK;
 	}
 }
