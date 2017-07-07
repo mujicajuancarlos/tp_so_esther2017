@@ -18,12 +18,13 @@ void handleKernel(kernel* kernel) {
 			running = false;
 			logError("Kernel cerro la conexion para FD: %d",
 					kernel->fileDescriptor);
-			handleKernelRequest (kernel, createPackage (COD_KERNEL_DISCONNECT, 0, NULL));
+			kernelDisconnect(kernel);
 		}
 		destroyPackage(package);
 	}
 	kernel->memoryStruct->socketClientKernel = -1;
 	close(kernel->fileDescriptor);
+	destroyKernel(kernel);
 }
 
 void handleKernelRequest(kernel* kernel, Package* package) {
@@ -44,13 +45,13 @@ void handleKernelRequest(kernel* kernel, Package* package) {
 		addNewPages(package, kernel);
 		break;
 	case COD_FREE_PAGE_REQUEST:
-		freeMemoryPage (package, kernel);
+		freeMemoryPage(package, kernel);
 		break;
 	case COD_END_PROCESS_REQUEST: //para liberar todas las paginas de un proceso que finalizo
-		endProcess (package, kernel);
+		endProcess(package, kernel);
 		break;
 	case COD_KERNEL_DISCONNECT:
-		kernelDisconnect (kernel);
+		kernelDisconnect(kernel);
 		break;
 	default:
 		logError("El kernel solicito una accion desconocida FD: %d Cod: %d",

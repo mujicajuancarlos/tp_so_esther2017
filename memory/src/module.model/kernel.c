@@ -16,6 +16,7 @@ kernel* createKernel(MemoryClient* newClient) {
 
 void destroyKernel(kernel* kernel) {
 	if (kernel != NULL) {
+		kernel->memoryStruct = NULL;
 		free(kernel);
 	}
 }

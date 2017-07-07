@@ -17,13 +17,13 @@ void handleCpu(CPU* cpu) {
 			handleCpuRequest(cpu, package);
 		} else {
 			running = false;
+			close(cpu->fileDescriptor);
 			logError("CPU cerro la conexion para FD: %d", cpu->fileDescriptor);
 		}
 		destroyPackage(package);
 	}
 	removeCPU(cpu);
 	destroyCPU(cpu);
-	close(cpu->fileDescriptor);
 }
 
 void handleCpuRequest(CPU* cpu, Package* package) {

@@ -16,6 +16,7 @@ CPU* createCPU(MemoryClient* newClient) {
 
 void destroyCPU(CPU* cpu) {
 	if (cpu != NULL) {
+		cpu->memoryStruct = NULL;
 		free(cpu);
 	}
 }
