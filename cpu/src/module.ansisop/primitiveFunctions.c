@@ -104,106 +104,132 @@ void ansisop_asignar(t_puntero pointer, t_valor_variable value) {
 }
 
 t_valor_variable ansisop_obtenerValorCompartida(t_nombre_compartida name) {
-	if (name[strlen(name) - 1] == '\n') {
-		name[strlen(name) - 1] = '\0';
-	}
-	logTrace("Ejecutando ansisop_obtenerValorCompartida(%s)", name);
+	char* identificadorVariable = normalizeString(name);
+	logTrace("Ejecutando ansisop_obtenerValorCompartida(%s)", identificadorVariable);
 	t_valor_variable value = NULL_VALUE;
 	if (getErrorFlag() == FLAG_OK) {
-		value = getSharedVarriableValue(getCPUStruct(), name);
+		value = getSharedVarriableValue(getCPUStruct(), identificadorVariable);
 		if (getErrorFlag() == FLAG_OK) {
 			logTrace(
 					"Socilitud al kernel realizada, variable compartida: %s value:%d",
-					name, value);
+					identificadorVariable, value);
 		} else {
 			logError(
 					"Fallo la solicitud al kernel para la variable compartida: %s",
-					name);
+					identificadorVariable);
 		}
 	}
+	free(identificadorVariable);
 	return value;
 }
 
 t_valor_variable ansisop_asignarValorCompartida(t_nombre_compartida name,
 		t_valor_variable value) {
-	if (name[strlen(name) - 1] == '\n') {
-		name[strlen(name) - 1] = '\0';
-	}
-	logTrace("Ejecutando ansisop_asignarValorCompartida(%s,%d)", name, value);
+	char* identificadorVariable = normalizeString(name);
+	logTrace("Ejecutando ansisop_asignarValorCompartida(%s,%d)", identificadorVariable, value);
 	t_valor_variable assignedValue = NULL_VALUE;
 	if (getErrorFlag() == FLAG_OK) {
-		assignedValue = setSharedVarriableValue(getCPUStruct(), name, value);
+		assignedValue = setSharedVarriableValue(getCPUStruct(), identificadorVariable, value);
 		if (getErrorFlag() == FLAG_OK) {
 			logTrace(
 					"Socilitud al kernel realizada, variable compartida: %s value:%d",
-					name, value);
+					identificadorVariable, value);
 		} else {
 			logError(
 					"Fallo la solicitud al kernel para la variable compartida: %s",
-					name);
+					identificadorVariable);
 		}
 	}
+	free(identificadorVariable);
 	return assignedValue;
 }
 
 void ansisop_irAlLabel(t_nombre_etiqueta name) {
-	logTrace("Ejecutando ansisop_irAlLabel(%d,%d)", name);
+	char* identificadorEtiqueta = normalizeString(name);
+	logTrace("Ejecutando ansisop_irAlLabel(%s)", identificadorEtiqueta);
 	if (getErrorFlag() == FLAG_OK) {
-		t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(
-				name);
-		getPCB()->programCounter = newProgramCounter;
-		logTrace("Se definio el program counter con el valor: %d",
-				newProgramCounter);
+		int status = NULL_VALUE;
+		t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(identificadorEtiqueta,
+				&status);
+		if (status != NULL_VALUE) {
+			getPCB()->programCounter = newProgramCounter;
+			logTrace("Se definio el program counter con el valor: %d",
+					newProgramCounter);
+		} else {
+			logError("No se encontro la etiqueta %s", identificadorEtiqueta);
+			setErrorFlag(FLAG_SINTAX_ERROR);
+		}
 	}
+	free(identificadorEtiqueta);
 }
 
-void ansisop_llamarSinRetorno(t_nombre_etiqueta label) {
-	logTrace("Ejecutando ansisop_llamarSinRetorno(%s,)", label);
+void ansisop_llamarSinRetorno(t_nombre_etiqueta name) {
+	char* identificadorEtiqueta = normalizeString(name);
+	logTrace("Ejecutando ansisop_llamarSinRetorno(%s,)", identificadorEtiqueta);
 	if (getErrorFlag() == FLAG_OK) {
+		int status = NULL_VALUE;
 		t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(
-				label);
-		PCB* tmpPcb = getPCB();
-		createNewContext(tmpPcb);
-		logTrace("Se genero un nuevo contexto en el stack");
-		t_stack_index* stackIndex = getCurrentContext();
-		stackIndex->retPos = tmpPcb->programCounter;
-		logTrace("Se definio el puntero de retorno en: %d",
-				tmpPcb->programCounter);
-		tmpPcb->programCounter = newProgramCounter;
-		logTrace("Se definio el program counter en: %d",
-				tmpPcb->programCounter);
-		stackIndex->retVar.pagina = 0;
-		stackIndex->retVar.offset = 0;
-		stackIndex->retVar.size = 0;
+				identificadorEtiqueta, &status);
+		if (status != NULL_VALUE) {
+			PCB* tmpPcb = getPCB();
+			createNewContext(tmpPcb);
+			logTrace("Se genero un nuevo contexto en el stack");
+			t_stack_index* stackIndex = getCurrentContext();
+			stackIndex->retPos = tmpPcb->programCounter;
+			logTrace("Se definio el puntero de retorno en: %d",
+					tmpPcb->programCounter);
+			tmpPcb->programCounter = newProgramCounter;
+			logTrace("Se definio el program counter en: %d",
+					tmpPcb->programCounter);
+			stackIndex->retVar.pagina = 0;
+			stackIndex->retVar.offset = 0;
+			stackIndex->retVar.size = 0;
+		} else {
+			logError(
+					"No se pudo obtener un program counter para la etiqueta %s",
+					identificadorEtiqueta);
+			setErrorFlag(FLAG_SINTAX_ERROR);
+		}
 	}
-	logTrace("Fin de ansisop_llamarSinRetorno(%s)", label);
+	logTrace("Fin de ansisop_llamarSinRetorno(%s)", identificadorEtiqueta);
+	free(identificadorEtiqueta);
 }
 
-void ansisop_llamarConRetorno(t_nombre_etiqueta label, t_puntero pointer) {
-	logTrace("Ejecutando ansisop_llamarConRetorno(%s, %d)", label, pointer);
+void ansisop_llamarConRetorno(t_nombre_etiqueta name, t_puntero pointer) {
+	char* identificadorEtiqueta = normalizeString(name);
+	logTrace("Ejecutando ansisop_llamarConRetorno(%s, %d)", identificadorEtiqueta, pointer);
 	if (getErrorFlag() == FLAG_OK) {
+		int status = NULL_VALUE;
 		t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(
-				label);
-		PCB* tmpPcb = getPCB();
-		createNewContext(tmpPcb);
-		logTrace("Se genero un nuevo contexto en el stack");
-		t_stack_index* stackIndex = getCurrentContext();
-		stackIndex->retPos = tmpPcb->programCounter;
-		logTrace("Se definio el puntero de retorno en: %d",
-				tmpPcb->programCounter);
-		tmpPcb->programCounter = newProgramCounter;
-		logTrace("Se definio el program counter en: %d",
-				tmpPcb->programCounter);
-		dir_memoria* address = pointerToMemoryLogicalAddress(pointer);
-		stackIndex->retVar.pagina = address->pagina;
-		stackIndex->retVar.offset = address->offset;
-		stackIndex->retVar.size = address->size;
-		logTrace(
-				"Se definio la direccion del valor de retorno en: pag:%d, offset:%d, size:%d",
-				address->pagina, address->offset, address->size);
-		free(address);
+				identificadorEtiqueta, &status);
+		if (status != NULL_VALUE) {
+			PCB* tmpPcb = getPCB();
+			createNewContext(tmpPcb);
+			logTrace("Se genero un nuevo contexto en el stack");
+			t_stack_index* stackIndex = getCurrentContext();
+			stackIndex->retPos = tmpPcb->programCounter;
+			logTrace("Se definio el puntero de retorno en: %d",
+					tmpPcb->programCounter);
+			tmpPcb->programCounter = newProgramCounter;
+			logTrace("Se definio el program counter en: %d",
+					tmpPcb->programCounter);
+			dir_memoria* address = pointerToMemoryLogicalAddress(pointer);
+			stackIndex->retVar.pagina = address->pagina;
+			stackIndex->retVar.offset = address->offset;
+			stackIndex->retVar.size = address->size;
+			logTrace(
+					"Se definio la direccion del valor de retorno en: pag:%d, offset:%d, size:%d",
+					address->pagina, address->offset, address->size);
+			free(address);
+		} else {
+			logError(
+					"No se pudo obtener un program counter para la etiqueta %s",
+					identificadorEtiqueta);
+			setErrorFlag(FLAG_SINTAX_ERROR);
+		}
 	}
-	logTrace("Fin de ansisop_llamarConRetorno(%s, %d)", label, pointer);
+	logTrace("Fin de ansisop_llamarConRetorno(%s, %d)", identificadorEtiqueta, pointer);
+	free(name);
 }
 
 void ansisop_finalizar() {

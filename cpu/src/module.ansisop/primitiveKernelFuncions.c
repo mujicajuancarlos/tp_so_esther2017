@@ -11,10 +11,8 @@ int kernelSocket() {
 	return getCPUStruct()->socketClientKernel;
 }
 
-void ansisopKernel_wait(t_nombre_semaforo identificador_semaforo) {
-	if (identificador_semaforo[strlen(identificador_semaforo) - 1] == '\n') {
-		identificador_semaforo[strlen(identificador_semaforo) - 1] = '\0';
-	}
+void ansisopKernel_wait(t_nombre_semaforo name) {
+	char* identificador_semaforo = normalizeString(name);
 	logTrace("Ejecutando ansisopKernel_wait(%s)", identificador_semaforo);
 	if (getErrorFlag() == FLAG_OK) {
 		Package* package = createAndSendPackage(kernelSocket(), COD_SEM_WAIT,
@@ -47,12 +45,11 @@ void ansisopKernel_wait(t_nombre_semaforo identificador_semaforo) {
 		}
 	}
 	logTrace("Ejecutado ansisopKernel_wait(%s)", identificador_semaforo);
+	free(identificador_semaforo);
 }
 
-void ansisopKernel_signal(t_nombre_semaforo identificador_semaforo) {
-	if (identificador_semaforo[strlen(identificador_semaforo) - 1] == '\n') {
-		identificador_semaforo[strlen(identificador_semaforo) - 1] = '\0';
-	}
+void ansisopKernel_signal(t_nombre_semaforo name) {
+	char* identificador_semaforo = normalizeString(name);
 	logTrace("Ejecutando ansisopKernel_signal(%s)", identificador_semaforo);
 	if (getErrorFlag() == FLAG_OK) {
 		Package* package = createAndSendPackage(kernelSocket(), COD_SEM_SIGNAL,
@@ -78,6 +75,7 @@ void ansisopKernel_signal(t_nombre_semaforo identificador_semaforo) {
 		}
 	}
 	logTrace("Ejecutado ansisopKernel_signal(%s)", identificador_semaforo);
+	free(identificador_semaforo);
 }
 
 t_puntero ansisopKernel_reservar(t_valor_variable size) {
@@ -146,11 +144,9 @@ void ansisopKernel_liberar(t_puntero pointer) {
 	logTrace("Ejecutado ansisopKernel_liberar(%d)", pointer);
 }
 
-t_descriptor_archivo ansisopKernel_abrir(t_direccion_archivo path,
+t_descriptor_archivo ansisopKernel_abrir(t_direccion_archivo name,
 		t_banderas flags) {
-	if (path[strlen(path) - 1] == '\n') {
-		path[strlen(path) - 1] = '\0';
-	}
+	char* path = normalizeString(name);
 	uint32_t newFD = NULL_VALUE;
 	logTrace(
 			"Ejecutando ansisopKernel_abrir(%s,flags(leer:%d, escribir:%d, crear:%d))",
@@ -186,6 +182,7 @@ t_descriptor_archivo ansisopKernel_abrir(t_direccion_archivo path,
 	logTrace(
 			"Ejecutado ansisopKernel_abrir(%s,flags(leer:%d, escribir:%d, crear:%d))",
 			path, flags.lectura, flags.escritura, flags.creacion);
+	free(path);
 	return newFD;
 }
 

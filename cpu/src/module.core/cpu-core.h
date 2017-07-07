@@ -59,6 +59,8 @@ t_variable* getArgument(t_nombre_variable name);
 
 t_variable* getVariable(t_nombre_variable name);
 
-t_puntero_instruccion getProgramCounterByLabel(t_nombre_etiqueta label);
+t_puntero_instruccion getProgramCounterByLabel(t_nombre_etiqueta label, int* status);
+
+char* normalizeString(char* text);
 
 #endif /* MODULE_CORE_CPU_CORE_H_ */
