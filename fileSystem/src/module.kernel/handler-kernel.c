@@ -13,28 +13,34 @@
 void handleKernel(fileSystem_struct* fsStruct) {
 
 	Package* package;
+	bool running;
 	while (true) {
 
-		logInfo("Esperando nueva conexion del kernel");
+		logInfo("Esperando una conexion del kernel");
 		fsStruct->fd_kernel = aceptarConexionCliente(fsStruct->socketServer);
 
 		if (fsStruct->fd_kernel != -1) {
-			logInfo("El kernel se conectó exitosamente");
-
-			package = createAndReceivePackage(fsStruct->fd_kernel);
-
+			logInfo("El kernel se conectó exitosamente a travez del fd %d",
+					fsStruct->fd_kernel);
 			/**
 			 * Mientras mantenga la conexion atiendo los pedidos
 			 */
-			while (package != NULL) {
-				handleKernelRequest(fsStruct, package);
+			running = true;
+			while (running) {
+				logInfo("Esperando una solicitud del kernel");
 				package = createAndReceivePackage(fsStruct->fd_kernel);
+				if (package != NULL) {
+					handleKernelRequest(fsStruct, package);
+				} else {
+					running = false;
+					close(fsStruct->fd_kernel);
+					logInfo("El kernel cerro la conexion del FD: %d",
+										fsStruct->fd_kernel);
+				}
+				destroyPackage(package);
 			}
-
-			logError("El kernel cerro la conexion para FD: %d",
-					fsStruct->fd_kernel);
 		} else {
-			logError("El kernel no se pudo conectar");
+			logError("El kernel no se pudo conectar,reintente nuevamente");
 		}
 	}
 }
