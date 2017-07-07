@@ -67,6 +67,4 @@ void handleKernelRequest(fileSystem_struct* fsStruct, Package* package) {
 		logError("El kernel solicitó una accion no permitida");
 		break;
 	}
-
-	destroyPackage(package);
 }
