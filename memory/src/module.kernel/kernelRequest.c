@@ -107,7 +107,7 @@ void readData(Package* package, kernel* kernel) {
 void endProcess(Package* package, kernel* kernel) {
 	int* pid = (int*) package->stream;
 
-	logTrace ("Memoria recibe solicitud para terminar con proceso %i", pid);
+	logTrace ("Memoria recibe solicitud para terminar con proceso %i", *pid);
 	Package* outPackage;
 	terminateProcess(kernel->memoryStruct, *pid);
 	outPackage = createAndSendPackage (kernel->fileDescriptor, COD_END_PROCESS_RESPONSE, 0, NULL);

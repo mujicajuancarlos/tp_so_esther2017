@@ -45,7 +45,7 @@ void markAsGarbage(heap_page* page){
 
 heap_metadata* getHeapMetadataFromDataOffset(heap_page* page,
 		uint32_t dataOffset, int* index) {
-	*index = -1; //todo verificar, si rompe probar con 0
+	*index = -1;
 	bool condition(void* element) {
 		heap_metadata* metadata = element;
 		*index = *index + 1;
@@ -59,7 +59,7 @@ heap_metadata* getHeapMetadataFromDataOffset(heap_page* page,
  */
 heap_metadata* getAvailableHeapMetadataForPage(int allocSize, heap_page* page,
 		int* index) {
-	*index = -1; //todo verificar, si rompe probar con 0
+	*index = -1;
 	bool condition(void* element) {
 		heap_metadata* metadata = element;
 		*index = *index + 1;
@@ -69,14 +69,14 @@ heap_metadata* getAvailableHeapMetadataForPage(int allocSize, heap_page* page,
 }
 
 /*
- * devuelvo true si tendo alguna metada con espacio libre y del tamaño indicado
+ * devuelvo true no soy basura y si tendo alguna metada con espacio libre y del tamaño indicado
  */
 bool isAvailableHeapPage(int allocSize, heap_page* page) {
 	bool condition(void* element) {
 		heap_metadata* metadata = element;
 		return isAvailableHeapMetadata(allocSize, metadata);
 	}
-	return list_any_satisfy(page->metadataList, condition);
+	return !page->isGarbage && list_any_satisfy(page->metadataList, condition);
 }
 
 bool isFreePage(heap_page* page) {

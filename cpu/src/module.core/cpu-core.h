@@ -39,7 +39,7 @@ t_stack_index* getCurrentContext();
 
 t_puntero logicalAddressToPointer(dir_memoria* dir);
 
-dir_memoria* pointerToLogicalAddress(t_puntero pointer);
+dir_memoria* pointerToMemoryLogicalAddress(t_puntero pointer);
 
 void finalize_CPU_process();
 

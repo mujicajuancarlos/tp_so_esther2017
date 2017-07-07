@@ -1,0 +1,11 @@
+begin
+  variables a, b, c, d
+  alocar a 400
+  alocar b 400
+  liberar a
+  alocar c 400
+  liberar b
+  alocar d 400
+  liberar d
+  liberar c
+end

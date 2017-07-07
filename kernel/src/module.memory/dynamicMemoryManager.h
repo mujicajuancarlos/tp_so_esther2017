@@ -24,6 +24,7 @@ int basicMallocMemory(Process* process, int mallocSize, t_puntero* pointer);
 int basicFreeMemory(Process* process, t_puntero pointer);
 
 void executeGarbageCollectorOn(heap_page* page, Process* process, int* status);
+void removeGarbagePages(Process* process);
 
 void resolveFragmentation(Process* process, heap_page* page);
 
@@ -40,6 +41,7 @@ int getNextHeapPageNumber(t_list* pageList);
 uint32_t getHeapFistPageNumber(Process* process);
 
 t_puntero logicalAddressToPointer(dir_memoria address, Process* process);
-dir_memoria pointerToLogicalAddress(t_puntero pointer, Process* process);
+dir_memoria pointerToMemoryLogicalAddress(t_puntero pointer, Process* process);
+dir_memoria pointerToHeapLogicalAddress(t_puntero pointer, Process* process);
 
 #endif /* MODULE_MEMORY_DYNAMICMEMORYMANAGER_H_ */

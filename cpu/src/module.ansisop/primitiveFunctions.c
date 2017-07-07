@@ -63,7 +63,7 @@ t_valor_variable ansisop_dereferenciar(t_puntero pointer) {
 	logTrace("Ejecutando ansisop_dereferenciar(%d)", pointer);
 	t_valor_variable value = NULL_VALUE;
 	if (getErrorFlag() == FLAG_OK) {
-		dir_memoria* address = pointerToLogicalAddress(pointer);
+		dir_memoria* address = pointerToMemoryLogicalAddress(pointer);
 		char* buffer = getDataFromMemory(getCPUStruct(), address->pagina,
 				address->offset, address->size);
 		if (getErrorFlag() == FLAG_OK) {
@@ -85,7 +85,7 @@ t_valor_variable ansisop_dereferenciar(t_puntero pointer) {
 void ansisop_asignar(t_puntero pointer, t_valor_variable value) {
 	logTrace("Ejecutando ansisop_asignar(%d,%d)", pointer, value);
 	if (getErrorFlag() == FLAG_OK) {
-		dir_memoria* address = pointerToLogicalAddress(pointer);
+		dir_memoria* address = pointerToMemoryLogicalAddress(pointer);
 		char* buffer = serialize_int(value);
 		saveDataOnMemory(getCPUStruct(), address->pagina, address->offset,
 				address->size, buffer);
@@ -194,7 +194,7 @@ void ansisop_llamarConRetorno(t_nombre_etiqueta label, t_puntero pointer) {
 		tmpPcb->programCounter = newProgramCounter;
 		logTrace("Se definio el program counter en: %d",
 				tmpPcb->programCounter);
-		dir_memoria* address = pointerToLogicalAddress(pointer);
+		dir_memoria* address = pointerToMemoryLogicalAddress(pointer);
 		stackIndex->retVar.pagina = address->pagina;
 		stackIndex->retVar.offset = address->offset;
 		stackIndex->retVar.size = address->size;

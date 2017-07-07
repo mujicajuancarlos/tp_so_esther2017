@@ -169,9 +169,9 @@ void readFileRequest(Process* process, t_fileData* data, int* status) {
 	int fsSocket = process->kernelStruct->socketClientFileSystem;
 	size_t size = sizeof_t_fileData(data);
 	char* buffer = serialize_t_fileData(data);
-	free(buffer);
 	tmpPackage = createAndSendPackage(fsSocket, COD_READ_FILE_REQUEST, size,
 			buffer);
+	free(buffer);
 	if (tmpPackage == NULL) {
 		logError("El file system no esta conectado");
 		exit(EXIT_FAILURE);
