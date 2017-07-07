@@ -132,7 +132,7 @@ void handleCommand_info_all_process(kernel_struct* kernelStruct,
 			}
 			list_iterate(processList, printElement);
 		}
-		wapperPrintAllProcess(STATE_CODE_NEW, states->new);
+		wapperPrintAllProcess(STATE_CODE_NEW, states->new->elements);
 		wapperPrintAllProcess(STATE_CODE_READY, states->ready->elements);
 		wapperPrintAllProcess(STATE_CODE_EXECUTE, states->execute);
 		wapperPrintAllProcess(STATE_CODE_BLOCK, states->block);
@@ -155,7 +155,7 @@ void handleCommand_info_by_state_process(kernel_struct* kernelStruct,
 			}
 			switch (stateIndex) {
 			case STATE_CODE_NEW:
-				list_iterate(states->new, printElement);
+				list_iterate(states->new->elements, printElement);
 				break;
 			case STATE_CODE_READY:
 				list_iterate(states->ready->elements, printElement);
@@ -238,7 +238,7 @@ void handleCommand_end_all_program(kernel_struct* kernelStruct, char** commands)
 			list_iterate(processList, moveExit);
 		}
 
-		wrapperToForceQuitAllProcess(STATE_CODE_NEW, getStates()->new);
+		wrapperToForceQuitAllProcess(STATE_CODE_NEW, getStates()->new->elements);
 		wrapperToForceQuitAllProcess(STATE_CODE_READY,
 				getStates()->ready->elements);
 		wrapperToForceQuitAllProcess(STATE_CODE_BLOCK, getStates()->block);

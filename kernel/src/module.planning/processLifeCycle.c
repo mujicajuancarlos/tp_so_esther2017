@@ -227,10 +227,27 @@ Process* popToEXIT() {
 
 void sendToNEW(Process* process) {
 	pthread_mutex_lock(&newListMutex);
-	list_add(states->new, process);
+	queue_push(states->new, process);
 	pthread_mutex_unlock(&newListMutex);
-	logTrace("El proceso %d ingresó a la lista de NEW", process->pid);
+	logTrace("El proceso %d ingresó a la cola de NEW", process->pid);
 
+}
+
+Process* popToNEW() {
+	Process* process;
+	pthread_mutex_lock(&newListMutex);
+	process = queue_pop(states->new);
+	pthread_mutex_unlock(&newListMutex);
+	logTrace("El proceso %d salio de la cola NEW", process->pid);
+	return process;
+}
+
+Process* peekToNEW() {
+	Process* process;
+	pthread_mutex_lock(&newListMutex);
+	process = queue_peek(states->new);
+	pthread_mutex_unlock(&newListMutex);
+	return process;
 }
 
 void removeFromNEW(Process* process) {
@@ -239,9 +256,9 @@ void removeFromNEW(Process* process) {
 		return anyProcess->pid == process->pid;
 	}
 	pthread_mutex_lock(&newListMutex);
-	list_remove_by_condition(states->new, condition);
+	list_remove_by_condition(states->new->elements, condition);
 	pthread_mutex_unlock(&newListMutex);
-	logTrace("El proceso %d salio de la lista de NEW", process->pid);
+	logTrace("El proceso %d salio de la cola de NEW", process->pid);
 }
 
 t_planningStates* getStates() {
@@ -255,7 +272,7 @@ void initializeProcessLifeCycle() {
 
 	states->execute = list_create();
 	states->exit = queue_create();
-	states->new = list_create();
+	states->new = queue_create();
 	states->ready = queue_create();
 	states->block = list_create();
 
@@ -271,7 +288,7 @@ void destroyProcessLifeCycle() {
 
 	list_destroy_and_destroy_elements(states->execute, (void*) destroyProcess);
 	queue_destroy_and_destroy_elements(states->exit, (void*) destroyProcess);
-	list_destroy_and_destroy_elements(states->new, (void*) destroyProcess);
+	queue_destroy_and_destroy_elements(states->new, (void*) destroyProcess);
 	queue_destroy_and_destroy_elements(states->ready, (void*) destroyProcess);
 	list_destroy_and_destroy_elements(states->block, (void*) destroyProcess);
 

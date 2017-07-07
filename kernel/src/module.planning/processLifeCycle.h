@@ -31,7 +31,7 @@
 #include "stateConverter.h"
 
 typedef struct {
-	t_list* new;
+	t_queue* new;
 	t_queue* ready;
 	t_list* execute;
 	t_list* block;
@@ -70,6 +70,8 @@ void sendToEXIT(Process* process);
 Process* popToEXIT();
 
 void sendToNEW(Process* process);
+Process* popToNEW();
+Process* peekToNEW();
 void removeFromREADY(Process* process);
 void removeFromNEW(Process* process);
 

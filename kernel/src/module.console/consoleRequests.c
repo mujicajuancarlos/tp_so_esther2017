@@ -7,6 +7,24 @@
 
 #include "consoleRequests.h"
 
+pthread_mutex_t excecuteContinueMutex;
+
+void initializeExcecuteContinueMutex() {
+	pthread_mutex_init(&excecuteContinueMutex, NULL);
+}
+
+void destroyExcecuteContinueMutex() {
+	pthread_mutex_destroy(&excecuteContinueMutex);
+}
+
+void excecuteContinueMutex_lock() {
+	pthread_mutex_lock(&excecuteContinueMutex);
+}
+
+void excecuteContinueMutex_unlock() {
+	pthread_mutex_unlock(&excecuteContinueMutex);
+}
+
 /**
  * Se ejecuta cuando la consola envia el package con codigo COD_KC_RUN_PROGRAM_REQUEST
  *
@@ -23,28 +41,47 @@
  *	8. muevo el proceso a ready
  *	fin
  */
-void startNewProcess(Process* process, Package* package) {
+void startNewProcess(Process** ptrProcess, Package* package) {
+
+	Process* process = *ptrProcess;
 
 	process->pid = getNextPID();
-	logInfo("Se asigno el pid: %d al proceso de FD: %d", process->pid, process->fileDescriptor);
+	logInfo("Se asigno el pid: %d al proceso de FD: %d", process->pid,
+			process->fileDescriptor);
 	sendToNEW(process);
 
-	logInfo("Se está verificando el grado de multiprogramacion para el pid %d", process->pid);
+	logInfo("Se está verificando el grado de multiprogramacion para el pid %d",
+			process->pid);
 	_decrementMultiprogrammingLevel();
 
-	if(canContinueNewProcessExecution(process)){
-		logInfo("El pid: %d ingreso oficialmente al sistema por el grado de multiprogramacion", process->pid);
+	bool canContinue = false;
+
+	excecuteContinueMutex_lock();
+	canContinue = canContinueNewProcessExecution(process);
+	if (canContinue) {
+		process = popToNEW();
+		*ptrProcess = process;
+		logInfo(
+				"El pid: %d fue aceptado en el sistema. Se verifico el grado de multiprogramacion",
+				process->pid);
+		logInfo("Se solicitara la reserva de memoria para el proceso %d",
+				process->pid);
 		reservePagesForNewProcess(process, package);
-		if(!process->aborted){
+
+	}
+	excecuteContinueMutex_unlock();
+	if (canContinue) {
+		if (!process->aborted) {
 			sendSourceCodeForNewProcess(process, package);
 		}
-		if(!process->aborted){
+		if (!process->aborted) {
 			createPcbForNewProcess(process, package);
-			moveFromNewToReady(process);
+			sendToREADY(process);
 		}
-		if(process->aborted){
-			logInfo("El proceso %d va a ser removido del sistema porque no pudo iniciar satisfactoriamente", process->pid);
-			removeFromNEW(process);
+		if (process->aborted) {
+			logInfo(
+					"El proceso %d no pudo iniciar satisfactoriamente por los problemas mencionados\nSera descartado del sistema",
+					process->pid);
 			close(process->fileDescriptor);
 		}
 	}
@@ -55,14 +92,14 @@ void startNewProcess(Process* process, Package* package) {
  * 		- la consola solicita finalizar un proceso
  * 		- la consola se desconecta inesperadamente
  */
-void stopProcess(Process* process){
+void stopProcess(Process* process) {
 	int state = getProcessStateIndex(process);
-	if(state != STATE_CODE_NOTFOUND){
-		basicForceQuitProcess(process,state);
+	if (state != STATE_CODE_NOTFOUND) {
+		basicForceQuitProcess(process, state);
 	} else {
-		if(process->aborted){
+		if (process->aborted) {
 			destroyProcess(process);
-		}else{
+		} else {
 			logError("El proceso %d tiene un estado desconocido", process->pid);
 		}
 	}
@@ -71,7 +108,7 @@ void stopProcess(Process* process){
 /*
  * debo continuar solo si el proceso no fue enviado a exit
  */
-bool canContinueNewProcessExecution(Process* process){
+bool canContinueNewProcessExecution(Process* process) {
 	return getProcessStateIndex(process) == STATE_CODE_NEW;
 }
 

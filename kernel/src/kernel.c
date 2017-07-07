@@ -72,6 +72,7 @@ void initializeStruct(kernel_struct* kernelStruct, Configuration* config) {
 	initializeFileSystemModule();
 	initializeMemoryRequestMutex();
 	initializeFileSystemRequestMutex();
+	initializeExcecuteContinueMutex();
 }
 
 void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config){
@@ -85,6 +86,7 @@ void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config){
 	destroyFileSystemModule();
 	destroyMemoryRequestMutex();
 	destroyFileSystemRequestMutex();
+	destroyExcecuteContinueMutex();
 }
 
 kernel_struct* getKernelStruct(){

@@ -12,7 +12,7 @@ Process* getProcessAndStateIndexByPID(int pidParam, int* stateIndex) {
 		return aProcess->pid == pidParam;
 	}
 	Process* encontrado;
-	if ((encontrado = list_find(states->new, condicion)) != NULL){
+	if ((encontrado = list_find(states->new->elements , condicion)) != NULL){
 		*stateIndex = STATE_CODE_NEW;
 		return encontrado;
 	}
@@ -41,7 +41,7 @@ int getProcessStateIndex(Process* proceso) {
 		Process* aProcess = element;
 		return aProcess == proceso;
 	}
-	if (list_find(states->new, condicion) != NULL)
+	if (list_find(states->new->elements, condicion) != NULL)
 		return STATE_CODE_NEW;
 	if (list_find(states->ready->elements, condicion) != NULL)
 		return STATE_CODE_READY;

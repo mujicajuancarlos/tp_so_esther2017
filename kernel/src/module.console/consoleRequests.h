@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include <dc-commons/logger.h>
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
@@ -23,7 +24,12 @@
 #include "../module.model/processFinder.h"
 #include "../module.planning/longTermScheduler.h"
 
-void startNewProcess(Process* process, Package* package);
+void initializeExcecuteContinueMutex();
+void destroyExcecuteContinueMutex();
+void excecuteContinueMutex_lock();
+void excecuteContinueMutex_unlock();
+
+void startNewProcess(Process** process, Package* package);
 
 void stopProcess(Process* process);
 

@@ -25,6 +25,6 @@ void handleConsolas(kernel_struct *args);
 
 void handleNewProcess(Process* newProcess);
 
-void handleConsoleRequestForProcess(Process* newProcess, Package* package);
+void handleConsoleRequestForProcess(Process** newProcess, Package* package);
 
 #endif /* HANDLER_CONSOLE_H_ */

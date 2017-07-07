@@ -43,7 +43,7 @@ void handleNewProcess(Process* newProcess) {
 
 		package = createAndReceivePackage(newProcess->fileDescriptor);
 		if (package != NULL) {
-			handleConsoleRequestForProcess(newProcess, package);
+			handleConsoleRequestForProcess(&newProcess, package);
 		} else {
 			running = false;
 			close(newProcess->fileDescriptor);
@@ -59,10 +59,13 @@ void handleNewProcess(Process* newProcess) {
 	pthread_exit(EXIT_SUCCESS);
 }
 
-void handleConsoleRequestForProcess(Process* process, Package* package) {
+void handleConsoleRequestForProcess(Process** ptrProcess, Package* package) {
+
+	Process* process = *ptrProcess;
+
 	switch (package->msgCode) {
 	case COD_KC_RUN_PROGRAM_REQUEST:
-		startNewProcess(process, package);
+		startNewProcess(ptrProcess, package);
 		break;
 	case COD_KC_STOP_PROGRAM_REQUEST:
 		logInfo("La consola solicitó finalizar el proceso %d", process->pid);
