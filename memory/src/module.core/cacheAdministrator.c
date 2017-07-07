@@ -39,10 +39,9 @@ void removeEntryFromCache (memory_struct* memoryStruct, int processId, int proce
 }
 
 void addEntryToCache (memory_struct* memoryStruct, int processId, int processPage, int globPage) {
-	cache_entry* entry = malloc (sizeof (entry));
-	entry->globPage = globPage;
-	entry->procPage = processPage;
-	entry->pid = processId;
+	if (memoryStruct->config->cache_x_proceso <= 0)
+		return;
+
 	int i;
 
 	for (i = 0; i < list_size (memoryStruct->cacheEntries); i++) {

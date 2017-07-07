@@ -38,8 +38,11 @@ int main(int argc, char *argv[]) {
 
 	logInfo("Creando el hilo para el planificador");
 	pthread_t hiloPlanificador;
-	pthread_create(&hiloPlanificador, NULL, (void*) handlePlanning,
-			&kernelStruct);
+	pthread_create(&hiloPlanificador, NULL, (void*) handlePlanning, &kernelStruct);
+
+	logInfo("Creando el hilo para modificacion INOTIFY");
+	pthread_t hiloINOTIFY;
+	pthread_create(&hiloINOTIFY, NULL, (void*) VerifiedFileModificationINOTIFY,config);
 
 	logInfo("Inicia el lector de comandos para el usuario");
 	handleUserRequest(&kernelStruct);

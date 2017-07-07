@@ -8,20 +8,24 @@
 #include "configuration.h"
 
 Configuration* config_with(char *config_file) {
-
 	Configuration* config = malloc(sizeof(Configuration));
 	t_config* temporalConfig;
+
 	if (config_file != NULL) {
+
 		//si es distinto a null quiere decir que recibimos el archivo de configuracion por parametro
 		temporalConfig = config_create(config_file);
+
 		if (temporalConfig == NULL) {
 			error_show("No se pudo leer el archivo de configuracion %s",
 					config_file);
 			exit(1);
 		}
 	} else {
+
 		temporalConfig = config_create(DEFAULT_CONFIG_PATH);
 		if (temporalConfig == NULL) {
+
 			//para debuggear desde eclipse
 			temporalConfig = config_create(ECLIPSE_CONFIG_PATH);
 			if (temporalConfig == NULL) {
@@ -30,6 +34,7 @@ Configuration* config_with(char *config_file) {
 				exit(1);
 			}
 		}
+
 	}
 
 	config_set_int_valid_value(&config->puerto_program, temporalConfig, PUERTO_PROG);
@@ -65,26 +70,28 @@ Configuration* config_with(char *config_file) {
 	return config;
 }
 
+
+
 Configuration* getConfiguration() {
 	return config;
 }
 
 
-void VerifiedFileModificationINOTIFY(char *config_file){
+void VerifiedFileModificationINOTIFY(Configuration* config){
 
   int length, i = 0;
   int fd;
-  int wd;
   char buffer[BUF_LEN];
 
-  fd = inotify_init();
+  fd  = inotify_init();
 
   if ( fd < 0 ) {
     perror( "inotify_init" );
   }
 
-  wd = inotify_add_watch( fd, "/home/utnso/tp-2017-1c-Los-5-Fant-sticos/kernel",
-                         IN_MODIFY | IN_CREATE | IN_DELETE );
+  int watch_descriptor = inotify_add_watch( fd, CONFIG_PATH,
+                           IN_MODIFY );
+
   length = read( fd, buffer, BUF_LEN );
 
   if ( length < 0 ) {
@@ -92,32 +99,40 @@ void VerifiedFileModificationINOTIFY(char *config_file){
   }
 
   while ( i < length ) {
-    struct inotify_event *event = ( struct inotify_event * ) &buffer[ i ];
+	struct inotify_event *event = ( struct inotify_event * ) &buffer[ i ];
+
     if ( event->len ) {
-      if ( event->mask & IN_CREATE ) {
-        if ( event->mask & IN_ISDIR ) {
-          printf( "The file %s was created.\n", event->name );
-        }
-      }
-      else if ( event->mask & IN_DELETE ) {
-        if ( event->mask & IN_ISDIR ) {
-          printf( "The file %s was deleted.\n", event->name );
-        }
-      }
-      else if ( event->mask & IN_MODIFY ) {
-        if ( event->mask & IN_ISDIR ) {
-          printf( "The file %s was modified.\n", event->name );
-          // vuelvo a leer el archivo de configuracion si esta modificado
-          config_with(config_file);
+
+     if ( event->mask & IN_MODIFY ) {
+
+    	 if ( event->mask & IN_ISDIR ) {
+
+        	logInfo("The directory %s was modified.\n", event->name );
+
+    	 }
+    	 else {
+           	logInfo( "The file %s was modified.\n", event->name );
+           	//retardo para la funcion config_with pueda tomar el archivo despues de ser liberado
+           	//por el inotify
+        	sleep(1);
+        	Configuration* configu = config_with(NULL);
+        	logInfo( "Se ha modificado el quantum_sleep y su valor actualizado es:  %d ", configu->quantum_sleep);
+
         }
       }
     }
-    i += EVENT_SIZE + event->len;
-  }
 
-  ( void ) inotify_rm_watch( fd, wd );
-  ( void ) close( fd );
+   i += EVENT_SIZE + event->len;
+   }
 
-  exit( 0 );
+  // Agrego retardo la funcion no me vuelva a tomar el cambio anterior(si es que se hizo)
+  sleep(1);
+  VerifiedFileModificationINOTIFY(config);
+
+  //logInfo("* Eliminar el directorio “/ tmp” de la lista de vigilancia. * ");
+  //( void ) inotify_rm_watch( fd, watch_descriptor );
+  //logInfo(" * Cerrar la instancia Inotify * ");
+  //( void ) close( fd );
+
 }
 

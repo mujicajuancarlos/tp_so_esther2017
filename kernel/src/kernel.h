@@ -23,6 +23,7 @@
 
 #include "kernelStruct.h"
 #include "connection.h"
+#include "configuration.h"
 
 
 /**
