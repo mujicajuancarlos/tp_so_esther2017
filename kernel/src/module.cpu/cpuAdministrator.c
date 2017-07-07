@@ -33,7 +33,7 @@ void markFreeCPU(CPU* cpu) {
 	cpu->process = NULL;
 	cpu->libre = true;
 	sem_post(&freeCPU_sem);
-	logInfo("Se marco como libre la cpu %d",cpu->fileDescriptor);
+	logInfo("Se marco como libre la cpu %d", cpu->fileDescriptor);
 	pthread_mutex_unlock(&cpuListMutex);
 }
 
@@ -52,7 +52,7 @@ CPU* searchAndMarkBusyCPU() {
 	pthread_mutex_lock(&cpuListMutex);
 	cpu = list_find(cpuList, condicion);
 	cpu->libre = false;
-	logInfo("Se marco como ocupada la cpu %d",cpu->fileDescriptor);
+	logInfo("Se marco como ocupada la cpu %d", cpu->fileDescriptor);
 	pthread_mutex_unlock(&cpuListMutex);
 	return cpu;
 }
@@ -65,24 +65,25 @@ void addCPU(CPU* cpu) {
 }
 
 /*
- * realizo el wait solo si la cpu se encontraba en la lista
+ * realizo el wait solo si la cpu es valida y esta marcada como libre
  */
 void removeCPU(CPU* cpu) {
-	CPU* finded;
-	bool condicion(void* element) {
-		CPU* anCpu = element;
-		return anCpu->fileDescriptor == cpu->fileDescriptor;
+	int cpuFD = cpu->fileDescriptor;
+	bool condition(void* element) {
+		CPU* otherCpu = element;
+		return otherCpu->fileDescriptor == cpuFD;
 	}
-	if(cpu->libre == true){
-		sem_wait(&freeCPU_sem);
-	}
-	pthread_mutex_lock(&cpuListMutex);
-	finded = list_find(cpuList,condicion);
-	if(finded!=NULL){
-		list_remove_and_destroy_by_condition(cpuList, condicion,
+	if (cpu != NULL) {
+		if (cpu->libre == true) {
+			sem_wait(&freeCPU_sem);
+		}
+		pthread_mutex_lock(&cpuListMutex);
+		if (list_any_satisfy(cpuList, condition)) {
+			close(cpuFD);
+			list_remove_and_destroy_by_condition(cpuList, condition,
 					(void*) destroyCPU);
+			cpu = NULL;
+		}
+		pthread_mutex_unlock(&cpuListMutex);
 	}
-	pthread_mutex_unlock(&cpuListMutex);
-	close(cpu->fileDescriptor);
-	cpu->fileDescriptor = -1;
 }

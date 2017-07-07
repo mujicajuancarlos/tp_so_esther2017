@@ -52,15 +52,17 @@ void handleNewCPU(CPU* newCpu) {
 			handleCPURequest(newCpu, package);
 		} else {
 			running = false;
-			if(newCpu->process != NULL){
-				moveFromExcecToReady(newCpu->process);
+			if (newCpu != NULL) {
+				if (newCpu->process != NULL) {
+					moveFromExcecToReady(newCpu->process);
+				}
+				logInfo("Se desconecto la cpu con FD: %d",
+						newCpu->fileDescriptor);
+				removeCPU(newCpu);
 			}
-			logInfo("Se desconecto la cpu con FD: %d", newCpu->fileDescriptor);
-			removeCPU(newCpu);
 		}
 		destroyPackage(package);
 	}
-	removeCPU(newCpu); //REMUEVO Y DECREMENTO EL SEMAFORO DE CPUS LIBRES
 	pthread_exit(EXIT_SUCCESS);
 }
 

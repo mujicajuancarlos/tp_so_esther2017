@@ -18,8 +18,9 @@ CPU* createCPU(int socket, kernel_struct* kernelStruct) {
 }
 
 void destroyCPU(CPU* cpu) {
-	cpu->process = NULL;
 	if (cpu != NULL) {
+		cpu->process = NULL;
+		cpu->kernelStruct = NULL;
 		free(cpu);
 	}
 }
