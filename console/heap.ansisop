@@ -7,5 +7,5 @@ begin
   liberar b
   alocar d 400
   liberar d
-  iberar c
+  liberar c
 end
