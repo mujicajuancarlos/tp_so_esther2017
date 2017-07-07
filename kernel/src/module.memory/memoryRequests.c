@@ -6,6 +6,24 @@
  */
 
 #include "memoryRequests.h"
+
+pthread_mutex_t memoryRequestMutex;
+
+void initializeMemoryRequestMutex() {
+	pthread_mutex_init(&memoryRequestMutex, NULL);
+}
+
+void destroyMemoryRequestMutex() {
+	pthread_mutex_destroy(&memoryRequestMutex);
+}
+
+void memoryRequestMutex_lock() {
+	pthread_mutex_lock(&memoryRequestMutex);
+}
+
+void memoryRequestMutex_unlock() {
+	pthread_mutex_unlock(&memoryRequestMutex);
+}
 /**
  * mi objetivo es solicitar y setear el tmaño de pagina
  */
@@ -34,6 +52,7 @@ void loadMemoryPageSize(kernel_struct* kernel_struct) {
 }
 
 void reserveNewHeapPageForProcess(Process* process, int* status) {
+	memoryRequestMutex_lock();
 	Package* tmpPackage;
 	t_AddPagesToProcess* content = create_t_AddPagesToProcess(process->pid, 1);
 	tmpPackage = createAndSendPackage(
@@ -74,9 +93,11 @@ void reserveNewHeapPageForProcess(Process* process, int* status) {
 		logError("La memoria no esta conectada");
 		exit(EXIT_FAILURE);
 	}
+	memoryRequestMutex_unlock();
 }
 
 void freePageForProcess(Process* process, int memoryPageNumber, int* status) {
+	memoryRequestMutex_lock();
 	Package* tmpPackage;
 	t_FreePageToProcess* content = create_t_FreePageToProcess(process->pid,
 			memoryPageNumber);
@@ -112,6 +133,7 @@ void freePageForProcess(Process* process, int memoryPageNumber, int* status) {
 		logError("La memoria no esta conectada");
 		exit(EXIT_FAILURE);
 	}
+	memoryRequestMutex_unlock();
 }
 
 /**
@@ -119,6 +141,7 @@ void freePageForProcess(Process* process, int memoryPageNumber, int* status) {
  * package contiene el codigo fuente
  */
 void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
+	memoryRequestMutex_lock();
 	Package* tmpPackage;
 	int pagesNumber =
 			(sourceCodePackage->size % process->kernelStruct->pageSize) ? 1 : 0;
@@ -174,14 +197,15 @@ void reservePagesForNewProcess(Process* process, Package* sourceCodePackage) {
 				process->pid);
 		exit(EXIT_FAILURE);	//tiene sentido por que la memoria no responde
 	}
-
 	destroyPackage(tmpPackage);
+	memoryRequestMutex_unlock();
 }
 
 /**
  * usado cuando un proceso es enviado a EXIT
  */
 void notifyEndProcessToMemory(Process* process) {
+	memoryRequestMutex_lock();
 	char* buffer = serialize_int(process->pid);
 	Package* tmpPackage = createAndSendPackage(
 			process->kernelStruct->socketClientMemoria, COD_END_PROCESS_REQUEST,
@@ -216,6 +240,7 @@ void notifyEndProcessToMemory(Process* process) {
 		exit(EXIT_FAILURE);
 	}
 	destroyPackage(tmpPackage);
+	memoryRequestMutex_unlock();
 }
 
 void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
@@ -270,6 +295,7 @@ void saveDataOnMemory(Process* process, int startPage, u_int32_t offset,
 
 void saveDataOnPage(Process* process, int pageNumber, int offset, int size,
 		char* buffer, bool* hasError) {
+	memoryRequestMutex_lock();
 	Package* package;
 	t_PageBytes* data = create_t_PageBytes(process->pid, pageNumber, offset,
 			size, buffer);
@@ -311,4 +337,5 @@ void saveDataOnPage(Process* process, int pageNumber, int offset, int size,
 		logError("No se pudo enviar la solicitud a la memoria");
 		*hasError = true;
 	}
+	memoryRequestMutex_unlock();
 }

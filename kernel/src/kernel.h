@@ -20,6 +20,8 @@
 #include "module.planning/scheduler.h"
 #include "module.cpu/cpuAdministrator.h"
 #include "module.userInterface/handler-user.h"
+#include "module.memory/memoryRequests.h"
+#include "module.fileSystem/fileSystemRequest.h"
 
 #include "kernelStruct.h"
 #include "connection.h"

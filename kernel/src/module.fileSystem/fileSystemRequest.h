@@ -9,12 +9,18 @@
 #define MODULE_FILESYSTEM_FILESYSTEMREQUEST_H_
 
 #include <stdbool.h>
+#include <pthread.h>
 #include <dc-commons/protocol-fileSystem-kernel.h>
 #include <dc-commons/package.h>
 #include <dc-commons/socket-message.h>
 #include <dc-commons/logger.h>
 #include "../module.model/process.h"
 #include "fileSystemManager.h"
+
+void initializeFileSystemRequestMutex();
+void destroyFileSystemRequestMutex();
+void fileSystemRequestMutex_lock();
+void fileSystemRequestMutex_unlock();
 
 void validateExistFileRequest(Process* process, char* path, int* status);
 

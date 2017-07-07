@@ -70,6 +70,8 @@ void initializeStruct(kernel_struct* kernelStruct, Configuration* config) {
 	initializeScheduler(kernelStruct);
 	initializeCpuAdministrator();
 	initializeFileSystemModule();
+	initializeMemoryRequestMutex();
+	initializeFileSystemRequestMutex();
 }
 
 void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config){
@@ -81,6 +83,8 @@ void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config){
 	destroyScheduler();
 	destroyCpuAdministrator();
 	destroyFileSystemModule();
+	destroyMemoryRequestMutex();
+	destroyFileSystemRequestMutex();
 }
 
 kernel_struct* getKernelStruct(){

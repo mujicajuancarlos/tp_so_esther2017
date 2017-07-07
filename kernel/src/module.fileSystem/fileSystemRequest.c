@@ -7,7 +7,26 @@
 
 #include "fileSystemRequest.h"
 
+pthread_mutex_t fileSystemRequestMutex;
+
+void initializeFileSystemRequestMutex() {
+	pthread_mutex_init(&fileSystemRequestMutex, NULL);
+}
+
+void destroyFileSystemRequestMutex() {
+	pthread_mutex_destroy(&fileSystemRequestMutex);
+}
+
+void fileSystemRequestMutex_lock() {
+	pthread_mutex_lock(&fileSystemRequestMutex);
+}
+
+void fileSystemRequestMutex_unlock() {
+	pthread_mutex_unlock(&fileSystemRequestMutex);
+}
+
 void validateExistFileRequest(Process* process, char* path, int* status) {
+	fileSystemRequestMutex_lock();
 	Package* tmpPackage;
 	int fsSocket = process->kernelStruct->socketClientFileSystem;
 	tmpPackage = createAndSendPackage(fsSocket, COD_EXIST_FILE_REQUEST,
@@ -43,9 +62,11 @@ void validateExistFileRequest(Process* process, char* path, int* status) {
 		logError("El file system no esta conectado");
 		exit(EXIT_FAILURE);
 	}
+	fileSystemRequestMutex_unlock();
 }
 
 void createFileRequest(Process* process, char* path, int* status) {
+	fileSystemRequestMutex_lock();
 	Package* tmpPackage;
 	int fsSocket = process->kernelStruct->socketClientFileSystem;
 	tmpPackage = createAndSendPackage(fsSocket, COD_CREATE_FILE_REQUEST,
@@ -84,9 +105,11 @@ void createFileRequest(Process* process, char* path, int* status) {
 		logError("El file system no esta conectado");
 		exit(EXIT_FAILURE);
 	}
+	fileSystemRequestMutex_unlock();
 }
 
 void deleteFileRequest(Process* process, char* path, int* status) {
+	fileSystemRequestMutex_lock();
 	Package* tmpPackage;
 	int fsSocket = process->kernelStruct->socketClientFileSystem;
 	tmpPackage = createAndSendPackage(fsSocket, COD_DELETE_FILE_REQUEST,
@@ -120,9 +143,11 @@ void deleteFileRequest(Process* process, char* path, int* status) {
 		logError("El file system no esta conectado");
 		exit(EXIT_FAILURE);
 	}
+	fileSystemRequestMutex_unlock();
 }
 
 void writeFileRequest(Process* process, t_fileData* data, int* status) {
+	fileSystemRequestMutex_lock();
 	Package* tmpPackage;
 	int fsSocket = process->kernelStruct->socketClientFileSystem;
 	size_t size = sizeof_t_fileData(data);
@@ -162,9 +187,11 @@ void writeFileRequest(Process* process, t_fileData* data, int* status) {
 		logError("El file system no esta conectado");
 		exit(EXIT_FAILURE);
 	}
+	fileSystemRequestMutex_unlock();
 }
 
 void readFileRequest(Process* process, t_fileData* data, int* status) {
+	fileSystemRequestMutex_lock();
 	Package* tmpPackage;
 	int fsSocket = process->kernelStruct->socketClientFileSystem;
 	size_t size = sizeof_t_fileData(data);
@@ -201,5 +228,6 @@ void readFileRequest(Process* process, t_fileData* data, int* status) {
 		logError("El file system no esta conectado");
 		exit(EXIT_FAILURE);
 	}
+	fileSystemRequestMutex_unlock();
 }
 

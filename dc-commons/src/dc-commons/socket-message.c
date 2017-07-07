@@ -90,11 +90,16 @@ int sendMessage(int socket, char *buffer, int sizeOfMessage, int flags) {
 
 	while (total_bytes_written < sizeOfMessage) {
 
+		if (total_bytes_written != 0) {
+			logWarning(
+					"La funcion send(...) no pudo enviar el conjunto de bytes, se intentara reenviar los bytes restante");
+		}
+
 		bytes_written = send(socket, aux_buffer,
 				sizeOfMessage - total_bytes_written, flags);
 
 		if (bytes_written == 0) {
-			logWarning("La funcion 'recv(...)' retorno 0, FD: %d\n", socket);
+			logWarning("La funcion 'send(...)' retorno 0, FD: %d\n", socket);
 			return SEND_OR_RECEIVE_FAILURE;
 		}
 
@@ -134,12 +139,18 @@ int receiveMessage(int socket, char *buffer, int sizeOfMessage, int flags) {
 
 	while (total_bytes_received < sizeOfMessage) {
 
+		if (total_bytes_received != 0) {
+			logWarning(
+					"La funcion recv(...) no pudo recibir el conjunto de bytes, se intentara recibir los bytes restante");
+		}
+
 		bytes_received = recv(socket, aux_buffer,
 				sizeOfMessage - total_bytes_received, flags);
 
 		switch (errno) { //errno indica el tipo de error
 		case EINTR: //tipo EINTR si hubo interrupcion en el sistema
 		case EAGAIN: //tipo EAGAIN si el socket no esta disponible
+			logWarning("Se detecto una interrupcion mientras se ejecutabala funcion recv(...)");
 			usleep(100); //demora de 100 microsegundos y vuelo a intentar leer
 			break;
 		default:
