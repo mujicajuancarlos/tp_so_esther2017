@@ -43,6 +43,8 @@ void basicWriteFile(fileSystem_struct* fsStruct, char* path, int offset,
 		//si el tamaño cabia posiblemente necesite un resize
 		if (file->size != offset + size) {
 			resizeBlocksQuantity(fsStruct, file, offset + size, status);
+		}else{
+			*status = EXC_OK;
 		}
 		if (*status == EXC_OK) {
 			saveDataOnFS(fsStruct, file, offset, size, buffer);

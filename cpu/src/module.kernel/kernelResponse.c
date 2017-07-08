@@ -37,7 +37,6 @@ void reportEndProcess(cpu_struct* cpuStruct) {
 void reportContextSwich(cpu_struct* cpuStruct) {
 	logInfo("Informando al kernel en nuevo pcb producto del context switch");
 	sendPCB(cpuStruct, COD_CONTEXT_SWITCH_RESPONSE);
-	unloadPCB(cpuStruct);
 }
 
 void sendPCB(cpu_struct* cpuStruct, int messageCode) {

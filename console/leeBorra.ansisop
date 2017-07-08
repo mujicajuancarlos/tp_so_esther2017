@@ -1,7 +1,7 @@
 begin
   variables a, f
   alocar a 100
-  abrir f LE /smallFile.bin
+  abrir f LE /archivo.bin
   leer f a 10
   prints n *a
   borrar f

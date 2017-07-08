@@ -54,8 +54,8 @@ int basicDeleteProcessFile(Process* process, int fileDescriptor) {
 	if (status == VALIDATION_FD_OK) {
 		validateDeleteFile(file->globalFile, &status);
 		if (status == VALIDATION_FD_OK) {
-			removeAndDestroyFile(process, file);
 			deleteFileRequest(process, file->globalFile->path, &status);
+			removeAndDestroyFile(process, file);
 			if (status == COD_FS_RESPONSE_OK) {
 				status = DELETE_FD_SUCCESS;
 			} else {

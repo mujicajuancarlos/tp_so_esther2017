@@ -8,6 +8,5 @@ begin
 		prints n !pasadas
 	signal b
 	liberar a
-	signal b
 	goto ready
 end
