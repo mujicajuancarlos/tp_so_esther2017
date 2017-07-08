@@ -1,0 +1,12 @@
+begin
+	variables a
+	:ready
+	wait b
+	alocar a 100
+	wait b
+	prints s a
+	wait b
+	liberar a
+	wait b
+	goto ready
+end
