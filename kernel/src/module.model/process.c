@@ -63,12 +63,15 @@ void setForceExitCode(Process* process) {
 void freeProcessResources(Process* process) {
 	if (process->pcb != NULL) {
 		destroy_PBC(process->pcb);
-	}
-	if (process->heapPages != NULL) {
-		freeProcessHeapPagesResources(process);
-	}
-	if (process->files != NULL) {
-		freeProcessFilesResources(process);
+		if (process->heapPages != NULL) {
+			freeProcessHeapPagesResources(process);
+		}
+		if (process->files != NULL) {
+			freeProcessFilesResources(process);
+		}
+	}else{
+		list_destroy(process->heapPages);
+		list_destroy(process->files);
 	}
 	notifyEndProcessToConsole(process);
 	notifyEndProcessToMemory(process);
