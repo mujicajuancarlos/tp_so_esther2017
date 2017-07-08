@@ -32,7 +32,7 @@ int basicFreeMemory(Process* process, t_puntero pointer) {
 	int status = SC_ERROR_MEMORY_EXCEPTION;
 	int index;
 	dir_memoria address = pointerToHeapLogicalAddress(pointer, process);
-	bool condition(void* element){
+	bool condition(void* element) {
 		heap_page* page = element;
 		return page->page == address.pagina;
 	}
@@ -71,6 +71,7 @@ void executeGarbageCollectorOn(heap_page* page, Process* process, int* status) {
 		}
 	} else {
 		resolveFragmentation(process, page);
+		*status = FREE_MEMORY_SUCCES;
 	}
 }
 
@@ -98,14 +99,21 @@ void resolveFragmentation(Process* process, heap_page* page) {
 					currentIndex);
 			nextIndex = currentIndex + 1;
 			next = list_get(page->metadataList, nextIndex);
+			if (next == NULL || !next->isFree) {
+				logTrace(
+						"El siguiente bloque #%d no existe o no estaba libre, no se podra compactar",
+						nextIndex);
+			}
 			while (next != NULL && next->isFree) {
 				logTrace(
-						"Se detecto el bloque de metadatos #%d tambien esta libre, se eliminara e incorporara en metadatos #",
+						"Se detecto el bloque de metadatos #%d tambien esta libre, se eliminara e incorporara en metadatos #%d",
 						nextIndex, currentIndex);
 				current->dataSize = current->dataSize + next->dataSize
 						+ sizeof_heapMetadata();
 				logTrace("Se trasfirio %d bytes al bloque #%d",
 						next->dataSize + sizeof_heapMetadata(), currentIndex);
+				logTrace("El bloque #%d ahora tiene %d bytes libres",
+						currentIndex, current->dataSize);
 				list_remove_and_destroy_element(page->metadataList, nextIndex,
 						(void*) destroy_heap_metadata);
 				logTrace(
@@ -168,7 +176,7 @@ heap_page* createHeapPageFor(Process* process, int* status) {
 		selectedPage = create_heap_page(nextNumber,
 				process->kernelStruct->pageSize);
 		createHeapMetadataFor(selectedPage, NULL, -1);
-		list_add(process->heapPages,selectedPage);
+		list_add(process->heapPages, selectedPage);
 	}
 	return selectedPage;
 }

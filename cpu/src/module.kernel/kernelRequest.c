@@ -17,12 +17,13 @@ void updateStackPageSize(cpu_struct* cpuStruct, Package* package) {
 
 void executeNewPcb(cpu_struct* cpuStruct, Package* package) {
 	PCB* pcb = deserialize_PCB(package->stream);
+	int pid = pcb->pid;
 	if (pcb->stackIndex == NULL)
 		createNewContext(pcb);
 	loadPCB(pcb);
-	logTrace("El PCB para pid: %d fue cargado", pcb->pid);
+	logTrace("El PCB para pid: %d fue cargado", pid);
 	ansisopExecuteInstruccion(cpuStruct);
-	logTrace("Se ejecuto la instruccion ansisop del pid: %d", pcb->pid);
+	logTrace("Se ejecuto la instruccion ansisop del pid: %d", pid);
 }
 
 void continueExecution(cpu_struct* cpuStruct, Package* package) {
