@@ -13,8 +13,8 @@ int kernelSocket() {
 
 void ansisopKernel_wait(t_nombre_semaforo name) {
 	char* identificador_semaforo = normalizeString(name);
-	logTrace("Ejecutando ansisopKernel_wait(%s)", identificador_semaforo);
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisopKernel_wait(%s)", identificador_semaforo);
 		Package* package = createAndSendPackage(kernelSocket(), COD_SEM_WAIT,
 				strlen(identificador_semaforo), identificador_semaforo);
 		if (package != NULL) {
@@ -43,15 +43,15 @@ void ansisopKernel_wait(t_nombre_semaforo name) {
 		} else {
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 		}
+		logTrace("Ejecutado ansisopKernel_wait(%s)", identificador_semaforo);
 	}
-	logTrace("Ejecutado ansisopKernel_wait(%s)", identificador_semaforo);
 	free(identificador_semaforo);
 }
 
 void ansisopKernel_signal(t_nombre_semaforo name) {
 	char* identificador_semaforo = normalizeString(name);
-	logTrace("Ejecutando ansisopKernel_signal(%s)", identificador_semaforo);
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisopKernel_signal(%s)", identificador_semaforo);
 		Package* package = createAndSendPackage(kernelSocket(), COD_SEM_SIGNAL,
 				strlen(identificador_semaforo), identificador_semaforo);
 		if (package != NULL) {
@@ -73,15 +73,15 @@ void ansisopKernel_signal(t_nombre_semaforo name) {
 		} else {
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 		}
+		logTrace("Ejecutado ansisopKernel_signal(%s)", identificador_semaforo);
 	}
-	logTrace("Ejecutado ansisopKernel_signal(%s)", identificador_semaforo);
 	free(identificador_semaforo);
 }
 
 t_puntero ansisopKernel_reservar(t_valor_variable size) {
 	t_puntero pointer = NULL_VALUE;
-	logTrace("Ejecutando ansisopKernel_reservar(%d)", size);
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisopKernel_reservar(%d)", size);
 		char* buffer = serialize_int(size);
 		Package* package = createAndSendPackage(kernelSocket(),
 		COD_MALLOC_MEMORY, sizeof(uint32_t), buffer);
@@ -107,14 +107,14 @@ t_puntero ansisopKernel_reservar(t_valor_variable size) {
 		} else {
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 		}
+		logTrace("Ejecutado ansisopKernel_reservar(%d)", size);
 	}
-	logTrace("Ejecutado ansisopKernel_reservar(%d)", size);
 	return pointer;
 }
 
 void ansisopKernel_liberar(t_puntero pointer) {
-	logTrace("Ejecutando ansisopKernel_liberar(%d)", pointer);
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisopKernel_liberar(%d)", pointer);
 		char* buffer = serialize_int(pointer);
 		Package* package = createAndSendPackage(kernelSocket(),
 		COD_FREE_MEMORY, sizeof(uint32_t), buffer);
@@ -140,18 +140,18 @@ void ansisopKernel_liberar(t_puntero pointer) {
 		} else {
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 		}
+		logTrace("Ejecutado ansisopKernel_liberar(%d)", pointer);
 	}
-	logTrace("Ejecutado ansisopKernel_liberar(%d)", pointer);
 }
 
 t_descriptor_archivo ansisopKernel_abrir(t_direccion_archivo name,
 		t_banderas flags) {
 	char* path = normalizeString(name);
 	uint32_t newFD = NULL_VALUE;
-	logTrace(
-			"Ejecutando ansisopKernel_abrir(%s,flags(leer:%d, escribir:%d, crear:%d))",
-			path, flags.lectura, flags.escritura, flags.creacion);
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace(
+				"Ejecutando ansisopKernel_abrir(%s,flags(leer:%d, escribir:%d, crear:%d))",
+				path, flags.lectura, flags.escritura, flags.creacion);
 		t_new_FD_request* data = create_t_new_FD_request(path, flags);
 		char* buffer = serialize_t_new_FD_request(data);
 		size_t size = sizeof_t_new_FD_request(data);
@@ -178,17 +178,17 @@ t_descriptor_archivo ansisopKernel_abrir(t_direccion_archivo name,
 		} else {
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 		}
+		logTrace(
+				"Ejecutado ansisopKernel_abrir(%s,flags(leer:%d, escribir:%d, crear:%d))",
+				path, flags.lectura, flags.escritura, flags.creacion);
 	}
-	logTrace(
-			"Ejecutado ansisopKernel_abrir(%s,flags(leer:%d, escribir:%d, crear:%d))",
-			path, flags.lectura, flags.escritura, flags.creacion);
 	free(path);
 	return newFD;
 }
 
 void ansisopKernel_borrar(t_descriptor_archivo fd) {
-	logTrace("Ejecutando ansisopKernel_borrar(%d)", fd);
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisopKernel_borrar(%d)", fd);
 		char* buffer = serialize_int(fd);
 		Package* package = createAndSendPackage(kernelSocket(), COD_DELETE_FD,
 				sizeof(uint32_t), buffer);
@@ -213,13 +213,13 @@ void ansisopKernel_borrar(t_descriptor_archivo fd) {
 		} else {
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 		}
+		logTrace("Ejecutado ansisopKernel_borrar(%d)", fd);
 	}
-	logTrace("Ejecutado ansisopKernel_borrar(%d)", fd);
 }
 
 void ansisopKernel_cerrar(t_descriptor_archivo fd) {
-	logTrace("Ejecutando ansisopKernel_cerrar(%d)", fd);
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisopKernel_cerrar(%d)", fd);
 		char* buffer = serialize_int(fd);
 		Package* package = createAndSendPackage(kernelSocket(), COD_CLOSE_FD,
 				sizeof(uint32_t), buffer);
@@ -244,13 +244,13 @@ void ansisopKernel_cerrar(t_descriptor_archivo fd) {
 		} else {
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 		}
+		logTrace("Ejecutado ansisopKernel_cerrar(%d)", fd);
 	}
-	logTrace("Ejecutado ansisopKernel_cerrar(%d)", fd);
 }
 
 void ansisopKernel_moverCursor(t_descriptor_archivo fd, t_valor_variable offset) {
-	logTrace("Ejecutando ansisopKernel_moverCursor(%d,%d)", fd, offset);
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisopKernel_moverCursor(%d,%d)", fd, offset);
 		t_seed_FD_request* data = create_t_seed_FD_request(fd, offset);
 		char* buffer = serialize_t_seed_FD_request(data);
 		size_t size = sizeof_t_seed_FD_request(data);
@@ -281,14 +281,15 @@ void ansisopKernel_moverCursor(t_descriptor_archivo fd, t_valor_variable offset)
 		} else {
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 		}
+		logTrace("Ejecutado ansisopKernel_moverCursor(%d,%d)", fd, offset);
 	}
-	logTrace("Ejecutado ansisopKernel_moverCursor(%d,%d)", fd, offset);
 }
 
 void ansisopKernel_escribir(t_descriptor_archivo fd, void* info,
 		t_valor_variable sizeInfo) {
-	logTrace("Ejecutando ansisopKernel_escribir(%d,>>data<<,%d)", fd, sizeInfo);
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisopKernel_escribir(%d,>>data<<,%d)", fd,
+				sizeInfo);
 		t_data_FD_request* data = create_t_data_FD_request(fd, sizeInfo,
 				(char*) info);
 		char* buffer = serialize_t_data_FD_request(data);
@@ -318,14 +319,15 @@ void ansisopKernel_escribir(t_descriptor_archivo fd, void* info,
 		} else {
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 		}
+		logTrace("Ejecutado ansisopKernel_escribir(%d,>>data<<,%d)", fd,
+				sizeInfo);
 	}
-	logTrace("Ejecutado ansisopKernel_escribir(%d,>>data<<,%d)", fd, sizeInfo);
 }
 
 void ansisopKernel_leer(t_descriptor_archivo fd, t_puntero pos,
 		t_valor_variable size) {
-	logTrace("Ejecutando ansisopKernel_leer(%d,%d,%d)", fd, pos, size);
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisopKernel_leer(%d,%d,%d)", fd, pos, size);
 		t_dataPointer_FD_request data;
 		data.fd = fd;
 		data.pointer = pos;
@@ -352,6 +354,6 @@ void ansisopKernel_leer(t_descriptor_archivo fd, t_puntero pos,
 		} else {
 			setErrorFlag(FLAG_DISCONNECTED_KERNEL);
 		}
+		logTrace("Ejecutado ansisopKernel_leer(%d,%d,%d)", fd, pos, size);
 	}
-	logTrace("Ejecutado ansisopKernel_leer(%d,%d,%d)", fd, pos, size);
 }

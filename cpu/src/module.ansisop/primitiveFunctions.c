@@ -8,11 +8,11 @@
 #include "primitiveFunctions.h"
 
 t_puntero ansisop_definirVariable(t_nombre_variable identificador_variable) {
-	logTrace("Ejecutando ansisop_definirVariable(%c)", identificador_variable);
 	t_variable* newArgOrVar;
 	t_puntero pointer = NULL_POINTER;
 	validateStackOverflow(sizeof(t_puntero));
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisop_definirVariable(%c)", identificador_variable);
 		if (isdigit(identificador_variable)) {
 			newArgOrVar = createArgumentForCurrentPCB(identificador_variable);
 			logTrace("Argumento definido: Nom: %c", newArgOrVar->nombre);
@@ -33,11 +33,11 @@ t_puntero ansisop_definirVariable(t_nombre_variable identificador_variable) {
 
 t_puntero ansisop_obtenerPosicionVariable(
 		t_nombre_variable identificador_variable) {
-	logTrace("Ejecutando ansisop_obtenerPosicionVariable(%c)",
-			identificador_variable);
 	t_variable* newArgOrVar;
 	t_puntero pointer = NULL_POINTER;
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisop_obtenerPosicionVariable(%c)",
+					identificador_variable);
 		if (isdigit(identificador_variable)) {
 			newArgOrVar = getArgument(identificador_variable);
 		} else {
@@ -60,9 +60,9 @@ t_puntero ansisop_obtenerPosicionVariable(
 }
 
 t_valor_variable ansisop_dereferenciar(t_puntero pointer) {
-	logTrace("Ejecutando ansisop_dereferenciar(%d)", pointer);
 	t_valor_variable value = NULL_VALUE;
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisop_dereferenciar(%d)", pointer);
 		dir_memoria* address = pointerToMemoryLogicalAddress(pointer);
 		char* buffer = getDataFromMemory(getCPUStruct(), address->pagina,
 				address->offset, address->size);
@@ -83,8 +83,8 @@ t_valor_variable ansisop_dereferenciar(t_puntero pointer) {
 }
 
 void ansisop_asignar(t_puntero pointer, t_valor_variable value) {
-	logTrace("Ejecutando ansisop_asignar(%d,%d)", pointer, value);
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisop_asignar(%d,%d)", pointer, value);
 		dir_memoria* address = pointerToMemoryLogicalAddress(pointer);
 		char* buffer = serialize_int(value);
 		saveDataOnMemory(getCPUStruct(), address->pagina, address->offset,
@@ -105,9 +105,9 @@ void ansisop_asignar(t_puntero pointer, t_valor_variable value) {
 
 t_valor_variable ansisop_obtenerValorCompartida(t_nombre_compartida name) {
 	char* identificadorVariable = normalizeString(name);
-	logTrace("Ejecutando ansisop_obtenerValorCompartida(%s)", identificadorVariable);
 	t_valor_variable value = NULL_VALUE;
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisop_obtenerValorCompartida(%s)", identificadorVariable);
 		value = getSharedVarriableValue(getCPUStruct(), identificadorVariable);
 		if (getErrorFlag() == FLAG_OK) {
 			logTrace(
@@ -126,9 +126,9 @@ t_valor_variable ansisop_obtenerValorCompartida(t_nombre_compartida name) {
 t_valor_variable ansisop_asignarValorCompartida(t_nombre_compartida name,
 		t_valor_variable value) {
 	char* identificadorVariable = normalizeString(name);
-	logTrace("Ejecutando ansisop_asignarValorCompartida(%s,%d)", identificadorVariable, value);
 	t_valor_variable assignedValue = NULL_VALUE;
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisop_asignarValorCompartida(%s,%d)", identificadorVariable, value);
 		assignedValue = setSharedVarriableValue(getCPUStruct(), identificadorVariable, value);
 		if (getErrorFlag() == FLAG_OK) {
 			logTrace(
@@ -146,8 +146,8 @@ t_valor_variable ansisop_asignarValorCompartida(t_nombre_compartida name,
 
 void ansisop_irAlLabel(t_nombre_etiqueta name) {
 	char* identificadorEtiqueta = normalizeString(name);
-	logTrace("Ejecutando ansisop_irAlLabel(%s)", identificadorEtiqueta);
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisop_irAlLabel(%s)", identificadorEtiqueta);
 		int status = NULL_VALUE;
 		t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(identificadorEtiqueta,
 				&status);
@@ -165,8 +165,8 @@ void ansisop_irAlLabel(t_nombre_etiqueta name) {
 
 void ansisop_llamarSinRetorno(t_nombre_etiqueta name) {
 	char* identificadorEtiqueta = normalizeString(name);
-	logTrace("Ejecutando ansisop_llamarSinRetorno(%s,)", identificadorEtiqueta);
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisop_llamarSinRetorno(%s,)", identificadorEtiqueta);
 		int status = NULL_VALUE;
 		t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(
 				identificadorEtiqueta, &status);
@@ -190,15 +190,15 @@ void ansisop_llamarSinRetorno(t_nombre_etiqueta name) {
 					identificadorEtiqueta);
 			setErrorFlag(FLAG_SINTAX_ERROR);
 		}
+		logTrace("Fin de ansisop_llamarSinRetorno(%s)", identificadorEtiqueta);
 	}
-	logTrace("Fin de ansisop_llamarSinRetorno(%s)", identificadorEtiqueta);
 	free(identificadorEtiqueta);
 }
 
 void ansisop_llamarConRetorno(t_nombre_etiqueta name, t_puntero pointer) {
 	char* identificadorEtiqueta = normalizeString(name);
-	logTrace("Ejecutando ansisop_llamarConRetorno(%s, %d)", identificadorEtiqueta, pointer);
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisop_llamarConRetorno(%s, %d)", identificadorEtiqueta, pointer);
 		int status = NULL_VALUE;
 		t_puntero_instruccion newProgramCounter = getProgramCounterByLabel(
 				identificadorEtiqueta, &status);
@@ -227,21 +227,22 @@ void ansisop_llamarConRetorno(t_nombre_etiqueta name, t_puntero pointer) {
 					identificadorEtiqueta);
 			setErrorFlag(FLAG_SINTAX_ERROR);
 		}
+		logTrace("Fin de ansisop_llamarConRetorno(%s, %d)", identificadorEtiqueta, pointer);
 	}
-	logTrace("Fin de ansisop_llamarConRetorno(%s, %d)", identificadorEtiqueta, pointer);
+
 	free(name);
 }
 
 void ansisop_finalizar() {
-	logTrace("Ejecutando ansisop_finalizar()");
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisop_finalizar()");
 		setErrorFlag(FLAG_END_PROGRAM);
 	}
 }
 
 void ansisop_retornar(t_valor_variable value) {
-	logTrace("Ejecutando ansisop_retornar(%d)", value);
 	if (getErrorFlag() == FLAG_OK) {
+		logTrace("Ejecutando ansisop_retornar(%d)", value);
 		t_stack_index* stackIndex = getCurrentContext();
 		dir_memoria* address = &(stackIndex->retVar);
 		char* buffer = serialize_int(value);

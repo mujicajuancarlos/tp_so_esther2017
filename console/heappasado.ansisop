@@ -3,6 +3,6 @@
 begin
 	variables a
 	
-	alocar a 400
+	alocar a 600
 	
 end
