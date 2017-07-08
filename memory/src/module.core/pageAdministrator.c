@@ -25,7 +25,7 @@ int processWrite(memory_struct* memoryStruct, t_PageBytes* dataInfo) {
 			dataInfo->pageNumber);
 	char *memAddress = globalPage->startAddress + dataInfo->offset;
 
-	if ((dataInfo->offset + dataInfo->size) > memoryStruct->config->marco_size) {
+	if ((dataInfo->offset + dataInfo->size) >= memoryStruct->config->marco_size) {
 		// segmentation fault
 		return (-1);
 	} else
@@ -39,7 +39,7 @@ int processRead(memory_struct* memoryStruct, t_PageBytes* dataInfo) {
 			dataInfo->pageNumber);
 	char *memAddress = globalPage->startAddress + dataInfo->offset;
 
-	if ((dataInfo->offset + dataInfo->size) > memoryStruct->config->marco_size) {
+	if ((dataInfo->offset + dataInfo->size) >= memoryStruct->config->marco_size) {
 		// segmentation fault
 		return (-1);
 	}
