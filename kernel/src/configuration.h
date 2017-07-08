@@ -24,9 +24,8 @@
 #include "module.model/sharedVariables.h"
 
 //configuration file keys
-#define DEFAULT_CONFIG_PATH "../conf/kernel.conf"
-#define ECLIPSE_CONFIG_PATH "conf/kernel.conf"
-#define CONFIG_PATH "/home/utnso/tp-2017-1c-Los-5-Fant-sticos/kernel/conf"
+#define DEFAULT_CONFIG_PATH "../kernel.conf"
+#define ECLIPSE_CONFIG_PATH "kernel.conf"
 
 //process keys
 #define PUERTO_PROG "PUERTO_PROG"
@@ -67,6 +66,7 @@ typedef struct Configuration {
 	char* algoritmo;
 	int grado_multiprog;
 	int stack_size;
+	char* configPath;
 	char* log_level;
 	char* log_file;
 	char* log_program_name;
@@ -86,6 +86,6 @@ Configuration* config_with(char *config_file);
  */
 Configuration* getConfiguration();
 
-void VerifiedFileModificationINOTIFY(Configuration* config);
+void configMonitor(Configuration* config);
 
 #endif /* CONFIGURATION_CONFIGURATION_H_ */

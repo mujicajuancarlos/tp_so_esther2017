@@ -22,6 +22,10 @@ int main(int argc, char *argv[]) {
 	logInfo("Inicializado proceso kernel");
 	initializeStruct(&kernelStruct, config);
 
+	logInfo("Creando el hilo para monitorizar cambios en el achivo de confguracion");
+	pthread_t hiloInotify;
+	pthread_create(&hiloInotify, NULL, (void*) configMonitor, config);
+
 	logInfo("Creacion de sockets cliente y server");
 	createSockets(&kernelStruct);
 
@@ -38,11 +42,8 @@ int main(int argc, char *argv[]) {
 
 	logInfo("Creando el hilo para el planificador");
 	pthread_t hiloPlanificador;
-	pthread_create(&hiloPlanificador, NULL, (void*) handlePlanning, &kernelStruct);
-
-	logInfo("Creando el hilo para modificacion INOTIFY");
-	pthread_t hiloINOTIFY;
-	pthread_create(&hiloINOTIFY, NULL, (void*) VerifiedFileModificationINOTIFY,config);
+	pthread_create(&hiloPlanificador, NULL, (void*) handlePlanning,
+			&kernelStruct);
 
 	logInfo("Inicia el lector de comandos para el usuario");
 	handleUserRequest(&kernelStruct);
@@ -75,7 +76,7 @@ void initializeStruct(kernel_struct* kernelStruct, Configuration* config) {
 	initializeExcecuteContinueMutex();
 }
 
-void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config){
+void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config) {
 
 	free(kernelStruct);
 	free(config);
@@ -89,6 +90,6 @@ void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config){
 	destroyExcecuteContinueMutex();
 }
 
-kernel_struct* getKernelStruct(){
+kernel_struct* getKernelStruct() {
 	return &kernelStruct;
 }
