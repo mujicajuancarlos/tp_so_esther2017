@@ -229,8 +229,7 @@ void ansisop_llamarConRetorno(t_nombre_etiqueta name, t_puntero pointer) {
 		}
 		logTrace("Fin de ansisop_llamarConRetorno(%s, %d)", identificadorEtiqueta, pointer);
 	}
-
-	free(name);
+	free(identificadorEtiqueta);
 }
 
 void ansisop_finalizar() {
