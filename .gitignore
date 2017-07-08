@@ -32,7 +32,6 @@
 # Debug files
 *.dSYM/
 *.su
-*/Debug/
 
 # LOG files
 *.log
@@ -43,3 +42,4 @@ RemoteSystemsTempFiles/
 fileSystem/mnt/FS_SADICA/metadata/bitmap.bin
 fileSystem/mnt/FS_SADICA/files/*
 fileSystem/mnt/FS_SADICA/blocks/*.bin
+cpu/Debug/cpu
