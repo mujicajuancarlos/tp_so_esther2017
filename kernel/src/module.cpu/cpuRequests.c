@@ -318,7 +318,6 @@ void executeDeleteProcessFileTo(CPU* cpu, Package* package) {
 	default:
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
 		COD_SYSCALL_FAILURE, 0, NULL);
-		markFreeCPU(cpu);
 		switch (status) {
 		case FILE_NOTFOUND_FD_FAILURE:
 			moveFromExcecToExit_withError(cpu->process,
@@ -333,6 +332,7 @@ void executeDeleteProcessFileTo(CPU* cpu, Package* package) {
 			break;
 		}
 		break;
+		markFreeCPU(cpu);
 	}
 	destroyPackage(tmpPackage);
 }
@@ -395,7 +395,6 @@ void executeWriteProcessFileTo(CPU* cpu, Package* package) {
 	default:
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
 		COD_SYSCALL_FAILURE, 0, NULL);
-		markFreeCPU(cpu);
 		switch (status) {
 		case FILE_NOTFOUND_FD_FAILURE:
 			moveFromExcecToExit_withError(cpu->process,
@@ -411,6 +410,7 @@ void executeWriteProcessFileTo(CPU* cpu, Package* package) {
 			break;
 		}
 		break;
+		markFreeCPU(cpu);
 	}
 	destroyPackage(tmpPackage);
 }
@@ -429,16 +429,17 @@ void executeReadProcessFileTo(CPU* cpu, Package* package) {
 	case FILE_NOTFOUND_FD_FAILURE:
 	case MEMORY_SAVE_FAILURE:
 	case PERMISSIONS_DENIED_FD_FAILURE:
+	case FS_FILE_BLOCK_FAULT:
 	default:
 		tmpPackage = createAndSendPackage(cpu->fileDescriptor,
 		COD_SYSCALL_FAILURE, 0, NULL);
-		markFreeCPU(cpu);
 		switch (status) {
 		case FILE_NOTFOUND_FD_FAILURE:
 			moveFromExcecToExit_withError(cpu->process,
 			SC_ERROR_FILE_NOT_FOUND);
 			break;
 		case PERMISSIONS_DENIED_FD_FAILURE:
+		case FS_FILE_BLOCK_FAULT:
 			moveFromExcecToExit_withError(cpu->process,
 			SC_ERROR_FILE_READ_REFUSED);
 			break;
@@ -452,6 +453,7 @@ void executeReadProcessFileTo(CPU* cpu, Package* package) {
 			break;
 		}
 		break;
+		markFreeCPU(cpu);
 	}
 	destroyPackage(tmpPackage);
 }

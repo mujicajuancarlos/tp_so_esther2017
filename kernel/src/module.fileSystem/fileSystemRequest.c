@@ -160,7 +160,8 @@ void writeFileRequest(Process* process, t_fileData* data, int* status) {
 		exit(EXIT_FAILURE);
 	}
 	destroyPackage(tmpPackage);
-	logInfo("Se solicitó al FS escribir en el archivo para el pid: %d", process->pid);
+	logInfo("Se solicitó al FS escribir en el archivo para el pid: %d",
+			process->pid);
 	//me quedo a la espera de la aprobacion
 	tmpPackage = createAndReceivePackage(fsSocket);
 	if (tmpPackage != NULL) {
@@ -217,6 +218,10 @@ void readFileRequest(Process* process, t_fileData* data, int* status) {
 		case COD_FS_RESPONSE_FILE_NOTFOUND:
 			logInfo("El FS no pudo leer en el archivo");
 			*status = FILE_NOTFOUND_FD_FAILURE;
+			break;
+		case COD_FS_RESPONSE_ERROR_GENERIC:
+			logInfo("El FS no pudo leer en el archivo, los datos solicitados exceden el tamaño actual del archivo");
+			*status = FS_FILE_BLOCK_FAULT;
 			break;
 		default:
 			logError("El FS respondio con un mensaje desconocido");

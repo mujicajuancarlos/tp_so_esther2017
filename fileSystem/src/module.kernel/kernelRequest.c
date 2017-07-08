@@ -15,8 +15,7 @@ void executeExistFileRequest(fileSystem_struct* fsStruct, Package* package) {
 	if (exist) {
 		tmpPackage = createAndSendPackage(fsStruct->fd_kernel,
 		COD_FS_RESPONSE_OK, 0, NULL);
-		logInfo("Se informo que el archivo %s existe en el file system",
-				path);
+		logInfo("Se informo que el archivo %s existe en el file system", path);
 	} else {
 		tmpPackage = createAndSendPackage(fsStruct->fd_kernel,
 		COD_FS_RESPONSE_FILE_NOTFOUND, 0, NULL);
@@ -37,7 +36,8 @@ void executeCreateFileRequest(fileSystem_struct* fsStruct, Package* package) {
 	case EXC_OK:
 		tmpPackage = createAndSendPackage(fsStruct->fd_kernel,
 		COD_FS_RESPONSE_OK, 0, NULL);
-		logInfo("El file system indico al kernel que el archivo %s fue creado", path);
+		logInfo("El file system indico al kernel que el archivo %s fue creado",
+				path);
 		break;
 	case EXC_ERROR_EXIST_FILE:
 		tmpPackage = createAndSendPackage(fsStruct->fd_kernel,
@@ -100,6 +100,12 @@ void executeReadFileRequest(fileSystem_struct* fsStruct, Package* package) {
 		tmpPackage = createAndSendPackage(fsStruct->fd_kernel,
 		COD_FS_RESPONSE_FILE_NOTFOUND, 0, NULL);
 		logInfo("El file system indico al kernel que el archivo %s no existe",
+				data->path);
+		break;
+	case EXC_ERROR_BLOCK_FAULT:
+		tmpPackage = createAndSendPackage(fsStruct->fd_kernel,
+				COD_FS_RESPONSE_ERROR_GENERIC, 0, NULL);
+		logInfo("El file system indico al kernel que los datos solicitados exceden el tamaño actual del archivo %s",
 				data->path);
 		break;
 	}

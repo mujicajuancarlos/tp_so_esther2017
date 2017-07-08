@@ -10,25 +10,34 @@
 int basicOpenProcessFile(Process* process, t_new_FD_request* dataRequest,
 		int* assignedFD) {
 	int status = OPEN_FD_SUCCESS;
-	char* path = string_substring_until(dataRequest->path,dataRequest->sizePath);
+	char* path = string_substring_until(dataRequest->path,
+			dataRequest->sizePath);
 	t_globalFile* globalFile = getGlobalFileFor(path);
 	if (globalFile == NULL) {
-		globalFile = createGlobalFileWith(dataRequest, &status);
-		if (globalFile != NULL){
-			//realizo la verificacion en FS
-			validateExistFileRequest(process,path,&status);
-			if(status == FILE_NOTFOUND_FD_FAILURE){
-				logInfo("El archivo %s no existe en FS, se solicitara crear el archivo",path);
-				createFileRequest(process,path,&status);
-				if(status == COD_FS_RESPONSE_OK){
-					logInfo("El FS indico que el archivo %s se creo sin problemas");
+		validateExistFileRequest(process, path, &status);
+		if (status == FILE_NOTFOUND_FD_FAILURE) {
+			logInfo("El archivo %s no existe en FS", path);
+			logInfo("Validando permisos", path);
+			validatePermissionForCreateFile(dataRequest->flags, &status);
+			if (status == VALIDATION_FD_OK) {
+				createFileRequest(process, path, &status);
+				if (status == COD_FS_RESPONSE_OK) {
+					logInfo(
+							"El FS indico que el archivo %s se creo sin problemas");
+					globalFile = createGlobalFileWith(dataRequest);
 					status = OPEN_FD_SUCCESS;
-				}else{
+				} else {
+					free(path);
 					return WITHOUT_RESOURCES_FD_FAILURE;
 				}
+			} else {
+				logInfo(
+						"El archivo %s no tiene permisos de creacion, la solicitud no puede continuar");
+				free(path);
+				return PERMISSIONS_DENIED_FD_FAILURE;
 			}
 		} else {
-			return PERMISSIONS_DENIED_FD_FAILURE;
+			globalFile = createGlobalFileWith(dataRequest);
 		}
 	}
 	free(path);
@@ -44,15 +53,15 @@ int basicDeleteProcessFile(Process* process, int fileDescriptor) {
 	validateExistFile(file, &status);
 	if (status == VALIDATION_FD_OK) {
 		validateDeleteFile(file->globalFile, &status);
-		if (status == VALIDATION_FD_OK){
+		if (status == VALIDATION_FD_OK) {
 			removeAndDestroyFile(process, file);
-			deleteFileRequest(process,file->globalFile->path,&status);
-			if(status==COD_FS_RESPONSE_OK){
+			deleteFileRequest(process, file->globalFile->path, &status);
+			if (status == COD_FS_RESPONSE_OK) {
 				status = DELETE_FD_SUCCESS;
-			}else{
+			} else {
 				status = FILE_NOTFOUND_FD_FAILURE;
 			}
-		}else{
+		} else {
 			status = FILE_IN_USED_FD_FAILUERE;
 		}
 	}
@@ -65,7 +74,7 @@ int basicCloseProcessFile(Process* process, int fileDescriptor) {
 	validateExistFile(file, &status);
 	if (status == VALIDATION_FD_OK) {
 		removeAndDestroyFile(process, file);
-		status = CLOSE_FD_SUCCESS;//no es necesario informar a fs
+		status = CLOSE_FD_SUCCESS; //no es necesario informar a fs
 	}
 	return status;
 }
@@ -76,14 +85,14 @@ int basicSeekProcessFile(Process* process, t_seed_FD_request* dataRequest) {
 	validateExistFile(file, &status);
 	if (status == VALIDATION_FD_OK) {
 		file->seekValue = dataRequest->offset;
-		status = SEEK_FD_SUCCESS;//no es necesario informa a fs
+		status = SEEK_FD_SUCCESS; //no es necesario informa a fs
 	}
 	return status;
 }
 
 int basicWriteProcessFile(Process* process, t_data_FD_request* dataRequest) {
 	int status = WRITE_FD_SUCCESS;
-	if(dataRequest->fd == STDOUT_FD){
+	if (dataRequest->fd == STDOUT_FD) {
 		writeOnStdout(process, dataRequest);
 		return WRITE_FD_SUCCESS;
 	}
@@ -92,12 +101,14 @@ int basicWriteProcessFile(Process* process, t_data_FD_request* dataRequest) {
 	if (status == VALIDATION_FD_OK) {
 		validatePermissionForWriteFile(file, &status);
 		if (status == VALIDATION_FD_OK) {
-			t_fileData* fileData = create_t_fileData(file->globalFile->path,file->seekValue,dataRequest->sizeBuffer);
-			memcpy(fileData->data, dataRequest->buffer, dataRequest->sizeBuffer);
+			t_fileData* fileData = create_t_fileData(file->globalFile->path,
+					file->seekValue, dataRequest->sizeBuffer);
+			memcpy(fileData->data, dataRequest->buffer,
+					dataRequest->sizeBuffer);
 			writeFileRequest(process, fileData, &status);
-			if(status == COD_FS_RESPONSE_OK){
+			if (status == COD_FS_RESPONSE_OK) {
 				status = WRITE_FD_SUCCESS;
-			}else{
+			} else {
 				status = FILE_NOTFOUND_FD_FAILURE;
 			}
 			destroy_t_fileData(fileData);
@@ -106,27 +117,34 @@ int basicWriteProcessFile(Process* process, t_data_FD_request* dataRequest) {
 	return status;
 }
 
-int basicReadProcessFile(Process* process, t_dataPointer_FD_request* dataRequest) {
+int basicReadProcessFile(Process* process,
+		t_dataPointer_FD_request* dataRequest) {
 	int status = READ_FD_SUCCESS;
 	t_processFile* file = getProcessFile(process, dataRequest->fd);
 	validateExistFile(file, &status);
 	if (status == VALIDATION_FD_OK) {
 		validatePermissionForReadFile(file, &status);
 		if (status == VALIDATION_FD_OK) {
-			t_fileData* fileData = create_t_fileData(file->globalFile->path,file->seekValue,dataRequest->size);
-			readFileRequest(process,fileData,&status);
-			if(status == COD_FS_RESPONSE_OK){
-				dir_memoria address = pointerToMemoryLogicalAddress(dataRequest->pointer,process);
+			t_fileData* fileData = create_t_fileData(file->globalFile->path,
+					file->seekValue, dataRequest->size);
+			readFileRequest(process, fileData, &status);
+			if (status == COD_FS_RESPONSE_OK) {
+				dir_memoria address = pointerToMemoryLogicalAddress(
+						dataRequest->pointer, process);
 				bool hasError;
-				logInfo("Enviando la informacion del archivo leido a la memoria");
-				saveDataOnMemory(process, address.pagina, address.offset, fileData->dataSize, fileData->data, &hasError);
-				if(!hasError){
+				logInfo(
+						"Enviando la informacion del archivo leido a la memoria");
+				saveDataOnMemory(process, address.pagina, address.offset,
+						fileData->dataSize, fileData->data, &hasError);
+				if (!hasError) {
 					status = READ_FD_SUCCESS;
-				}else{
+				} else {
 					status = MEMORY_SAVE_FAILURE;
 				}
-			}else{
-				status = FILE_NOTFOUND_FD_FAILURE;
+			} else {
+				if(status != FS_FILE_BLOCK_FAULT){
+					status = FILE_NOTFOUND_FD_FAILURE;
+				}
 			}
 			destroy_t_fileData(fileData);
 		}
@@ -153,21 +171,22 @@ int createProcessFileWith(Process* process, t_globalFile* globalFile,
 /*
  * invocar solo cuando se verifico que el archivo no existe
  */
-t_globalFile* createGlobalFileWith(t_new_FD_request* dataRequest, int* status) {
+t_globalFile* createGlobalFileWith(t_new_FD_request* dataRequest) {
 	t_globalFile* globalFile = NULL;
-	validatePermissionForCreateFile(dataRequest->flags, status);
-	char* path = string_substring_until(dataRequest->path,dataRequest->sizePath);
-	if (*status == VALIDATION_FD_OK) {
-		logInfo("Creando fd global para el archivo %s", path);
-		globalFile = create_t_globalFile(path);
-		addGlobalFile(globalFile);
-	}
+	char* path = string_substring_until(dataRequest->path,
+			dataRequest->sizePath);
+	logInfo("Creando fd global para el archivo %s", path);
+	globalFile = create_t_globalFile(path);
+	addGlobalFile(globalFile);
+
 	free(path);
 	return globalFile;
 }
 
-void validateDeleteFile(t_globalFile* globalFile, int* status){
-	*status = (globalFile->open == 1) ? VALIDATION_FD_OK : FILE_IN_USED_FD_FAILUERE;
+void validateDeleteFile(t_globalFile* globalFile, int* status) {
+	*status = (globalFile->open == 1) ?
+	VALIDATION_FD_OK :
+										FILE_IN_USED_FD_FAILUERE;
 }
 
 void validatePermissionForCreateFile(t_banderas flags, int* status) {

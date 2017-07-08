@@ -61,6 +61,8 @@ void basicReadFile(fileSystem_struct* fsStruct, char* path, int offset,
 		validateBlocksQuantity(file, offset + size, status);
 		if (*status == EXC_OK) {
 			readDataFromFS(fsStruct, file, offset, size, buffer);
+		}else{
+			logError("El tamaño del archivo es %d y se solicito desde %d hasta %d",file->size,offset,size);
 		}
 	} else {
 		*status = EXC_ERROR_FILE_NOT_FOUND;

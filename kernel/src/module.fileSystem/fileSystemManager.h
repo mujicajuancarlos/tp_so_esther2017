@@ -33,6 +33,7 @@
 #define FS_ERROR_UNKNOWN 13
 #define WITHOUT_RESOURCES_FD_FAILURE 14
 #define MEMORY_SAVE_FAILURE 15
+#define FS_FILE_BLOCK_FAULT 16 //como el segmentation fautl pero en archivos
 
 #define VALIDATION_FD_OK 20
 
@@ -52,7 +53,7 @@ int basicReadProcessFile(Process* process, t_dataPointer_FD_request* dataRequest
 int createProcessFileWith(Process* process, t_globalFile* globalFile,
 		t_banderas externalFlags);
 
-t_globalFile* createGlobalFileWith(t_new_FD_request* dataRequest, int* status);
+t_globalFile* createGlobalFileWith(t_new_FD_request* dataRequest);
 
 void validateDeleteFile(t_globalFile* globalFile, int* status);
 void validatePermissionForCreateFile(t_banderas flags, int* status);
