@@ -4,20 +4,26 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/socket/socket.c 
+../src/configuration.c \
+../src/connection.c \
+../src/kernel.c 
 
 OBJS += \
-./src/socket/socket.o 
+./src/configuration.o \
+./src/connection.o \
+./src/kernel.o 
 
 C_DEPS += \
-./src/socket/socket.d 
+./src/configuration.d \
+./src/connection.d \
+./src/kernel.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/socket/%.o: ../src/socket/%.c
+src/%.o: ../src/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
-	gcc -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	gcc -I"/home/utnso/Desarrollo/workspace/esther2017/dc-commons" -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

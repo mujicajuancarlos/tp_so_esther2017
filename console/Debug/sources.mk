@@ -13,11 +13,5 @@ EXECUTABLES :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
-src/module.userInterface \
-src/module.planning \
-src/module.model \
-src/module.memory \
-src/module.cpu \
-src/module.console \
 src \
 
