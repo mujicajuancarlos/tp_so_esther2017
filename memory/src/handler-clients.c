@@ -13,7 +13,7 @@
 void handleClients(memory_struct* memoryStruct) {
 
 	int newSocket;
-	Package* package;
+	Package* package = NULL;
 
 	while (true) {
 

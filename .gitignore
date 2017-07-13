@@ -42,4 +42,22 @@ RemoteSystemsTempFiles/
 fileSystem/mnt/FS_SADICA/metadata/bitmap.bin
 fileSystem/mnt/FS_SADICA/files/*
 fileSystem/mnt/FS_SADICA/blocks/*.bin
+
+# commons
+dc-commons/Debug/libdc-commons.so
+dc-commons/Release/libdc-commons.so
+# console
+console/Debug/console
+console/Release/console
+#cpu
 cpu/Debug/cpu
+cpu/Release/cpu
+# fileSystem
+fileSystem/Debug/fileSystem
+fileSystem/Release/fileSystem
+# kernel
+kernel/Debug/kernel
+kernel/Release/kernel
+# memory
+memory/Debug/memory
+memory/Release/memory

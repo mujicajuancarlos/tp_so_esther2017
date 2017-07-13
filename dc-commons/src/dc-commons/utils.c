@@ -31,7 +31,11 @@ char* readFile(char* pathFile, long startByte, long endByte) {
 	logDebug("Leyendo el archivo %s", pathFile);
 
 	fseek(file, startByte, SEEK_SET);
-	fread(buffer, sizeBuffer, 1, file);
+	int systemRet = fread(buffer, sizeBuffer, 1, file);
+	if(systemRet == -1){
+		logWarning("El SO no pudo ejecutar fread(buffer, sizeBuffer, 1, file)");
+	}
+
 	fclose(file);
 
 	logDebug("Archivo leido: \n %s", buffer);

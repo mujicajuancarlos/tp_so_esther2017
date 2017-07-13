@@ -306,7 +306,7 @@ t_puntero_instruccion getProgramCounterByLabel(t_nombre_etiqueta label,
 	size_t size = pcb->metadata->etiquetas_size;
 	int offset = 0;
 	*status = NULL_VALUE;
-	t_puntero_instruccion newProgramCounter;
+	t_puntero_instruccion newProgramCounter = 0;
 
 	char* normalizedLabel = normalizeString(label);
 

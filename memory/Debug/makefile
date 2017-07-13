@@ -31,13 +31,13 @@ endif
 all: memory
 
 dependents:
-	-cd /home/utnso/esther2017/dc-commons/Debug && $(MAKE) clean all
+	-cd ../../dc-commons/Release && $(MAKE) clean all
 
 # Tool invocations
-memory: $(OBJS) $(USER_OBJS) /home/utnso/esther2017/dc-commons/Debug/libdc-commons.so
+memory: $(OBJS) $(USER_OBJS) ../../dc-commons/Release/libdc-commons.so
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/utnso/esther2017/dc-commons/Debug" -L"/home/utnso/esther2017/dc-commons" -o "memory" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"../../dc-commons/Debug" -o "memory" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -48,6 +48,6 @@ clean:
 
 .PHONY: all clean dependents
 .SECONDARY:
-/home/utnso/esther2017/dc-commons/Debug/libdc-commons.so:
+../../dc-commons/Release/libdc-commons.so:
 
 -include ../makefile.targets

@@ -14,6 +14,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <commons/string.h>
+#include "logger.h"
 
 #define HELP_COMMAND "-help"
 

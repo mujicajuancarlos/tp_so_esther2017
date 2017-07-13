@@ -26,13 +26,13 @@ endif
 all: console
 
 dependents:
-	-cd /home/utnso/esther2017/dc-commons/Debug && $(MAKE) clean all
+	-cd ../../dc-commons/Debug && $(MAKE) clean all
 
 # Tool invocations
-console: $(OBJS) $(USER_OBJS) /home/utnso/esther2017/dc-commons/Debug/libdc-commons.so
+console: $(OBJS) $(USER_OBJS) ../../dc-commons/Debug/libdc-commons.so
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/utnso/esther2017/dc-commons/Debug" -L"/home/utnso/esther2017/dc-commons" -o "console" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"../../dc-commons/Debug" -L"../../dc-commons" -o "console" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -43,6 +43,6 @@ clean:
 
 .PHONY: all clean dependents
 .SECONDARY:
-/home/utnso/esther2017/dc-commons/Debug/libdc-commons.so:
+../../dc-commons/Debug/libdc-commons.so:
 
 -include ../makefile.targets

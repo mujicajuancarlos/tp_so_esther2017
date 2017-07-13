@@ -27,7 +27,13 @@ void printNewLine() {
 
 void clearScreem() {
 	lockPrinter();
-	system("clear");
+	int systemRet = system("clear");
+	if(systemRet != -1){
+	  logInfo("Se ejecuto system(clear) correctamente");
+	}else{
+		logWarning("El comando system(clear) no se pudo ejecutar");
+	}
+
 	unlockPrinter();
 }
 
