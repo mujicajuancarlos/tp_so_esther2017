@@ -39,7 +39,7 @@ int crearSocketServer(int port) {
 		return SOCKET_FAILURE;
 	}
 
-	if (listen(socketFileDescriptor, 100) == -1) {
+	if (listen(socketFileDescriptor, 250) == -1) {
 		error_show("Socket listen failed FD: %d address: %s port: %d\n",
 				socketFileDescriptor, LOCAL_HOST, port);
 		close(socketFileDescriptor);

@@ -63,7 +63,7 @@
 				<externalSettings containerId="dc-commons;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/dc-commons"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/dc-commons/Release"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/dc-commons/Debug"/>
 						<entry flags="RESOLVED" kind="libraryFile" name="dc-commons" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
