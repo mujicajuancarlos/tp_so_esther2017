@@ -49,15 +49,20 @@ dc-commons/Release/libdc-commons.so
 # console
 console/Debug/console
 console/Release/console
+console/console
 #cpu
 cpu/Debug/cpu
 cpu/Release/cpu
+cpu/cpu
 # fileSystem
 fileSystem/Debug/fileSystem
 fileSystem/Release/fileSystem
+fileSystem/fileSystem
 # kernel
 kernel/Debug/kernel
 kernel/Release/kernel
+kernel/kernel
 # memory
 memory/Debug/memory
 memory/Release/memory
+memory/memory
