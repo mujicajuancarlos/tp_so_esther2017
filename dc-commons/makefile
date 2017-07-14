@@ -1,12 +1,13 @@
 NAME=dc-commons
+MAKE=make -f customMakefile
 install:
 	@echo "Instalando la libreria <$(NAME)> en el Sistema "
-	-cd src && sudo $(MAKE) install
+	-cd src && sudo make install
 	@echo "La libreria <$(NAME)> se instalo exitosamente "
 
 uninstall:
 	@echo "Desinstalando la libreria <$(NAME)> en el Sistema "
-	-cd src && sudo $(MAKE) uninstall
+	-cd src && sudo make uninstall
 	@echo "La libreria <$(NAME)> se desinstalo exitosamente "
 
 release:  cleanRelease

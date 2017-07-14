@@ -1,4 +1,5 @@
 NAME=kernel
+MAKE=make -f customMakefile
 release:  cleanRelease
 	@echo "> START................................................................................ "
 	@echo "Iniciando compilacion de <$(NAME)> en modo RELEASE "
