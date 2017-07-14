@@ -39,6 +39,12 @@
 .metadata
 RemoteSystemsTempFiles/
 
+console/.cproject
+cpu/.cproject
+kernel/.cproject
+fileSystem/.cproject
+memory/.cproject
+
 fileSystem/mnt/FS_SADICA/metadata/bitmap.bin
 fileSystem/mnt/FS_SADICA/files/*
 fileSystem/mnt/FS_SADICA/blocks/*.bin
