@@ -34,7 +34,7 @@ all: memory
 memory: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"../../dc-commons/Release" -o "memory" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/utnso/esther2017/dc-commons/Release" -o "memory" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
