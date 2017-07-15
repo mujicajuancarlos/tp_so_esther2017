@@ -12,6 +12,7 @@
 #include <dc-commons/logger.h>
 #include "handler-clients.h"
 #include "module.userInterface/handler-user.h"
+#include "module.core/pageAdministrator.h"
 #include "memoryStruct.h"
 
 //estructura princial del cpu

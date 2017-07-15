@@ -53,7 +53,7 @@ void initializeStruct(memory_struct* memoryStruct, Configuration* config) {
 	pthread_mutex_init(&(memoryStruct->socketClientKernelMutex), NULL);
 	memoryStruct->listaCPUs = list_create();
 	pthread_mutex_init(&(memoryStruct->listaCPUsMutex), NULL);
-
+	initializeFinderPageMutex();
 	memoryStruct->memorySize = memoryStruct->config->marcos * memoryStruct->config->marco_size;
 	memoryStruct->memory = (void*) malloc (memoryStruct->memorySize);
 	memoryStruct->referenceTable = list_create();

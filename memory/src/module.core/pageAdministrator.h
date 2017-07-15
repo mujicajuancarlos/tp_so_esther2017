@@ -8,7 +8,13 @@
 #ifndef PAGEADMINISTRATOR_H_
 #define PAGEADMINISTRATOR_H_
 
+#include <pthread.h>
 #include "cacheAdministrator.h"
+
+void initializeFinderPageMutex();
+void destroyFinderPageMutex();
+void finderPageMutex_lock();
+void finderPageMutex_unlock();
 
 int assignNewPages (memory_struct* memoryStruct, int processId, int pages);
 
