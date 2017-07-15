@@ -43,7 +43,7 @@ void basicWriteFile(fileSystem_struct* fsStruct, char* path, int offset,
 		//si el tamaño cabia posiblemente necesite un resize
 		if (file->size != offset + size) {
 			resizeBlocksQuantity(fsStruct, file, offset + size, status);
-		}else{
+		} else {
 			*status = EXC_OK;
 		}
 		if (*status == EXC_OK) {
@@ -63,8 +63,10 @@ void basicReadFile(fileSystem_struct* fsStruct, char* path, int offset,
 		validateBlocksQuantity(file, offset + size, status);
 		if (*status == EXC_OK) {
 			readDataFromFS(fsStruct, file, offset, size, buffer);
-		}else{
-			logError("El tamaño del archivo es %d y se solicito desde %d hasta %d",file->size,offset,size);
+		} else {
+			logError(
+					"El tamaño del archivo es %d y se solicito desde %d hasta %d",
+					file->size, offset, size);
 		}
 	} else {
 		*status = EXC_ERROR_FILE_NOT_FOUND;
@@ -151,14 +153,15 @@ void resizeBlocksQuantity(fileSystem_struct* fsStruct, sadica_file* file,
 			file->blocks = realloc(file->blocks, sizeof(uint32_t) * new);
 			assignBlocks(fsStruct, missing, file->blocks + current, status);
 		} else {
-			unassignBlocks(fsStruct, missing * (-1), file->blocks + new, status);
+			unassignBlocks(fsStruct, missing * (-1), file->blocks + new,
+					status);
 			file->blocks = realloc(file->blocks, sizeof(uint32_t) * new);
-		}
-		if (*status == EXC_OK) {
-			file->size = maxSize;
-			writeMetadataFile(fsStruct, file);
 		}
 	} else {
 		*status = EXC_OK;
+	}
+	if (*status == EXC_OK) {
+		file->size = maxSize;
+		writeMetadataFile(fsStruct, file);
 	}
 }

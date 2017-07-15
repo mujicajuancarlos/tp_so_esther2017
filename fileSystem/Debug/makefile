@@ -28,7 +28,7 @@ endif
 all: fileSystem
 
 dependents:
-	-cd /home/utnso/tp-2017-1c-Los-5-Fant-sticos/dc-commons/Debug && $(MAKE) all
+	-cd /home/utnso/tp-2017-1c-Los-5-Fant-sticos/dc-commons/Debug && $(MAKE) clean all
 
 # Tool invocations
 fileSystem: $(OBJS) $(USER_OBJS) /home/utnso/tp-2017-1c-Los-5-Fant-sticos/dc-commons/Debug/libdc-commons.so
