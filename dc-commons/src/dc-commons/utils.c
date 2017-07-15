@@ -37,8 +37,9 @@ char* readFile(char* pathFile, long startByte, long endByte) {
 	}
 
 	fclose(file);
-
-	logDebug("Archivo leido: \n %s", buffer);
+	char* bufferCopy = string_substring_until(buffer,sizeBuffer);
+	logDebug("Contenido del archivo leido: \n %s", bufferCopy);
+	free(bufferCopy);
 	return buffer;
 }
 
