@@ -281,7 +281,7 @@ void saveDataOnMemory(Process* process, int startPage, u_int32_t offset,
 	for (pageNumber = firstPage; !*hasError && pageNumber <= lastPage;
 			++pageNumber) {
 		firstByte = (pageNumber == firstPage) ? firstPageOffset : 0;
-		lastByte = (pageNumber == lastPage) ? lastPageOffset : pageSize;
+		lastByte = (pageNumber == lastPage) ? lastPageOffset : pageSize - 1;
 		tmpBufferSize = lastByte - firstByte;
 		tmpBuffer = malloc(tmpBufferSize);
 		memcpy(tmpBuffer, buffer + bufferOffset, tmpBufferSize);
