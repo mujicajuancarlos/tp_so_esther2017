@@ -22,7 +22,7 @@ installSadica: uninstallSadica
 	-cp FS_SADICA.tar /home/utnso/.
 	-cd /home/utnso/ && tar -xvf FS_SADICA.tar
 
-build: install
+build: install installSadica
 	@echo "> START: BUILD - RELEASE - ESTHER - 2017 - LOS 3 FANTASTICOS...................................................................................... "
 	@echo "Construyendo DC-COMMONS................................................................................................................................................. "
 	-cd dc-commons && $(MAKE) release
@@ -36,10 +36,9 @@ build: install
 	-cd kernel && $(MAKE) release
 	@echo "Construyendo MEMORY ..........................................................................................................................................................."
 	-cd memory && $(MAKE) release
-	installSadica
 	@echo "> END: BUILD - RELEASE - ESTHER - 2017 - LOS 3 FANTASTICOS........................................................................................... "
 
-clean: uninstall
+clean: uninstall uninstallSadica
 	@echo "> START: CLEAN - RELEASE - ESTHER - 2017 - LOS 3 FANTASTICOS...................................................................................... "
 	@echo "Removiendo DC-COMMONS................................................................................................................................................. "
 	-cd dc-commons && $(MAKE) cleanRelease
@@ -53,10 +52,9 @@ clean: uninstall
 	-cd kernel && $(MAKE) cleanRelease
 	@echo "Removiendo MEMORY ..........................................................................................................................................................."
 	-cd memory && $(MAKE) cleanRelease
-	uninstallSadica
 	@echo "> END: CLEAN - RELEASE - ESTHER - 2017 - LOS 3 FANTASTICOS........................................................................................... "
 
-buildDebug: install
+buildDebug: install installSadica
 	@echo "> START: BUILD DEBUG - RELEASE - ESTHER - 2017 - LOS 3 FANTASTICOS............................................................................... "
 	@echo "Construyendo DEBUG DC-COMMONS...................................................................................................................................... "
 	-cd dc-commons && $(MAKE) debug
@@ -70,10 +68,9 @@ buildDebug: install
 	-cd kernel && $(MAKE) debug
 	@echo "Construyendo DEBUG MEMORY ..............................................................................................................................................."
 	-cd memory && $(MAKE) debug
-	installSadica
 	@echo "> END: BUILD DEBUG - RELEASE - ESTHER - 2017 - LOS 3 FANTASTICOS.................................................................................. "
 
-cleanDebug: uninstall
+cleanDebug: uninstall uninstallSadica
 	@echo "> START: CLEAN DEBUG - RELEASE - ESTHER - 2017 - LOS 3 FANTASTICOS.............................................................................. "
 	@echo "Removiendo DEBUG DC-COMMONS......................................................................................................................................... "
 	-cd dc-commons && $(MAKE) cleanDebug
@@ -87,5 +84,4 @@ cleanDebug: uninstall
 	-cd kernel && $(MAKE) cleanDebug
 	@echo "Removiendo DEBUG MEMORY ................................................................................................................................................."
 	-cd memory && $(MAKE) cleanDebug
-	uninstallSadica
 	@echo "> END: CLEAN DEBUG - RELEASE - ESTHER - 2017 - LOS 3 FANTASTICOS................................................................................. "
