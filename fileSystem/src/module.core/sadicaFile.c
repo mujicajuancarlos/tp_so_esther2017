@@ -73,11 +73,16 @@ void writeMetadataFile(fileSystem_struct* fsStruct, sadica_file* file) {
 	if (stat(directory, &st) == -1) {
 		logInfo("No existe el directorio %s", directory);
 		char* command = string_new();
-		string_append(&command,"mkdir -p ");
-		string_append(&command,directory);
-		system(command);
+		string_append(&command, "mkdir -p ");
+		string_append(&command, directory);
+		int systemRet = system(command);
+		if (systemRet != -1) {
+			logInfo("Se creo el directorio %s", directory);
+		} else {
+			logWarning("El SO no pudo crear el directorio %s", directory);
+		}
 		free(command);
-		logInfo("Se creo el directorio %s", directory);
+
 	}
 	free(directory);
 	writeFile(buffer, sizeBuffer, file->path, 0);
