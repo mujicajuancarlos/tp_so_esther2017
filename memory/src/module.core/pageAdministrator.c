@@ -31,6 +31,7 @@ memory_page *getGlobalMemoryPage(memory_struct* memoryStruct, int processId,
 	int inCache = getFromCache(memoryStruct, processId, processPage);
 	if (inCache != -1) {
 		addEntryToCache(memoryStruct, processId, processPage, inCache);
+		finderPageMutex_unlock();
 		return list_get(memoryStruct->referenceTable, inCache);
 	}
 
@@ -38,8 +39,8 @@ memory_page *getGlobalMemoryPage(memory_struct* memoryStruct, int processId,
 			getHashed(memoryStruct, processId, processPage));
 
 	addEntryToCache(memoryStruct, page->pid, page->procPage, page->globPage);
-	return page;
 	finderPageMutex_unlock();
+	return page;
 }
 
 int processWrite(memory_struct* memoryStruct, t_PageBytes* dataInfo) {
