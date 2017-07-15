@@ -44,7 +44,7 @@ char* readFile(char* pathFile, long startByte, long endByte) {
 
 void writeFile(char* buffer, long sizeBuffer, char* pathFile, long startByte) {
 	FILE *file;
-	file = fopen(pathFile, "w");  // w for write, b for binary
+	file = fopen(pathFile, "wr");  // w for write, b for binary
 	fseek(file, startByte, SEEK_SET);
 	fwrite(buffer, 1, sizeBuffer, file);
 	fclose(file);

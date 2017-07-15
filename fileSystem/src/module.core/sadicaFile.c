@@ -68,7 +68,8 @@ void writeMetadataFile(fileSystem_struct* fsStruct, sadica_file* file) {
 	uint32_t offset = 0;
 	serialize_and_copy_value(buffer, &file->size, sizeof(uint32_t), &offset);
 	serialize_and_copy_value(buffer, file->blocks, size, &offset);
-	char* directory = dirname(file->path);
+	char* pathCopy = string_duplicate(file->path);
+	char* directory = dirname(pathCopy);
 	struct stat st = { 0 };
 	if (stat(directory, &st) == -1) {
 		logInfo("No existe el directorio %s", directory);
@@ -82,9 +83,8 @@ void writeMetadataFile(fileSystem_struct* fsStruct, sadica_file* file) {
 			logWarning("El SO no pudo crear el directorio %s", directory);
 		}
 		free(command);
-
 	}
-	free(directory);
+	free(pathCopy);
 	writeFile(buffer, sizeBuffer, file->path, 0);
 	free(buffer);
 }
