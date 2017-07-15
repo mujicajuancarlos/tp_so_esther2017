@@ -10,6 +10,9 @@
 
 #include <dirent.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <commons/string.h>
 #include <commons/bitarray.h>
 #include <commons/collections/list.h>

@@ -46,12 +46,12 @@ void loadBlocks(fileSystem_struct* fsStruct) {
 	logInfo("Verificando los bloques de datos de SADICA");
 	int index;
 	char* path = getBlocksDirPath(fsStruct);
-	DIR* directory = opendir(path);
-	if (directory == NULL) {
-		logError("No existe el directorio %s ", path);
-		exit(EXIT_FAILURE);
+	struct stat st = { 0 };
+	if (stat(path, &st) == -1) {
+		logInfo("No existe el directorio %s", path);
+		mkdir(path, 0700);
+		logInfo("Se creo el directorio %s", path);
 	}
-	closedir(directory);
 	free(path);
 	sadica_block* block;
 	for (index = 0; index < metadata.quantity; index++) {
@@ -73,12 +73,12 @@ void loadFiles(fileSystem_struct* fsStruct) {
 	logInfo("Iniciando la carga de archivos SADICA");
 	sadicaFiles = list_create();
 	char* path = getFilesDirPath(fsStruct);
-	DIR* directory = opendir(path);
-	if (directory == NULL) {
-		logError("No existe el directorio %s ", path);
-		exit(EXIT_FAILURE);
+	struct stat st = { 0 };
+	if (stat(path, &st) == -1) {
+		logInfo("No existe el directorio %s", path);
+		mkdir(path, 0700);
+		logInfo("Se creo el directorio %s", path);
 	}
-	closedir(directory);
 	logInfo("Buscando archivos sadica en el punto de montaje especificado");
 	findSadicaFilesOn(fsStruct, path);
 	free(path);

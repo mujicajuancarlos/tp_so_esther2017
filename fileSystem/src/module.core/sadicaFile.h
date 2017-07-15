@@ -8,8 +8,10 @@
 #ifndef MODULE_CORE_SADICAFILE_H_
 #define MODULE_CORE_SADICAFILE_H_
 
+#include <libgen.h>
 #include <string.h>
 #include <stdlib.h>
+#include <commons/string.h>
 #include <dc-commons/utils.h>
 #include <dc-commons/serialization.h>
 #include "../fileSystemStruct.h"
