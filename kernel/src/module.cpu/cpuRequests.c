@@ -136,6 +136,7 @@ void contextSwitchForForceQuitProcess(CPU* cpu) {
 void executeWaitTo(CPU* cpu, Package* package) {
 	t_nombre_semaforo semId = string_substring_until(package->stream,
 			package->size);
+	semaphoresRequestMutex_lock();
 	bool shouldLock = false;
 	bool hasError = executeBasicWait(semId, &shouldLock) != UPDATE_SEM_SUCCESS;
 	notifyUpdateSemaphoreStatus(cpu, hasError, shouldLock);
@@ -155,11 +156,13 @@ void executeWaitTo(CPU* cpu, Package* package) {
 		markFreeCPU(cpu);
 	}
 	free(semId);
+	semaphoresRequestMutex_unlock();
 }
 
 void executeSignalTo(CPU* cpu, Package* package) {
 	t_nombre_semaforo semId = string_substring_until(package->stream,
 			package->size);
+	semaphoresRequestMutex_lock();
 	bool shouldUnlock = false;
 	bool hasError = executeBasicSignal(semId,
 			&shouldUnlock) != UPDATE_SEM_SUCCESS;
@@ -180,6 +183,7 @@ void executeSignalTo(CPU* cpu, Package* package) {
 		markFreeCPU(cpu);
 	}
 	free(semId);
+	semaphoresRequestMutex_unlock();
 }
 
 void executeSetSharedVar(CPU* cpu, Package* package) {

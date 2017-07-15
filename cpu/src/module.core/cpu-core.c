@@ -131,6 +131,7 @@ void ansisopExecuteInstruccion(cpu_struct* cpuStruct) {
 	logTrace("La instruccion leida de la memoria es %s", instruccion);
 	if (errorFlag == FLAG_OK) {
 		pcb->programCounter++;
+		logInfo("Incremento el program counter, el nuevo valor es %d", pcb->programCounter);
 		logTrace("INSTRUCCION ANSISOP START");
 		logTrace("Ejecutando %s", instruccion);
 		analizadorLinea(instruccion, &ansisop_funtions,
