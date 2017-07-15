@@ -27,18 +27,18 @@ void finderPageMutex_unlock() {
 
 memory_page *getGlobalMemoryPage(memory_struct* memoryStruct, int processId,
 		int processPage) {
+	memory_page *page;
 	finderPageMutex_lock();
 	int inCache = getFromCache(memoryStruct, processId, processPage);
 	if (inCache != -1) {
 		addEntryToCache(memoryStruct, processId, processPage, inCache);
-		finderPageMutex_unlock();
-		return list_get(memoryStruct->referenceTable, inCache);
+		page = list_get(memoryStruct->referenceTable, inCache);
+	} else {
+		page = list_get(memoryStruct->referenceTable,
+				getHashed(memoryStruct, processId, processPage));
+		addEntryToCache(memoryStruct, page->pid, page->procPage,
+				page->globPage);
 	}
-
-	memory_page *page = list_get(memoryStruct->referenceTable,
-			getHashed(memoryStruct, processId, processPage));
-
-	addEntryToCache(memoryStruct, page->pid, page->procPage, page->globPage);
 	finderPageMutex_unlock();
 	return page;
 }
