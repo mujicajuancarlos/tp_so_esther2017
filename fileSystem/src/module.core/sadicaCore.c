@@ -26,7 +26,7 @@ void loadBitmap(fileSystem_struct* fsStruct) {
 	if (existFile(path, "r")) {
 		logTrace("Leyendo bitmap de %s", path);
 		bitschar = readFile(path, 0, size - 1);
-		bitmap = bitarray_create_with_mode(bitschar, size, LSB_FIRST);
+		bitmap = bitarray_create_with_mode(bitschar, size, MSB_FIRST);
 	} else {
 		logTrace(
 				"No existe el archivo %s que contiene la informacion del bitmap",
@@ -124,7 +124,7 @@ void addSadicaFile(fileSystem_struct* fsStruct, char* pathFile, int* status) {
 	if (*status == EXC_OK) {
 		sadica_file* sadicaFile = createSadicaFileTo(fsStruct, pathFile, block);
 		list_add(sadicaFiles, sadicaFile);
-	}
+	}//si da full sale con error 2
 }
 
 void removeSadicaFile(fileSystem_struct* fsStruct, sadica_file* file) {
@@ -196,9 +196,7 @@ void assignBlocks(fileSystem_struct* fsStruct, int size, uint32_t* blocks,
 			logTrace(
 					"Se encontro la cantidad de bloques solicitados, se persistira la reserva");
 			for (index = 0; index < auxSize; index++) {
-				if (bitarray_test_bit(bitmap, index) == 0) {
-					bitarray_set_bit(bitmap, blocks[index]);
-				}
+				bitarray_set_bit(bitmap, blocks[index]);
 			}
 			persistBitMap(fsStruct);
 		} else {
