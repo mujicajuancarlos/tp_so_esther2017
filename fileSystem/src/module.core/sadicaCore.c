@@ -129,8 +129,8 @@ void addSadicaFile(fileSystem_struct* fsStruct, char* pathFile, int* status) {
 
 void removeSadicaFile(fileSystem_struct* fsStruct, sadica_file* file) {
 	bool condition(void* element) {
-		char* anyPath = element;
-		return string_equals_ignore_case(anyPath, file->path);
+		sadica_file* anyFile = element;
+		return string_equals_ignore_case(anyFile->path, file->path);
 	}
 	list_remove_by_condition(sadicaFiles, condition);
 	uint32_t quantity = getBlocksQuantity(fsStruct, file->size);
