@@ -131,7 +131,7 @@ int basicReadProcessFile(Process* process,
 			if (status == COD_FS_RESPONSE_OK) {
 				dir_memoria address = pointerToMemoryLogicalAddress(
 						dataRequest->pointer, process);
-				bool hasError;
+				bool hasError = false;
 				logInfo(
 						"Enviando la informacion del archivo leido a la memoria");
 				saveDataOnMemory(process, address.pagina, address.offset,

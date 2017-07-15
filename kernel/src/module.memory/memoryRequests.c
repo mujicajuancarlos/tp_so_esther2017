@@ -272,6 +272,7 @@ void saveDataOnMemory(Process* process, int startPage, u_int32_t offset,
 	int bufferOffset = 0;
 	char* tmpBuffer;
 	int firstByte, lastByte, pageNumber, tmpBufferSize, pageSize;
+	logInfo("Solicitando a la memoria almacenar desde la pagina %d offset %d size %d",startPage, offset, length);
 	pageSize = process->kernelStruct->pageSize;
 	int firstPage = startPage + (offset / pageSize);
 	int lastPage = startPage + ((offset + length) / pageSize);
