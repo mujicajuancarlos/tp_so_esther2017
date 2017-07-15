@@ -86,7 +86,7 @@ void saveDataOnFS(fileSystem_struct* fsStruct, sadica_file* file, int offset,
 	int lastPageOffset = (offset + length) % blockSize;
 	for (blockNumber = firstBlock; blockNumber <= lastBlock; ++blockNumber) {
 		firstByte = (blockNumber == firstBlock) ? firstPageOffset : 0;
-		lastByte = (blockNumber == lastBlock) ? lastPageOffset : blockSize - 1;
+		lastByte = (blockNumber == lastBlock) ? lastPageOffset : blockSize;
 		tmpBufferSize = lastByte - firstByte;
 		tmpBuffer = malloc(tmpBufferSize);
 		memcpy(tmpBuffer, buffer + bufferOffset, tmpBufferSize);

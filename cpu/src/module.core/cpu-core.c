@@ -233,7 +233,7 @@ void saveDataOnMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset,
 	for (pageNumber = firstPage; errorFlag == FLAG_OK && pageNumber <= lastPage;
 			++pageNumber) {
 		firstByte = (pageNumber == firstPage) ? firstPageOffset : 0;
-		lastByte = (pageNumber == lastPage) ? lastPageOffset : pageSize - 1;
+		lastByte = (pageNumber == lastPage) ? lastPageOffset : pageSize;
 		tmpBufferSize = lastByte - firstByte;
 		tmpBuffer = malloc(tmpBufferSize);
 		memcpy(tmpBuffer, buffer + bufferOffset, tmpBufferSize);
