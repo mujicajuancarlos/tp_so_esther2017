@@ -199,12 +199,14 @@ char* getDataFromMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset,
 		firstByte = (pageNumber == firstPage) ? firstPageOffset : 0;
 		lastByte = (pageNumber == lastPage) ? lastPageOffset : pageSize;
 		tmpBufferSize = lastByte - firstByte;
-		tmpBuffer = getDataFromPage(cpuStruct, pageNumber, firstByte,
-				tmpBufferSize);
-		if (errorFlag == FLAG_OK) {
-			memcpy(buffer + bufferOffset, tmpBuffer, tmpBufferSize);
-			bufferOffset += tmpBufferSize;
-			free(tmpBuffer);
+		if (tmpBufferSize > 0) {
+			tmpBuffer = getDataFromPage(cpuStruct, pageNumber, firstByte,
+					tmpBufferSize);
+			if (errorFlag == FLAG_OK) {
+				memcpy(buffer + bufferOffset, tmpBuffer, tmpBufferSize);
+				bufferOffset += tmpBufferSize;
+				free(tmpBuffer);
+			}
 		}
 	}
 	if (errorFlag == FLAG_OK) {
@@ -235,14 +237,18 @@ void saveDataOnMemory(cpu_struct* cpuStruct, int startPage, u_int32_t offset,
 		firstByte = (pageNumber == firstPage) ? firstPageOffset : 0;
 		lastByte = (pageNumber == lastPage) ? lastPageOffset : pageSize;
 		tmpBufferSize = lastByte - firstByte;
-		tmpBuffer = malloc(tmpBufferSize);
-		memcpy(tmpBuffer, buffer + bufferOffset, tmpBufferSize);
-		saveDataOnPage(cpuStruct, pageNumber, firstByte, tmpBufferSize,
-				tmpBuffer);
-		if (errorFlag == FLAG_OK) {
-			bufferOffset += tmpBufferSize;
+		if (tmpBufferSize > 0) {
+			logTrace("Solicitando a memoria por la pagina %d offset %d size %d",
+					pageNumber, firstByte, tmpBufferSize);
+			tmpBuffer = malloc(tmpBufferSize);
+			memcpy(tmpBuffer, buffer + bufferOffset, tmpBufferSize);
+			saveDataOnPage(cpuStruct, pageNumber, firstByte, tmpBufferSize,
+					tmpBuffer);
+			if (errorFlag == FLAG_OK) {
+				bufferOffset += tmpBufferSize;
+			}
+			free(tmpBuffer);
 		}
-		free(tmpBuffer);
 	}
 }
 
@@ -267,10 +273,8 @@ t_variable* createArgumentForCurrentPCB(t_nombre_variable name) {
 	currentContext->args = realloc(currentContext->args,
 			sizeof(t_variable) * (currentContext->arg_len + 1));
 	currentContext->args[currentContext->arg_len].nombre = name;
-	//TODO verificar la correcta asignacion
 	currentContext->args[currentContext->arg_len].direccion.pagina =
 			pcb->stackFirstPage + (pcb->stackOffset / pageSize);
-	//TODO verificar la correcta asignacion
 	currentContext->args[currentContext->arg_len].direccion.offset =
 			pcb->stackOffset % pageSize;
 	currentContext->args[currentContext->arg_len].direccion.size =

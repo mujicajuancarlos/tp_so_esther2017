@@ -42,11 +42,11 @@ int basicFreeMemory(Process* process, t_puntero pointer) {
 				address.offset, &index);
 		if (metadata != NULL) {
 			metadata->isFree = true;
+			incrementCounter(&(process->processCounters->freeSize_Counter),
+							metadata->dataSize);
 		}
 		executeGarbageCollectorOn(page, process, &status);
 		incrementCounter(&(process->processCounters->freeTimes_Counter), 1);
-		incrementCounter(&(process->processCounters->freeSize_Counter),
-				metadata->dataSize);
 	} else {
 		status = SC_ERROR_MEMORY_EXCEPTION;
 	}

@@ -226,7 +226,8 @@ void notifyEndProcessToMemory(Process* process) {
 			process->kernelStruct->socketClientMemoria);
 	if (tmpPackage != NULL) {
 		if (tmpPackage->msgCode == COD_END_PROCESS_RESPONSE) {
-			logInfo("La memoria libero las paginas del proceso %d", process->pid);
+			logInfo("La memoria libero las paginas del proceso %d",
+					process->pid);
 		} else {
 			logError(
 					"La memoria respondio con un codigo no esperado despues de la solicitud 'Liberar paginas para proceso %d'",
@@ -272,7 +273,9 @@ void saveDataOnMemory(Process* process, int startPage, u_int32_t offset,
 	int bufferOffset = 0;
 	char* tmpBuffer;
 	int firstByte, lastByte, pageNumber, tmpBufferSize, pageSize;
-	logInfo("Solicitando a la memoria almacenar desde la pagina %d offset %d size %d",startPage, offset, length);
+	logInfo(
+			"Solicitando a la memoria almacenar desde la pagina %d offset %d size %d",
+			startPage, offset, length);
 	pageSize = process->kernelStruct->pageSize;
 	int firstPage = startPage + (offset / pageSize);
 	int lastPage = startPage + ((offset + length) / pageSize);
@@ -283,14 +286,18 @@ void saveDataOnMemory(Process* process, int startPage, u_int32_t offset,
 		firstByte = (pageNumber == firstPage) ? firstPageOffset : 0;
 		lastByte = (pageNumber == lastPage) ? lastPageOffset : pageSize;
 		tmpBufferSize = lastByte - firstByte;
-		tmpBuffer = malloc(tmpBufferSize);
-		memcpy(tmpBuffer, buffer + bufferOffset, tmpBufferSize);
-		saveDataOnPage(process, pageNumber, firstByte, tmpBufferSize, tmpBuffer,
-				hasError);
-		if (!*hasError) {
-			bufferOffset += tmpBufferSize;
+		if (tmpBufferSize > 0) {
+			logTrace("Solicitando a memoria por la pagina %d offset %d size %d",
+								pageNumber, firstByte, tmpBufferSize);
+			tmpBuffer = malloc(tmpBufferSize);
+			memcpy(tmpBuffer, buffer + bufferOffset, tmpBufferSize);
+			saveDataOnPage(process, pageNumber, firstByte, tmpBufferSize,
+					tmpBuffer, hasError);
+			if (!*hasError) {
+				bufferOffset += tmpBufferSize;
+			}
+			free(tmpBuffer);
 		}
-		free(tmpBuffer);
 	}
 }
 
