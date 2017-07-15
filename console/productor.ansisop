@@ -1,12 +1,12 @@
+#!/usr/bin/ansisop
 begin
-	variables a
-	:ready
-	alocar a 240
-	signal b
+	:etiqueta
+
 	wait b
-		!pasadas=!pasadas + 1
-		prints n !pasadas
-	signal b
-	liberar a
-	goto ready
+	!colas = !colas +1
+	signal c
+
+	#Ciclar indefinidamente
+	goto etiqueta
+
 end
