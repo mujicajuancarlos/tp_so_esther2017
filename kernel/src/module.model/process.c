@@ -267,14 +267,15 @@ void printQuitStatusToProcess(Process* process) {
 		t_list* sublist = list_filter(process->heapPages, condition);
 		if (sublist->elements_count > 0) {
 			printf(
-					"[Advertencia!] El proceso no liberó los siguientes bloques de memoria\n");
+					"[Advertencia!] El proceso ansisop no liberó los siguientes bloques de memoria heap\n");
 			printf("\t%5s %6s %5s\n", "Page", "Offset", "Size");
+			int startPageNumber = getStartHeapPageNumber(process);
 			void printNotFreePage(void* element) {
 				heap_page* page = element;
 				void printNotFreeBlock(void* blockElement) {
 					heap_metadata* block = blockElement;
 					if (!block->isFree) {
-						printf("\t%5d %6d %5d\n", page->page, block->dataOffset,
+						printf("\t%5d %6d %5d\n", page->page + startPageNumber, block->dataOffset,
 								block->dataSize);
 					}
 				}
