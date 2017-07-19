@@ -41,6 +41,7 @@ void freePageForProcess(Process* process, int pageNumber, int* status);
 void notifyEndProcessToMemory(Process* process);
 
 void sendSourceCodeForNewProcess(Process* process, Package* package);
+void sendHeapMetadata(Process* process, heap_page* page, heap_metadata* metadata);
 
 void saveDataOnMemory(Process* process, int startPage, u_int32_t offset,
 		t_size length, char* buffer, bool* hasError);

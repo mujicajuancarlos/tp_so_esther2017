@@ -28,12 +28,12 @@ void removeGarbagePages(Process* process);
 
 void resolveFragmentation(Process* process, heap_page* page);
 
-void saveAlloc(int allocSize, heap_metadata* metadata, int index, heap_page* page);
+void saveAlloc(int allocSize, heap_metadata* metadata, int index, heap_page* page, Process* process);
 
 heap_page* getAvailableHeapPageForProcess(int allocSize, Process* process, int* status);
 heap_page* getAvailableHeapPageIntoListFor(int allocSize, t_list* heapList);
 heap_page* createHeapPageFor(Process* process, int* status);
-void createHeapMetadataFor(heap_page* page, heap_metadata* previous, int previousIndex);
+void createHeapMetadataFor(heap_page* page, heap_metadata* previous, int previousIndex, Process* process);
 
 void validateMaxAllockSize(int allocSize, Process* process, int* status);
 

@@ -178,6 +178,13 @@ void removeAndDestroyFile(Process* process, t_processFile* file) {
 	removeClosedGlobalFiles();
 }
 
+/**
+ * retorna el numero de pagina inicial para heap
+ */
+int getStartHeapPageNumber(Process* process){
+	return process->pcb->stackFirstPage + process->kernelStruct->config->stack_size;
+}
+
 void printHeaderProcess() {
 	printf("\n%5s\t%20s\t%20s\n%s\n", "PID", "STATE", "EXIT CODE",
 			"===============================================================");

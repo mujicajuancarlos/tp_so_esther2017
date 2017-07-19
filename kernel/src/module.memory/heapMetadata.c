@@ -37,9 +37,22 @@ void destroy_heap_metadata(heap_metadata* metadata) {
 	free(metadata);
 }
 
-void markAsGarbage(heap_page* page){
+char* serializeHeapMetadata(heap_metadata* metadata) {
+	char* stream = malloc(sizeof(char) * 5);
+	uint32_t offset = 0;
+
+	serialize_and_copy_value(stream, &(metadata->dataSize), sizeof(uint32_t),
+			&offset);
+	serialize_and_copy_value(stream, &(metadata->isFree), sizeof(bool),
+			&offset);
+
+	return stream;
+}
+
+void markAsGarbage(heap_page* page) {
 	page->isGarbage = true;
-	list_destroy_and_destroy_elements(page->metadataList,(void*)destroy_heap_metadata);
+	list_destroy_and_destroy_elements(page->metadataList,
+			(void*) destroy_heap_metadata);
 	page->metadataList = NULL;
 }
 
@@ -84,7 +97,7 @@ bool isFreePage(heap_page* page) {
 		heap_metadata* metadata = element;
 		return metadata->isFree;
 	}
-	return list_all_satisfy(page->metadataList,condition);
+	return list_all_satisfy(page->metadataList, condition);
 }
 
 /*

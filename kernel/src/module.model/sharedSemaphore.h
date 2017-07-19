@@ -21,6 +21,10 @@
 
 void initializeSemaphores(char** semKeys, char** semValues);
 
+void semaphoresRequestMutex_lock();
+
+void semaphoresRequestMutex_unlock();
+
 int executeBasicWait(t_nombre_semaforo semId, bool* shouldLock);
 
 int executeBasicSignal(t_nombre_semaforo semId, bool* shouldUnlock);

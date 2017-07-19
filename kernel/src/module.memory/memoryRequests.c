@@ -263,6 +263,23 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 
 }
 
+void sendHeapMetadata(Process* process, heap_page* page,
+		heap_metadata* metadata) {
+	uint32_t startHeapPageNumber = getStartHeapPageNumber(process);
+	bool hasError = false;
+	char* buffer = serializeHeapMetadata(metadata);
+
+	logInfo("Enviando heap metadata de pagina: %d offset: %d size: 5 para el proceso %d",
+			page->page + startHeapPageNumber, metadata->dataOffset, process->pid);
+	logTrace("El contenido de la metadata enviada es dataSize: %d free: %s",
+			metadata->dataSize, metadata->isFree ? "true" : "false");
+
+	saveDataOnMemory(process, page->page + startHeapPageNumber, metadata->dataOffset, 5,
+			buffer, &hasError);
+	logInfo("Se envio los metadatos del heap para el proceso %d", process->pid);
+	free(buffer);
+}
+
 /**
  * Soy una funcion generica que sirve para guardar datos en la memoria
  * SIN IMPORTAR QUE ESOS DATOS ESTEN PARTIDOS ENTRE DOS O MAS PAGINAS CONTIGUAS
@@ -288,7 +305,7 @@ void saveDataOnMemory(Process* process, int startPage, u_int32_t offset,
 		tmpBufferSize = lastByte - firstByte;
 		if (tmpBufferSize > 0) {
 			logTrace("Solicitando a memoria por la pagina %d offset %d size %d",
-								pageNumber, firstByte, tmpBufferSize);
+					pageNumber, firstByte, tmpBufferSize);
 			tmpBuffer = malloc(tmpBufferSize);
 			memcpy(tmpBuffer, buffer + bufferOffset, tmpBufferSize);
 			saveDataOnPage(process, pageNumber, firstByte, tmpBufferSize,

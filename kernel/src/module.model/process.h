@@ -81,6 +81,8 @@ void removeFile(Process* process, int fileDescriptor);
 
 void removeAndDestroyFile(Process* process, t_processFile* file);
 
+int getStartHeapPageNumber(Process* process);
+
 void printHeaderProcess();
 
 void printProcess(Process* proceso, int stateIndex);

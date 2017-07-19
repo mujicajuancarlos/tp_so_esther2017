@@ -16,7 +16,7 @@ int basicMallocMemory(Process* process, int allocSize, t_puntero* pointer) {
 		int index;
 		heap_metadata* availableMetadata = getAvailableHeapMetadataForPage(
 				allocSize, availablePage, &index);
-		saveAlloc(allocSize, availableMetadata, index, availablePage);
+		saveAlloc(allocSize, availableMetadata, index, availablePage, process);
 		address.pagina = availablePage->page;
 		address.offset = availableMetadata->dataOffset;
 		*pointer = logicalAddressToPointer(address, process);
@@ -131,10 +131,10 @@ void resolveFragmentation(Process* process, heap_page* page) {
 }
 
 void saveAlloc(int allocSize, heap_metadata* metadata, int index,
-		heap_page* page) {
+		heap_page* page, Process* process) {
 	metadata->dataSize = allocSize;
 	metadata->isFree = false;
-	createHeapMetadataFor(page, metadata, index);
+	createHeapMetadataFor(page, metadata, index, process);
 }
 
 /*
@@ -175,7 +175,7 @@ heap_page* createHeapPageFor(Process* process, int* status) {
 		int nextNumber = getNextHeapPageNumber(process->heapPages);
 		selectedPage = create_heap_page(nextNumber,
 				process->kernelStruct->pageSize);
-		createHeapMetadataFor(selectedPage, NULL, -1);
+		createHeapMetadataFor(selectedPage, NULL, -1, process);
 		list_add(process->heapPages, selectedPage);
 	}
 	return selectedPage;
@@ -188,7 +188,7 @@ heap_page* createHeapPageFor(Process* process, int* status) {
  * estoy preparado para generar metadata incluso en el medio de la lista
  */
 void createHeapMetadataFor(heap_page* page, heap_metadata* previous,
-		int previousIndex) {
+		int previousIndex, Process* process) {
 	int dataOffset, sizeData, maxSize;
 	heap_metadata* next = list_get(page->metadataList, previousIndex + 1);
 	dataOffset =
@@ -202,6 +202,7 @@ void createHeapMetadataFor(heap_page* page, heap_metadata* previous,
 		logError(
 				"Uso incorrecto de la funcion createHeapMetadataFor(heap_page* page), se intenta crear metadata en una pagina que no tiene mas espacio libre");
 	heap_metadata* metadata = create_heap_metadata(dataOffset, sizeData);
+	sendHeapMetadata(process, page, metadata);
 	list_add_in_index(page->metadataList, previousIndex + 1, metadata);
 }
 

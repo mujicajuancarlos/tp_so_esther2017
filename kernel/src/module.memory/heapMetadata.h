@@ -13,6 +13,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <commons/collections/list.h>
+#include <dc-commons/serialization.h>
 
 typedef struct {
     int page;	//numero de pagina -> pagina inicial es pag stack + stack size
@@ -32,6 +33,8 @@ void destroy_heap_page(heap_page* heapPage);
 
 heap_metadata* create_heap_metadata(uint32_t startData, uint32_t dataSize);
 void destroy_heap_metadata(heap_metadata* metadata);
+
+char* serializeHeapMetadata(heap_metadata* metadata);
 
 void markAsGarbage(heap_page* page);
 
