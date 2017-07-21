@@ -87,10 +87,13 @@ void readData(Package* package, kernel* kernel) {
 
 	int status = processRead(kernel->memoryStruct, pageBytes);
 
+	char* serializedData = serialize_t_PageBytes(pageBytes);
+
 	if (status == 0) {
 		outPackage = createAndSendPackage(kernel->fileDescriptor,
 				COD_GET_PAGE_BYTES_RESPONSE, package->size,
-				serialize_t_PageBytes (pageBytes));
+				serializedData);
+				// serialize_t_PageBytes (pageBytes));
 		logTrace ("Se devuelven los datos pedidos por Kernel para pid: %i pag: %i offset: %i size: %i", pageBytes->pid,
 				pageBytes->pageNumber, pageBytes->offset, pageBytes->size);
 	}
@@ -100,6 +103,7 @@ void readData(Package* package, kernel* kernel) {
 		logError ("La peticion de lectura de Kernel produce segmentation fault");
 	}
 
+	free (serializedData);
 	destroy_t_PageBytes(pageBytes);
 	destroyPackage(outPackage);
 }

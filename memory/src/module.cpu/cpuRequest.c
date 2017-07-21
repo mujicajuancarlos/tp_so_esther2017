@@ -34,11 +34,13 @@ void cpuReadData(CPU* cpu, Package* package) {
 
 	int status = processRead(cpu->memoryStruct, pageBytes);
 
+	char* serializedData = serialize_t_PageBytes(pageBytes);
 
 	if (status == 0) {
 		outPackage = createAndSendPackage(cpu->fileDescriptor,
 				COD_GET_PAGE_BYTES_RESPONSE, package->size,
-				serialize_t_PageBytes (pageBytes));
+				serializedData);
+				// serialize_t_PageBytes (pageBytes));
 		logTrace ("Se devuelven los datos pedidos por CPU para pid: %i pag: %i offset: %i size: %i", pageBytes->pid,
 				pageBytes->pageNumber, pageBytes->offset, pageBytes->size);
 	}
@@ -48,6 +50,7 @@ void cpuReadData(CPU* cpu, Package* package) {
 		logError ("La peticion de lectura de CPU produce segmentation fault");
 	}
 
-	destroy_t_PageBytes(pageBytes);
+	free (serializedData);
 	destroyPackage(outPackage);
+	destroy_t_PageBytes(pageBytes);
 }
