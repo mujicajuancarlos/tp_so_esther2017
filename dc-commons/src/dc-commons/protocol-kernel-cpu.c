@@ -413,8 +413,8 @@ void createNewContext(PCB* pcb) {
 	pcb->stackIndex[pcb->stackSize].var_len = 0;
 	pcb->stackIndex[pcb->stackSize].vars = NULL;
 	pcb->stackSize++;
-	logInfo("Se creó el contexto #%d del stack para el pid: %d",
-			pcb->stackSize, pcb->pid);
+	logInfo("Se creó el contexto #%d del stack para el pid: %d", pcb->stackSize,
+			pcb->pid);
 }
 
 void destroyCurrentContext(PCB* pcb) {
@@ -473,7 +473,7 @@ set_shared_var* deserialize_SetSharedVar(char* buffer) {
 	uint32_t offset = 0;
 	deserialize_and_copy_value(&(object->sizeName), buffer, sizeof(uint32_t),
 			&offset);
-	object->name = string_substring(buffer,offset,object->sizeName);
+	object->name = string_substring(buffer, offset, object->sizeName);
 	offset += object->sizeName;
 
 	deserialize_and_copy_value(&(object->newValue), buffer, sizeof(uint32_t),
@@ -523,7 +523,7 @@ t_new_FD_request* deserialize_t_new_FD_request(char* buffer) {
 	uint32_t offset = 0;
 	deserialize_and_copy_value(&(object->sizePath), buffer, sizeof(uint32_t),
 			&offset);
-	object->path = string_substring(buffer,offset,object->sizePath);
+	object->path = string_substring(buffer, offset, object->sizePath);
 	offset += object->sizePath;
 
 	deserialize_and_copy_value(&(object->flags), buffer, sizeof(t_banderas),
@@ -611,8 +611,10 @@ char* serialize_t_dataPointer_FD_request(t_dataPointer_FD_request* object) {
 	char* buffer = malloc(sizeof(char) * sizeof(t_dataPointer_FD_request));
 	uint32_t offset = 0;
 	serialize_and_copy_value(buffer, &(object->fd), sizeof(uint32_t), &offset);
-	serialize_and_copy_value(buffer, &(object->pointer), sizeof(uint32_t), &offset);
-	serialize_and_copy_value(buffer, &(object->size), sizeof(uint32_t), &offset);
+	serialize_and_copy_value(buffer, &(object->pointer), sizeof(uint32_t),
+			&offset);
+	serialize_and_copy_value(buffer, &(object->size), sizeof(uint32_t),
+			&offset);
 	return buffer;
 }
 

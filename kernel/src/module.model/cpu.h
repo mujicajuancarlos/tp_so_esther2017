@@ -17,7 +17,7 @@
 typedef struct CPU {
 	int fileDescriptor;	//file descriptor del socket del cpu
 	Process* process;	//proceso que esta ejecutando actualmente
-	int libre;	// 0:ocupado / 1:libre
+	bool libre;	// 0:ocupado / 1:libre
 	kernel_struct* kernelStruct;
 } CPU;
 

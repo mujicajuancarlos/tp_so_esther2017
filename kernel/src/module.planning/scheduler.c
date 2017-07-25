@@ -26,15 +26,17 @@ int getAlgorithmIndex(char* name){
 }
 
 void execute_RoundRobin_scheduling(kernel_struct* kernel_struct, CPU* selectedCPU){
+	int currentFD = selectedCPU->fileDescriptor;
 	Process* process = getReadyProcess_with_FIFO();
 	process->quantum = kernel_struct->config->quantum;
-	startProcessExecution(process, selectedCPU);
+	startProcessExecution(process, selectedCPU, currentFD);
 }
 
 void execute_FIFO_scheduling(kernel_struct *kernel_struct, CPU* selectedCPU){
+	int currentFD = selectedCPU->fileDescriptor;
 	Process* process = getReadyProcess_with_FIFO();
 	process->quantum = WITHOUT_QUANTUM;
-	startProcessExecution(process, selectedCPU);
+	startProcessExecution(process, selectedCPU, currentFD);
 }
 
 Process* getReadyProcess_with_FIFO(){

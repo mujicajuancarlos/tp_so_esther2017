@@ -11,20 +11,21 @@
  * soy invocado por el planificador para ejecutar un proceso,
  * puede ser nuevo o un proceso que fue bloqueado y esta listo para ejecutar nuevamente
  */
-void startProcessExecution(Process* selectedProcess, CPU* selectedCPU) {
+void startProcessExecution(Process* selectedProcess, CPU* selectedCPU, int cpuFD) {
 	sendToEXEC(selectedProcess);
-	selectedCPU->process = selectedProcess;
 	logInfo("Iniciando ejecucion de pid: %d en cpu: %d", selectedProcess->pid,
 			selectedCPU->fileDescriptor);
 	char* buffer = serialize_PCB(selectedProcess->pcb);
 	uint32_t size = sizeOf_PCB(selectedProcess->pcb);
-	Package* package = createAndSendPackage(selectedCPU->fileDescriptor,
+	Package* package = createAndSendPackage(cpuFD,
 	COD_EXEC_NEW_PCB, size, buffer);
-	if (package == NULL) {
+	if (package != NULL) {
+		selectedCPU->process = selectedProcess;
+	} else {
 		logError("La CPU no pudo recibir la solicitud de ejecutar el proceso.");
 		moveFromExcecToReady(selectedProcess);
 		logInfo("Finalizando la CPU que no acepta solicitudes");
-		removeCPU(selectedCPU);
+		//removeCPU(selectedCPU);
 	}
 	free(buffer);
 	destroyPackage(package);

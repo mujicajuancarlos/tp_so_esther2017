@@ -129,16 +129,14 @@ void ansisopExecuteInstruccion(cpu_struct* cpuStruct) {
 	errorFlag = FLAG_OK;
 	char* instruccion = getNextInstruction(cpuStruct);
 	logTrace("La instruccion leida de la memoria es %s", instruccion);
-	if (errorFlag == FLAG_OK) {
-		pcb->programCounter++;
-		logInfo("Incremento el program counter, el nuevo valor es %d", pcb->programCounter);
-		logTrace("INSTRUCCION ANSISOP START");
-		logTrace("Ejecutando %s", instruccion);
-		analizadorLinea(instruccion, &ansisop_funtions,
-				&ansisop_kernelFunctions);
-		logTrace("INSTRUCCION ANSISOP END");
-		free(instruccion);
-	}
+	pcb->programCounter++;
+	logInfo("Incremento el program counter, el nuevo valor es %d",
+			pcb->programCounter);
+	logTrace("====> INSTRUCCION ANSISOP START <===");
+	logTrace("Ejecutando %s", instruccion);
+	analizadorLinea(instruccion, &ansisop_funtions, &ansisop_kernelFunctions);
+	logTrace("===> INSTRUCCION ANSISOP END <===");
+	free(instruccion);
 	pthread_mutex_unlock(&executionMutex);
 	switch (errorFlag) {
 	case FLAG_OK: //caso feliz reporto que finalizo ejecucion de la instruccion

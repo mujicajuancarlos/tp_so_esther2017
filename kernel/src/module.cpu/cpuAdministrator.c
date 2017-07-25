@@ -69,6 +69,7 @@ void addCPU(CPU* cpu) {
  */
 void removeCPU(CPU* cpu) {
 	int cpuFD = cpu->fileDescriptor;
+	close(cpuFD);
 	bool condition(void* element) {
 		CPU* otherCpu = element;
 		return otherCpu->fileDescriptor == cpuFD;
@@ -78,12 +79,8 @@ void removeCPU(CPU* cpu) {
 			sem_wait(&freeCPU_sem);
 		}
 		pthread_mutex_lock(&cpuListMutex);
-		if (list_any_satisfy(cpuList, condition)) {
-			close(cpuFD);
-			list_remove_and_destroy_by_condition(cpuList, condition,
+		list_remove_and_destroy_by_condition(cpuList, condition,
 					(void*) destroyCPU);
-			cpu = NULL;
-		}
 		pthread_mutex_unlock(&cpuListMutex);
 	}
 }

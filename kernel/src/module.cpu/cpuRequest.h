@@ -29,7 +29,7 @@
 
 #define SHARED_VAR_PREFIX "!"
 
-void startProcessExecution(Process* selectedProcess, CPU* selectedCPU);
+void startProcessExecution(Process* selectedProcess, CPU* selectedCPU, int cpuFD);
 
 void continueCurrentExcecution(CPU* cpu);
 void contextSwitch(CPU* cpu);
