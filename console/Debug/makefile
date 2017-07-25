@@ -26,13 +26,13 @@ endif
 all: console
 
 dependents:
-	-cd /home/utnso/tp-2017-1c-Los-5-Fant-sticos/dc-commons/Debug && $(MAKE) clean all
+	-cd /home/utnso/workspace/tp-2017-1c-Los-5-Fant-sticos/dc-commons/Debug && $(MAKE) clean all
 
 # Tool invocations
-console: $(OBJS) $(USER_OBJS) /home/utnso/tp-2017-1c-Los-5-Fant-sticos/dc-commons/Debug/libdc-commons.so
+console: $(OBJS) $(USER_OBJS) /home/utnso/workspace/tp-2017-1c-Los-5-Fant-sticos/dc-commons/Debug/libdc-commons.so
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/utnso/tp-2017-1c-Los-5-Fant-sticos/dc-commons/Debug" -o "console" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/utnso/workspace/tp-2017-1c-Los-5-Fant-sticos/dc-commons/Debug" -o "console" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -43,6 +43,6 @@ clean:
 
 .PHONY: all clean dependents
 .SECONDARY:
-/home/utnso/tp-2017-1c-Los-5-Fant-sticos/dc-commons/Debug/libdc-commons.so:
+/home/utnso/workspace/tp-2017-1c-Los-5-Fant-sticos/dc-commons/Debug/libdc-commons.so:
 
 -include ../makefile.targets

@@ -91,7 +91,6 @@ void handleCommand_dump_cache(memory_struct* memoryStruct, char** commands) {
 				return true;
 		}
 		t_list* displayList;
-		displayList = list_create ();
 		displayList = list_filter (memoryStruct->cacheEntries, onlyValidEntries);
 
 
@@ -110,6 +109,7 @@ void handleCommand_dump_cache(memory_struct* memoryStruct, char** commands) {
 			}
 		}
 		printf ("==================================\n");
+		list_destroy (displayList);
 	} else
 		printInvalidArguments(commands[2], commands[0]);
 }
@@ -124,7 +124,6 @@ void handleCommand_dump_structure(memory_struct* memoryStruct, char** commands) 
 				return true;
 		}
 		t_list* occupiedPages;
-		occupiedPages = list_create ();
 		occupiedPages = list_filter (memoryStruct->referenceTable, onlyOccupiedPages);
 
 		bool onlyUniquePids (void* element) {
@@ -135,7 +134,6 @@ void handleCommand_dump_structure(memory_struct* memoryStruct, char** commands) 
 				return false;
 		}
 		t_list* uniquePids;
-		uniquePids = list_create ();
 		uniquePids = list_filter (occupiedPages, onlyUniquePids);
 
 		printf ("==================================\n");
@@ -155,6 +153,8 @@ void handleCommand_dump_structure(memory_struct* memoryStruct, char** commands) 
 			}
 		}
 		printf ("==================================\n");
+		list_destroy(occupiedPages);
+		list_destroy (uniquePids);
 	} else
 		printInvalidArguments(commands[2], commands[0]);
 }
@@ -181,7 +181,7 @@ void handleCommand_dump_content_all(memory_struct* memoryStruct,
 			return (p->isFree == false);
 		}
 
-		t_list* occupiedPages = list_create ();
+		t_list* occupiedPages;
 		occupiedPages = list_filter (memoryStruct->referenceTable, onlyOccupiedPages);
 
 		printf ("==================================\n");
@@ -195,6 +195,7 @@ void handleCommand_dump_content_all(memory_struct* memoryStruct,
 			}
 		}
 		printf ("==================================\n");
+		list_destroy(occupiedPages);
 	} else
 		printInvalidArguments(commands[3], commands[0]);
 }
@@ -209,7 +210,7 @@ void handleCommand_dump_content_pid(memory_struct* memoryStruct,
 			return (p->pid == pid);
 		}
 
-		t_list* processPages = list_create ();
+		t_list* processPages;
 		processPages = list_filter (memoryStruct->referenceTable, onlyThisProcess);
 
 		printf ("==================================\n");
@@ -226,6 +227,7 @@ void handleCommand_dump_content_pid(memory_struct* memoryStruct,
 			}
 		}
 		printf ("==================================\n");
+		list_destroy(processPages);
 	} else
 		printInvalidArguments(commands[3], commands[0]);
 }
@@ -298,7 +300,7 @@ void handleCommand_size_pid(memory_struct* memoryStruct, char** commands) {
 			memory_page* page = element;
 			return (page->pid == pid);
 		}
-		t_list* processPages = list_create();
+		t_list* processPages;
 		processPages = list_filter (memoryStruct->referenceTable, justThisProcess);
 		uint32_t processSize = memoryStruct->config->marco_size * list_size (processPages);
 		printf ("==================================\n");
@@ -309,6 +311,7 @@ void handleCommand_size_pid(memory_struct* memoryStruct, char** commands) {
 		else
 			printf("El tamaño del proceso en memoria es de %i bytes\n", processSize);
 		printf ("==================================\n");
+		list_destroy(processPages);
 	} else
 		printInvalidArguments("", commands[0]);
 }

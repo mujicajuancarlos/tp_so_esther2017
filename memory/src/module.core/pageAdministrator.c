@@ -76,7 +76,6 @@ int processRead(memory_struct* memoryStruct, t_PageBytes* dataInfo) {
 int assignNewPages(memory_struct* memoryStruct, int processId, int pages) {
 	/* asigno paginas nuevas a un proceso si me pide el kernel*/
 	t_list* myProcessPages;
-	myProcessPages = list_create();
 
 	bool onlyThisProcess(void* element) {
 		memory_page* page = element;
@@ -103,7 +102,6 @@ int assignNewPages(memory_struct* memoryStruct, int processId, int pages) {
 	}
 
 	t_list *freePages;
-	freePages = list_create();
 
 	bool onlyFreePages(void* element) {
 		memory_page* page = element;
@@ -127,9 +125,13 @@ int assignNewPages(memory_struct* memoryStruct, int processId, int pages) {
 					"Se crea pagina nro %i para proceso nro %i. Pagina global: %i\n",
 					newPage->procPage, newPage->pid, newPage->globPage);
 		}
+		list_destroy (myProcessPages);
+		list_destroy (freePages);
 		return 0;
 	} else {
 		logError("No hay tantas paginas disponibles");
+		list_destroy (myProcessPages);
+		list_destroy (freePages);
 		return (-1);
 	}
 }
@@ -145,7 +147,7 @@ void freePage(memory_struct* memoryStruct, int processId, int procPage) {
 
 void terminateProcess(memory_struct *memoryStruct, int processId) {
 	t_list* thisProcessPages;
-	thisProcessPages = list_create();
+	// thisProcessPages = list_create();
 
 	bool onlyThisProcess(void* element) {
 		memory_page* page = element;
@@ -163,4 +165,5 @@ void terminateProcess(memory_struct *memoryStruct, int processId) {
 		}
 	}
 	logInfo("El proceso %i ha sido terminado", processId);
+	list_destroy (thisProcessPages);
 }
