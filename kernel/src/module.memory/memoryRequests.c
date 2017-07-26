@@ -269,15 +269,75 @@ void sendHeapMetadata(Process* process, heap_page* page,
 	bool hasError = false;
 	char* buffer = serializeHeapMetadata(metadata);
 
-	logInfo("Enviando heap metadata de pagina: %d offset: %d size: 5 para el proceso %d",
-			page->page + startHeapPageNumber, metadata->dataOffset, process->pid);
+	logInfo(
+			"Enviando a memoria el heap metadata de pagina: %d offset: %d size: 5 para el proceso %d",
+			page->page + startHeapPageNumber, metadata->dataOffset - 5,
+			process->pid);
 	logTrace("El contenido de la metadata enviada es dataSize: %d free: %s",
 			metadata->dataSize, metadata->isFree ? "true" : "false");
 
-	saveDataOnMemory(process, page->page + startHeapPageNumber, metadata->dataOffset, 5,
-			buffer, &hasError);
+	saveDataOnMemory(process, page->page + startHeapPageNumber,
+			metadata->dataOffset, 5, buffer, &hasError);
 	logInfo("Se envio los metadatos del heap para el proceso %d", process->pid);
 	free(buffer);
+}
+
+void readHeapMetadata(Process* process, heap_page* page,
+		heap_metadata* metadata) {
+	uint32_t startHeapPageNumber = getStartHeapPageNumber(process);
+	logInfo(
+			"Solicitando a memoria el heap metadata de pagina: %d offset: %d size: 5 para el proceso %d",
+			page->page + startHeapPageNumber, metadata->dataOffset - 5,
+			process->pid);
+	char* buffer = getDataFromPage(process, page->page + startHeapPageNumber, metadata->dataOffset - 5, 5);
+	logTrace("El contenido de la metadata leia es dataSize: %d free: %s",
+			metadata->dataSize, metadata->isFree ? "true" : "false");
+	free(buffer);
+}
+
+/**
+ * ojo que por ahora no maneja errores
+ */
+char* getDataFromPage(Process* process, int pageNumber, int offset, int size) {
+	memoryRequestMutex_lock();
+	Package* package;
+	size_t bufferSize = sizeof(char) * size;
+	char* buffer = malloc(bufferSize);
+	t_PageBytes* data = create_t_PageBytes(process->pid, pageNumber, offset,
+			size, buffer);
+	char* serializedData = serialize_t_PageBytes(data);
+	size_t serializedSize = sizeof_t_PageBytes(data);
+	logTrace("Solicitando datos para pid: %d pag: %d offset: %d size: %d",
+			process->pid, pageNumber, offset, size);
+	package = createAndSendPackage(process->kernelStruct->socketClientMemoria,
+	COD_GET_PAGE_BYTES_REQUEST, serializedSize, serializedData);
+	free(serializedData);
+	destroy_t_PageBytes(data);
+	if (package != NULL) {
+		destroyPackage(package);
+		package = createAndReceivePackage(
+				process->kernelStruct->socketClientMemoria);
+		if (package != NULL) {
+			switch (package->msgCode) {
+			case COD_GET_PAGE_BYTES_RESPONSE:
+				logInfo(
+						"Solicitud de datos realizada para pid: %d pag: %d offset: %d size: %d",
+						process->pid, pageNumber, offset, size);
+				data = deserialize_t_PageBytes(package->stream);
+				memcpy(buffer, data->buffer, bufferSize);
+				destroy_t_PageBytes(data);
+				break;
+			}
+			destroyPackage(package);
+		} else {
+			logError("No se pudo recibir la solicitud a la memoria");
+		}
+
+	} else {
+		logError("No se pudo enviar la solicitud a la memoria");
+	}
+	memoryRequestMutex_unlock();
+	return buffer;
 }
 
 /**

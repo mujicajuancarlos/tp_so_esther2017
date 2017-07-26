@@ -41,7 +41,12 @@ void freePageForProcess(Process* process, int pageNumber, int* status);
 void notifyEndProcessToMemory(Process* process);
 
 void sendSourceCodeForNewProcess(Process* process, Package* package);
-void sendHeapMetadata(Process* process, heap_page* page, heap_metadata* metadata);
+void sendHeapMetadata(Process* process, heap_page* page,
+		heap_metadata* metadata);
+void readHeapMetadata(Process* process, heap_page* page,
+		heap_metadata* metadata);
+
+char* getDataFromPage(Process* process, int pageNumber, int offset, int size);
 
 void saveDataOnMemory(Process* process, int startPage, u_int32_t offset,
 		t_size length, char* buffer, bool* hasError);

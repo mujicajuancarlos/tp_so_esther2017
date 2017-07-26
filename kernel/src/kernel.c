@@ -22,7 +22,8 @@ int main(int argc, char *argv[]) {
 	logInfo("Inicializado proceso kernel");
 	initializeStruct(&kernelStruct, config);
 
-	logInfo("Creando el hilo para monitorizar cambios en el achivo de confguracion");
+	logInfo(
+			"Creando el hilo para monitorizar cambios en el achivo de confguracion");
 	pthread_t hiloInotify;
 	pthread_create(&hiloInotify, NULL, (void*) configMonitor, config);
 
@@ -77,10 +78,6 @@ void initializeStruct(kernel_struct* kernelStruct, Configuration* config) {
 }
 
 void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config) {
-
-	free(kernelStruct);
-	free(config);
-
 	destroyCurrentPidMutex();
 	destroyScheduler();
 	destroyCpuAdministrator();
@@ -88,6 +85,7 @@ void destroyKernelStructs(kernel_struct* kernelStruct, Configuration* config) {
 	destroyMemoryRequestMutex();
 	destroyFileSystemRequestMutex();
 	destroyExcecuteContinueMutex();
+	free(config);
 }
 
 kernel_struct* getKernelStruct() {

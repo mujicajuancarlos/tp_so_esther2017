@@ -41,6 +41,7 @@ int basicFreeMemory(Process* process, t_puntero pointer) {
 		heap_metadata* metadata = getHeapMetadataFromDataOffset(page,
 				address.offset, &index);
 		if (metadata != NULL) {
+			readHeapMetadata(process, page, metadata);
 			metadata->isFree = true;
 			incrementCounter(&(process->processCounters->freeSize_Counter),
 							metadata->dataSize);
@@ -106,12 +107,14 @@ void resolveFragmentation(Process* process, heap_page* page) {
 			}
 			while (next != NULL && next->isFree) {
 				logTrace(
-						"Se detecto el bloque de metadatos #%d tambien esta libre, se eliminara e incorporara en metadatos #%d",
+						"Se detecto el bloque de metadatos #%d tambien esta libre, se compactara el bloque e incorporara en metadatos #%d",
 						nextIndex, currentIndex);
 				current->dataSize = current->dataSize + next->dataSize
 						+ sizeof_heapMetadata();
-				logTrace("Se trasfirio %d bytes al bloque #%d",
+
+				logTrace("Se va transferir %d bytes al bloque #%d",
 						next->dataSize + sizeof_heapMetadata(), currentIndex);
+				sendHeapMetadata(process, page, current);
 				logTrace("El bloque #%d ahora tiene %d bytes libres",
 						currentIndex, current->dataSize);
 				list_remove_and_destroy_element(page->metadataList, nextIndex,
