@@ -14,6 +14,8 @@ memory_struct memoryStruct;
 
 int main(int argc, char *argv[]) {
 
+	atexit (atExitCleanup);
+
 	Configuration* config = config_with(argc > 1 ? argv[1] : NULL);
 	initLogMutex(config->log_file, config->log_program_name,
 			config->log_print_console,
@@ -123,4 +125,16 @@ void initializeStruct(memory_struct* memoryStruct, Configuration* config) {
 		cache_entry *c = list_get (memoryStruct->cacheEntries, i);
 		logTrace ("Pagina de memoria: %i Proceso: %i Pagina %i Direccion: %p", c->globPage, c->pid, c->procPage, c);
 	}
+}
+
+void atExitCleanup () {
+	free (memoryStruct.memory);
+	list_destroy(memoryStruct.listaCPUs);
+	list_destroy(memoryStruct.cacheEntries);
+	list_destroy(memoryStruct.referenceTable);
+	free (memoryStruct.config->log_file);
+	free (memoryStruct.config->log_level);
+	free (memoryStruct.config->log_program_name);
+	free (memoryStruct.config->reemplazo_cache);
+	free (memoryStruct.config);
 }

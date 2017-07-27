@@ -25,4 +25,6 @@ void createMemoryServerSocket(memory_struct* memoryStruct);
 
 void initializeStruct(memory_struct* memoryStruct, Configuration* config);
 
+void atExitCleanup ();
+
 #endif /* MEMORY_H_ */
