@@ -31,6 +31,7 @@ void loadMemoryPageSize(cpu_struct* cpuStruct) {
 		logError("La memoria respondio con una accion no permitida.");
 		exit(ERROR_UNKNOWN_MESSAGE_CODE);
 	}
+	destroyPackage(package);
 }
 
 char* getDataFromPage(cpu_struct* cpuStruct, int pageNumber, int offset,

@@ -52,9 +52,11 @@ void loadPCB(PCB* newPCB) {
 }
 
 void unloadPCB() {
-	destroy_PBC(pcb);
-	pcb = NULL;
-	logTrace("Se descargo el pcb");
+	if (pcb != NULL) {
+		destroy_PBC(pcb);
+		pcb = NULL;
+		logTrace("Se descargo el pcb");
+	}
 }
 
 void setStackPageSize(int size) {
