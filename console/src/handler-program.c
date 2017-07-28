@@ -26,7 +26,8 @@ int handleNewProgram(Program* program) {
 	//armo paquete y lo envio, verifico que no se produzca errores
 	logDebug("Creando paquete de inicio de programa para enviar a kernel.");
 	fsize = fileSize(program->sourceCodePath);
-	char* stream = readFile(program->sourceCodePath, 0, fsize);
+	char *stream;
+	stream = readFile(program->sourceCodePath, 0, fsize);
 	package = createAndSendPackage(program->fd_client,
 	COD_KC_RUN_PROGRAM_REQUEST, fsize, stream);
 	free(stream);
