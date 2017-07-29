@@ -279,7 +279,7 @@ void sendHeapMetadata(Process* process, heap_page* page,
 			metadata->dataSize, metadata->isFree ? "true" : "false");
 
 	saveDataOnMemory(process, page->page + startHeapPageNumber,
-			metadata->dataOffset, 5, buffer, &hasError);
+			metadata->dataOffset - 5, 5, buffer, &hasError);
 	logInfo("Se envio los metadatos del heap para el proceso %d", process->pid);
 	free(buffer);
 }
@@ -293,7 +293,7 @@ void readHeapMetadata(Process* process, heap_page* page,
 			process->pid);
 	char* buffer = getDataFromPage(process, page->page + startHeapPageNumber, metadata->dataOffset - 5, 5);
 	logTrace("El contenido de la metadata leia es dataSize: %d free: %s",
-			metadata->dataSize, metadata->isFree ? "true" : "false");
+			metadata->dataOffset - 5, metadata->isFree ? "true" : "false");
 	free(buffer);
 }
 
