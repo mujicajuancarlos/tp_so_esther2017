@@ -79,12 +79,15 @@ int sendMessage(int socket, char *buffer, int sizeOfMessage, int flags) {
 
 	int total_bytes_written = 0;
 	int bytes_written = 0;
-	char *aux_buffer = buffer;
+	char* copyBuffer = malloc(sizeof(char)*sizeOfMessage + 1);
+	memcpy(copyBuffer,buffer,sizeOfMessage);
+	copyBuffer[sizeOfMessage] = '\0';
+	char *aux_buffer = copyBuffer;
 
 	if ((socket == -1) || (buffer == NULL) || (sizeOfMessage < 1)) {
 		logError(
 				"Error de parametros. No se puede enviar porque FD->%d message->%s Tamaño->%d\n",
-				socket, buffer, sizeOfMessage);
+				socket, copyBuffer, sizeOfMessage);
 		return SEND_OR_RECEIVE_FAILURE;
 	}
 
@@ -120,6 +123,7 @@ int sendMessage(int socket, char *buffer, int sizeOfMessage, int flags) {
 				socket, total_bytes_written, sizeOfMessage);
 		return SEND_OR_RECEIVE_FAILURE;
 	}
+	free(copyBuffer);
 
 	return total_bytes_written;
 }

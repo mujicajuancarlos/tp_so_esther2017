@@ -46,8 +46,9 @@ void handleNewCPU(CPU* newCpu) {
 	}
 	free(tmpBuffer);
 	destroyPackage(package);
+	int cpuFD = newCpu->fileDescriptor;
 	while (running) {
-		package = createAndReceivePackage(newCpu->fileDescriptor);
+		package = createAndReceivePackage(cpuFD);
 		if (package != NULL) {
 			handleCPURequest(newCpu, package);
 		} else {
@@ -59,6 +60,7 @@ void handleNewCPU(CPU* newCpu) {
 				logInfo("Se desconecto la cpu con FD: %d",
 						newCpu->fileDescriptor);
 				removeCPU(newCpu);
+				newCpu = NULL;
 			}
 		}
 		destroyPackage(package);

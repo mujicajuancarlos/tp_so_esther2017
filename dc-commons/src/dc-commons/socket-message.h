@@ -15,6 +15,7 @@
 #include <sys/socket.h>
 
 #include <commons/error.h>
+#include <commons/string.h>
 #include "logger.h"
 
 #include "package.h"

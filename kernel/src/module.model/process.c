@@ -69,9 +69,14 @@ void freeProcessResources(Process* process) {
 		if (process->files != NULL) {
 			freeProcessFilesResources(process);
 		}
-	}else{
-		list_destroy(process->heapPages);
-		list_destroy(process->files);
+		process->pcb = NULL;
+	} else {
+		if (process->heapPages != NULL) {
+			list_destroy(process->heapPages);
+		}
+		if (process->files != NULL) {
+			list_destroy(process->files);
+		}
 	}
 	notifyEndProcessToConsole(process);
 	notifyEndProcessToMemory(process);
@@ -133,7 +138,8 @@ void createPcbForNewProcess(Process* process, Package* sourceCodePackage) {
 
 	logInfo("Generando la metadata para el proceso %d", process->pid);
 	char* sourceCode;
-	sourceCode = string_substring_until(sourceCodePackage->stream,sourceCodePackage->size);
+	sourceCode = string_substring_until(sourceCodePackage->stream,
+			sourceCodePackage->size);
 	t_metadata_program* metadata = metadata_desde_literal(sourceCode);
 	free(sourceCode);
 	uint32_t stackFirstPage =
@@ -182,8 +188,9 @@ void removeAndDestroyFile(Process* process, t_processFile* file) {
 /**
  * retorna el numero de pagina inicial para heap
  */
-int getStartHeapPageNumber(Process* process){
-	return process->pcb->stackFirstPage + process->kernelStruct->config->stack_size;
+int getStartHeapPageNumber(Process* process) {
+	return process->pcb->stackFirstPage
+			+ process->kernelStruct->config->stack_size;
 }
 
 void printHeaderProcess() {
@@ -276,8 +283,8 @@ void printQuitStatusToProcess(Process* process) {
 				void printNotFreeBlock(void* blockElement) {
 					heap_metadata* block = blockElement;
 					if (!block->isFree) {
-						printf("\t%5d %6d %5d\n", page->page + startPageNumber, block->dataOffset,
-								block->dataSize);
+						printf("\t%5d %6d %5d\n", page->page + startPageNumber,
+								block->dataOffset, block->dataSize);
 					}
 				}
 				list_iterate(page->metadataList, printNotFreeBlock);
