@@ -90,10 +90,12 @@ void resolveFragmentation(Process* process, heap_page* page) {
 	heap_metadata* next = NULL;
 	int currentIndex = 0;
 	int nextIndex = 0;
-	logTrace("Iniciando algoritmo de optimizacion en la pagina heap #%d",
-			page->page);
+	int heapPageNumber = getStartHeapPageNumber(process);
+	logTrace("Iniciando algoritmo de <<COMPACTACION>> en la pagina heap #%d",
+			heapPageNumber);
 	current = list_get(page->metadataList, currentIndex);
 	while (current != NULL) {
+		readHeapMetadata(process,page,current);
 		if (current->isFree) {
 			logTrace(
 					"El bloque de metadatos #%d esta libre se buscara optimizar los bloques siguientes",
@@ -101,11 +103,15 @@ void resolveFragmentation(Process* process, heap_page* page) {
 			nextIndex = currentIndex + 1;
 			next = list_get(page->metadataList, nextIndex);
 			if (next == NULL || !next->isFree) {
+				if(next != NULL){
+					readHeapMetadata(process,page,next);
+				}
 				logTrace(
 						"El siguiente bloque #%d no existe o no estaba libre, no se podra compactar",
 						nextIndex);
 			}
 			while (next != NULL && next->isFree) {
+				readHeapMetadata(process,page,next);
 				logTrace(
 						"Se detecto el bloque de metadatos #%d tambien esta libre, se compactara el bloque e incorporara en metadatos #%d",
 						nextIndex, currentIndex);
@@ -129,8 +135,8 @@ void resolveFragmentation(Process* process, heap_page* page) {
 		currentIndex++;
 		current = list_get(page->metadataList, currentIndex);
 	}
-	logTrace("Finalizo el algoritmo de optimizacion en la pagina heap #%d",
-			page->page);
+	logTrace("Finalizo el algoritmo de <<COMPACTACION>> en la pagina heap #%d",
+			heapPageNumber);
 }
 
 void saveAlloc(int allocSize, heap_metadata* metadata, int index,
