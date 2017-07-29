@@ -293,7 +293,7 @@ void readHeapMetadata(Process* process, heap_page* page,
 			process->pid);
 	char* buffer = getDataFromPage(process, page->page + startHeapPageNumber, metadata->dataOffset - 5, 5);
 	logTrace("El contenido de la metadata leia es dataSize: %d free: %s",
-			metadata->dataOffset - 5, metadata->isFree ? "true" : "false");
+			metadata->dataOffset, metadata->isFree ? "true" : "false");
 	free(buffer);
 }
 
