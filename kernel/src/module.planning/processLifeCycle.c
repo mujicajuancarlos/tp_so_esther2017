@@ -58,6 +58,7 @@ void moveFromNewToExit(Process* process) {
 	sendToEXIT(process);
 	setForceExitCode(process);
 	freeProcessResources(process);
+	_incrementMultiprogrammingLevel();
 }
 
 void moveFromReadyToExit(Process* process) {
