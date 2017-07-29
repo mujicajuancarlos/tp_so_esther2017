@@ -137,6 +137,7 @@ void saveAlloc(int allocSize, heap_metadata* metadata, int index,
 		heap_page* page, Process* process) {
 	metadata->dataSize = allocSize;
 	metadata->isFree = false;
+	sendHeapMetadata(process, page, metadata);
 	createHeapMetadataFor(page, metadata, index, process);
 }
 
