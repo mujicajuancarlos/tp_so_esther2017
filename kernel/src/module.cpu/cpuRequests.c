@@ -17,11 +17,11 @@ void startProcessExecution(Process* selectedProcess, CPU* selectedCPU, int cpuFD
 			selectedCPU->fileDescriptor);
 	char* buffer = serialize_PCB(selectedProcess->pcb);
 	uint32_t size = sizeOf_PCB(selectedProcess->pcb);
+	selectedCPU->process = selectedProcess;
 	Package* package = createAndSendPackage(cpuFD,
 	COD_EXEC_NEW_PCB, size, buffer);
-	if (package != NULL) {
-		selectedCPU->process = selectedProcess;
-	} else {
+	if (package == NULL) {
+		selectedCPU->process = NULL;
 		logError("La CPU no pudo recibir la solicitud de ejecutar el proceso.");
 		moveFromExcecToReady(selectedProcess);
 		logInfo("Finalizando la CPU que no acepta solicitudes");

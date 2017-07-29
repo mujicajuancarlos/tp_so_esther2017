@@ -8,17 +8,18 @@
 #include "package.h"
 
 Package* createPackage(uint32_t msgCode, uint32_t size, char* stream) {
-	Package *package = calloc(1, sizeof(Package));
+	Package *package = malloc(sizeof(Package));
 	size_t sizeBuffer = (sizeof(char) * size);
-	package->stream = calloc(1, sizeBuffer);
+	package->stream = malloc(sizeBuffer + 1);
 	memcpy(package->stream, stream, sizeBuffer);
+	(package->stream)[sizeBuffer] = '\0';
 	package->size = size;
 	package->msgCode = msgCode;
 	return package;
 }
 
 Package* createEmptyPackage() {
-	Package *package = calloc(1, sizeof(Package));
+	Package *package = malloc(sizeof(Package));
 	package->stream = NULL;
 	package->size = 0;
 	package->msgCode = 0;
@@ -43,7 +44,7 @@ void destroyPackage(Package* package) {
 
 char* serializePackage(Package *package){
 
-	char *serializedPackage = calloc(1,sizePackage(package));
+	char *serializedPackage = malloc(sizePackage(package));
 
 	int offset = 0;
 	size_t size_to_send;

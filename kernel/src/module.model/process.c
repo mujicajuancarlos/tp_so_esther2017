@@ -132,9 +132,10 @@ void markForcedQuitProcess(Process* process) {
 void createPcbForNewProcess(Process* process, Package* sourceCodePackage) {
 
 	logInfo("Generando la metadata para el proceso %d", process->pid);
-	t_metadata_program* metadata = metadata_desde_literal(
-			sourceCodePackage->stream);
-
+	char* sourceCode;
+	sourceCode = string_substring_until(sourceCodePackage->stream,sourceCodePackage->size);
+	t_metadata_program* metadata = metadata_desde_literal(sourceCode);
+	free(sourceCode);
 	uint32_t stackFirstPage =
 			(sourceCodePackage->size % process->kernelStruct->pageSize) ? 1 : 0;
 	stackFirstPage += sourceCodePackage->size / process->kernelStruct->pageSize;

@@ -250,8 +250,10 @@ void sendSourceCodeForNewProcess(Process* process, Package* sourceCodePackage) {
 
 	logInfo("Enviando el codigo fuente a la memoria para el pid: %d",
 			process->pid);
-	saveDataOnMemory(process, 0, 0, sourceCodePackage->size,
-			sourceCodePackage->stream, &hasError);//startPage 0 porque se trata del codigo
+	char* sourceCode;
+	sourceCode = string_substring_until(sourceCodePackage->stream, sourceCodePackage->size);
+	saveDataOnMemory(process, 0, 0, sourceCodePackage->size, sourceCode, &hasError);//startPage 0 porque se trata del codigo
+	free(sourceCode);
 	logInfo("Se envio el codigo fuente a la memoria para el pid: %d",
 			process->pid);
 	if (hasError) {
